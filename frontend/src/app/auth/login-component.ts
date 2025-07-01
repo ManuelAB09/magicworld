@@ -1,46 +1,53 @@
 import { Component } from '@angular/core';
 import { AuthService } from './auth-service';
-import {FormsModule} from '@angular/forms';
-
+import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
+import { ErrorService } from '../error/error-service';
 @Component({
   selector: 'app-login',
   imports: [
-    FormsModule
+    FormsModule,
+    TranslateModule
   ],
   template: `
     <div class="login-background">
       <form class="auth-form" (ngSubmit)="onLogin()">
-       <h2>Login</h2>
-       <label for="username">Username</label>
-       <input id="username" [(ngModel)]="username" name="username" required />
+        <h2>{{ 'LOGIN.TITLE' | translate }}</h2>
+        <label for="username">{{ 'LOGIN.USERNAME' | translate }}</label>
+        <input id="username" [(ngModel)]="username" name="username" required />
 
-       <label for="password">Password</label>
-       <input id="password" [(ngModel)]="password" name="password" type="password" required />
-       @if (errorMessage) {
-         <div class="error">{{ errorMessage }}</div>
-       }
-       <button type="submit">Login</button>
-    </form>
-  </div>
+        <label for="password">{{ 'LOGIN.PASSWORD' | translate }}</label>
+        <input id="password" [(ngModel)]="password" name="password" type="password" required />
+        @if (errorCode) {
+          <div class="error">{{ errorCode | translate:errorArgs }}</div>
+        }
+        <button type="submit">{{ 'LOGIN.BUTTON' | translate }}</button>
+      </form>
+    </div>
   `,
   styleUrls: ['../static/css/login.component.css']
 })
 export class LoginComponent {
   username = '';
   password = '';
-  errorMessage = '';
-  constructor(private auth: AuthService) {}
+  errorCode: string|null = null;
+  errorArgs: any = {};
+
+  constructor(private auth: AuthService, private errorService: ErrorService) {}
 
   onLogin() {
-    this.auth.login({ username: this.username, password: this.password }).subscribe({
-      next: res => {
-        console.log('Login successful', res);
-        this.auth.notifyAuthChanged(true);
-        this.errorMessage = '';
-      },
-      error: err => {
-        this.errorMessage = err.error?.message || 'Unexpected error occurred';
-      }
-    });
+    this.auth.login({ username: this.username, password: this.password })
+      .subscribe({
+        next: () => {
+          this.errorCode = null;
+          this.errorArgs = {};
+          this.auth.notifyAuthChanged(true);
+        },
+        error: err => {
+          const { code, args } = this.errorService.handleError(err);
+          this.errorCode = code;
+          this.errorArgs = args;
+        }
+      });
   }
 }

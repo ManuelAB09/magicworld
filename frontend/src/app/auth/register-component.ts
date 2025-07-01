@@ -1,36 +1,38 @@
 import { Component } from '@angular/core';
 import { AuthService } from './auth-service';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
+import {ErrorService} from '../error/error-service';
 
 @Component({
   selector: 'app-register',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslateModule],
   template: `
     <div class="register-background">
       <form class="auth-form" (ngSubmit)="onRegister()">
-        <h2>Register</h2>
-        <label for="username">Username</label>
+        <h2>{{ 'REGISTER.TITLE' | translate }}</h2>
+        <label for="username">{{ 'REGISTER.USERNAME' | translate }}</label>
         <input id="username" [(ngModel)]="username" name="username" required/>
 
-        <label for="firstname">First Name</label>
+        <label for="firstname">{{ 'REGISTER.FIRSTNAME' | translate }}</label>
         <input id="firstname" [(ngModel)]="firstname" name="firstname" required/>
 
-        <label for="lastname">Last Name</label>
+        <label for="lastname">{{ 'REGISTER.LASTNAME' | translate }}</label>
         <input id="lastname" [(ngModel)]="lastname" name="lastname" required/>
 
-        <label for="email">Email</label>
+        <label for="email">{{ 'REGISTER.EMAIL' | translate }}</label>
         <input id="email" [(ngModel)]="email" name="email" required/>
 
-        <label for="password">Password</label>
+        <label for="password">{{ 'REGISTER.PASSWORD' | translate }}</label>
         <input id="password" [(ngModel)]="password" name="password" type="password" required/>
 
-        <label for="confirmPassword">Confirm Password</label>
+        <label for="confirmPassword">{{ 'REGISTER.CONFIRM' | translate }}</label>
         <input id="confirmPassword" [(ngModel)]="confirmPassword" name="confirmPassword" type="password" required/>
 
-        @if (errorMessage) {
-          <div class="error">{{ errorMessage }}</div>
+        @if (errorCode) {
+          <div class="error">{{ errorCode | translate:errorArgs }}</div>
         }
-        <button type="submit">Register</button>
+        <button type="submit">{{ 'REGISTER.BUTTON' | translate }}</button>
       </form>
     </div>
   `,
@@ -43,9 +45,10 @@ export class RegisterComponent {
   email = '';
   password = '';
   confirmPassword = '';
-  errorMessage = '';
+  errorCode: string|null = null;
+  errorArgs: any = {};
 
-  constructor(private auth: AuthService) {}
+  constructor(private errorService: ErrorService, private auth: AuthService) {}
 
   onRegister() {
     this.auth.register({
@@ -56,13 +59,15 @@ export class RegisterComponent {
       password: this.password,
       confirmPassword: this.confirmPassword
     }).subscribe({
-      next: res => {
-        console.log('Register succesfull', res);
+      next: () => {
         this.auth.notifyAuthChanged(true);
-        this.errorMessage = '';
+        this.errorCode = null;
+        this.errorArgs = {};
       },
       error: err => {
-        this.errorMessage = err.error?.message || 'Unexpected error occurred';
+        const { code, args } = this.errorService.handleError(err);
+        this.errorCode = code;
+        this.errorArgs = args;
       }
     });
   }

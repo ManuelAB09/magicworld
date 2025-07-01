@@ -88,6 +88,7 @@ export class AuthService {
       })
     );
   }
+
   notifyAuthChanged(isAuth: boolean) {
     this.authChanged.next(isAuth);
   }

@@ -1,0 +1,35 @@
+{
+  "LOGIN": {
+    "TITLE": "Iniciar sesión",
+    "USERNAME": "Usuario",
+    "PASSWORD": "Contraseña",
+    "BUTTON": "Entrar"
+  },
+  "REGISTER": {
+    "TITLE": "Registro",
+    "USERNAME": "Usuario",
+    "FIRSTNAME": "Nombre",
+    "LASTNAME": "Apellido",
+    "EMAIL": "Correo electrónico",
+    "PASSWORD": "Contraseña",
+    "CONFIRM": "Confirmar contraseña",
+    "BUTTON": "Registrarse"
+  },
+  "NAV": {
+    "LOGIN": "Iniciar sesión",
+    "REGISTER": "Registrarse",
+    "LOGOUT": "Cerrar sesión",
+    "SEASON_PASS": "Pase de temporada",
+    "TICKETS": "Entradas",
+    "HOTEL_PACK": "Hotel + Entradas",
+    "SCHOOL_GROUPS": "Grupos escolares"
+  },
+  "error.resource.not.found": "Recurso no encontrado: {{0}}",
+  "error.invalid.credentials": "Credenciales inválidas",
+  "error.password.do.not.match": "Las contraseñas no coinciden",
+  "error.username.already.exists": "El usuario ya está registrado: {{0}}",
+  "error.email.already.exists": "El correo ya está registrado: {{0}}",
+  "error.validation": "Error de validación: {{0}}",
+  "error.internal": "Ha ocurrido un error interno",
+  "error.unexpected": "Error inesperado"
+}
