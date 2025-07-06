@@ -29,7 +29,21 @@
   "error.password.do.not.match": "Passwords do not match",
   "error.username.already.exists": "Username already registered: {{0}}",
   "error.email.already.exists": "Email already registered: {{0}}",
-  "error.validation": "Validation error: {{0}}",
+  "error.validation": "Validation error:",
   "error.internal": "An internal error occurred",
-  "error.unexpected": "Unexpected error"
+  "error.unexpected": "Unexpected error",
+  "validation.username.required": "Username is required",
+  "validation.username.size": "Username must be between 1 and 50 characters",
+  "validation.firstname.required": "First name is required",
+  "validation.firstname.size": "First name must be between 1 and 50 characters",
+  "validation.firstname.pattern": "First name must contain only letters and valid characters",
+  "validation.lastname.required": "Last name is required",
+  "validation.lastname.size": "Last name must be between 1 and 50 characters",
+  "validation.lastname.pattern": "Last name must contain only letters and valid characters",
+  "validation.email.required": "Email is required",
+  "validation.email.invalid": "Email should be valid",
+  "validation.password.required": "Password is required",
+  "validation.password.size": "Password must be between 8 and 100 characters",
+  "validation.password.pattern": "Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long.",
+  "validation.confirmPassword.required": "Confirm password is required"
 }

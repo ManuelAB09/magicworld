@@ -26,9 +26,10 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + request.getUsername()));
+                .orElseThrow(() -> new ResourceNotFoundException(request.getUsername()));
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException("Invalid credentials");
+            throw new InvalidCredentialsException();
         }
 
         String token = jwtService.getToken(user);
@@ -39,13 +40,13 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UsernameAlreadyExistsException("Name already registered");
+            throw new UsernameAlreadyExistsException(request.getUsername());
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new EmailAlreadyExistsException("Email already registered");
+            throw new EmailAlreadyExistsException(request.getEmail());
         }
         if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new PasswordsDoNoMatchException("Passwords do not match");
+            throw new PasswordsDoNoMatchException();
         }
 
         User user = User.builder()
@@ -61,6 +62,7 @@ public class AuthService {
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
         }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
 
@@ -68,10 +70,11 @@ public class AuthService {
                 .token(jwtService.getToken(user))
                 .build();
     }
+
     public UserDTO getCurrentUser(String token) {
         String username = jwtService.getUsernameFromToken(token);
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+                .orElseThrow(() -> new ResourceNotFoundException(username));
 
         return new UserDTO(user.getUsername(), user.getFirstname(), user.getLastname(), user.getEmail());
     }

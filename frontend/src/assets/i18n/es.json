@@ -31,5 +31,19 @@
   "error.email.already.exists": "El correo ya está registrado: {{0}}",
   "error.validation": "Error de validación: {{0}}",
   "error.internal": "Ha ocurrido un error interno",
-  "error.unexpected": "Error inesperado"
+  "error.unexpected": "Error inesperado",
+  "validation.username.required": "El usuario es obligatorio",
+  "validation.username.size": "El usuario debe tener entre 1 y 50 caracteres",
+  "validation.firstname.required": "El nombre es obligatorio",
+  "validation.firstname.size": "El nombre debe tener entre 1 y 50 caracteres",
+  "validation.firstname.pattern": "El nombre solo puede contener letras y caracteres válidos",
+  "validation.lastname.required": "El apellido es obligatorio",
+  "validation.lastname.size": "El apellido debe tener entre 1 y 50 caracteres",
+  "validation.lastname.pattern": "El apellido solo puede contener letras y caracteres válidos",
+  "validation.email.required": "El correo electrónico es obligatorio",
+  "validation.email.invalid": "El correo electrónico debe ser válido",
+  "validation.password.required": "La contraseña es obligatoria",
+  "validation.password.size": "La contraseña debe tener entre 8 y 100 caracteres",
+  "validation.password.pattern": "La contraseña debe tener al menos una mayúscula, una minúscula, un número, un carácter especial y mínimo 8 caracteres",
+  "validation.confirmPassword.required": "La confirmación de la contraseña es obligatoria"
 }

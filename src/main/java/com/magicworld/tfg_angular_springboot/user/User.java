@@ -23,29 +23,28 @@ import java.util.List;
 public class User extends BaseEntity implements UserDetails {
 
     @Column(unique = true, nullable = false)
-    @NotBlank(message = "Username cannot be blank")
-    @Size(min = 1, max = 50, message = "Username must be between 1 and 50 characters")
+    @NotBlank(message = "validation.username.required")
+    @Size(min = 1, max = 50, message = "validation.username.size")
     private String username;
 
-    @NotBlank(message = "Firstname cannot be blank")
-    @Size(min = 1, max = 50, message = "Firstname must be between 1 and 50 characters")
-    @Pattern(regexp = "^[\\p{L}\\s'-]+$", message = "Firstname must contain only letters and valid characters")
+    @NotBlank(message = "validation.firstname.required")
+    @Size(min = 1, max = 50, message = "validation.firstname.size")
+    @Pattern(regexp = "^[\\p{L}\\s'-]+$", message = "validation.firstname.pattern")
     @Column(nullable = false)
     private String firstname;
 
-    @NotBlank(message = "Lastname cannot be blank")
-    @Size(min = 1, max = 50, message = "Lastname must be between 1 and 50 characters")
-    @Pattern(regexp = "^[\\p{L}\\s'-]+$", message = "Lastname must contain only letters and valid characters")
+    @NotBlank(message = "validation.lastname.required")
+    @Size(min = 1, max = 50, message = "validation.lastname.size")
+    @Pattern(regexp = "^[\\p{L}\\s'-]+$", message = "validation.lastname.pattern")
     @Column(nullable = false)
     private String lastname;
 
-    @Email(message = "Email should be valid")
+    @Email(message = "validation.email.invalid")
     @Column(unique = true, nullable = false)
     private String email;
 
-
-    @NotBlank(message = "Password cannot be blank")
-    @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
+    @NotBlank(message = "validation.password.required")
+    @Size(min = 8, max = 100, message = "validation.password.size")
     private String password;
 
     @Enumerated(EnumType.STRING)

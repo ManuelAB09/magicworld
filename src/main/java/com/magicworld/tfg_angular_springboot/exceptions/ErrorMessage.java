@@ -5,18 +5,20 @@ import lombok.Getter;
 import java.util.Date;
 
 @Getter
+
 public class ErrorMessage {
-
-    private final int statusCode;
+    private final int status;
     private final Date timestamp;
-    private final String message;
-    private final String description;
+    private final String code;      // antes "message"
+    private final Object[] args;    // parámetros opcionales
+    private final String path;
 
-    public ErrorMessage(int statusCode, Date timestamp, String message, String description) {
-        this.statusCode = statusCode;
+    public ErrorMessage(int status, Date timestamp, String code, Object[] args, String path) {
+        this.status    = status;
         this.timestamp = timestamp;
-        this.message = message;
-        this.description = description;
+        this.code      = code;
+        this.args      = args;
+        this.path      = path;
     }
 
 }
