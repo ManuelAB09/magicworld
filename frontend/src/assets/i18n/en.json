@@ -24,6 +24,26 @@
     "HOTEL_PACK": "Hotel + Tickets",
     "SCHOOL_GROUPS": "School Groups"
   },
+  "HOME": {
+    "TITLE": "Welcome to MagicWorld",
+    "SUBTITLE": "Discover the magic that awaits you. Live unforgettable experiences with us.",
+    "CTA": "Buy your tickets!",
+    "FEATURE1": {
+      "ALT": "Family fun",
+      "TITLE": "For the whole family",
+      "DESC": "Attractions for young and old, everyone finds their adventure."
+    },
+    "FEATURE2": {
+      "ALT": "Magical shows",
+      "TITLE": "Magical shows",
+      "DESC": "Live shows that will leave you breathless, every day."
+    },
+    "FEATURE3": {
+      "ALT": "Magical lodging",
+      "TITLE": "Themed hotel",
+      "DESC": "Stay in the heart of the park with all the comforts."
+    }
+  },
   "error.resource.not.found": "Resource not found: {{0}}",
   "error.invalid.credentials": "Invalid credentials",
   "error.password.do.not.match": "Passwords do not match",

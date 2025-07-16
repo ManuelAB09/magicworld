@@ -1,0 +1,135 @@
+:host {
+  display: block;
+  font-family: 'Georgia', serif;
+  color: #2c0d0d;
+}
+
+.home-hero {
+  position: relative;
+  height: calc(100vh - 80px);
+  background: linear-gradient(
+    to bottom right,
+    #fff7e6 0%,
+    #fff1cc 40%,
+    #ffe59d 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-hero::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  background: radial-gradient(circle at center, rgba(255,183,0,0.2), transparent 70%);
+  transform: rotate(45deg);
+}
+
+.overlay {
+  position: relative;
+  text-align: center;
+  padding: 2rem;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 1s ease-out both;
+}
+
+.overlay h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  border-bottom: 4px solid #a11d1d;
+  display: inline-block;
+  padding-bottom: 0.3rem;
+}
+
+.overlay p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  line-height: 1.4;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.promo-video-container {
+  margin: 2rem auto;
+  width: 80%;
+  max-width: 800px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.promo-video-container video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* BOTÓN PRINCIPAL */
+.btn-primary {
+  display: inline-block;
+  background-color: #ffb700;
+  border: 2px solid #a11d1d;
+  color: #2c0d0d;
+  font-weight: bold;
+  padding: 0.8rem 1.6rem;
+  border-radius: 25px;
+  text-decoration: none;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+  transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
+  margin-bottom: 3rem;
+}
+
+.btn-primary:hover {
+  background-color: #ffd35c;
+  transform: translateY(-3px);
+  box-shadow: 4px 4px 8px rgba(0,0,0,0.25);
+}
+
+/* TARJETAS DE FEATURES */
+.feature-cards {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 2rem 1rem;
+  background: #fff7e6;
+}
+
+.feature-card {
+  background: #fff;
+  border: 2px solid #a11d1d;
+  border-radius: 20px;
+  padding: 1.5rem;
+  width: 300px;
+  text-align: center;
+  box-shadow: 4px 4px 8px rgba(0,0,0,0.1);
+}
+
+.feature-card img {
+  width: 100%;
+  border-radius: 15px;
+  margin-bottom: 1rem;
+}
+
+.feature-card h2 {
+  font-size: 1.5rem;
+  color: #a11d1d;
+  margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+/* ANIMACIONES */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
