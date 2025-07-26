@@ -75,7 +75,6 @@ public class AuthService {
         String username = jwtService.getUsernameFromToken(token);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(username));
-
-        return new UserDTO(user.getUsername(), user.getFirstname(), user.getLastname(), user.getEmail());
+        return new UserDTO(user.getUsername(), user.getFirstname(), user.getLastname(), user.getEmail(), user.getRole());
     }
 }

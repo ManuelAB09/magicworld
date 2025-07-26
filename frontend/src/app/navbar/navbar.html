@@ -20,6 +20,14 @@
         <button class="nav-btn" (click)="logout()">{{ 'NAV.LOGOUT' | translate }}</button>
       </li>
     }
+    @if (role === 'ADMIN') {
+      <li class="nav-list__item">
+        <a class="nav-btn" href="http://localhost:8080/swagger-ui/index.html">
+          <i class="fa fa-user-shield"></i>
+          {{ 'NAV.ADMIN_PANEL' | translate }}
+        </a>
+      </li>
+    }
     <li class="nav-list__item">
       <a class="nav-btn" routerLink="/season-pass">
         <i class="fa fa-id-card"></i>

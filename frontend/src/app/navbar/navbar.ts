@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../auth/auth-service';
+import {AuthService, Role} from '../auth/auth-service';
 import { NgOptimizedImage } from '@angular/common';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
 
@@ -13,16 +13,24 @@ import {TranslateModule, TranslateService} from '@ngx-translate/core';
 export class Navbar implements OnInit, AfterViewInit{
   isAuthenticated = false;
   currentLang = 'es';
+  role: Role | null = null;
 
   constructor(public auth: AuthService, private translate: TranslateService) {}
 
   ngOnInit() {
     this.currentLang = this.translate.currentLang || this.translate.getDefaultLang() || 'es';
     this.checkAuth();
+    this.getRole();
     setInterval(() => this.checkAuth(), 7200000);
+
 
     this.auth.authChanged.subscribe(isAuth => {
       this.isAuthenticated = isAuth;
+      if (isAuth) {
+        this.getRole();
+      } else {
+        this.role = null;
+      }
     });
   }
   ngAfterViewInit(): void {
@@ -44,6 +52,13 @@ export class Navbar implements OnInit, AfterViewInit{
   logout() {
     this.auth.logout().subscribe(() => {
       this.auth.notifyAuthChanged(false);
+      this.role = null;
+    });
+  }
+
+  getRole() {
+    this.auth.checkRole().subscribe(role => {
+      this.role = role;
     });
   }
 

@@ -22,7 +22,8 @@
     "SEASON_PASS": "Season Pass",
     "TICKETS": "Tickets",
     "HOTEL_PACK": "Hotel + Tickets",
-    "SCHOOL_GROUPS": "School Groups"
+    "SCHOOL_GROUPS": "School Groups",
+    "ADMIN_PANEL": "App endpoints"
   },
   "HOME": {
     "TITLE": "Welcome to MagicWorld",

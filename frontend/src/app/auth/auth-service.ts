@@ -3,6 +3,18 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {catchError, map, Observable, of, Subject, switchMap} from 'rxjs';
 import { Router } from '@angular/router';
 
+export enum Role {
+  ADMIN = 'ADMIN',
+  USER = 'USER'
+}
+export interface UserDTO {
+  username: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  role: Role | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = 'http://localhost:8080/api/v1/auth';
@@ -89,7 +101,14 @@ export class AuthService {
     );
   }
 
+  checkRole(): Observable<Role | null> {
+    return this.http.get<UserDTO>(`${this.apiUrl}/me`, { withCredentials: true }).pipe(
+      map(user => user.role)
+    );
+  }
+
   notifyAuthChanged(isAuth: boolean) {
     this.authChanged.next(isAuth);
   }
+
 }
