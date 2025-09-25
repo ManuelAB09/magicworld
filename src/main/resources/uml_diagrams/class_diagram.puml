@@ -1,0 +1,107 @@
+@startuml
+
+class BaseEntity {
+  Long id
+}
+
+
+class User {
+  String username
+  String firstname
+  String lastname
+  String email
+  String password
+  String photoUrl
+  Role role
+  --
+  Collection<GrantedAuthority> getAuthorities()
+  String getPassword()
+  String getUsername()
+  boolean isAccountNonExpired()
+  boolean isAccountNonLocked()
+  boolean isCredentialsNonExpired()
+  boolean isEnabled()
+}
+
+class PasswordResetToken {
+  String token
+  LocalDateTime expiryDate
+  User user
+}
+
+class TicketType {
+  BigDecimal cost
+  String currency
+  String typeName
+  String description
+  int maxPerDay
+}
+
+class Discount {
+  int discountPercentage
+  LocalDate expiryDate
+  String discountCode
+  TicketType ticketType
+}
+
+class Purchase {
+  LocalDate purchaseDate
+  User buyer
+}
+
+class PurchaseLine {
+  LocalDate validDate
+  int quantity
+  Purchase purchase
+  TicketType ticketType
+}
+
+class Review  {
+  double stars
+  LocalDate publicationDate
+  String description
+  User user
+}
+
+class Attraction {
+  String name
+  Intensity intensity
+  int minimumHeight
+  int minimumAge
+  int minimumHeight
+  String description
+  String photoUrl
+  bool isActive
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Intensity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+User --|> BaseEntity
+User ..|> UserDetails
+User --> Role
+PasswordResetToken --|> BaseEntity
+Attraction --|> BaseEntity
+Attraction --> Intensity
+TicketType --|> BaseEntity
+Discount --|> BaseEntity
+Purchase --|> BaseEntity
+PurchaseLine --|> BaseEntity
+Review --|> BaseEntity
+
+PasswordResetToken "*" --> "1" User
+Purchase "1" <-- "*" PurchaseLine
+User "1" <-- "*" Review
+TicketType "1" <-- "*" PurchaseLine
+User "1" <-- "*" Purchase
+Discount "*" -- "*" TicketType
+
+@enduml
