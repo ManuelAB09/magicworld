@@ -26,7 +26,7 @@ jobs:
           cache: 'maven'
       - name: Build and run tests with JaCoCo
         run: >-
-          mvn -B -DskipTests=false
+          mvn -B -Dspring.profiles.active=test -DskipTests=false
           org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent
           test
           org.jacoco:jacoco-maven-plugin:0.8.12:report
@@ -60,7 +60,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run tests and generate coverage
-        run: npm run test -- --coverage --watch=false --browsers=ChromeHeadless
+        run: npm run test -- --code-coverage --watch=false --browsers=ChromeHeadless
         env:
           CI: true
       - name: Upload coverage to Codacy (Angular)
@@ -87,7 +87,7 @@ jobs:
           -e CODACY_PROJECT_TOKEN=$CODACY_PROJECT_TOKEN
           codacy/codacy-analysis-cli:latest
           analyze -d /src
-          --exclude node_modules --exclude frontend/dist --exclude target
+          --exclude-paths node_modules,frontend/dist,target
           --format sarif --output /src/codacy.sarif
       - name: Upload SARIF to GitHub Code Scanning
         if: env.CODACY_PROJECT_TOKEN != ''
