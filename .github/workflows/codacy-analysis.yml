@@ -63,11 +63,25 @@ jobs:
         run: npm run test -- --code-coverage --watch=false --browsers=ChromeHeadless
         env:
           CI: true
+      - name: Locate lcov file
+        run: |
+          set -e
+          FILE=""
+          if [ -f coverage/frontend/lcov.info ]; then FILE=coverage/frontend/lcov.info; fi
+          if [ -z "$FILE" ] && [ -f coverage/lcov.info ]; then FILE=coverage/lcov.info; fi
+          if [ -z "$FILE" ]; then
+            echo "lcov.info not found in expected locations" 1>&2
+            echo "Directory tree under ./coverage:" 1>&2
+            ls -R coverage || true
+            exit 1
+          fi
+          echo "Using LCOV file: $FILE"
+          echo "LCOV_FILE=$FILE" >> $GITHUB_ENV
       - name: Upload coverage to Codacy (Angular)
         if: env.CODACY_PROJECT_TOKEN != ''
         run: >-
           bash <(curl -Ls https://coverage.codacy.com/get.sh)
-          report -l JavaScript -r coverage/frontend/lcov.info
+          report -l JavaScript -r "$LCOV_FILE"
 
   static-analysis:
     name: Codacy Static Analysis (Monorepo)
@@ -92,5 +106,7 @@ jobs:
       - name: Upload SARIF to GitHub Code Scanning
         if: env.CODACY_PROJECT_TOKEN != '' && github.event_name == 'push'
         uses: github/codeql-action/upload-sarif@v3
+        continue-on-error: true
         with:
           sarif_file: codacy.sarif
+
