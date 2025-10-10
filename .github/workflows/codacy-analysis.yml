@@ -10,7 +10,8 @@ jobs:
   backend-codacy:
     name: Codacy Java Backend Analysis
     runs-on: ubuntu-latest
-    # Ejecutar Maven desde la raíz del repo (aquí está el pom.xml)
+    env:
+      CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
     defaults:
       run:
         working-directory: ./
@@ -30,16 +31,16 @@ jobs:
           test
           org.jacoco:jacoco-maven-plugin:0.8.12:report
       - name: Upload coverage to Codacy (Java)
-        if: ${{ secrets.CODACY_PROJECT_TOKEN != '' }}
+        if: env.CODACY_PROJECT_TOKEN != ''
         run: >-
           bash <(curl -Ls https://coverage.codacy.com/get.sh)
           report -l Java -r target/site/jacoco/jacoco.xml
-        env:
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
   frontend-codacy:
     name: Codacy Angular Frontend Analysis
     runs-on: ubuntu-latest
+    env:
+      CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
     defaults:
       run:
         working-directory: ./frontend
@@ -63,26 +64,24 @@ jobs:
         env:
           CI: true
       - name: Upload coverage to Codacy (Angular)
-        if: ${{ secrets.CODACY_PROJECT_TOKEN != '' }}
+        if: env.CODACY_PROJECT_TOKEN != ''
         run: >-
           bash <(curl -Ls https://coverage.codacy.com/get.sh)
           report -l JavaScript -r coverage/frontend/lcov.info
-        env:
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
   static-analysis:
     name: Codacy Static Analysis (Monorepo)
     runs-on: ubuntu-latest
-    if: ${{ secrets.CODACY_PROJECT_TOKEN != '' }}
     permissions:
       contents: read
       security-events: write
+    env:
+      CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run Codacy Analysis CLI (Docker)
-        env:
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        if: env.CODACY_PROJECT_TOKEN != ''
         run: >-
           docker run --rm -v "$PWD":/src -w /src
           -e CODACY_PROJECT_TOKEN=$CODACY_PROJECT_TOKEN
@@ -91,6 +90,7 @@ jobs:
           --exclude node_modules --exclude frontend/dist --exclude target
           --format sarif --output /src/codacy.sarif
       - name: Upload SARIF to GitHub Code Scanning
+        if: env.CODACY_PROJECT_TOKEN != ''
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: codacy.sarif
