@@ -1,5 +1,5 @@
 // src/main/java/com/magicworld/tfg_angular_springboot/auth/PasswordResetTokenRepository.java
-package com.magicworld.tfg_angular_springboot.auth;
+package com.magicworld.tfg_angular_springboot.reset_token;
 
 import com.magicworld.tfg_angular_springboot.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;

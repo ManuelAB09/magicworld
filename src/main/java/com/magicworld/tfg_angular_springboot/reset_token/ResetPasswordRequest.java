@@ -1,4 +1,4 @@
-package com.magicworld.tfg_angular_springboot.auth;
+package com.magicworld.tfg_angular_springboot.reset_token;
 
 import lombok.Getter;
 import lombok.Setter;

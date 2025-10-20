@@ -6,7 +6,7 @@ import com.magicworld.tfg_angular_springboot.user.Role;
 import com.magicworld.tfg_angular_springboot.user.User;
 import com.magicworld.tfg_angular_springboot.user.UserDTO;
 import com.magicworld.tfg_angular_springboot.user.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
@@ -58,7 +58,7 @@ public class AuthService {
                 .lastname(request.getLastname())
                 .email(request.getEmail())
                 .password(request.getPassword())
-                .role(Role.USER)
+                .userRole(Role.USER)
                 .build();
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -78,6 +78,6 @@ public class AuthService {
         String username = jwtService.getUsernameFromToken(token);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(username));
-        return new UserDTO(user.getUsername(), user.getFirstname(), user.getLastname(), user.getEmail(), user.getRole());
+        return new UserDTO(user.getUsername(), user.getFirstname(), user.getLastname(), user.getEmail(), user.getUserRole());
     }
 }

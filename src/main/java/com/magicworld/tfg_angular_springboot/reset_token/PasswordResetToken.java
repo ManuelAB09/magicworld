@@ -1,4 +1,4 @@
-package com.magicworld.tfg_angular_springboot.auth;
+package com.magicworld.tfg_angular_springboot.reset_token;
 
 import com.magicworld.tfg_angular_springboot.user.User;
 import com.magicworld.tfg_angular_springboot.util.BaseEntity;
