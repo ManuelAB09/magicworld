@@ -32,7 +32,7 @@ public class TicketType extends BaseEntity {
 
     @NotBlank
     @Size(max = 50)
-    @Column(name = "type_name", nullable = false, length = 50)
+    @Column(name = "type_name", nullable = false, length = 50, unique = true)
     private String typeName;
 
     @NotBlank

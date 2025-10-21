@@ -43,10 +43,10 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/static/**", "/v3/api-docs/**", "/swagger-resources/**", "/api/v1/auth/login","/api/v1/auth/register",
                                          "/api/v1/auth/reset-password","/api/v1/auth/forgot-password", "/swagger-ui.html", "/swagger-ui/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/attractions", "/api/v1/attractions/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/attractions/**").hasRole(ADMIN_ROLE)
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/attractions/**").hasRole(ADMIN_ROLE)
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/attractions/**").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/attractions", "/api/v1/attractions/**","/api/v1/ticket-types","/api/v1/ticket-types/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/attractions/**","/api/v1/ticket-types/**").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/attractions/**","/api/v1/ticket-types/**").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/attractions/**","/api/v1/ticket-types/**").hasRole(ADMIN_ROLE)
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = AttractionController.class, excludeAutoConfiguration = {org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class})
 @AutoConfigureMockMvc(addFilters = false)
-public class AttractionEndToEndTests {
+public class AttractionControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -138,7 +138,7 @@ public class AttractionEndToEndTests {
     }
 
     @TestConfiguration
-    static class AttractionEndToEndTestConfig {
+    static class AttractionControllerTestConfig {
         @Bean
         public AttractionService attractionService() {
             return Mockito.mock(AttractionService.class);
