@@ -7,9 +7,9 @@ INSERT  INTO users (username, firstname, lastname, email, password, user_role)
 VALUES ('jdoe', 'John', 'Doe', 'jdoe@example.com', '$2a$10$JZA..SzcDSPyDZXa.ESvYeUCdbz51tkOMOdp7237iOivFmx5suRjy', 'USER');
 
 
-INSERT  INTO ticket_type (cost, currency, type_name, description, max_per_day)
-VALUES (29.90, 'EUR', 'Adult', 'Entrada general para adultos', 100),
-       (19.90, 'EUR', 'Child', 'Entrada para niños', 50);
+INSERT  INTO ticket_type (cost, currency, type_name, description, max_per_day, photo_url)
+VALUES (29.90, 'EUR', 'Adult', 'Entrada general para adultos', 100, '/img/adult_ticket.jpg'),
+       (19.90, 'EUR', 'Child', 'Entrada para niños', 50, '/img/child_ticket.jpg');
 
 
 INSERT  INTO discount (discount_percentage, expiry_date, discount_code)

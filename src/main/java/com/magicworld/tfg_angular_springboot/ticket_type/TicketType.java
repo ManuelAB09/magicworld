@@ -37,11 +37,15 @@ public class TicketType extends BaseEntity {
 
     @NotBlank
     @Size(max = 255)
-    @Column(name = "description", nullable = false, length = 255)
+    @Column(name = "description", nullable = false)
     private String description;
 
     @NotNull
     @Positive
     @Column(name = "max_per_day", nullable = false)
     private Integer maxPerDay;
+
+    @NotNull
+    @Column(name="photo_url",nullable = false)
+    private String photoUrl;
 }

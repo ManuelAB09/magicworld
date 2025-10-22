@@ -4,8 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ErrorService } from '../error/error-service';
-import { TicketType, TicketTypeApiService } from './ticket-type.service';
-import { catchError, of, switchMap } from 'rxjs';
+import { TicketTypeApiService, TicketTypeData } from './ticket-type.service';
+import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-ticket-type-form',
@@ -22,6 +22,14 @@ export class TicketTypeForm implements OnInit {
   validationMessages: string[] = [];
   isEdit = false;
   id: number | null = null;
+
+  selectedFile: File | null = null;
+  previewUrl: string | null = null;
+  existingPhotoUrl: string | null = null;
+  photoRequiredError = false;
+
+  private apiBase = 'http://localhost:8080';
+  private readonly maxFileBytes = 50 * 1024 * 1024; // 50MB - keep in sync with backend
 
   constructor(
     private fb: FormBuilder,
@@ -59,7 +67,16 @@ export class TicketTypeForm implements OnInit {
           return of(null);
         })
       ).subscribe(tt => {
-        if (tt) this.form.patchValue(tt);
+        if (tt) {
+          this.form.patchValue({
+            typeName: tt.typeName,
+            description: tt.description,
+            currency: tt.currency,
+            cost: tt.cost,
+            maxPerDay: tt.maxPerDay
+          });
+          this.existingPhotoUrl = tt.photoUrl;
+        }
         this.loading = false;
       });
     } else {
@@ -67,19 +84,77 @@ export class TicketTypeForm implements OnInit {
     }
   }
 
+  onFileChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      this.selectedFile = null;
+      this.previewUrl = null;
+      return;
+    }
+    const file = input.files[0];
+    if (!file.type.startsWith('image/')) {
+      // no es una imagen
+      this.selectedFile = null;
+      this.previewUrl = null;
+      this.photoRequiredError = true;
+      return;
+    }
+    // validar tamaño en cliente antes de enviar
+    if (file.size > this.maxFileBytes) {
+      this.selectedFile = null;
+      this.previewUrl = null;
+      this.photoRequiredError = false;
+      this.errorKey = 'error.file.size_exceeded';
+      // ErrorService espera args como objeto (no validation), aquí pasamos índice 0 con bytes
+      this.errorArgs = { 0: this.maxFileBytes };
+      this.validationMessages = [];
+      return;
+    }
+    this.selectedFile = file;
+    this.photoRequiredError = false;
+    const reader = new FileReader();
+    reader.onload = () => this.previewUrl = reader.result as string;
+    reader.readAsDataURL(file);
+  }
+
+  private getDataFromForm(): TicketTypeData {
+    return {
+      typeName: this.form.value.typeName,
+      description: this.form.value.description,
+      currency: this.form.value.currency,
+      cost: Number(this.form.value.cost),
+      maxPerDay: Number(this.form.value.maxPerDay)
+    };
+  }
+
+  getImageUrl(url: string | null): string | null {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return this.apiBase + url;
+  }
+
   submit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+    // validar archivo requerido si es creación
+    if (!this.isEdit && !this.selectedFile) {
+      this.photoRequiredError = true;
+      return;
+    }
+
     this.loading = true;
     this.errorKey = null;
     this.errorArgs = null;
     this.validationMessages = [];
 
-    const payload: TicketType = { ...this.form.value } as TicketType;
+    const data = this.getDataFromForm();
 
-    const obs = this.isEdit && this.id ? this.api.update(this.id, payload) : this.api.create(payload);
+    const obs = this.isEdit && this.id
+      ? this.api.updateMultipart(this.id, data, this.selectedFile || undefined)
+      : this.api.createMultipart(data, this.selectedFile!);
+
     obs.pipe(
       catchError(err => {
         const mapped = this.error.handleError(err);
@@ -114,4 +189,3 @@ export class TicketTypeForm implements OnInit {
     });
   }
 }
-

@@ -44,6 +44,9 @@ public class TicketTypeService {
         existingTicketType.setTypeName(updatedTicketType.getTypeName());
         existingTicketType.setDescription(updatedTicketType.getDescription());
         existingTicketType.setMaxPerDay(updatedTicketType.getMaxPerDay());
+        if (updatedTicketType.getPhotoUrl() != null) {
+            existingTicketType.setPhotoUrl(updatedTicketType.getPhotoUrl());
+        }
         return ticketTypeRepository.save(existingTicketType);
     }
 

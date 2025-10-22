@@ -10,7 +10,10 @@ export interface TicketType {
   typeName: string;
   description: string;
   maxPerDay: number;
+  photoUrl: string;
 }
+
+export type TicketTypeData = Omit<TicketType, 'id' | 'photoUrl'>;
 
 @Injectable({ providedIn: 'root' })
 export class TicketTypeApiService {
@@ -31,9 +34,11 @@ export class TicketTypeApiService {
     return this.withCsrf((h) => this.http.get<TicketType>(`${this.baseUrl}/${id}`, { withCredentials: true, headers: h }));
   }
 
+
   create(tt: TicketType): Observable<TicketType> {
     return this.withCsrf((h) => this.http.post<TicketType>(this.baseUrl, tt, { withCredentials: true, headers: h }));
   }
+
 
   update(id: number, tt: TicketType): Observable<TicketType> {
     return this.withCsrf((h) => this.http.put<TicketType>(`${this.baseUrl}/${id}`, tt, { withCredentials: true, headers: h }));
@@ -41,5 +46,23 @@ export class TicketTypeApiService {
 
   delete(id: number): Observable<void> {
     return this.withCsrf((h) => this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true, headers: h }));
+  }
+
+  private buildForm(data: TicketTypeData, file?: File): FormData {
+    const fd = new FormData();
+    const json = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    fd.append('data', json);
+    if (file) fd.append('photo', file);
+    return fd;
+  }
+
+  createMultipart(data: TicketTypeData, file: File): Observable<TicketType> {
+    const form = this.buildForm(data, file);
+    return this.withCsrf((h) => this.http.post<TicketType>(this.baseUrl, form, { withCredentials: true, headers: h }));
+  }
+
+  updateMultipart(id: number, data: TicketTypeData, file?: File): Observable<TicketType> {
+    const form = this.buildForm(data, file);
+    return this.withCsrf((h) => this.http.put<TicketType>(`${this.baseUrl}/${id}`, form, { withCredentials: true, headers: h }));
   }
 }

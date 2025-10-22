@@ -58,6 +58,12 @@
   "error.at.least.one.ticket.type.must.be.provided": "At least one ticket type must be provided",
   "error.ticket_type.discounts.assigned": "A ticket type with assigned discounts cannot be deleted",
   "error.discount.expiryDate.past": "A discount cannot have an expiry date in the past or today",
+
+  "error.file.empty": "No file uploaded",
+  "error.file.size_exceeded": "File too large (max {{0}} bytes)",
+  "error.file.invalid_type": "Only image uploads are allowed",
+  "error.file.save_failed": "Failed to save the uploaded file",
+
   "passwordReset": {
     "title": "Forgot your password?",
     "emailLabel": "Email address",
@@ -137,14 +143,16 @@
       "CURRENCY": "Currency",
       "COST": "Cost",
       "MAX_PER_DAY": "Max per day",
-      "DESCRIPTION": "Description"
+      "DESCRIPTION": "Description",
+      "PHOTO_URL": "Photo URL"
     },
     "VALIDATION": {
       "NAME": "Name is required (max 50)",
       "CURRENCY": "Currency is required",
       "COST": "Cost must be greater than 0",
       "MAX_PER_DAY": "Max per day must be at least 1",
-      "DESCRIPTION": "Description is required (max 255)"
+      "DESCRIPTION": "Description is required (max 255)",
+      "PHOTO_URL": "Photo URL is required"
     },
     "BUTTON_SAVE": "Save",
     "BUTTON_DELETE": "Delete",

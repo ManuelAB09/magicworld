@@ -58,6 +58,12 @@
   "error.at.least.one.ticket.type.must.be.provided": "Debe proporcionarse al menos un tipo de entrada.",
   "error.ticket_type.discounts.assigned": "No se puede eliminar un tipo de entrada con descuentos asignados.",
   "error.discount.expiryDate.past": "Un descuento no puede tener una fecha de expiración en el pasado o en el día de hoy.",
+
+  "error.file.empty": "No se ha subido ningún fichero",
+  "error.file.size_exceeded": "Fichero demasiado grande (máx. {{0}} bytes)",
+  "error.file.invalid_type": "Solo se permiten imágenes",
+  "error.file.save_failed": "No se pudo guardar el fichero subido",
+
   "passwordReset": {
     "title": "¿Has olvidado tu contraseña?",
     "emailLabel": "Correo electrónico",
@@ -137,14 +143,16 @@
       "CURRENCY": "Divisa",
       "COST": "Coste",
       "MAX_PER_DAY": "Máx. por día",
-      "DESCRIPTION": "Descripción"
+      "DESCRIPTION": "Descripción",
+      "PHOTO_URL": "URL de la foto"
     },
     "VALIDATION": {
       "NAME": "Nombre requerido (máx. 50)",
       "CURRENCY": "Divisa requerida",
       "COST": "El coste debe ser mayor que 0",
       "MAX_PER_DAY": "El máximo por día debe ser mayor o igual que 1",
-      "DESCRIPTION": "Descripción requerida (máx. 255)"
+      "DESCRIPTION": "Descripción requerida (máx. 255)",
+      "PHOTO_URL": "La URL de la foto es obligatoria"
     },
     "BUTTON_SAVE": "Guardar",
     "BUTTON_DELETE": "Eliminar",

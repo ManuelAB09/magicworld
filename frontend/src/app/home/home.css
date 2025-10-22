@@ -2,6 +2,7 @@
   display: block;
   font-family: 'Georgia', serif;
   color: #2c0d0d;
+  overflow: hidden;
 }
 
 .home-hero {
@@ -70,7 +71,7 @@
   height: auto;
 }
 
-/* BOTÓN PRINCIPAL */
+
 .btn-primary {
   display: inline-block;
   background-color: #ffb700;
@@ -91,44 +92,6 @@
   box-shadow: 4px 4px 8px rgba(0,0,0,0.25);
 }
 
-/* TARJETAS DE FEATURES */
-.feature-cards {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-  padding: 2rem 1rem;
-  background: #fff7e6;
-}
-
-.feature-card {
-  background: #fff;
-  border: 2px solid #a11d1d;
-  border-radius: 20px;
-  padding: 1.5rem;
-  width: 300px;
-  text-align: center;
-  box-shadow: 4px 4px 8px rgba(0,0,0,0.1);
-}
-
-.feature-card img {
-  width: 100%;
-  border-radius: 15px;
-  margin-bottom: 1rem;
-}
-
-.feature-card h2 {
-  font-size: 1.5rem;
-  color: #a11d1d;
-  margin-bottom: 0.5rem;
-}
-
-.feature-card p {
-  font-size: 1rem;
-  line-height: 1.4;
-}
-
-/* ANIMACIONES */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }

@@ -60,6 +60,7 @@ public class DiscountServiceTests {
                 .typeName("ADULT")
                 .description("Adult ticket")
                 .maxPerDay(10)
+                .photoUrl("https://example.com/adult.jpg")
                 .build());
 
         child = ticketTypeRepository.save(TicketType.builder()
@@ -68,6 +69,7 @@ public class DiscountServiceTests {
                 .typeName("CHILD")
                 .description("Child ticket")
                 .maxPerDay(10)
+                .photoUrl("https://example.com/child.jpg")
                 .build());
 
         vip = ticketTypeRepository.save(TicketType.builder()
@@ -76,6 +78,7 @@ public class DiscountServiceTests {
                 .typeName("VIP")
                 .description("VIP ticket")
                 .maxPerDay(5)
+                .photoUrl("https://example.com/vip.jpg")
                 .build());
         entityManager.flush();
         entityManager.clear();

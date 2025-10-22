@@ -36,6 +36,7 @@ public class TicketTypeServiceTests {
                 .typeName("STANDARD")
                 .description("Standard ticket")
                 .maxPerDay(10)
+                .photoUrl("http://example.com/photo.jpg")
                 .build();
     }
 
@@ -92,6 +93,7 @@ public class TicketTypeServiceTests {
                 .typeName("PREMIUM")
                 .description("Premium ticket")
                 .maxPerDay(20)
+                .photoUrl("http://example.com/updated.jpg")
                 .build();
 
         TicketType updated = ticketTypeService.update(saved.getId(), update);
@@ -101,6 +103,7 @@ public class TicketTypeServiceTests {
         assertEquals("PREMIUM", updated.getTypeName());
         assertEquals("Premium ticket", updated.getDescription());
         assertEquals(20, updated.getMaxPerDay());
+        assertEquals("http://example.com/updated.jpg", updated.getPhotoUrl());
     }
 
     @Test

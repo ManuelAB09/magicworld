@@ -22,6 +22,8 @@ export class TicketTypeList implements OnInit {
   errorArgs: any = null;
   validationMessages: string[] = [];
 
+  private apiBase = 'http://localhost:8080';
+
   constructor(
     private api: TicketTypeApiService,
     private auth: AuthService,
@@ -58,5 +60,10 @@ export class TicketTypeList implements OnInit {
       this.loading = false;
     });
   }
-}
 
+  getImageUrl(url: string | null | undefined): string | null {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return this.apiBase + url;
+  }
+}

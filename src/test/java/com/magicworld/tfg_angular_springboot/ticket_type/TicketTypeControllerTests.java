@@ -49,6 +49,7 @@ public class TicketTypeControllerTests {
                 .typeName("STANDARD")
                 .description("Standard ticket")
                 .maxPerDay(10)
+                .photoUrl("http://example.com/standard.jpg")
                 .build();
     }
 
@@ -109,6 +110,7 @@ public class TicketTypeControllerTests {
                 .typeName("PREMIUM")
                 .description("Premium ticket")
                 .maxPerDay(20)
+                .photoUrl("http://example.com/premium.jpg")
                 .build();
 
         TicketType returned = TicketType.builder()
@@ -117,6 +119,7 @@ public class TicketTypeControllerTests {
                 .typeName("PREMIUM")
                 .description("Premium ticket")
                 .maxPerDay(20)
+                .photoUrl("http://example.com/premium.jpg")
                 .build();
         returned.setId(4L);
 
@@ -143,11 +146,12 @@ public class TicketTypeControllerTests {
     @Test
     public void testCreateTicketType_badRequest_whenInvalid() throws Exception {
         TicketType invalid = TicketType.builder()
-                .cost(null) // NotNull
-                .currency("") // NotBlank
-                .typeName("") // NotBlank
-                .description("") // NotBlank
-                .maxPerDay(null) // NotNull
+                .cost(null)
+                .currency("")
+                .typeName("")
+                .description("")
+                .maxPerDay(null)
+                .photoUrl("http://example.com/invalid.jpg")
                 .build();
 
         mockMvc.perform(post("/api/v1/ticket-types")
@@ -171,6 +175,11 @@ public class TicketTypeControllerTests {
         @Bean
         public JwtAuthenticationFilter jwtAuthenticationFilter() {
             return Mockito.mock(JwtAuthenticationFilter.class);
+        }
+
+        @Bean
+        public com.magicworld.tfg_angular_springboot.storage.ImageStorageService imageStorageService() {
+            return Mockito.mock(com.magicworld.tfg_angular_springboot.storage.ImageStorageService.class);
         }
     }
 }

@@ -1,13 +1,23 @@
 package com.magicworld.tfg_angular_springboot.configuration;
 
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Configuration
-public class WebConfiguration implements WebMvcConfigurer {
-
+public class WebConfig implements WebMvcConfigurer {
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        Path uploadDir = Paths.get("uploads").toAbsolutePath().normalize();
+        String uploadPath = uploadDir.toUri().toString();
+        registry.addResourceHandler("/images/**")
+                .addResourceLocations(uploadPath)
+                .setCachePeriod(3600);
+    }
     @Bean
     public WebMvcConfigurer cors() {
         return new WebMvcConfigurer() {
@@ -22,3 +32,4 @@ public class WebConfiguration implements WebMvcConfigurer {
         };
     }
 }
+

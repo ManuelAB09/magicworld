@@ -52,6 +52,21 @@
           <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.DESCRIPTION' | translate }}</div>
         }
       </div>
+
+      <div class="col-md-6">
+        <label class="form-label">{{ 'TICKET_TYPE_FORM.FIELDS.PHOTO_URL' | translate }}</label>
+        <input type="file" accept="image/*" class="form-control" (change)="onFileChange($event)" />
+        @if (photoRequiredError) {
+          <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.PHOTO_URL' | translate }}</div>
+        }
+      </div>
+      <div class="col-md-6 d-flex align-items-end">
+        @if (previewUrl) {
+          <img [src]="previewUrl" alt="preview" class="img-thumbnail" style="max-height: 120px;" />
+        } @else if (getImageUrl(existingPhotoUrl)) {
+          <img [src]="getImageUrl(existingPhotoUrl)" alt="current" class="img-thumbnail" style="max-height: 120px;" />
+        }
+      </div>
     </div>
 
     <div class="d-flex gap-2 mt-4">
@@ -62,4 +77,3 @@
     </div>
   </form>
 </div>
-
