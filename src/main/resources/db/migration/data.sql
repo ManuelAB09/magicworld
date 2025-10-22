@@ -1,9 +1,9 @@
 -- Password for 'admin' is 'AdminPassword123!'
-INSERT  INTO `user` (username, firstname, lastname, email, password, user_role)
+INSERT  INTO users (username, firstname, lastname, email, password, user_role)
 VALUES ('admin', 'Admin', 'Principal', 'admin@example.com', '$2a$10$LwU2fAnk66AtbSaUB9umZ.PV8TZ/IbkLO9DRDUg0/eGMj/9nWk2Nm', 'ADMIN');
 
 -- Password for user is 'SecurePassword123!'
-INSERT  INTO `user` (username, firstname, lastname, email, password, user_role)
+INSERT  INTO users (username, firstname, lastname, email, password, user_role)
 VALUES ('jdoe', 'John', 'Doe', 'jdoe@example.com', '$2a$10$JZA..SzcDSPyDZXa.ESvYeUCdbz51tkOMOdp7237iOivFmx5suRjy', 'USER');
 
 
@@ -28,18 +28,18 @@ VALUES ('Roller Coaster', 'HIGH', 120, 12, 30, 'Montaña rusa extrema', '/img/ro
 
 
 INSERT  INTO purchase (purchase_date, buyer_id)
-SELECT CURDATE(), u.id FROM `user` u WHERE u.username = 'jdoe';
+SELECT CURDATE(), u.id FROM users u WHERE u.username = 'jdoe';
 
 
 INSERT  INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
 SELECT CURDATE() + INTERVAL 1 DAY, 2, p.id, 2 * t.cost, t.type_name
 FROM purchase p
-JOIN `user` u ON p.buyer_id = u.id
+JOIN users u ON p.buyer_id = u.id
 JOIN ticket_type t ON t.type_name = 'Adult'
 WHERE u.username = 'jdoe';
 
 
 INSERT  INTO review (stars, publication_date, description, user_id)
 SELECT 4.5, CURDATE(), 'Muy divertida y emocionante', u.id
-FROM `user` u
+FROM users u
 WHERE u.username = 'jdoe';

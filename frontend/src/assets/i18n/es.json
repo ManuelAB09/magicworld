@@ -20,31 +20,14 @@
     "LOGIN": "Iniciar sesión",
     "REGISTER": "Registrarse",
     "LOGOUT": "Cerrar sesión",
-    "SEASON_PASS": "Pase de temporada",
-    "TICKETS": "Entradas",
-    "HOTEL_PACK": "Hotel + Entradas",
-    "SCHOOL_GROUPS": "Grupos escolares",
-    "ADMIN_PANEL": "Panel de administración"
+    "ADMIN_PANEL": "Endpoints de la aplicación",
+    "DISCOUNT": "Descuentos",
+    "TICKET_TYPE": "Tipos de entradas"
   },
   "HOME": {
     "TITLE": "Bienvenido a MagicWorld",
     "SUBTITLE": "Descubre la magia que te espera. Vive experiencias inolvidables con nosotros.",
-    "CTA": "¡Compra tus entradas!",
-    "FEATURE1": {
-      "ALT": "Diversión en familia",
-      "TITLE": "Para toda la familia",
-      "DESC": "Atracciones para grandes y pequeños, todos encuentran su aventura."
-    },
-    "FEATURE2": {
-      "ALT": "Espectáculos mágicos",
-      "TITLE": "Espectáculos mágicos",
-      "DESC": "Espectáculos en vivo que te dejarán sin aliento, cada día."
-    },
-    "FEATURE3": {
-      "ALT": "Alojamiento mágico",
-      "TITLE": "Hotel temático",
-      "DESC": "Alójate en el corazón del parque con todas las comodidades."
-    }
+    "CTA": "¡Compra tus entradas!"
   },
   "error.resource.not.found": "Recurso no encontrado: {{0}}",
   "error.invalid.credentials": "Credenciales inválidas",
@@ -72,6 +55,7 @@
   "error.password.pattern": "La contraseña debe contener al menos una mayúscula, una minúscula, un número, un carácter especial y tener al menos 8 caracteres.",
   "error.invalid.token": "El token es inválido o ha expirado",
   "error.too.many.requests": "Lo ha intentando varias veces seguidas, por favor pruebe luego.",
+  "error.at.least.one.ticket.type.must.be.provided": "Debe proporcionarse al menos un tipo de entrada.",
   "passwordReset": {
     "title": "¿Has olvidado tu contraseña?",
     "emailLabel": "Correo electrónico",
@@ -86,5 +70,44 @@
     "confirmPassword": "Confirmar contraseña",
     "submit": "Cambiar contraseña",
     "success": "Tu contraseña ha sido cambiada con éxito."
+  },
+  "DISCOUNTS": {
+    "TITLE": "Descuentos",
+    "CREATE": "Crear descuento",
+    "EDIT": "Editar",
+    "LOADING": "Cargando...",
+    "LOADING_TYPES": "Cargando tipos...",
+    "ERROR_LIST": "No se pudo cargar el listado",
+    "EMPTY": "No hay descuentos.",
+    "TABLE": {
+      "CODE": "Código",
+      "PERCENTAGE": "%",
+      "EXPIRY_DATE": "Expira",
+      "APPLIES_TO": "Aplicable a",
+      "ACTIONS": "Acciones"
+    }
+  },
+  "DISCOUNT_FORM": {
+    "CREATE_TITLE": "Crear descuento",
+    "EDIT_TITLE": "Editar descuento",
+    "BUTTON_BACK": "Volver",
+    "FIELDS": {
+      "CODE": "Código",
+      "PERCENTAGE": "Porcentaje",
+      "EXPIRY_DATE": "Fecha de expiración",
+      "TYPES_LABEL": "Tipos de entrada aplicables"
+    },
+    "VALIDATION": {
+      "CODE_REQUIRED": "Código requerido (máx. 20)",
+      "PERCENTAGE_RANGE": "Debe estar entre 1 y 100",
+      "EXPIRY_REQUIRED": "Fecha requerida"
+    },
+    "BUTTON_SAVE": "Guardar",
+    "BUTTON_DELETE": "Eliminar",
+    "CONFIRM_DELETE": "¿Seguro que deseas eliminar este descuento?",
+    "ERROR_LOAD": "No se pudieron cargar los datos",
+    "TYPES_REQUIRED": "Debes seleccionar al menos un tipo de entrada",
+    "ERROR_SAVE": "No se pudo guardar el descuento",
+    "ERROR_DELETE": "No se pudo eliminar"
   }
 }

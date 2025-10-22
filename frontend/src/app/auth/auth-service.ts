@@ -65,7 +65,8 @@ export class AuthService {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? decodeURIComponent(match[2]) : null;
   }
-  private ensureCsrfToken(headers: HttpHeaders): Observable<HttpHeaders> {
+
+  ensureCsrfToken(headers: HttpHeaders): Observable<HttpHeaders> {
     const csrfToken = this.getCookie('XSRF-TOKEN');
 
     if (csrfToken) {
@@ -103,6 +104,15 @@ export class AuthService {
 
   checkRole(): Observable<Role | null> {
     return this.http.get<UserDTO>(`${this.apiUrl}/me`, { withCredentials: true }).pipe(
+      map(user => user.role)
+    );
+  }
+
+
+  checkRoleSecure(): Observable<Role | null> {
+    const headers = new HttpHeaders();
+    return this.ensureCsrfToken(headers).pipe(
+      switchMap(h => this.http.get<UserDTO>(`${this.apiUrl}/me`, { withCredentials: true, headers: h })),
       map(user => user.role)
     );
   }
