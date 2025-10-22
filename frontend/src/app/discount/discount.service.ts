@@ -6,7 +6,7 @@ import { AuthService } from '../auth/auth-service';
 export interface Discount {
   id?: number;
   discountPercentage: number;
-  expiryDate: string; // ISO yyyy-MM-dd
+  expiryDate: string;
   discountCode: string;
 }
 

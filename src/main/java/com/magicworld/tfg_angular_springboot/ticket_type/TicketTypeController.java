@@ -70,6 +70,7 @@ public class TicketTypeController {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Ticket type deleted", content = @Content),
             @ApiResponse(responseCode = "404", description = "Ticket type not found", content = @Content),
+            @ApiResponse(responseCode = "409", description = "The ticket type has a discount associated", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
     })
     @DeleteMapping("/{id}")

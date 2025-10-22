@@ -8,10 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -32,6 +29,7 @@ public class Discount extends BaseEntity {
     private Integer discountPercentage;
 
     @NotNull
+    @Future(message = "error.discount.expiryDate.past")
     @Column(name = "expiry_date", nullable = false)
     private LocalDate expiryDate;
 

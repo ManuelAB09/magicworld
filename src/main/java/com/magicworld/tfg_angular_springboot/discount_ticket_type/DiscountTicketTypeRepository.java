@@ -15,5 +15,6 @@ public interface DiscountTicketTypeRepository extends JpaRepository<DiscountTick
     List<TicketType> findByDiscountId(Long discountId);
 
     @Modifying(clearAutomatically = true)
+    @Query("delete from DiscountTicketType d where d.discount.id = :discountId")
     void deleteByDiscountId(Long discountId);
 }

@@ -57,6 +57,7 @@
   "error.too.many.requests": "You have tried to much times. Please try again later.",
   "error.at.least.one.ticket.type.must.be.provided": "At least one ticket type must be provided",
   "error.ticket_type.discounts.assigned": "A ticket type with assigned discounts cannot be deleted",
+  "error.discount.expiryDate.past": "A discount cannot have an expiry date in the past or today",
   "passwordReset": {
     "title": "Forgot your password?",
     "emailLabel": "Email address",

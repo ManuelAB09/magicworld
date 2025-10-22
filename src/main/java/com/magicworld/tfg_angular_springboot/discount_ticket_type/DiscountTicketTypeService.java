@@ -20,9 +20,11 @@ public class DiscountTicketTypeService {
         return discountTicketTypeRepository.findByDiscountId(discountId);
     }
 
-    @Transactional
+
     public void replaceAssociations(Discount discount, List<TicketType> ticketTypes) {
         discountTicketTypeRepository.deleteByDiscountId(discount.getId());
+        discountTicketTypeRepository.flush();
+
         List<DiscountTicketType> toSave = ticketTypes.stream()
                 .map(tt -> DiscountTicketType.builder()
                         .discount(discount)
