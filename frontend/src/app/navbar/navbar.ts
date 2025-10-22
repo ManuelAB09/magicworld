@@ -57,7 +57,7 @@ export class Navbar implements OnInit, AfterViewInit{
   }
 
   getRole() {
-    this.auth.checkRole().subscribe(role => {
+    this.auth.checkRoleSecure().subscribe(role => {
       this.role = role;
     });
   }

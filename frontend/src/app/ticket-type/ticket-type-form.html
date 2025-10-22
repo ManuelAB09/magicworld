@@ -1,0 +1,65 @@
+<div class="container mt-4" [class.opacity-50]="loading">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ (isEdit ? 'TICKET_TYPE_FORM.EDIT_TITLE' : 'TICKET_TYPE_FORM.CREATE_TITLE') | translate }}</h2>
+    <a class="btn btn-secondary" [routerLink]="['/ticket-types']">{{ 'TICKET_TYPE_FORM.BUTTON_BACK' | translate }}</a>
+  </div>
+
+  @if (errorKey) {
+    <div class="alert alert-danger">{{ errorKey | translate:errorArgs }}</div>
+    @if (validationMessages.length) {
+      <ul class="mt-2 mb-0">
+        @for (m of validationMessages; track m) {
+          <li>{{ m }}</li>
+        }
+      </ul>
+    }
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">{{ 'TICKET_TYPE_FORM.FIELDS.NAME' | translate }}</label>
+        <input class="form-control" formControlName="typeName" maxlength="50" />
+        @if (form.get('typeName')?.touched && form.get('typeName')?.invalid) {
+          <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.NAME' | translate }}</div>
+        }
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">{{ 'TICKET_TYPE_FORM.FIELDS.CURRENCY' | translate }}</label>
+        <input class="form-control" formControlName="currency" />
+        @if (form.get('currency')?.touched && form.get('currency')?.invalid) {
+          <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.CURRENCY' | translate }}</div>
+        }
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">{{ 'TICKET_TYPE_FORM.FIELDS.COST' | translate }}</label>
+        <input type="number" step="0.01" min="0.01" class="form-control" formControlName="cost" />
+        @if (form.get('cost')?.touched && form.get('cost')?.invalid) {
+          <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.COST' | translate }}</div>
+        }
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">{{ 'TICKET_TYPE_FORM.FIELDS.MAX_PER_DAY' | translate }}</label>
+        <input type="number" min="1" class="form-control" formControlName="maxPerDay" />
+        @if (form.get('maxPerDay')?.touched && form.get('maxPerDay')?.invalid) {
+          <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.MAX_PER_DAY' | translate }}</div>
+        }
+      </div>
+      <div class="col-12">
+        <label class="form-label">{{ 'TICKET_TYPE_FORM.FIELDS.DESCRIPTION' | translate }}</label>
+        <textarea class="form-control" rows="3" formControlName="description" maxlength="255"></textarea>
+        @if (form.get('description')?.touched && form.get('description')?.invalid) {
+          <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.DESCRIPTION' | translate }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" [disabled]="loading" class="btn btn-primary">{{ 'TICKET_TYPE_FORM.BUTTON_SAVE' | translate }}</button>
+      @if (isEdit) {
+        <button type="button" [disabled]="loading" class="btn btn-outline-danger" (click)="delete()">{{ 'TICKET_TYPE_FORM.BUTTON_DELETE' | translate }}</button>
+      }
+    </div>
+  </form>
+</div>
+

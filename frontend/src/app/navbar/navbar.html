@@ -19,6 +19,12 @@
       <li class="nav-list__item">
         <button class="nav-btn" (click)="logout()">{{ 'NAV.LOGOUT' | translate }}</button>
       </li>
+      <li class="nav-list__item">
+        <a class="nav-btn" routerLink="/discounts">
+          <i class="fa fa-user"></i>
+          {{ 'NAV.DISCOUNT' | translate }}
+        </a>
+      </li>
     }
     @if (role === 'ADMIN') {
       <li class="nav-list__item">
@@ -28,17 +34,12 @@
         </a>
       </li>
       <li class="nav-list__item">
-        <a class="nav-btn" routerLink="/ticket-type">
+        <a class="nav-btn" routerLink="/ticket-types">
           <i class="fa fa-tachometer-alt"></i>
           {{ 'NAV.TICKET_TYPE' | translate }}
         </a>
+      </li>
     }
-    <li class="nav-list__item">
-      <a class="nav-btn" routerLink="/discounts">
-        <i class="fa fa-user"></i>
-        {{ 'NAV.DISCOUNT' | translate }}
-      </a>
-    </li>
     <li class="nav-list__item">
       <div class="lang-switcher">
         <span class="world-icon">🌐</span>

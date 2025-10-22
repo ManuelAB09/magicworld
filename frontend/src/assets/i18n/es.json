@@ -56,6 +56,7 @@
   "error.invalid.token": "El token es inválido o ha expirado",
   "error.too.many.requests": "Lo ha intentando varias veces seguidas, por favor pruebe luego.",
   "error.at.least.one.ticket.type.must.be.provided": "Debe proporcionarse al menos un tipo de entrada.",
+  "error.ticket_type.discounts.assigned": "No se puede eliminar un tipo de entrada con descuentos asignados.",
   "passwordReset": {
     "title": "¿Has olvidado tu contraseña?",
     "emailLabel": "Correo electrónico",
@@ -109,5 +110,43 @@
     "TYPES_REQUIRED": "Debes seleccionar al menos un tipo de entrada",
     "ERROR_SAVE": "No se pudo guardar el descuento",
     "ERROR_DELETE": "No se pudo eliminar"
+  },
+  "TICKET_TYPES": {
+    "TITLE": "Tipos de entrada",
+    "CREATE": "Crear tipo de entrada",
+    "EDIT": "Editar",
+    "LOADING": "Cargando...",
+    "ERROR_LIST": "No se pudo cargar el listado",
+    "EMPTY": "No hay tipos de entrada.",
+    "TABLE": {
+      "NAME": "Nombre",
+      "COST": "Coste",
+      "CURRENCY": "Divisa",
+      "DESCRIPTION": "Descripción",
+      "MAX_PER_DAY": "Máx. por día",
+      "ACTIONS": "Acciones"
+    }
+  },
+  "TICKET_TYPE_FORM": {
+    "CREATE_TITLE": "Crear tipo de entrada",
+    "EDIT_TITLE": "Editar tipo de entrada",
+    "BUTTON_BACK": "Volver",
+    "FIELDS": {
+      "NAME": "Nombre",
+      "CURRENCY": "Divisa",
+      "COST": "Coste",
+      "MAX_PER_DAY": "Máx. por día",
+      "DESCRIPTION": "Descripción"
+    },
+    "VALIDATION": {
+      "NAME": "Nombre requerido (máx. 50)",
+      "CURRENCY": "Divisa requerida",
+      "COST": "El coste debe ser mayor que 0",
+      "MAX_PER_DAY": "El máximo por día debe ser mayor o igual que 1",
+      "DESCRIPTION": "Descripción requerida (máx. 255)"
+    },
+    "BUTTON_SAVE": "Guardar",
+    "BUTTON_DELETE": "Eliminar",
+    "CONFIRM_DELETE": "¿Seguro que deseas eliminar este tipo de entrada?"
   }
 }

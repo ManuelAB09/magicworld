@@ -5,10 +5,12 @@ import {AuthGuard} from './auth/AuthGuard';
 import {HomeComponent} from './home/home';
 import {EmailForm} from './auth/password_reset/email-form/email-form';
 import {ResetPasswordForm} from './auth/password_reset/reset-password-form/reset-password-form';
-import {TicketType} from './ticket-type/ticket-type';
 import { DiscountList } from './discount/discount-list';
 import { DiscountForm } from './discount/discount-form';
 import { AdminGuard } from './auth/AdminGuard';
+import { TicketTypeList } from './ticket-type/ticket-type-list';
+import { TicketTypeForm } from './ticket-type/ticket-type-form';
+import { RequireAuthGuard } from './auth/RequireAuthGuard';
 
 export const routes: Routes = [
   { path: 'login',
@@ -31,10 +33,13 @@ export const routes: Routes = [
     component: HomeComponent
   },
 
+
   { path: 'discounts', component: DiscountList },
-  // Crear/editar sólo admin
   { path: 'discounts/new', component: DiscountForm, canActivate: [AdminGuard] },
   { path: 'discounts/:id', component: DiscountForm, canActivate: [AdminGuard] },
-  {path: 'ticket_type',
-   component: TicketType}
+
+
+  { path: 'ticket-types', component: TicketTypeList, canActivate: [AdminGuard] },
+  { path: 'ticket-types/new', component: TicketTypeForm, canActivate: [AdminGuard] },
+  { path: 'ticket-types/:id', component: TicketTypeForm, canActivate: [AdminGuard] }
 ];

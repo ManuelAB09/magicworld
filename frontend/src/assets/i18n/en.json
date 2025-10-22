@@ -56,6 +56,7 @@
   "error.invalid.token": "Token is invalid or has expired",
   "error.too.many.requests": "You have tried to much times. Please try again later.",
   "error.at.least.one.ticket.type.must.be.provided": "At least one ticket type must be provided",
+  "error.ticket_type.discounts.assigned": "A ticket type with assigned discounts cannot be deleted",
   "passwordReset": {
     "title": "Forgot your password?",
     "emailLabel": "Email address",
@@ -109,5 +110,43 @@
     "TYPES_REQUIRED": "You must select at least one ticket type",
     "ERROR_SAVE": "Failed to save the discount",
     "ERROR_DELETE": "Failed to delete"
+  },
+  "TICKET_TYPES": {
+    "TITLE": "Ticket types",
+    "CREATE": "Create ticket type",
+    "EDIT": "Edit",
+    "LOADING": "Loading...",
+    "ERROR_LIST": "Could not load the list",
+    "EMPTY": "No ticket types.",
+    "TABLE": {
+      "NAME": "Name",
+      "COST": "Cost",
+      "CURRENCY": "Currency",
+      "DESCRIPTION": "Description",
+      "MAX_PER_DAY": "Max per day",
+      "ACTIONS": "Actions"
+    }
+  },
+  "TICKET_TYPE_FORM": {
+    "CREATE_TITLE": "Create ticket type",
+    "EDIT_TITLE": "Edit ticket type",
+    "BUTTON_BACK": "Back",
+    "FIELDS": {
+      "NAME": "Name",
+      "CURRENCY": "Currency",
+      "COST": "Cost",
+      "MAX_PER_DAY": "Max per day",
+      "DESCRIPTION": "Description"
+    },
+    "VALIDATION": {
+      "NAME": "Name is required (max 50)",
+      "CURRENCY": "Currency is required",
+      "COST": "Cost must be greater than 0",
+      "MAX_PER_DAY": "Max per day must be at least 1",
+      "DESCRIPTION": "Description is required (max 255)"
+    },
+    "BUTTON_SAVE": "Save",
+    "BUTTON_DELETE": "Delete",
+    "CONFIRM_DELETE": "Are you sure you want to delete this ticket type?"
   }
 }

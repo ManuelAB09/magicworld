@@ -1,0 +1,58 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ 'TICKET_TYPES.TITLE' | translate }}</h2>
+    @if (isAdmin) {
+      <a class="btn btn-primary" [routerLink]="['/ticket-types/new']">{{ 'TICKET_TYPES.CREATE' | translate }}</a>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="alert alert-info">{{ 'TICKET_TYPES.LOADING' | translate }}</div>
+  }
+
+  @if (errorKey) {
+    <div class="alert alert-danger">{{ errorKey | translate:errorArgs }}</div>
+    @if (validationMessages.length) {
+      <ul class="mt-2 mb-0">
+        @for (m of validationMessages; track m) {
+          <li>{{ m }}</li>
+        }
+      </ul>
+    }
+  }
+
+  @if (!loading && items.length) {
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>{{ 'TICKET_TYPES.TABLE.NAME' | translate }}</th>
+        <th>{{ 'TICKET_TYPES.TABLE.COST' | translate }}</th>
+        <th>{{ 'TICKET_TYPES.TABLE.CURRENCY' | translate }}</th>
+        <th>{{ 'TICKET_TYPES.TABLE.DESCRIPTION' | translate }}</th>
+        <th>{{ 'TICKET_TYPES.TABLE.MAX_PER_DAY' | translate }}</th>
+        @if (isAdmin) {
+          <th class="text-end">{{ 'TICKET_TYPES.TABLE.ACTIONS' | translate }}</th>
+        }
+      </tr>
+      </thead>
+      <tbody>
+        @for (tt of items; track tt.id) {
+          <tr>
+            <td>{{ tt.typeName }}</td>
+            <td>{{ tt.cost }}</td>
+            <td>{{ tt.currency }}</td>
+            <td>{{ tt.description }}</td>
+            <td>{{ tt.maxPerDay }}</td>
+            @if (isAdmin) {
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/ticket-types', tt.id]">{{ 'TICKET_TYPES.EDIT' | translate }}</a>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else if (!loading && !(items.length)) {
+    <div class="text-muted">{{ 'TICKET_TYPES.EMPTY' | translate }}</div>
+  }
+</div>
