@@ -1,11 +1,11 @@
-package com.magicworld.tfg_angular_springboot.auth;
+package com.magicworld.tfg_angular_springboot.reset_token;
 
 import com.magicworld.tfg_angular_springboot.exceptions.BadRequestException;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidTokenException;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import com.magicworld.tfg_angular_springboot.user.User;
 import com.magicworld.tfg_angular_springboot.user.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;

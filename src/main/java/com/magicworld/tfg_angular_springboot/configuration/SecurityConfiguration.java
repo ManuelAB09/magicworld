@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -27,7 +28,6 @@ public class SecurityConfiguration {
     private final AuthEntryPointJwt unauthorizedHandler;
 
     private static final String ADMIN_ROLE = "ADMIN";
-    private static final String USER_ROLE = "USER";
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -41,7 +41,12 @@ public class SecurityConfiguration {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(unauthorizedHandler))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/static/**", "/v3/api-docs/**", "/swagger-resources/**", "/api/v1/auth/login","/api/v1/auth/register","/api/v1/auth/reset-password","/api/v1/auth/forgot-password", "/swagger-ui.html", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/static/**", "/v3/api-docs/**", "/swagger-resources/**", "/api/v1/auth/login","/api/v1/auth/register",
+                                         "/api/v1/auth/reset-password","/api/v1/auth/forgot-password", "/swagger-ui.html", "/swagger-ui/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/attractions", "/api/v1/attractions/**","/api/v1/ticket-types","/api/v1/ticket-types/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/attractions/**","/api/v1/ticket-types/**").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/attractions/**","/api/v1/ticket-types/**").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/attractions/**","/api/v1/ticket-types/**").hasRole(ADMIN_ROLE)
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -1,9 +1,0 @@
-exclude_paths:
-  - node_modules/**
-  - frontend/dist/**
-  - target/**
-  - docs-site/build/**
-  - .github/**
-
-
-

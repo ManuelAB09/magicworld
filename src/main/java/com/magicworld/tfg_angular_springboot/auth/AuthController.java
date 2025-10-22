@@ -1,6 +1,8 @@
 package com.magicworld.tfg_angular_springboot.auth;
 
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtAuthenticationFilter;
+import com.magicworld.tfg_angular_springboot.reset_token.PasswordResetService;
+import com.magicworld.tfg_angular_springboot.reset_token.ResetPasswordRequest;
 import com.magicworld.tfg_angular_springboot.user.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
