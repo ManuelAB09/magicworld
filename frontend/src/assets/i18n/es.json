@@ -57,6 +57,7 @@
   "error.too.many.requests": "Lo ha intentando varias veces seguidas, por favor pruebe luego.",
   "error.at.least.one.ticket.type.must.be.provided": "Debe proporcionarse al menos un tipo de entrada.",
   "error.ticket_type.discounts.assigned": "No se puede eliminar un tipo de entrada con descuentos asignados.",
+  "error.discount.expiryDate.past": "Un descuento no puede tener una fecha de expiración en el pasado o en el día de hoy.",
   "passwordReset": {
     "title": "¿Has olvidado tu contraseña?",
     "emailLabel": "Correo electrónico",
