@@ -23,7 +23,7 @@ import java.util.UUID;
 public class ImageStorageService {
 
     private final Path baseDir;
-    private final long maxBytes; // computed from application property
+    private final long maxBytes;
 
     public ImageStorageService(Environment env) {
         this.baseDir = Paths.get("uploads").toAbsolutePath().normalize();
@@ -64,10 +64,10 @@ public class ImageStorageService {
             Path targetDir = baseDir.resolve(subfolder).normalize();
             Files.createDirectories(targetDir);
 
-            // compute hash of incoming file
+
             String incomingHash = computeHash(file.getInputStream());
 
-            // check existing files for same hash
+
             try (var stream = Files.list(targetDir)) {
                 var found = stream.filter(Files::isRegularFile).filter(p -> {
                     try (InputStream is = Files.newInputStream(p)) {

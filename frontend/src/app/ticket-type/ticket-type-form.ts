@@ -29,7 +29,7 @@ export class TicketTypeForm implements OnInit {
   photoRequiredError = false;
 
   private apiBase = 'http://localhost:8080';
-  private readonly maxFileBytes = 50 * 1024 * 1024; // 50MB - keep in sync with backend
+  private readonly maxFileBytes = 50 * 1024 * 1024;
 
   constructor(
     private fb: FormBuilder,
@@ -93,19 +93,19 @@ export class TicketTypeForm implements OnInit {
     }
     const file = input.files[0];
     if (!file.type.startsWith('image/')) {
-      // no es una imagen
+
       this.selectedFile = null;
       this.previewUrl = null;
       this.photoRequiredError = true;
       return;
     }
-    // validar tamaño en cliente antes de enviar
+
     if (file.size > this.maxFileBytes) {
       this.selectedFile = null;
       this.previewUrl = null;
       this.photoRequiredError = false;
       this.errorKey = 'error.file.size_exceeded';
-      // ErrorService espera args como objeto (no validation), aquí pasamos índice 0 con bytes
+
       this.errorArgs = { 0: this.maxFileBytes };
       this.validationMessages = [];
       return;
@@ -138,7 +138,7 @@ export class TicketTypeForm implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-    // validar archivo requerido si es creación
+
     if (!this.isEdit && !this.selectedFile) {
       this.photoRequiredError = true;
       return;

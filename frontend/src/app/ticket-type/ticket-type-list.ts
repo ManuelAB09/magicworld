@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { TicketType, TicketTypeApiService } from './ticket-type.service';
 import { AuthService, Role } from '../auth/auth-service';
 import { ErrorService } from '../error/error-service';
@@ -27,7 +27,9 @@ export class TicketTypeList implements OnInit {
   constructor(
     private api: TicketTypeApiService,
     private auth: AuthService,
-    private error: ErrorService
+    private error: ErrorService,
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -65,5 +67,25 @@ export class TicketTypeList implements OnInit {
     if (!url) return null;
     if (url.startsWith('http')) return url;
     return this.apiBase + url;
+  }
+
+  delete(id: number) {
+    const ok = confirm(this.translate.instant('TICKET_TYPE_FORM.CONFIRM_DELETE'));
+    if (!ok) return;
+
+    this.loading = true;
+    this.api.delete(id).subscribe({
+      next: () => {
+        this.loading = false;
+        this.items = this.items.filter(tt => tt.id !== id);
+      },
+      error: (err) => {
+        this.loading = false;
+        const mapped = this.error.handleError(err);
+        this.errorKey = mapped.code;
+        this.errorArgs = mapped.args;
+        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+      }
+    });
   }
 }

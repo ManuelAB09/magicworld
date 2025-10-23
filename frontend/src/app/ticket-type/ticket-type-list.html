@@ -1,8 +1,8 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
+<div class="ticket-types-page">
+  <div class="page-header">
     <h2>{{ 'TICKET_TYPES.TITLE' | translate }}</h2>
     @if (isAdmin) {
-      <a class="btn btn-primary" [routerLink]="['/ticket-types/new']">{{ 'TICKET_TYPES.CREATE' | translate }}</a>
+      <a class="btn-add" [routerLink]="['/ticket-types/new']">{{ 'TICKET_TYPES.CREATE' | translate }}</a>
     }
   </div>
 
@@ -22,26 +22,33 @@
   }
 
   @if (!loading && items.length) {
-    <div class="row g-3">
+    <div class="cards-container">
       @for (tt of items; track tt.id) {
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-          <div class="card h-100 shadow-sm">
-            @if (getImageUrl(tt.photoUrl)) {
-              <img class="card-img-top" [src]="getImageUrl(tt.photoUrl)!" [alt]="tt.typeName" style="object-fit: cover; height: 160px;" />
-            }
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title d-flex justify-content-between align-items-center">
-                <span>{{ tt.typeName }}</span>
-                <span class="badge bg-primary">{{ tt.cost }} {{ tt.currency }}</span>
-              </h5>
-              <p class="card-text text-muted" title="{{ tt.description }}">{{ tt.description }}</p>
-              <div class="mt-auto d-flex justify-content-between align-items-center">
-                <small class="text-secondary">{{ 'TICKET_TYPES.TABLE.MAX_PER_DAY' | translate }}: {{ tt.maxPerDay }}</small>
-                @if (isAdmin) {
-                  <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/ticket-types', tt.id]">{{ 'TICKET_TYPES.EDIT' | translate }}</a>
+        <div class="ticket-card">
+          @if (getImageUrl(tt.photoUrl)) {
+            <img class="ticket-image" [src]="getImageUrl(tt.photoUrl)!" [alt]="tt.typeName" />
+          }
+
+          <div class="ticket-content">
+            <h3>{{ tt.typeName }}</h3>
+            <p class="ticket-cost">{{ 'Cost:' | translate }} {{ tt.cost }} {{ tt.currency }}</p>
+            <p class="ticket-desc" title="{{ tt.description }}">{{ tt.description }}</p>
+
+            @if (isAdmin) {
+              <div class="ticket-buttons">
+                <a class="btn-edit" [routerLink]="['/ticket-types', tt.id]">
+                  {{ 'TICKET_TYPES.EDIT' | translate }}
+                </a>
+                @if (tt.id !== undefined) {
+                  <button
+                    class="btn-delete"
+                    (click)="delete(tt.id!)">
+                    {{ 'TICKET_TYPE_FORM.BUTTON_DELETE' | translate }}
+                  </button>
                 }
+
               </div>
-            </div>
+            }
           </div>
         </div>
       }

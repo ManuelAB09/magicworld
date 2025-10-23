@@ -1,79 +1,102 @@
-<div class="container mt-4" [class.opacity-50]="loading">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ (isEdit ? 'TICKET_TYPE_FORM.EDIT_TITLE' : 'TICKET_TYPE_FORM.CREATE_TITLE') | translate }}</h2>
-    <a class="btn btn-secondary" [routerLink]="['/ticket-types']">{{ 'TICKET_TYPE_FORM.BUTTON_BACK' | translate }}</a>
-  </div>
+<div class="container page-wrapper mt-4" [class.opacity-50]="loading">
 
-  @if (errorKey) {
-    <div class="alert alert-danger">{{ errorKey | translate:errorArgs }}</div>
-    @if (validationMessages.length) {
-      <ul class="mt-2 mb-0">
-        @for (m of validationMessages; track m) {
-          <li>{{ m }}</li>
-        }
-      </ul>
-    }
-  }
-
-  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label">{{ 'TICKET_TYPE_FORM.FIELDS.NAME' | translate }}</label>
-        <input class="form-control" formControlName="typeName" maxlength="50" />
-        @if (form.get('typeName')?.touched && form.get('typeName')?.invalid) {
-          <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.NAME' | translate }}</div>
-        }
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">{{ 'TICKET_TYPE_FORM.FIELDS.CURRENCY' | translate }}</label>
-        <input class="form-control" formControlName="currency" />
-        @if (form.get('currency')?.touched && form.get('currency')?.invalid) {
-          <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.CURRENCY' | translate }}</div>
-        }
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">{{ 'TICKET_TYPE_FORM.FIELDS.COST' | translate }}</label>
-        <input type="number" step="0.01" min="0.01" class="form-control" formControlName="cost" />
-        @if (form.get('cost')?.touched && form.get('cost')?.invalid) {
-          <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.COST' | translate }}</div>
-        }
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">{{ 'TICKET_TYPE_FORM.FIELDS.MAX_PER_DAY' | translate }}</label>
-        <input type="number" min="1" class="form-control" formControlName="maxPerDay" />
-        @if (form.get('maxPerDay')?.touched && form.get('maxPerDay')?.invalid) {
-          <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.MAX_PER_DAY' | translate }}</div>
-        }
-      </div>
-      <div class="col-12">
-        <label class="form-label">{{ 'TICKET_TYPE_FORM.FIELDS.DESCRIPTION' | translate }}</label>
-        <textarea class="form-control" rows="3" formControlName="description" maxlength="255"></textarea>
-        @if (form.get('description')?.touched && form.get('description')?.invalid) {
-          <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.DESCRIPTION' | translate }}</div>
-        }
+  <div class="ticket-area">
+    <div class="ticket-card">
+      <div class="ticket-card__header">
+        <h2 class="ticket-card__title">
+          {{ (isEdit ? 'TICKET_TYPE_FORM.EDIT_TITLE' : 'TICKET_TYPE_FORM.CREATE_TITLE') | translate }}
+        </h2>
+        <a class="btn btn--secondary ticket-card__back" [routerLink]="['/ticket-types']">
+          {{ 'TICKET_TYPE_FORM.BUTTON_BACK' | translate }}
+        </a>
       </div>
 
-      <div class="col-md-6">
-        <label class="form-label">{{ 'TICKET_TYPE_FORM.FIELDS.PHOTO_URL' | translate }}</label>
-        <input type="file" accept="image/*" class="form-control" (change)="onFileChange($event)" />
-        @if (photoRequiredError) {
-          <div class="invalid-feedback d-block">{{ 'TICKET_TYPE_FORM.VALIDATION.PHOTO_URL' | translate }}</div>
-        }
-      </div>
-      <div class="col-md-6 d-flex align-items-end">
-        @if (previewUrl) {
-          <img [src]="previewUrl" alt="preview" class="img-thumbnail" style="max-height: 120px;" />
-        } @else if (getImageUrl(existingPhotoUrl)) {
-          <img [src]="getImageUrl(existingPhotoUrl)" alt="current" class="img-thumbnail" style="max-height: 120px;" />
-        }
-      </div>
-    </div>
 
-    <div class="d-flex gap-2 mt-4">
-      <button type="submit" [disabled]="loading" class="btn btn-primary">{{ 'TICKET_TYPE_FORM.BUTTON_SAVE' | translate }}</button>
-      @if (isEdit) {
-        <button type="button" [disabled]="loading" class="btn btn-outline-danger" (click)="delete()">{{ 'TICKET_TYPE_FORM.BUTTON_DELETE' | translate }}</button>
+      @if (errorKey) {
+        <div class="alert alert--danger">{{ errorKey | translate:errorArgs }}</div>
+        @if (validationMessages.length) {
+          <ul class="alert__list mt-2 mb-0">
+            @for (m of validationMessages; track m) {
+              <li>{{ m }}</li>
+            }
+          </ul>
+        }
       }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="ticket-form">
+        <div class="ticket-form__grid">
+          <div class="field">
+            <label class="field__label">{{ 'TICKET_TYPE_FORM.FIELDS.NAME' | translate }}</label>
+            <input class="field__input" formControlName="typeName" maxlength="50" />
+            @if (form.get('typeName')?.touched && form.get('typeName')?.invalid) {
+              <div class="field__error">{{ 'TICKET_TYPE_FORM.VALIDATION.NAME' | translate }}</div>
+            }
+          </div>
+          <div class="field">
+            <label class="field__label">{{ 'TICKET_TYPE_FORM.FIELDS.MAX_PER_DAY' | translate }}</label>
+            <input type="number" min="1" class="field__input" formControlName="maxPerDay" />
+            @if (form.get('maxPerDay')?.touched && form.get('maxPerDay')?.invalid) {
+              <div class="field__error">{{ 'TICKET_TYPE_FORM.VALIDATION.MAX_PER_DAY' | translate }}</div>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field__label">{{ 'TICKET_TYPE_FORM.FIELDS.COST' | translate }}</label>
+            <input type="number" step="0.01" min="0.01" class="field__input" formControlName="cost" />
+            @if (form.get('cost')?.touched && form.get('cost')?.invalid) {
+              <div class="field__error">{{ 'TICKET_TYPE_FORM.VALIDATION.COST' | translate }}</div>
+            }
+          </div>
+
+
+          <div class="field">
+            <label class="field__label">{{ 'TICKET_TYPE_FORM.FIELDS.CURRENCY' | translate }}</label>
+            <input class="field__input" formControlName="currency" />
+            @if (form.get('currency')?.touched && form.get('currency')?.invalid) {
+              <div class="field__error">{{ 'TICKET_TYPE_FORM.VALIDATION.CURRENCY' | translate }}</div>
+            }
+          </div>
+
+
+          <div class="field field--full">
+            <label class="field__label">{{ 'TICKET_TYPE_FORM.FIELDS.DESCRIPTION' | translate }}</label>
+            <textarea class="field__textarea" rows="3" formControlName="description" maxlength="255"></textarea>
+            @if (form.get('description')?.touched && form.get('description')?.invalid) {
+              <div class="field__error">{{ 'TICKET_TYPE_FORM.VALIDATION.DESCRIPTION' | translate }}</div>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field__label">{{ 'TICKET_TYPE_FORM.FIELDS.PHOTO_URL' | translate }}</label>
+
+            <div class="file-input">
+              <label class="file-input__button" for="photoFile">
+                <span class="file-input__icon">📁</span>
+                <span class="file-input__text">{{ 'TICKET_TYPE_FORM.FIELDS.UPLOAD_IMAGE' | translate }}</span>
+              </label>
+              <input id="photoFile" type="file" accept="image/*" class="file-input__real" (change)="onFileChange($event)" />
+            </div>
+
+            @if (photoRequiredError) {
+              <div class="field__error">{{ 'TICKET_TYPE_FORM.VALIDATION.PHOTO_URL' | translate }}</div>
+            }
+          </div>
+
+          <div class="field field--preview">
+            @if (previewUrl) {
+              <div class="image-preview"><img [src]="previewUrl" alt="preview" /></div>
+            } @else if (getImageUrl(existingPhotoUrl)) {
+              <div class="image-preview"><img [src]="getImageUrl(existingPhotoUrl)" alt="current" /></div>
+            }
+          </div>
+        </div>
+
+        <div class="ticket-form__actions">
+          <button type="submit" [disabled]="loading" class="btn btn--primary">
+            {{ 'TICKET_TYPE_FORM.BUTTON_SAVE' | translate }}
+          </button>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>

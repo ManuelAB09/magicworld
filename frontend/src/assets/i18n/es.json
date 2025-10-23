@@ -144,7 +144,8 @@
       "COST": "Coste",
       "MAX_PER_DAY": "Máx. por día",
       "DESCRIPTION": "Descripción",
-      "PHOTO_URL": "URL de la foto"
+      "PHOTO_URL": "URL de la foto",
+      "UPLOAD_IMAGE": "Subir foto"
     },
     "VALIDATION": {
       "NAME": "Nombre requerido (máx. 50)",

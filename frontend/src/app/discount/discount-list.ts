@@ -23,6 +23,7 @@ export class DiscountList implements OnInit {
   validationMessages: string[] = [];
   appliedTypesMap: Record<number, string[]> = {};
   loadingTypes: Record<number, boolean> = {};
+  deleting: Record<number, boolean> = {}; // estado de eliminación por id
 
   constructor(private api: DiscountApiService, private auth: AuthService, private error: ErrorService) {}
 
@@ -44,6 +45,8 @@ export class DiscountList implements OnInit {
     this.errorArgs = null;
     this.validationMessages = [];
     this.discounts = [];
+    this.appliedTypesMap = {};
+    this.loadingTypes = {};
     this.api.findAll().pipe(
       catchError((err) => {
         const mapped = this.error.handleError(err);
@@ -67,6 +70,32 @@ export class DiscountList implements OnInit {
     ).subscribe((arr: any[]) => {
       this.appliedTypesMap[d.id!] = (arr || []).map(x => x.typeName);
       this.loadingTypes[d.id!] = false;
+    });
+  }
+
+  // eliminar un descuento desde la lista
+  onDelete(d: Discount) {
+    if (!d.id) return;
+    const confirmed = window.confirm(`¿Eliminar el descuento "${d.discountCode}"?`);
+    if (!confirmed) return;
+
+    this.errorKey = null;
+    this.errorArgs = null;
+    this.validationMessages = [];
+    this.deleting[d.id] = true;
+
+    this.api.delete(d.id).subscribe({
+      next: () => {
+        this.discounts = this.discounts.filter(x => x.id !== d.id);
+        delete this.deleting[d.id!];
+      },
+      error: (err) => {
+        const mapped = this.error.handleError(err);
+        this.errorKey = mapped.code;
+        this.errorArgs = mapped.args;
+        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+        this.deleting[d.id!] = false;
+      }
     });
   }
 }

@@ -1,68 +1,79 @@
-<div class="container mt-4" [class.opacity-50]="loading">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ (isEdit ? 'DISCOUNT_FORM.EDIT_TITLE' : 'DISCOUNT_FORM.CREATE_TITLE') | translate }}</h2>
-    <a class="btn btn-secondary" [routerLink]="['/discounts']">{{ 'DISCOUNT_FORM.BUTTON_BACK' | translate }}</a>
-  </div>
+<div class="page-wrapper" [class.opacity-50]="loading">
+  <div class="discount-area">
+    <div class="container mt-4">
+      <div class="discount-card">
+        <div class="discount-card__header">
+          <h2 class="discount-card__title">
+            {{ (isEdit ? 'DISCOUNT_FORM.EDIT_TITLE' : 'DISCOUNT_FORM.CREATE_TITLE') | translate }}
+          </h2>
+          <a class="btn btn--secondary discount-card__back" [routerLink]="['/discounts']">
+            {{ 'DISCOUNT_FORM.BUTTON_BACK' | translate }}
+          </a>
+        </div>
 
-  @if (errorKey) {
-    <div class="alert alert-danger">{{ errorKey | translate:errorArgs }}</div>
-    @if (validationMessages.length) {
-      <ul class="mt-2 mb-0">
-        @for (m of validationMessages; track m) {
-          <li>{{ m }}</li>
+        @if (errorKey) {
+          <div class="alert alert--danger">{{ errorKey | translate:errorArgs }}</div>
+          @if (validationMessages.length) {
+            <ul class="alert__list mt-2 mb-0">
+              @for (m of validationMessages; track m) {
+                <li>{{ m }}</li>
+              }
+            </ul>
+          }
         }
-      </ul>
-    }
-  }
 
-  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-    <div class="row g-3">
-      <div class="col-md-4">
-        <label class="form-label">{{ 'DISCOUNT_FORM.FIELDS.CODE' | translate }}</label>
-        <input class="form-control" formControlName="discountCode" maxlength="20" />
-        @if (form.get('discountCode')?.touched && form.get('discountCode')?.invalid) {
-          <div class="invalid-feedback d-block">{{ 'DISCOUNT_FORM.VALIDATION.CODE_REQUIRED' | translate }}</div>
-        }
-      </div>
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="discount-form">
+          <div class="discount-form__grid">
+            <div class="field">
+              <label class="field__label">{{ 'DISCOUNT_FORM.FIELDS.CODE' | translate }}</label>
+              <input class="field__input" formControlName="discountCode" maxlength="20" />
+              @if (form.get('discountCode')?.touched && form.get('discountCode')?.invalid) {
+                <div class="field__error">{{ 'DISCOUNT_FORM.VALIDATION.CODE_REQUIRED' | translate }}</div>
+              }
+            </div>
 
-      <div class="col-md-4">
-        <label class="form-label">{{ 'DISCOUNT_FORM.FIELDS.PERCENTAGE' | translate }}</label>
-        <input type="number" class="form-control" formControlName="discountPercentage" min="1" max="100" />
-        @if (form.get('discountPercentage')?.touched && form.get('discountPercentage')?.invalid) {
-          <div class="invalid-feedback d-block">{{ 'DISCOUNT_FORM.VALIDATION.PERCENTAGE_RANGE' | translate }}</div>
-        }
-      </div>
+            <div class="field">
+              <label class="field__label">{{ 'DISCOUNT_FORM.FIELDS.PERCENTAGE' | translate }}</label>
+              <input type="number" class="field__input" formControlName="discountPercentage" min="1" max="100" />
+              @if (form.get('discountPercentage')?.touched && form.get('discountPercentage')?.invalid) {
+                <div class="field__error">{{ 'DISCOUNT_FORM.VALIDATION.PERCENTAGE_RANGE' | translate }}</div>
+              }
+            </div>
 
-      <div class="col-md-4">
-        <label class="form-label">{{ 'DISCOUNT_FORM.FIELDS.EXPIRY_DATE' | translate }}</label>
-        <input type="date" class="form-control" formControlName="expiryDate" />
-        @if (form.get('expiryDate')?.touched && form.get('expiryDate')?.invalid) {
-          <div class="invalid-feedback d-block">{{ 'DISCOUNT_FORM.VALIDATION.EXPIRY_REQUIRED' | translate }}</div>
-        }
-      </div>
-    </div>
+            <div class="field">
+              <label class="field__label">{{ 'DISCOUNT_FORM.FIELDS.EXPIRY_DATE' | translate }}</label>
+              <input type="date" class="field__input" formControlName="expiryDate" />
+              @if (form.get('expiryDate')?.touched && form.get('expiryDate')?.invalid) {
+                <div class="field__error">{{ 'DISCOUNT_FORM.VALIDATION.EXPIRY_REQUIRED' | translate }}</div>
+              }
+            </div>
 
-    <div class="mt-4">
-      <label class="form-label">{{ 'DISCOUNT_FORM.FIELDS.TYPES_LABEL' | translate }}</label>
-      <div class="row">
-        @for (tt of allTicketTypes; track tt.id) {
-          <div class="col-md-6 col-lg-4 mb-2">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" [checked]="selectedNames.has(tt.typeName)" (change)="toggleTypeName(tt.typeName, ($any($event.target)?.checked ?? false))" id="ck-{{tt.id}}">
-              <label class="form-check-label" [for]="'ck-' + tt.id">
-                {{ tt.typeName }} ({{ tt.currency }} {{ tt.cost }})
-              </label>
+            <div class="field field--full">
+              <label class="field__label">{{ 'DISCOUNT_FORM.FIELDS.TYPES_LABEL' | translate }}</label>
+              <div class="checks-grid">
+                @for (tt of allTicketTypes; track tt.id) {
+                  <label class="check-item">
+                    <input
+                      class="check-item__real"
+                      type="checkbox"
+                      [checked]="selectedNames.has(tt.typeName)"
+                      (change)="toggleTypeName(tt.typeName, ($any($event.target)?.checked ?? false))"
+                    />
+                    <span class="check-item__box"></span>
+                    <span class="check-item__text">{{ tt.typeName }} ({{ tt.currency }} {{ tt.cost }})</span>
+                  </label>
+                }
+              </div>
             </div>
           </div>
-        }
+
+          <div class="discount-form__actions">
+            <button type="submit" [disabled]="loading" class="btn btn--primary">
+              {{ 'DISCOUNT_FORM.BUTTON_SAVE' | translate }}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-
-    <div class="d-flex gap-2 mt-4">
-      <button type="submit" [disabled]="loading" class="btn btn-primary">{{ 'DISCOUNT_FORM.BUTTON_SAVE' | translate }}</button>
-      @if (isEdit) {
-        <button type="button" [disabled]="loading" class="btn btn-outline-danger" (click)="delete()">{{ 'DISCOUNT_FORM.BUTTON_DELETE' | translate }}</button>
-      }
-    </div>
-  </form>
+  </div>
 </div>
