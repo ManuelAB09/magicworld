@@ -47,12 +47,12 @@ public class Attraction extends BaseEntity {
 
     @NotNull
     @Size(max = 255)
-    @Column(name = "description", length = 255, nullable = false)
+    @Column(name = "description", nullable = false)
     private String description;
 
     @NotNull
     @Size(max = 255)
-    @Column(name = "photo_url", length = 255, nullable = false)
+    @Column(name = "photo_url", nullable = false)
     private String photoUrl;
 
     @NotNull

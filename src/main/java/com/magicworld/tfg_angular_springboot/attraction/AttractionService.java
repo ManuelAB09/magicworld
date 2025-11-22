@@ -44,7 +44,9 @@ public class AttractionService {
         existingAttraction.setMinimumAge(updatedAttraction.getMinimumAge());
         existingAttraction.setMinimumWeight(updatedAttraction.getMinimumWeight());
         existingAttraction.setDescription(updatedAttraction.getDescription());
-        existingAttraction.setPhotoUrl(updatedAttraction.getPhotoUrl());
+        if (updatedAttraction.getPhotoUrl() != null) {
+            existingAttraction.setPhotoUrl(updatedAttraction.getPhotoUrl());
+        }
         existingAttraction.setIsActive(updatedAttraction.getIsActive());
         return attractionRepository.save(existingAttraction);
     }

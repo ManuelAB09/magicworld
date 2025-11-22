@@ -1,0 +1,68 @@
+<div class="attractions-page">
+  <div class="page-header">
+    <h2>{{ 'ATTRACTIONS.TITLE' | translate }}</h2>
+    @if (isAdmin) {
+      <a class="btn-add" [routerLink]="['/attractions/new']">{{ 'ATTRACTIONS.CREATE' | translate }}</a>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="alert alert-info">{{ 'ATTRACTIONS.LOADING' | translate }}</div>
+  }
+
+  @if (errorKey) {
+    <div class="alert alert-danger">{{ errorKey | translate:errorArgs }}</div>
+    @if (validationMessages.length) {
+      <ul class="mt-2 mb-0">
+        @for (m of validationMessages; track m) {
+          <li>{{ m }}</li>
+        }
+      </ul>
+    }
+  }
+
+  @if (!loading && items.length) {
+    <div class="cards-container">
+      @for (a of items; track a.id) {
+        <div class="attraction-card">
+          @if (getImageUrl(a.photoUrl)) {
+            <img class="attraction-image" [src]="getImageUrl(a.photoUrl)!" [alt]="a.name" />
+          }
+
+          <div class="attraction-content">
+            <h3>{{ a.name }}</h3>
+            <p class="attr-intensity">{{ 'ATTRACTION_FORM.FIELDS.INTENSITY' | translate }}: {{ a.intensity }}</p>
+            <p class="attr-constraints">
+              {{ 'ATTRACTIONS.MIN_CONSTRAINTS' | translate }}:
+              {{ a.minimumHeight }}cm · {{ a.minimumAge }}y · {{ a.minimumWeight }}kg
+            </p>
+            <p class="attr-desc" title="{{ a.description }}">{{ a.description }}</p>
+            <p class="attr-is_active" [ngClass]="{ active: a.isActive, inactive: !a.isActive }">
+              @if (a.isActive) {
+                {{ 'ATTRACTIONS.STATUS_ACTIVE' | translate }}
+              } @else {
+                {{ 'ATTRACTIONS.STATUS_INACTIVE' | translate }}
+              }
+            </p>
+
+            @if (isAdmin) {
+              <div class="attraction-buttons">
+                <a class="btn-edit" [routerLink]="['/attractions', a.id]">
+                  {{ 'ATTRACTIONS.EDIT' | translate }}
+                </a>
+                @if (a.id !== undefined) {
+                  <button class="btn-delete" (click)="delete(a.id!)">
+                    {{ 'ATTRACTION_FORM.BUTTON_DELETE' | translate }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (!loading && !(items.length)) {
+    <div class="text-muted">{{ 'ATTRACTIONS.EMPTY' | translate }}</div>
+  }
+</div>
+

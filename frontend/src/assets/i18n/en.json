@@ -22,7 +22,8 @@
     "LOGOUT": "Logout",
     "ADMIN_PANEL": "App endpoints",
     "DISCOUNT": "Discounts",
-    "TICKET_TYPE": "Ticket Types"
+    "TICKET_TYPE": "Ticket Types",
+    "ATTRACTIONS": "Attractions"
   },
   "HOME": {
     "TITLE": "Welcome to MagicWorld",
@@ -58,6 +59,7 @@
   "error.at.least.one.ticket.type.must.be.provided": "At least one ticket type must be provided",
   "error.ticket_type.discounts.assigned": "A ticket type with assigned discounts cannot be deleted",
   "error.discount.expiryDate.past": "A discount cannot have an expiry date in the past or today",
+  "error.attraction.notfound": "Attraction not found",
 
   "error.file.empty": "No file uploaded",
   "error.file.size_exceeded": "File too large (max {{0}} bytes)",
@@ -158,5 +160,43 @@
     "BUTTON_SAVE": "Save",
     "BUTTON_DELETE": "Delete",
     "CONFIRM_DELETE": "Are you sure you want to delete this ticket type?"
+  },
+  "ATTRACTIONS": {
+    "TITLE": "Attractions",
+    "CREATE": "Create attraction",
+    "EDIT": "Edit",
+    "LOADING": "Loading...",
+    "ERROR_LIST": "Could not load the list",
+    "EMPTY": "No attractions.",
+    "MIN_CONSTRAINTS": "Minimums",
+    "STATUS_ACTIVE": "The attraction is open",
+    "STATUS_INACTIVE": "The attraction is closed"
+  },
+  "ATTRACTION_FORM": {
+    "CREATE_TITLE": "Create attraction",
+    "EDIT_TITLE": "Edit attraction",
+    "BUTTON_BACK": "Back",
+    "FIELDS": {
+      "NAME": "Name",
+      "INTENSITY": "Intensity",
+      "MIN_HEIGHT": "Min height (cm)",
+      "MIN_AGE": "Min age (years)",
+      "MIN_WEIGHT": "Min weight (kg)",
+      "DESCRIPTION": "Description",
+      "IS_ACTIVE": "Active",
+      "PHOTO_URL": "Photo URL",
+      "UPLOAD_IMAGE": "Upload image"
+    },
+    "VALIDATION": {
+      "NAME": "Name is required (max 50)",
+      "MIN_HEIGHT": "Minimum height must be 0 or greater",
+      "MIN_AGE": "Minimum age must be 0 or greater",
+      "MIN_WEIGHT": "Minimum weight must be 0 or greater",
+      "DESCRIPTION": "Description is required (max 255)",
+      "PHOTO_URL": "You must provide an image or an URL"
+    },
+    "BUTTON_SAVE": "Save",
+    "BUTTON_DELETE": "Delete",
+    "CONFIRM_DELETE": "Are you sure you want to delete this attraction?"
   }
 }

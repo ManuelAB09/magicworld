@@ -1,0 +1,112 @@
+<div class="container page-wrapper mt-4" [class.opacity-50]="loading">
+  <div class="attr-area">
+    <div class="attr-card">
+      <div class="attr-card__header">
+        <h2 class="attr-card__title">
+          {{ (isEdit ? 'ATTRACTION_FORM.EDIT_TITLE' : 'ATTRACTION_FORM.CREATE_TITLE') | translate }}
+        </h2>
+        <a class="btn btn--secondary attr-card__back" [routerLink]="['/attractions']">
+          {{ 'ATTRACTION_FORM.BUTTON_BACK' | translate }}
+        </a>
+      </div>
+
+      @if (errorKey) {
+        <div class="alert alert--danger">{{ errorKey | translate:errorArgs }}</div>
+        @if (validationMessages.length) {
+          <ul class="alert__list mt-2 mb-0">
+            @for (m of validationMessages; track m) { <li>{{ m }}</li> }
+          </ul>
+        }
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="attr-form">
+        <div class="attr-form__grid">
+          <div class="field">
+            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.NAME' | translate }}</label>
+            <input class="field__input" formControlName="name" maxlength="50" />
+            @if (form.get('name')?.touched && form.get('name')?.invalid) {
+              <div class="field__error">{{ 'ATTRACTION_FORM.VALIDATION.NAME' | translate }}</div>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.INTENSITY' | translate }}</label>
+            <select class="field__input" formControlName="intensity">
+              @for (i of intensities; track i) { <option [value]="i">{{ i }}</option> }
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.MIN_HEIGHT' | translate }}</label>
+            <input type="number" min="0" class="field__input" formControlName="minimumHeight" />
+            @if (form.get('minimumHeight')?.touched && form.get('minimumHeight')?.invalid) {
+              <div class="field__error">{{ 'ATTRACTION_FORM.VALIDATION.MIN_HEIGHT' | translate }}</div>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.MIN_AGE' | translate }}</label>
+            <input type="number" min="0" class="field__input" formControlName="minimumAge" />
+            @if (form.get('minimumAge')?.touched && form.get('minimumAge')?.invalid) {
+              <div class="field__error">{{ 'ATTRACTION_FORM.VALIDATION.MIN_AGE' | translate }}</div>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.MIN_WEIGHT' | translate }}</label>
+            <input type="number" min="0" class="field__input" formControlName="minimumWeight" />
+            @if (form.get('minimumWeight')?.touched && form.get('minimumWeight')?.invalid) {
+              <div class="field__error">{{ 'ATTRACTION_FORM.VALIDATION.MIN_WEIGHT' | translate }}</div>
+            }
+          </div>
+
+          <div class="field field--full">
+            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.DESCRIPTION' | translate }}</label>
+            <textarea class="field__textarea" rows="3" formControlName="description" maxlength="255"></textarea>
+            @if (form.get('description')?.touched && form.get('description')?.invalid) {
+              <div class="field__error">{{ 'ATTRACTION_FORM.VALIDATION.DESCRIPTION' | translate }}</div>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.IS_ACTIVE' | translate }}</label>
+            <input type="checkbox" formControlName="isActive" />
+          </div>
+
+          <div class="field">
+            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.PHOTO_URL' | translate }}</label>
+            <div class="file-input">
+              <label class="file-input__button" for="photoFile">
+                <span class="file-input__icon">📁</span>
+                <span class="file-input__text">{{ 'ATTRACTION_FORM.FIELDS.UPLOAD_IMAGE' | translate }}</span>
+              </label>
+              <input id="photoFile" type="file" accept="image/*" class="file-input__real" (change)="onFileChange($event)" />
+            </div>
+            @if (photoRequiredError) {
+              <div class="field__error">{{ 'ATTRACTION_FORM.VALIDATION.PHOTO_URL' | translate }}</div>
+            }
+          </div>
+
+          <div class="field field--preview">
+            @if (previewUrl) {
+              <div class="image-preview"><img [src]="previewUrl" alt="preview" /></div>
+            } @else if (getImageUrl(existingPhotoUrl)) {
+              <div class="image-preview"><img [src]="getImageUrl(existingPhotoUrl)" alt="current" /></div>
+            }
+          </div>
+        </div>
+
+        <div class="attr-form__actions">
+          <button type="submit" [disabled]="loading" class="btn btn--primary">
+            {{ 'ATTRACTION_FORM.BUTTON_SAVE' | translate }}
+          </button>
+          @if (isEdit) {
+            <button type="button" class="btn btn--danger" (click)="delete()">
+              {{ 'ATTRACTION_FORM.BUTTON_DELETE' | translate }}
+            </button>
+          }
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

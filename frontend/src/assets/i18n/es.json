@@ -22,7 +22,8 @@
     "LOGOUT": "Cerrar sesión",
     "ADMIN_PANEL": "Endpoints de la aplicación",
     "DISCOUNT": "Descuentos",
-    "TICKET_TYPE": "Tipos de entradas"
+    "TICKET_TYPE": "Tipos de entradas",
+    "ATTRACTIONS": "Atracciones"
   },
   "HOME": {
     "TITLE": "Bienvenido a MagicWorld",
@@ -58,6 +59,7 @@
   "error.at.least.one.ticket.type.must.be.provided": "Debe proporcionarse al menos un tipo de entrada.",
   "error.ticket_type.discounts.assigned": "No se puede eliminar un tipo de entrada con descuentos asignados.",
   "error.discount.expiryDate.past": "Un descuento no puede tener una fecha de expiración en el pasado o en el día de hoy.",
+  "error.attraction.notfound": "Atracción no encontrada",
 
   "error.file.empty": "No se ha subido ningún fichero",
   "error.file.size_exceeded": "Fichero demasiado grande (máx. {{0}} bytes)",
@@ -158,5 +160,43 @@
     "BUTTON_SAVE": "Guardar",
     "BUTTON_DELETE": "Eliminar",
     "CONFIRM_DELETE": "¿Seguro que deseas eliminar este tipo de entrada?"
+  },
+  "ATTRACTIONS": {
+    "TITLE": "Atracciones",
+    "CREATE": "Crear atracción",
+    "EDIT": "Editar",
+    "LOADING": "Cargando...",
+    "ERROR_LIST": "No se pudo cargar el listado",
+    "EMPTY": "No hay atracciones.",
+    "MIN_CONSTRAINTS": "Mínimos",
+    "STATUS_ACTIVE": "La atracción está abierta",
+    "STATUS_INACTIVE": "La atracción está cerrada"
+  },
+  "ATTRACTION_FORM": {
+    "CREATE_TITLE": "Crear atracción",
+    "EDIT_TITLE": "Editar atracción",
+    "BUTTON_BACK": "Volver",
+    "FIELDS": {
+      "NAME": "Nombre",
+      "INTENSITY": "Intensidad",
+      "MIN_HEIGHT": "Altura mínima (cm)",
+      "MIN_AGE": "Edad mínima (años)",
+      "MIN_WEIGHT": "Peso mínimo (kg)",
+      "DESCRIPTION": "Descripción",
+      "IS_ACTIVE": "Activa",
+      "PHOTO_URL": "Imagen",
+      "UPLOAD_IMAGE": "Subir foto"
+    },
+    "VALIDATION": {
+      "NAME": "Nombre requerido (máx. 50)",
+      "MIN_HEIGHT": "La altura mínima debe ser 0 o mayor",
+      "MIN_AGE": "La edad mínima debe ser 0 o mayor",
+      "MIN_WEIGHT": "El peso mínimo debe ser 0 o mayor",
+      "DESCRIPTION": "Descripción requerida (máx. 255)",
+      "PHOTO_URL": "Debes proporcionar una imagen"
+    },
+    "BUTTON_SAVE": "Guardar",
+    "BUTTON_DELETE": "Eliminar",
+    "CONFIRM_DELETE": "¿Seguro que deseas eliminar esta atracción?"
   }
 }

@@ -1,0 +1,92 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { Attraction, AttractionApiService } from './attraction.service';
+import { AuthService, Role } from '../auth/auth-service';
+import { ErrorService } from '../error/error-service';
+import { catchError, map, of } from 'rxjs';
+
+@Component({
+  selector: 'app-attraction-list',
+  standalone: true,
+  imports: [CommonModule, RouterLink, TranslatePipe],
+  templateUrl: './attraction-list.html',
+  styleUrls: ['./attraction-list.css']
+})
+export class AttractionList implements OnInit {
+  items: Attraction[] = [];
+  loading = false;
+  isAdmin = false;
+  errorKey: string | null = null;
+  errorArgs: any = null;
+  validationMessages: string[] = [];
+
+  private apiBase = 'http://localhost:8080';
+
+  constructor(
+    private api: AttractionApiService,
+    private auth: AuthService,
+    private error: ErrorService,
+    private router: Router,
+    private translate: TranslateService
+  ) {}
+
+  ngOnInit(): void {
+    this.checkAdmin();
+    this.load();
+  }
+
+  private checkAdmin() {
+    this.auth.checkRoleSecure().pipe(
+      map(role => role === Role.ADMIN),
+      catchError(() => of(false))
+    ).subscribe(v => this.isAdmin = v);
+  }
+
+  load() {
+    this.loading = true;
+    this.errorKey = null;
+    this.errorArgs = null;
+    this.validationMessages = [];
+    this.api.findAll().pipe(
+      catchError(err => {
+        const mapped = this.error.handleError(err);
+        this.errorKey = mapped.code;
+        this.errorArgs = mapped.args;
+        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+        return of([]);
+      })
+    ).subscribe(list => {
+      this.items = list;
+      this.loading = false;
+    });
+  }
+
+  getImageUrl(url: string | null | undefined): string | null {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return this.apiBase + url;
+  }
+
+  delete(id: number) {
+    const ok = confirm(this.translate.instant('ATTRACTION_FORM.CONFIRM_DELETE'));
+    if (!ok) return;
+
+    this.loading = true;
+    this.api.delete(id).subscribe({
+      next: () => {
+        this.loading = false;
+        this.items = this.items.filter(a => a.id !== id);
+      },
+      error: (err) => {
+        this.loading = false;
+        const mapped = this.error.handleError(err);
+        this.errorKey = mapped.code;
+        this.errorArgs = mapped.args;
+        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+      }
+    });
+  }
+}
+

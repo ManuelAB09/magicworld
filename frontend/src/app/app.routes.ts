@@ -10,7 +10,8 @@ import { DiscountForm } from './discount/discount-form';
 import { AdminGuard } from './auth/AdminGuard';
 import { TicketTypeList } from './ticket-type/ticket-type-list';
 import { TicketTypeForm } from './ticket-type/ticket-type-form';
-import { RequireAuthGuard } from './auth/RequireAuthGuard';
+import { AttractionList } from './attraction/attraction-list';
+import { AttractionForm } from './attraction/attraction-form';
 
 export const routes: Routes = [
   { path: 'login',
@@ -41,5 +42,10 @@ export const routes: Routes = [
 
   { path: 'ticket-types', component: TicketTypeList, canActivate: [AdminGuard] },
   { path: 'ticket-types/new', component: TicketTypeForm, canActivate: [AdminGuard] },
-  { path: 'ticket-types/:id', component: TicketTypeForm, canActivate: [AdminGuard] }
+  { path: 'ticket-types/:id', component: TicketTypeForm, canActivate: [AdminGuard] },
+
+  // Atracciones: listado público, CRUD solo admin
+  { path: 'attractions', component: AttractionList },
+  { path: 'attractions/new', component: AttractionForm, canActivate: [AdminGuard] },
+  { path: 'attractions/:id', component: AttractionForm, canActivate: [AdminGuard] }
 ];

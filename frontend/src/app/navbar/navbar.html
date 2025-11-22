@@ -26,6 +26,11 @@
         </a>
       </li>
     }
+    <li class="nav-list__item">
+      <a class="nav-btn" routerLink="/attractions">
+        {{ 'NAV.ATTRACTIONS' | translate }}
+      </a>
+    </li>
     @if (role === 'ADMIN') {
       <li class="nav-list__item">
         <a class="nav-btn" href="http://localhost:8080/swagger-ui/index.html">
