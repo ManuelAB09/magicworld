@@ -91,7 +91,7 @@
     "EMPTY": "No hay descuentos.",
     "TABLE": {
       "CODE": "Código",
-      "PERCENTAGE": "%",
+      "PERCENTAGE": "Porcentaje de descuento",
       "EXPIRY_DATE": "Expira",
       "APPLIES_TO": "Aplicable a",
       "ACTIONS": "Acciones"
@@ -146,8 +146,8 @@
       "COST": "Coste",
       "MAX_PER_DAY": "Máx. por día",
       "DESCRIPTION": "Descripción",
-      "PHOTO_URL": "URL de la foto",
-      "UPLOAD_IMAGE": "Subir foto"
+      "PHOTO_URL": "Imagen",
+      "UPLOAD_IMAGE": "Subir imagen"
     },
     "VALIDATION": {
       "NAME": "Nombre requerido (máx. 50)",
@@ -155,7 +155,7 @@
       "COST": "El coste debe ser mayor que 0",
       "MAX_PER_DAY": "El máximo por día debe ser mayor o igual que 1",
       "DESCRIPTION": "Descripción requerida (máx. 255)",
-      "PHOTO_URL": "La URL de la foto es obligatoria"
+      "PHOTO_URL": "La imagen es obligatoria"
     },
     "BUTTON_SAVE": "Guardar",
     "BUTTON_DELETE": "Eliminar",
@@ -170,7 +170,20 @@
     "EMPTY": "No hay atracciones.",
     "MIN_CONSTRAINTS": "Mínimos",
     "STATUS_ACTIVE": "La atracción está abierta",
-    "STATUS_INACTIVE": "La atracción está cerrada"
+    "STATUS_INACTIVE": "La atracción está cerrada",
+    "FILTER": {
+      "MIN_HEIGHT": "Altura mínima (cm)",
+      "MIN_WEIGHT": "Peso mínimo (kg)",
+      "MIN_AGE": "Edad mínima (años)",
+      "SEARCH": "Buscar",
+      "CLEAR": "Borrar",
+      "INVALID_NEGATIVE": "El valor no puede ser negativo",
+      "INTENSITY_LABEL": "Intensidad",
+      "INTENSITY_ALL": "Todas",
+      "INTENSITY_LOW": "Baja",
+      "INTENSITY_MEDIUM": "Media",
+      "INTENSITY_HIGH": "Alta"
+    }
   },
   "ATTRACTION_FORM": {
     "CREATE_TITLE": "Crear atracción",
@@ -185,7 +198,7 @@
       "DESCRIPTION": "Descripción",
       "IS_ACTIVE": "Activa",
       "PHOTO_URL": "Imagen",
-      "UPLOAD_IMAGE": "Subir foto"
+      "UPLOAD_IMAGE": "Subir imagen"
     },
     "VALIDATION": {
       "NAME": "Nombre requerido (máx. 50)",

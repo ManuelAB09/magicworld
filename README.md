@@ -1,4 +1,4 @@
-# TFG-parqueaventura
+# TFG-magicworld
 
 Repositorio del proyecto TFG para la gestión de un parque de atracciones ficticio.  
 Tecnologías principales: **Angular** (frontend) y **Spring Boot** (backend, Java), con base de datos **MySQL**.
@@ -12,7 +12,7 @@ Tecnologías principales: **Angular** (frontend) y **Spring Boot** (backend, Jav
 
 ## Configuración inicial
 
-1. Clona el repositorio: `git clone https://github.com/Manuelgithuv/TFG-parqueaventura.git`
+1. Clona el repositorio: `git clone https://github.com/Manuelgithuv/TFG-magicworld.git`
 2. Configura la base de datos MySQL y añade las credenciales como variables de entorno en `src/main/resources/application.properties`.  
    Asegúrate de que la base de datos existe y las credenciales son correctas.
 3. Instala las dependencias del backend: `mvn clean install`

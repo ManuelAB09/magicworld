@@ -28,20 +28,19 @@ export class AttractionApiService {
     return this.auth.ensureCsrfToken(headers).pipe(switchMap(op));
   }
 
-  findAll(): Observable<Attraction[]> {
-    return this.http.get<Attraction[]>(this.baseUrl, { withCredentials: true});
+  findAll(filters?: { minHeight?: number; minWeight?: number; minAge?: number }): Observable<Attraction[]> {
+    if (!filters) {
+      return this.http.get<Attraction[]>(this.baseUrl, { withCredentials: true});
+    }
+    let params: any = {};
+    if (filters.minHeight != null) params.minHeight = String(filters.minHeight);
+    if (filters.minWeight != null) params.minWeight = String(filters.minWeight);
+    if (filters.minAge != null) params.minAge = String(filters.minAge);
+    return this.http.get<Attraction[]>(this.baseUrl, { withCredentials: true, params });
   }
 
   findById(id: number): Observable<Attraction> {
     return this.withCsrf((h) => this.http.get<Attraction>(`${this.baseUrl}/${id}`, { withCredentials: true, headers: h }));
-  }
-
-  createJson(data: Attraction): Observable<Attraction> {
-    return this.withCsrf((h) => this.http.post<Attraction>(this.baseUrl, data, { withCredentials: true, headers: h }));
-  }
-
-  updateJson(id: number, data: Attraction): Observable<Attraction> {
-    return this.withCsrf((h) => this.http.put<Attraction>(`${this.baseUrl}/${id}`, data, { withCredentials: true, headers: h }));
   }
 
   delete(id: number): Observable<void> {

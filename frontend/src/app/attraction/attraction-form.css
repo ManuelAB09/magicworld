@@ -42,14 +42,53 @@
 .btn--primary { background: linear-gradient(180deg,#2f5bff,#1a40d9); color: #fff; box-shadow: 0 8px 20px rgba(46,80,255,0.18); }
 .btn--primary:hover { filter: brightness(0.92); transform: translateY(-3px); box-shadow: 0 16px 28px rgba(41,67,200,0.22); }
 .btn--secondary { background: transparent; border: 1px solid rgba(0,0,0,0.08); color: #333; box-shadow: 0 4px 8px rgba(0,0,0,0.06); }
-.btn--danger { background: #e53935; color: #fff; }
 
-@media (max-width: 720px) {
-  .attr-card { padding: 18px; }
-  .attr-form__grid { grid-template-columns: 1fr; }
-  .attr-card__back { position: static; margin-top: 10px; }
-  .btn { transform: none !important; box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+
+.btn--secondary:hover,
+.btn--secondary:focus {
+  filter: brightness(0.9);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 20px rgba(0,0,0,0.12);
+}
+.btn--secondary:active {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
 }
 
-.opacity-50 { opacity: 0.55; pointer-events: none; }
+.btn:focus-visible {
+  outline: 3px solid rgba(79, 120, 255, 0.18);
+  outline-offset: 2px;
+}
 
+.field--checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.field--checkbox .field__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  margin-bottom: 0;
+  cursor: pointer;
+  font-size: 0.95rem;
+  align-self: flex-start;
+  white-space: nowrap;
+  width: auto;
+}
+
+.field--checkbox .field__label .field__label-text {
+  margin: 0;
+  display: inline-block;
+}
+
+.field--checkbox .field__label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+.opacity-50 { opacity: 0.55; pointer-events: none; }

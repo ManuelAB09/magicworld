@@ -3,15 +3,14 @@ package com.magicworld.tfg_angular_springboot.attraction;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtAuthenticationFilter;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtService;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
+import com.magicworld.tfg_angular_springboot.storage.ImageStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.mockito.Mockito;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -39,8 +38,17 @@ public class AttractionControllerTests {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
+    @MockitoBean
     private AttractionService attractionService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @MockitoBean
+    private ImageStorageService imageStorageService;
 
 
     @Test
@@ -135,23 +143,5 @@ public class AttractionControllerTests {
                 .andExpect(status().isNoContent());
 
         verify(attractionService).deleteAttraction(4L);
-    }
-
-    @TestConfiguration
-    static class AttractionControllerTestConfig {
-        @Bean
-        public AttractionService attractionService() {
-            return Mockito.mock(AttractionService.class);
-        }
-
-        @Bean
-        public JwtService jwtService() {
-            return Mockito.mock(JwtService.class);
-        }
-
-        @Bean
-        public JwtAuthenticationFilter jwtAuthenticationFilter() {
-            return Mockito.mock(JwtAuthenticationFilter.class);
-        }
     }
 }

@@ -1,5 +1,6 @@
 package com.magicworld.tfg_angular_springboot.attraction;
 
+import com.magicworld.tfg_angular_springboot.exceptions.BadRequestException;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,19 @@ public class AttractionService {
     @Transactional(readOnly = true)
     public List<Attraction> getAllAttractions() {
         return attractionRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Attraction> getAllAttractions(Integer minHeight, Integer minWeight, Integer minAge) {
+        List<Attraction> attractions = attractionRepository.findAll();
+        if (minHeight != null && minHeight < 0) throw new BadRequestException("minHeight");
+        if (minWeight != null && minWeight < 0) throw new BadRequestException("minWeight");
+        if (minAge != null && minAge < 0) throw new BadRequestException("minAge");
+        return attractions.stream().filter(a -> {
+            if (minHeight != null && a.getMinimumHeight() > minHeight) return false;
+            if (minWeight != null && a.getMinimumWeight() > minWeight) return false;
+            return minAge == null || a.getMinimumAge() <= minAge;
+        }).toList();
     }
 
     @Transactional(readOnly = true)

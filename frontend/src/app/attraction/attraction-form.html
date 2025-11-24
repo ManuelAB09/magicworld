@@ -32,7 +32,7 @@
           <div class="field">
             <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.INTENSITY' | translate }}</label>
             <select class="field__input" formControlName="intensity">
-              @for (i of intensities; track i) { <option [value]="i">{{ i }}</option> }
+              @for (i of intensities; track i) { <option [value]="i">{{ ('ATTRACTIONS.FILTER.INTENSITY_' + i) | translate }}</option> }
             </select>
           </div>
 
@@ -68,9 +68,11 @@
             }
           </div>
 
-          <div class="field">
-            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.IS_ACTIVE' | translate }}</label>
-            <input type="checkbox" formControlName="isActive" />
+          <div class="field field--checkbox">
+            <label class="field__label">
+              <span class="field__label-text">{{ 'ATTRACTION_FORM.FIELDS.IS_ACTIVE' | translate }}</span>
+              <input type="checkbox" formControlName="isActive" />
+            </label>
           </div>
 
           <div class="field">
@@ -100,11 +102,6 @@
           <button type="submit" [disabled]="loading" class="btn btn--primary">
             {{ 'ATTRACTION_FORM.BUTTON_SAVE' | translate }}
           </button>
-          @if (isEdit) {
-            <button type="button" class="btn btn--danger" (click)="delete()">
-              {{ 'ATTRACTION_FORM.BUTTON_DELETE' | translate }}
-            </button>
-          }
         </div>
       </form>
     </div>

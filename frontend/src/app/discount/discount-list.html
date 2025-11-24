@@ -1,9 +1,6 @@
 <div class="discounts-page">
   <div class="page-header">
     <h2>{{ 'DISCOUNTS.TITLE' | translate }}</h2>
-    @if (isAdmin) {
-      <a class="btn-add" [routerLink]="['/discounts/new']">{{ 'DISCOUNTS.CREATE' | translate }}</a>
-    }
   </div>
 
   @if (loading) {
@@ -22,63 +19,54 @@
   }
 
   @if (!loading && discounts.length) {
-    <div class="table-wrapper">
-      <table class="discounts-table">
-        <colgroup>
-          <col style="width: 15%;" />   <!-- CODE -->
-          <col style="width: 12%;" />   <!-- PERCENTAGE -->
-          <col style="width: 15%;" />   <!-- EXPIRY -->
-          <col style="width: auto;" />  <!-- APPLIES TO flexible -->
-          <col style="width: 120px;" /> <!-- ACTIONS ancho fijo -->
-        </colgroup>
+    <div class="list-container">
+      <div class="list-header">
+        <div class="col col-code">{{ 'DISCOUNTS.TABLE.CODE' | translate }}</div>
+        <div class="col col-perc">{{ 'DISCOUNTS.TABLE.PERCENTAGE' | translate }}</div>
+        <div class="col col-date">{{ 'DISCOUNTS.TABLE.EXPIRY_DATE' | translate }}</div>
+        <div class="col col-applies">{{ 'DISCOUNTS.TABLE.APPLIES_TO' | translate }}</div>
+        @if (isAdmin) {
+          <div class="col col-actions">{{ 'DISCOUNTS.TABLE.ACTIONS' | translate }}</div>
+        }
+      </div>
 
-        <thead>
-        <tr>
-          <th>{{ 'DISCOUNTS.TABLE.CODE' | translate }}</th>
-          <th>{{ 'DISCOUNTS.TABLE.PERCENTAGE' | translate }}</th>
-          <th>{{ 'DISCOUNTS.TABLE.EXPIRY_DATE' | translate }}</th>
-          <th>{{ 'DISCOUNTS.TABLE.APPLIES_TO' | translate }}</th>
+      @for (d of discounts; track d.id) {
+        <div class="discount-row">
+          <div class="col col-code">{{ d.discountCode }}</div>
+          <div class="col col-perc"><span class="badge">{{ d.discountPercentage }}%</span></div>
+          <div class="col col-date">{{ d.expiryDate }}</div>
+          <div class="col col-applies">
+            @if (d.id && loadingTypes[d.id]) {
+              <span class="text-muted">{{ 'DISCOUNTS.LOADING_TYPES' | translate }}</span>
+            } @else {
+              {{ (d.id && appliedTypesMap[d.id] && appliedTypesMap[d.id].length) ? appliedTypesMap[d.id].join(', ') : '-' }}
+            }
+          </div>
+
           @if (isAdmin) {
-            <th>{{ 'DISCOUNTS.TABLE.ACTIONS' | translate }}</th>
+            <div class="col col-actions">
+              <div class="actions">
+                <a class="btn-edit" [routerLink]="['/discounts', d.id]">{{ 'DISCOUNTS.EDIT' | translate }}</a>
+                <button class="btn-delete" [disabled]="d.id && deleting[d.id]" (click)="onDelete(d)">
+                  @if (d.id && deleting[d.id]) {
+                    <span class="loader" aria-hidden="true"></span>
+                    <span class="sr-only">{{ 'DISCOUNT_FORM.BUTTON_DELETE' | translate }}</span>
+                  } @else {
+                    {{ 'DISCOUNT_FORM.BUTTON_DELETE' | translate }}
+                  }
+                </button>
+              </div>
+            </div>
           }
-        </tr>
-        </thead>
-
-        <tbody>
-          @for (d of discounts; track d.id) {
-            <tr>
-              <td class="code">{{ d.discountCode }}</td>
-              <td><span class="badge">{{ d.discountPercentage }}%</span></td>
-              <td class="date">{{ d.expiryDate }}</td>
-              <td class="applies-to">
-                @if (d.id && loadingTypes[d.id]) {
-                  <span class="text-muted">{{ 'DISCOUNTS.LOADING_TYPES' | translate }}</span>
-                } @else {
-                  {{ (d.id && appliedTypesMap[d.id] && appliedTypesMap[d.id].length) ? appliedTypesMap[d.id].join(', ') : '-' }}
-                }
-              </td>
-
-              @if (isAdmin) {
-                <td class="actions-cell">
-                  <div class="actions">
-                    <a class="btn-edit" [routerLink]="['/discounts', d.id]">{{ 'DISCOUNTS.EDIT' | translate }}</a>
-                    <button class="btn-delete" [disabled]="d.id && deleting[d.id]" (click)="onDelete(d)">
-                      @if (d.id && deleting[d.id]) {
-                        <span class="loader" aria-hidden="true"></span>
-                        <span class="sr-only">{{ 'DISCOUNT_FORM.BUTTON_DELETE' | translate }}</span>
-                      } @else {
-                        {{ 'DISCOUNT_FORM.BUTTON_DELETE' | translate }}
-                      }
-                    </button>
-                  </div>
-                </td>
-              }
-            </tr>
-          }
-        </tbody>
-      </table>
+        </div>
+      }
     </div>
   } @else if (!loading && !(discounts.length)) {
     <div class="text-muted">{{ 'DISCOUNTS.EMPTY' | translate }}</div>
+  }
+  @if (isAdmin) {
+    <div class="add-container">
+      <a class="btn-add" [routerLink]="['/discounts/new']">{{ 'DISCOUNTS.CREATE' | translate }}</a>
+    </div>
   }
 </div>

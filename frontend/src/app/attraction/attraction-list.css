@@ -13,32 +13,34 @@
 
 .page-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  background-color: #d2a676;
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  color: white;
-  margin-bottom: 2rem;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
 }
 
 .page-header h2 {
   font-weight: 700;
   margin: 0;
+  text-align: center;
 }
 
 .btn-add {
-  background-color: #0066ff;
-  color: white;
+  background-color: #ffb700;
+  color: black;
   padding: 0.6rem 1.2rem;
   border-radius: 20px;
   text-decoration: none;
   font-weight: 600;
   transition: background-color 0.3s;
+  margin-top: 0.2rem;
+  align-self: center;
 }
 
 .btn-add:hover {
-  background-color: #008e5c;
+  background-color: #2c0d0d;
+  color: white;
 }
 
 .cards-container {
@@ -46,6 +48,16 @@
   flex-wrap: wrap;
   gap: 2rem;
   justify-content: flex-start;
+}
+
+.cards-container.centered {
+  justify-content: center;
+}
+
+.add-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
 }
 
 .attraction-card {
@@ -115,6 +127,7 @@
   padding: 0.4rem 1rem;
   border-radius: 8px;
   text-decoration: none;
+
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -139,9 +152,60 @@
   cursor: pointer;
 }
 
-@media (max-width: 768px) {
-  .cards-container { justify-content: center; }
-  .attraction-card { width: 90%; }
-  .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+.attraction-filter-bar {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin: 1rem 0 1.2rem 0;
+  justify-content: center;
 }
 
+.attraction-filter-bar label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  color: #3a2a1a;
+  font-size: 0.95rem;
+}
+
+.attraction-filter-bar input[type="number"] {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  width: 140px;
+  margin-top: 6px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.btn-search {
+  background-color: #ffb700;
+  color: black;
+  border: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.btn-clear {
+  background-color: transparent;
+  color: #2c0d0d;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0.45rem 0.9rem;
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .attraction-filter-bar {
+    justify-content: center;
+  }
+
+  .attraction-filter-bar input[type="number"] {
+    width: 100%;
+    max-width: 220px;
+  }
+}

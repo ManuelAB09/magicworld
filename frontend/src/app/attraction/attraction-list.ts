@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Attraction, AttractionApiService } from './attraction.service';
 import { AuthService, Role } from '../auth/auth-service';
@@ -10,7 +11,7 @@ import { catchError, map, of } from 'rxjs';
 @Component({
   selector: 'app-attraction-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, RouterLink, TranslatePipe, FormsModule],
   templateUrl: './attraction-list.html',
   styleUrls: ['./attraction-list.css']
 })
@@ -21,6 +22,7 @@ export class AttractionList implements OnInit {
   errorKey: string | null = null;
   errorArgs: any = null;
   validationMessages: string[] = [];
+  filters: { minHeight?: number | null; minWeight?: number | null; minAge?: number | null } = { minHeight: null, minWeight: null, minAge: null };
 
   private apiBase = 'http://localhost:8080';
 
@@ -44,12 +46,19 @@ export class AttractionList implements OnInit {
     ).subscribe(v => this.isAdmin = v);
   }
 
-  load() {
+  load(filters?: { minHeight?: number | null; minWeight?: number | null; minAge?: number | null }) {
     this.loading = true;
     this.errorKey = null;
     this.errorArgs = null;
     this.validationMessages = [];
-    this.api.findAll().pipe(
+    const apiFilters: any = {};
+    if (filters) {
+      if (filters.minHeight != null) apiFilters.minHeight = filters.minHeight;
+      if (filters.minWeight != null) apiFilters.minWeight = filters.minWeight;
+      if (filters.minAge != null) apiFilters.minAge = filters.minAge;
+    }
+
+    this.api.findAll(Object.keys(apiFilters).length ? apiFilters : undefined).pipe(
       catchError(err => {
         const mapped = this.error.handleError(err);
         this.errorKey = mapped.code;
@@ -61,6 +70,26 @@ export class AttractionList implements OnInit {
       this.items = list;
       this.loading = false;
     });
+  }
+
+  applyFilters() {
+    this.validationMessages = [];
+    if (this.filters.minHeight != null && this.filters.minHeight < 0) this.validationMessages.push(this.translate.instant('ATTRACTIONS.FILTER.INVALID_NEGATIVE'));
+    if (this.filters.minWeight != null && this.filters.minWeight < 0) this.validationMessages.push(this.translate.instant('ATTRACTIONS.FILTER.INVALID_NEGATIVE'));
+    if (this.filters.minAge != null && this.filters.minAge < 0) this.validationMessages.push(this.translate.instant('ATTRACTIONS.FILTER.INVALID_NEGATIVE'));
+    if (this.validationMessages.length) return;
+
+    const f: any = {};
+    if (this.filters.minHeight != null) f.minHeight = this.filters.minHeight;
+    if (this.filters.minWeight != null) f.minWeight = this.filters.minWeight;
+    if (this.filters.minAge != null) f.minAge = this.filters.minAge;
+
+    this.load(f);
+  }
+
+  clearFilters() {
+    this.filters = { minHeight: null, minWeight: null, minAge: null };
+    this.load();
   }
 
   getImageUrl(url: string | null | undefined): string | null {
@@ -89,4 +118,3 @@ export class AttractionList implements OnInit {
     });
   }
 }
-

@@ -67,11 +67,16 @@ public class AttractionController {
     @Operation(summary = "Get all attractions", description = "Retrieve a list of all attractions", tags = {"Attractions"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List of attractions", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Invalid filter", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
     })
     @GetMapping
-    public ResponseEntity<List<Attraction>> getAllAttractions() {
-        List<Attraction> list = attractionService.getAllAttractions();
+    public ResponseEntity<List<Attraction>> getAllAttractions(
+            @RequestParam(required = false) Integer minHeight,
+            @RequestParam(required = false) Integer minWeight,
+            @RequestParam(required = false) Integer minAge) {
+
+        List<Attraction> list = attractionService.getAllAttractions(minHeight, minWeight, minAge);
         return ResponseEntity.ok(list);
     }
 

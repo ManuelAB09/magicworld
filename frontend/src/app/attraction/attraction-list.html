@@ -1,10 +1,38 @@
 <div class="attractions-page">
   <div class="page-header">
     <h2>{{ 'ATTRACTIONS.TITLE' | translate }}</h2>
-    @if (isAdmin) {
-      <a class="btn-add" [routerLink]="['/attractions/new']">{{ 'ATTRACTIONS.CREATE' | translate }}</a>
-    }
   </div>
+
+  <!-- Barra de búsqueda / filtros -->
+  <div class="filter-bar">
+    <div class="filter-field">
+      <label>{{ 'ATTRACTIONS.FILTER.MIN_HEIGHT' | translate }}</label>
+      <input type="number" min="0" class="field__input" [(ngModel)]="filters.minHeight" />
+    </div>
+    <div class="filter-field">
+      <label>{{ 'ATTRACTIONS.FILTER.MIN_WEIGHT' | translate }}</label>
+      <input type="number" min="0" class="field__input" [(ngModel)]="filters.minWeight" />
+    </div>
+    <div class="filter-field">
+      <label>{{ 'ATTRACTIONS.FILTER.MIN_AGE' | translate }}</label>
+      <input type="number" min="0" class="field__input" [(ngModel)]="filters.minAge" />
+    </div>
+    <div class="filter-actions">
+      <button class="btn btn--primary" (click)="applyFilters()">{{ 'ATTRACTIONS.FILTER.SEARCH' | translate }}</button>
+      <button class="btn btn--secondary" (click)="clearFilters()">{{ 'ATTRACTIONS.FILTER.CLEAR' | translate }}</button>
+    </div>
+  </div>
+
+
+  @if (validationMessages.length) {
+    <div class="alert alert-danger">
+      <ul class="mt-2 mb-0">
+        @for (m of validationMessages; track m) {
+          <li>{{ m }}</li>
+        }
+      </ul>
+    </div>
+  }
 
   @if (loading) {
     <div class="alert alert-info">{{ 'ATTRACTIONS.LOADING' | translate }}</div>
@@ -31,7 +59,10 @@
 
           <div class="attraction-content">
             <h3>{{ a.name }}</h3>
-            <p class="attr-intensity">{{ 'ATTRACTION_FORM.FIELDS.INTENSITY' | translate }}: {{ a.intensity }}</p>
+            <p class="attr-intensity">
+              {{ 'ATTRACTION_FORM.FIELDS.INTENSITY' | translate }}:
+              {{ ('ATTRACTIONS.FILTER.INTENSITY_' + a.intensity) | translate }}
+            </p>
             <p class="attr-constraints">
               {{ 'ATTRACTIONS.MIN_CONSTRAINTS' | translate }}:
               {{ a.minimumHeight }}cm · {{ a.minimumAge }}y · {{ a.minimumWeight }}kg
@@ -64,5 +95,9 @@
   } @else if (!loading && !(items.length)) {
     <div class="text-muted">{{ 'ATTRACTIONS.EMPTY' | translate }}</div>
   }
+  @if (isAdmin) {
+    <div class="add-container">
+      <a class="btn-add" [routerLink]="['/attractions/new']">{{ 'ATTRACTIONS.CREATE' | translate }}</a>
+    </div>
+  }
 </div>
-

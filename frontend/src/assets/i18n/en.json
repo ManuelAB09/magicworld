@@ -91,7 +91,7 @@
     "EMPTY": "No discounts.",
     "TABLE": {
       "CODE": "Code",
-      "PERCENTAGE": "%",
+      "PERCENTAGE": "Discount percentage",
       "EXPIRY_DATE": "Expires",
       "APPLIES_TO": "Applies to",
       "ACTIONS": "Actions"
@@ -146,7 +146,7 @@
       "COST": "Cost",
       "MAX_PER_DAY": "Max per day",
       "DESCRIPTION": "Description",
-      "PHOTO_URL": "Photo URL",
+      "PHOTO_URL": "Image",
       "UPLOAD_IMAGE": "Upload image"
     },
     "VALIDATION": {
@@ -155,7 +155,7 @@
       "COST": "Cost must be greater than 0",
       "MAX_PER_DAY": "Max per day must be at least 1",
       "DESCRIPTION": "Description is required (max 255)",
-      "PHOTO_URL": "Photo URL is required"
+      "PHOTO_URL": "Image is required"
     },
     "BUTTON_SAVE": "Save",
     "BUTTON_DELETE": "Delete",
@@ -170,7 +170,20 @@
     "EMPTY": "No attractions.",
     "MIN_CONSTRAINTS": "Minimums",
     "STATUS_ACTIVE": "The attraction is open",
-    "STATUS_INACTIVE": "The attraction is closed"
+    "STATUS_INACTIVE": "The attraction is closed",
+    "FILTER": {
+      "MIN_HEIGHT": "Min height (cm)",
+      "MIN_WEIGHT": "Min weight (kg)",
+      "MIN_AGE": "Min age (years)",
+      "SEARCH": "Search",
+      "CLEAR": "Clear",
+      "INVALID_NEGATIVE": "Value cannot be negative",
+      "INTENSITY_LABEL": "Intensity",
+      "INTENSITY_ALL": "All",
+      "INTENSITY_LOW": "Low",
+      "INTENSITY_MEDIUM": "Medium",
+      "INTENSITY_HIGH": "High"
+    }
   },
   "ATTRACTION_FORM": {
     "CREATE_TITLE": "Create attraction",
@@ -184,7 +197,7 @@
       "MIN_WEIGHT": "Min weight (kg)",
       "DESCRIPTION": "Description",
       "IS_ACTIVE": "Active",
-      "PHOTO_URL": "Photo URL",
+      "PHOTO_URL": "Image",
       "UPLOAD_IMAGE": "Upload image"
     },
     "VALIDATION": {
@@ -193,7 +206,7 @@
       "MIN_AGE": "Minimum age must be 0 or greater",
       "MIN_WEIGHT": "Minimum weight must be 0 or greater",
       "DESCRIPTION": "Description is required (max 255)",
-      "PHOTO_URL": "You must provide an image or an URL"
+      "PHOTO_URL": "You must provide an image"
     },
     "BUTTON_SAVE": "Save",
     "BUTTON_DELETE": "Delete",

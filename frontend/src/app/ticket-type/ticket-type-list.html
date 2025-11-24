@@ -1,9 +1,6 @@
 <div class="ticket-types-page">
   <div class="page-header">
     <h2>{{ 'TICKET_TYPES.TITLE' | translate }}</h2>
-    @if (isAdmin) {
-      <a class="btn-add" [routerLink]="['/ticket-types/new']">{{ 'TICKET_TYPES.CREATE' | translate }}</a>
-    }
   </div>
 
   @if (loading) {
@@ -55,5 +52,10 @@
     </div>
   } @else if (!loading && !(items.length)) {
     <div class="text-muted">{{ 'TICKET_TYPES.EMPTY' | translate }}</div>
+  }
+  @if (isAdmin) {
+    <div class="add-container">
+      <a class="btn-add" [routerLink]="['/ticket-types/new']">{{ 'TICKET_TYPES.CREATE' | translate }}</a>
+    </div>
   }
 </div>
