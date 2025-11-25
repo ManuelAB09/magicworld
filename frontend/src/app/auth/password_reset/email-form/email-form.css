@@ -1,10 +1,5 @@
 .page-background {
-  background: linear-gradient(
-    135deg,
-    #256D85 0%,
-    #1B2A49 100%
-  );
-
+  background-color: #faebd7;
   min-height: calc(100vh - 4.375rem);
   padding-top: 4.375rem;
   margin: 0;

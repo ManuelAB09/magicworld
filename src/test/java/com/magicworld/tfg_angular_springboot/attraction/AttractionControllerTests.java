@@ -5,16 +5,16 @@ import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtService;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import com.magicworld.tfg_angular_springboot.storage.ImageStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.util.List;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -50,6 +50,10 @@ public class AttractionControllerTests {
     @MockitoBean
     private ImageStorageService imageStorageService;
 
+    @BeforeEach
+    void setUp() {
+        Mockito.reset(attractionService);
+    }
 
     @Test
     public void testCreateAttraction() throws Exception {
@@ -89,9 +93,19 @@ public class AttractionControllerTests {
 
     @Test
     public void testGetAllAttractions() throws Exception {
-        Attraction one = Attraction.builder().name("A").intensity(Intensity.LOW).minimumHeight(80).minimumAge(5).minimumWeight(20).description("d").photoUrl("u").isActive(true).build();
+        Attraction one = Attraction.builder()
+                .name("A")
+                .intensity(Intensity.LOW)
+                .minimumHeight(80)
+                .minimumAge(5)
+                .minimumWeight(20)
+                .description("d")
+                .photoUrl("u")
+                .isActive(true)
+                .build();
         one.setId(1L);
-        when(attractionService.getAllAttractions()).thenReturn(List.of(one));
+
+        when(attractionService.getAllAttractions(any(), any(), any())).thenReturn(List.of(one));
 
         mockMvc.perform(get("/api/v1/attractions").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
