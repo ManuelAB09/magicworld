@@ -1,0 +1,80 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/images/Dockerfile.backend
+    image: magicworld-backend:latest
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/magicworld?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT}
+      SPRING_MAIL_PROTOCOL: ${SPRING_MAIL_PROTOCOL}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+      SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION: "true"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    healthcheck:
+      test: ["CMD-SHELL", "status=$$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/actuator/health || echo 0); if [ \"$$status\" = \"200\" ] || [ \"$$status\" = \"401\" ] || [ \"$$status\" = \"403\" ]; then exit 0; else exit 1; fi"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/images/Dockerfile.frontend
+    image: magicworld-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "status=$$(curl -s -o /dev/null -w '%{http_code}' http://localhost/ || echo 0); if [ \"$$status\" = \"200\" ]; then exit 0; else exit 1; fi"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Servicio opcional que aplica los seeds (INSERTs) después de que el backend
+  # haya arrancado y creado las tablas con Hibernate.
+  db-seed:
+    image: mysql:8.0
+    restart: "no"
+    env_file: ../.env
+    depends_on:
+      - backend
+    entrypoint: ["sh","/seed/run-seed.sh"]
+    volumes:
+      - ../src/main/resources/db/migration/data.sql:/seed/data.sql:ro
+      - ./scripts/db-seed.sh:/seed/run-seed.sh:ro
+
+volumes:
+  mysql-data:
+    driver: local

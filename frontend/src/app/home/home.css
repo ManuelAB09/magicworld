@@ -8,12 +8,7 @@
 .home-hero {
   position: relative;
   height: calc(100vh - 80px);
-  background: linear-gradient(
-    to bottom right,
-    #fff7e6 0%,
-    #fff1cc 40%,
-    #ffe59d 100%
-  );
+  background-color: #faebd7;
   display: flex;
   align-items: center;
   justify-content: center;

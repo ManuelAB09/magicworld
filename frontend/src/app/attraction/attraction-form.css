@@ -3,7 +3,7 @@
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
-.page-wrapper { min-height: 100vh; background: #e3f6ff; }
+.page-wrapper { min-height: 100vh; background-color: #faebd7; }
 
 .attr-area { display: flex; justify-content: center; padding: 80px 20px 60px; }
 

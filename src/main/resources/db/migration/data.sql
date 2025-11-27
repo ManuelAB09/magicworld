@@ -9,7 +9,7 @@ VALUES ('user1', 'User', '1', 'user1@example.com', '$2a$10$JZA..SzcDSPyDZXa.ESvY
 
 INSERT  INTO ticket_type (cost, currency, type_name, description, max_per_day, photo_url)
 VALUES (29.90, 'EUR', 'Adult', 'Entrada general para adultos', 100, '/img/adult_ticket.jpg'),
-       (19.90, 'EUR', 'Child', 'Entrada para niños', 50, '/img/child_ticket.jpg');
+       (19.90, 'EUR', 'Child', 'Entrada para peques', 50, '/img/child_ticket.jpg');
 
 
 INSERT  INTO discount (discount_percentage, expiry_date, discount_code)
@@ -24,7 +24,7 @@ WHERE d.discount_code = 'SUMMER10' AND t.type_name = 'Adult';
 
 
 INSERT  INTO attraction (name, intensity, minimum_height, minimum_age, minimum_weight, description, photo_url, is_active)
-VALUES ('Roller Coaster', 'HIGH', 120, 12, 30, 'Montaña rusa extrema', '/img/roller.jpg', TRUE);
+VALUES ('Roller Coaster', 'HIGH', 120, 12, 30, 'Cool roller coaster', '/img/roller.jpg', TRUE);
 
 
 INSERT  INTO purchase (purchase_date, buyer_id)
