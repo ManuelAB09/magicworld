@@ -116,12 +116,12 @@ public class AuthController {
             secure = true;
         }
 
-        String sameSite = secure ? "None" : "Lax";
+        String sameSite = "None";
 
         ResponseCookie cookie = ResponseCookie.from("XSRF-TOKEN", token.getToken())
                 .path("/")
                 .httpOnly(false)
-                .secure(secure)
+                .secure(true)
                 .sameSite(sameSite)
                 .build();
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());

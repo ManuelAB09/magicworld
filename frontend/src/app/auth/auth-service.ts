@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {catchError, map, Observable, of, Subject, switchMap} from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -67,8 +67,24 @@ export class AuthService {
   }
 
   getCsrfTokenFromServer(): Observable<string> {
-    return this.http.get<{ token: string }>(`${this.apiUrl}/csrf-token`, { withCredentials: true })
-      .pipe(map(res => res.token));
+    return this.http.get(`${this.apiUrl}/csrf-token`, {
+      withCredentials: true,
+      observe: 'response'
+    }).pipe(
+      map((resp: HttpResponse<any>) => {
+        const header = resp.headers.get('XSRF-TOKEN');
+        if (header) {
+          return header;
+        }
+        const setCookie = resp.headers.get('Set-Cookie');
+        if (setCookie) {
+          const m = /XSRF-TOKEN=([^;]+)/.exec(setCookie);
+          if (m) {
+            return decodeURIComponent(m[1]);
+          }
+        }
+      return '';})
+    );
   }
 
   ensureCsrfToken(headers: HttpHeaders): Observable<HttpHeaders> {
