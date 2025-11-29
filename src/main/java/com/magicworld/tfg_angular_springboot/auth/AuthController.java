@@ -108,7 +108,6 @@ public class AuthController {
     public ResponseEntity<Void> csrf(HttpServletRequest request, HttpServletResponse response) {
         CsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
         CsrfToken token = repo.generateToken(request);
-        // repo.saveToken(token, request, response); // avoid default save if you want to control cookie
         boolean secure = false;
         String forwardedProto = request.getHeader("X-Forwarded-Proto");
         if (request.isSecure() || "https".equalsIgnoreCase(request.getScheme()) ||
@@ -116,15 +115,17 @@ public class AuthController {
             secure = true;
         }
 
-        String sameSite = "None";
+        String sameSite = secure ? "None" : "Lax";
 
         ResponseCookie cookie = ResponseCookie.from("XSRF-TOKEN", token.getToken())
                 .path("/")
                 .httpOnly(false)
-                .secure(true)
+                .secure(secure)
+                .partitioned(secure)
                 .sameSite(sameSite)
                 .build();
-        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        response.setHeader("X-XSRF-TOKEN", token.getToken());
         return ResponseEntity.ok().build();
     }
 

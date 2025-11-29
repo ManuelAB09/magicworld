@@ -72,16 +72,9 @@ export class AuthService {
       observe: 'response'
     }).pipe(
       map((resp: HttpResponse<any>) => {
-        const header = resp.headers.get('XSRF-TOKEN');
+        const header = resp.headers.get('X-XSRF-TOKEN');
         if (header) {
           return header;
-        }
-        const setCookie = resp.headers.get('Set-Cookie');
-        if (setCookie) {
-          const m = /XSRF-TOKEN=([^;]+)/.exec(setCookie);
-          if (m) {
-            return decodeURIComponent(m[1]);
-          }
         }
       return '';})
     );
