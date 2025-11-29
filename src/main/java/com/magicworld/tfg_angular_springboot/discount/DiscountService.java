@@ -48,15 +48,15 @@ public class DiscountService {
         existingDiscount.setDiscountCode(updatedDiscount.getDiscountCode());
         existingDiscount.setDiscountPercentage(updatedDiscount.getDiscountPercentage());
         existingDiscount.setExpiryDate(updatedDiscount.getExpiryDate());
-        Discount saved = discountRepository.save(existingDiscount);
         List<TicketType> applicableTicketTypes = applicableTicketTypesNames.stream()
                 .map(ticketTypeService::findByTypeName)
                 .toList();
         if (applicableTicketTypes.isEmpty()) {
             throw new AtLeastOneTicketTypeMustBeProvidedException();
         }
-        discountTicketTypeService.replaceAssociations(saved, applicableTicketTypes);
-        return saved;
+        discountTicketTypeService.replaceAssociations(existingDiscount, applicableTicketTypes);
+        discountRepository.save(existingDiscount);
+        return existingDiscount;
     }
 
     @Transactional
