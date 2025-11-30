@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../auth-service';
+import { AuthService } from '../../auth.service';
 import { ErrorService } from '../../../error/error-service';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 

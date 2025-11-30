@@ -6,6 +6,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ErrorService } from '../error/error-service';
 import { AttractionApiService, AttractionData, Attraction } from './attraction.service';
 import { catchError, of } from 'rxjs';
+import { getBackendBaseUrl } from '../config/backend';
 
 @Component({
   selector: 'app-attraction-form',
@@ -28,7 +29,7 @@ export class AttractionForm implements OnInit {
   existingPhotoUrl: string | null = null;
   photoRequiredError = false;
 
-  private apiBase = 'http://localhost:8080';
+  private apiBase = getBackendBaseUrl();
   private readonly maxFileBytes = 50 * 1024 * 1024;
 
   intensities: Array<'LOW'|'MEDIUM'|'HIGH'> = ['LOW','MEDIUM','HIGH'];

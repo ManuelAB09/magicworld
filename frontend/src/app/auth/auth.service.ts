@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {catchError, map, Observable, of, Subject, switchMap} from 'rxjs';
 import { Router } from '@angular/router';
+import { getBackendBaseUrl } from '../config/backend';
 
 export enum Role {
   ADMIN = 'ADMIN',
@@ -17,7 +18,7 @@ export interface UserDTO {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/v1/auth';
+  private apiUrl = `${getBackendBaseUrl()}/api/v1/auth`;
 
   constructor(private http: HttpClient, private router: Router) {}
 

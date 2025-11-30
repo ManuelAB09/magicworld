@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DiscountApiService, Discount } from './discount.service';
-import { AuthService, Role } from '../auth/auth-service';
+import { AuthService, Role } from '../auth/auth.service';
 import { catchError, map, of } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ErrorService } from '../error/error-service';

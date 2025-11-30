@@ -1,8 +1,9 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
 import { RouterLink } from '@angular/router';
-import {AuthService, Role} from '../auth/auth-service';
+import {AuthService, Role} from '../auth/auth.service';
 import { NgOptimizedImage } from '@angular/common';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import { getBackendBaseUrl } from '../config/backend';
 
 @Component({
   selector: 'app-navbar',
@@ -14,6 +15,7 @@ export class Navbar implements OnInit, AfterViewInit{
   isAuthenticated = false;
   currentLang = 'es';
   role: Role | null = null;
+  swaggerUrl = getBackendBaseUrl() + '/swagger-ui/index.html';
 
   constructor(public auth: AuthService, private translate: TranslateService) {}
 

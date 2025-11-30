@@ -33,7 +33,7 @@
     </li>
     @if (role === 'ADMIN') {
       <li class="nav-list__item">
-        <a class="nav-btn" href="http://localhost:8080/swagger-ui/index.html">
+        <a class="nav-btn" [href]="swaggerUrl" target="_blank" rel="noopener">
           <i class="fa fa-user-shield"></i>
           {{ 'NAV.ADMIN_PANEL' | translate }}
         </a>

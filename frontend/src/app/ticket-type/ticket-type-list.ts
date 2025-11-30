@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { TicketType, TicketTypeApiService } from './ticket-type.service';
-import { AuthService, Role } from '../auth/auth-service';
+import { AuthService, Role } from '../auth/auth.service';
 import { ErrorService } from '../error/error-service';
 import { catchError, map, of } from 'rxjs';
+import { getBackendBaseUrl } from '../config/backend';
 
 @Component({
   selector: 'app-ticket-type-list',
@@ -22,7 +23,7 @@ export class TicketTypeList implements OnInit {
   errorArgs: any = null;
   validationMessages: string[] = [];
 
-  private apiBase = 'http://localhost:8080';
+  private apiBase = getBackendBaseUrl();
 
   constructor(
     private api: TicketTypeApiService,
