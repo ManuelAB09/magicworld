@@ -64,7 +64,7 @@
   background-color: #fffdf5;
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  width: 300px; /* igual que las atracciones */
+  width: 300px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -84,7 +84,7 @@
 
 .ticket-content {
   padding: 1rem;
-  text-align: left; /* igual que en attractions */
+  text-align: left;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -109,7 +109,7 @@
 
 .ticket-buttons {
   display: flex;
-  justify-content: flex-end; /* igual que attraction-buttons */
+  justify-content: flex-end;
   gap: 1rem;
   margin-top: 0.5rem;
 }
@@ -147,7 +147,15 @@
 }
 
 @media (max-width: 768px) {
-  .cards-container { justify-content: center; }
-  .ticket-card { width: 90%; }
-  .page-header { flex-direction: column; align-items: center; gap: 1rem; }
+  .cards-container {
+    justify-content: center;
+  }
+  .ticket-card {
+    width: 90%;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
 }
