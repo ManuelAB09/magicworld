@@ -9,7 +9,6 @@
   justify-content: center;
 }
 
-
 .auth-form {
   background: #fff;
   padding: 3rem 3.5rem;
@@ -97,3 +96,57 @@
   border-radius: 0.5rem;
   padding: 0.75rem;
 }
+
+
+@media (max-width: 768px) {
+  .login-background {
+    padding: 1rem;
+  }
+
+  .auth-form {
+    width: 100%;
+    max-width: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+
+  .password-container {
+    position: relative;
+    display: block;
+  }
+
+  .password-container input {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 2.4rem;
+    font-size: 1rem;
+    min-width: 0;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 0.4rem;
+    top: 50%;
+    transform: translateY(-50%);
+    height: calc(100% - 6px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.15rem 0.45rem;
+    background: transparent;
+    border: none;
+    font-size: 1.05rem;
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+
+  .auth-form button[type="submit"] {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+

@@ -200,7 +200,6 @@
   max-width: 1100px;
   margin: 0 auto 0;
 }
-
 .list-header {
   display: grid;
   grid-template-columns: repeat(4, 1fr) 220px;
@@ -212,9 +211,7 @@
   color: #3a2a1a;
   margin-bottom: 8px;
 }
-
 .list-header > div { font-weight: 700; }
-
 .discount-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr) 220px;
@@ -227,13 +224,11 @@
   margin-bottom: 10px;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-
 .list-header, .discount-row {
   width: 100%;
   grid-template-columns: repeat(4, 1fr) 220px;
   box-sizing: border-box;
 }
-
 .actions {
   display: flex;
   gap: 10px;
@@ -241,30 +236,19 @@
   justify-content: flex-end;
   flex-wrap: nowrap;
 }
-
 .actions > * { flex: 0 0 auto; }
-
-
-.list-header, .discount-row {
-  box-sizing: border-box;
-}
-
-
 .list-header .col-actions {
   justify-self: center;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
 .discount-row .col-actions {
   justify-self: center;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
-
 .list-header .col-actions, .discount-row .col-actions {
   grid-column: 5;
   text-align: center;
@@ -273,50 +257,34 @@
   align-items: center;
   justify-content: center;
 }
-
-
 .list-header .col-code, .discount-row .col-code { grid-column: 1; }
 .list-header .col-perc, .discount-row .col-perc { grid-column: 2; }
 .list-header .col-date, .discount-row .col-date { grid-column: 3; }
 .list-header .col-applies, .discount-row .col-applies { grid-column: 4; }
 .list-header .col-actions, .discount-row .col-actions { grid-column: 5; }
-
-
 .list-header > .col { align-self: center; }
-
-
 .list-header > div, .discount-row > .col {
   padding: 4px 6px;
 }
 
 @media (max-width: 768px) {
-  .cards-container {
-    justify-content: center;
+  .list-container {
+    overflow-x: auto;
   }
 
-  .discount-card {
-    width: 90%;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .list-header { display: none; }
+  .list-header,
   .discount-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    padding: 12px;
+    min-width: 700px;
   }
-  .col-actions { justify-content: flex-start; }
+
   .actions {
     display: flex;
-    gap: 10px;
-    align-items: center;
-    justify-content: flex-end;
-    flex-wrap: nowrap;
+    gap: 0.5rem;
   }
-  .col-perc { margin-top: 6px; }
+
+  .btn-edit,
+  .btn-delete {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
 }
