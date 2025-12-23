@@ -24,9 +24,10 @@ public class WebConfig implements WebMvcConfigurer {
             @Override
             public void addCorsMappings(org.springframework.web.servlet.config.annotation.CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:4200", "https://events-am.gw.postman.com/","http://localhost")
+                        .allowedOrigins("http://localhost:4200", "https://events-am.gw.postman.com/","http://localhost","https://magicworld-theta.vercel.app/")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
+                        .exposedHeaders("X-XSRF-TOKEN")
                         .allowCredentials(true);
             }
         };

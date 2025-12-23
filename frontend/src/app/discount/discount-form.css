@@ -8,13 +8,11 @@
   background-color: #faebd7;
 }
 
-
 .discount-area {
   display: flex;
   justify-content: center;
   padding: 80px 60px 60px;
 }
-
 
 .discount-card {
   width: 640px;
@@ -203,14 +201,99 @@
   outline-offset: 2px;
 }
 
-@media (max-width: 720px) {
-  .discount-card { padding: 18px; }
-  .discount-form__grid { grid-template-columns: 1fr; }
-  .discount-card__back { position: static; margin-top: 10px; }
-  .btn { transform: none !important; box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
-  .checks-grid { grid-template-columns: 1fr; }
+
+@media (max-width: 768px) {
+
+
+  .page-wrapper,
+  .discount-area,
+  .container,
+  .discount-card,
+  .discount-form {
+    max-width: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+
+  .discount-card {
+    padding: 12px;
+  }
+
+
+  .discount-form__grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  .field,
+  .field--full {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .field__input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+  }
+
+
+
+  .checks-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .check-item {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    align-items: flex-start;
+  }
+
+  .check-item__text {
+    font-size: 0.9rem;
+    line-height: 1.2;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+
+  .discount-form__actions {
+    width: 100%;
+  }
+
+  .discount-form__actions .btn {
+    width: 100%;
+    padding: 0.7rem;
+    font-size: 1rem;
+  }
+  .discount-card__header {
+    position: static;
+  }
+
+  .discount-card__back {
+    position: static !important;   /* 🔑 mata absolute/fixed del desktop */
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
+    bottom: auto !important;
+
+    display: inline-block;
+    margin-bottom: 6px;            /* separación real del título */
+  }
+
+  .discount-card__title {
+    padding-top: 4px;
+  }
+
 }
 
-.container { max-width: 900px; }
-.opacity-50 { opacity: 0.5; pointer-events: none; }
-.invalid-feedback { font-size: 0.85rem; }
+
+

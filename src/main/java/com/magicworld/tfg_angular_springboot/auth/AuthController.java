@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -103,12 +105,30 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/csrf-token")
-    public ResponseEntity<Void> getCsrfToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> csrf(HttpServletRequest request, HttpServletResponse response) {
         CsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
         CsrfToken token = repo.generateToken(request);
-        repo.saveToken(token, request, response);
+        boolean secure = false;
+        String forwardedProto = request.getHeader("X-Forwarded-Proto");
+        if (request.isSecure() || "https".equalsIgnoreCase(request.getScheme()) ||
+                (forwardedProto != null && forwardedProto.toLowerCase().contains("https"))) {
+            secure = true;
+        }
+
+        String sameSite = secure ? "None" : "Lax";
+
+        ResponseCookie cookie = ResponseCookie.from("XSRF-TOKEN", token.getToken())
+                .path("/")
+                .httpOnly(false)
+                .secure(secure)
+                .partitioned(secure)
+                .sameSite(sameSite)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        response.setHeader("X-XSRF-TOKEN", token.getToken());
         return ResponseEntity.ok().build();
     }
+
 
 
     @PostMapping("/forgot-password")

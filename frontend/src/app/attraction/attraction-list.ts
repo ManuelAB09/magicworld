@@ -4,9 +4,10 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Attraction, AttractionApiService } from './attraction.service';
-import { AuthService, Role } from '../auth/auth-service';
+import { AuthService, Role } from '../auth/auth.service';
 import { ErrorService } from '../error/error-service';
 import { catchError, map, of } from 'rxjs';
+import { getBackendBaseUrl } from '../config/backend';
 
 @Component({
   selector: 'app-attraction-list',
@@ -24,7 +25,7 @@ export class AttractionList implements OnInit {
   validationMessages: string[] = [];
   filters: { minHeight?: number | null; minWeight?: number | null; minAge?: number | null } = { minHeight: 0, minWeight: 0, minAge: 0 };
 
-  private apiBase = 'http://localhost:8080';
+  private apiBase = getBackendBaseUrl();
 
   constructor(
     private api: AttractionApiService,

@@ -6,6 +6,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ErrorService } from '../error/error-service';
 import { TicketTypeApiService, TicketTypeData } from './ticket-type.service';
 import { catchError, of } from 'rxjs';
+import { getBackendBaseUrl } from '../config/backend';
 
 @Component({
   selector: 'app-ticket-type-form',
@@ -28,7 +29,7 @@ export class TicketTypeForm implements OnInit {
   existingPhotoUrl: string | null = null;
   photoRequiredError = false;
 
-  private apiBase = 'http://localhost:8080';
+  private apiBase = getBackendBaseUrl();
   private readonly maxFileBytes = 50 * 1024 * 1024;
 
   constructor(

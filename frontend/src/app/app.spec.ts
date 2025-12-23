@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { App } from './app';
 import { provideRouter } from '@angular/router';
-import { AuthService, Role } from './auth/auth-service';
+import { AuthService, Role } from './auth/auth.service';
 import { Observable, of, Subject } from 'rxjs';
 
 class MockAuthService {

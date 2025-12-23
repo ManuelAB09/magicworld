@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {catchError, map, Observable, of, Subject, switchMap} from 'rxjs';
 import { Router } from '@angular/router';
+import { getBackendBaseUrl } from '../config/backend';
 
 export enum Role {
   ADMIN = 'ADMIN',
@@ -17,7 +18,7 @@ export interface UserDTO {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/v1/auth';
+  private apiUrl = `${getBackendBaseUrl()}/api/v1/auth`;
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -66,23 +67,27 @@ export class AuthService {
     return match ? decodeURIComponent(match[2]) : null;
   }
 
+  getCsrfTokenFromServer(): Observable<string> {
+    return this.http.get(`${this.apiUrl}/csrf-token`, {
+      withCredentials: true,
+      observe: 'response'
+    }).pipe(
+      map((resp: HttpResponse<any>) => {
+        const header = resp.headers.get('X-XSRF-TOKEN');
+        if (header) {
+          return header;
+        }
+      return '';})
+    );
+  }
+
   ensureCsrfToken(headers: HttpHeaders): Observable<HttpHeaders> {
     const csrfToken = this.getCookie('XSRF-TOKEN');
-
     if (csrfToken) {
-      const updatedHeaders = headers.set('X-XSRF-TOKEN', csrfToken);
-      return of(updatedHeaders);
+      return of(headers.set('X-XSRF-TOKEN', csrfToken));
     }
-    return this.http.get(`${this.apiUrl}/csrf-token`, {
-      withCredentials: true
-    }).pipe(
-      map(() => {
-        const newToken = this.getCookie('XSRF-TOKEN');
-        if (newToken) {
-          return headers.set('X-XSRF-TOKEN', newToken);
-        }
-        return headers;
-      })
+    return this.getCsrfTokenFromServer().pipe(
+      map(token => token ? headers.set('X-XSRF-TOKEN', token) : headers)
     );
   }
 
@@ -101,13 +106,6 @@ export class AuthService {
       })
     );
   }
-
-  checkRole(): Observable<Role | null> {
-    return this.http.get<UserDTO>(`${this.apiUrl}/me`, { withCredentials: true }).pipe(
-      map(user => user.role)
-    );
-  }
-
 
   checkRoleSecure(): Observable<Role | null> {
     const headers = new HttpHeaders();

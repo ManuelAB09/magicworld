@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, switchMap } from 'rxjs';
-import { AuthService } from '../auth/auth-service';
+import { AuthService } from '../auth/auth.service';
+import { getBackendBaseUrl } from '../config/backend';
 
 export interface TicketType {
   id?: number;
@@ -17,7 +18,7 @@ export type TicketTypeData = Omit<TicketType, 'id' | 'photoUrl'>;
 
 @Injectable({ providedIn: 'root' })
 export class TicketTypeApiService {
-  private baseUrl = 'http://localhost:8080/api/v1/ticket-types';
+  private baseUrl = `${getBackendBaseUrl()}/api/v1/ticket-types`;
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 

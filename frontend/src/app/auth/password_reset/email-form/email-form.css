@@ -95,3 +95,12 @@
   color: #047857;
   border: 1px solid #6ee7b7;
 }
+
+
+@media (max-width: 480px) {
+
+  .email-form {
+    width: 90%;
+    padding: 2rem 1.5rem;
+  }
+}

@@ -42,12 +42,12 @@
   font-size: 1.25rem;
 }
 
-
 .password-container {
   position: relative;
   display: flex;
   align-items: center;
 }
+
 .password-container input {
   padding-right: 3rem;
   width: 100%;
@@ -88,6 +88,7 @@
   color: #fffbe6;
   transform: translateY(-0.0625rem);
 }
+
 .error {
   color: #F0060B;
   font-weight: bold;
@@ -98,4 +99,12 @@
   border: 1px solid #F0060B;
   border-radius: 0.5rem;
   padding: 0.75rem;
+}
+
+
+@media (max-width: 480px) {
+
+  .auth-form {
+    padding: 2rem 2rem;
+  }
 }
