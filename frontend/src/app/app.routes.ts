@@ -12,6 +12,7 @@ import { TicketTypeList } from './ticket-type/ticket-type-list';
 import { TicketTypeForm } from './ticket-type/ticket-type-form';
 import { AttractionList } from './attraction/attraction-list';
 import { AttractionForm } from './attraction/attraction-form';
+import { ChatbotComponent } from './chatbot/chatbot';
 
 export const routes: Routes = [
   { path: 'login',
@@ -47,5 +48,8 @@ export const routes: Routes = [
   // Atracciones: listado público, CRUD solo admin
   { path: 'attractions', component: AttractionList },
   { path: 'attractions/new', component: AttractionForm, canActivate: [AdminGuard] },
-  { path: 'attractions/:id', component: AttractionForm, canActivate: [AdminGuard] }
+  { path: 'attractions/:id', component: AttractionForm, canActivate: [AdminGuard] },
+
+  // Chatbot: solo admin
+  { path: 'chatbot', component: ChatbotComponent, canActivate: [AdminGuard] }
 ];

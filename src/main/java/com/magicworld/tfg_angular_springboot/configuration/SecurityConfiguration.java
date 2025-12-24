@@ -45,6 +45,7 @@ public class SecurityConfiguration {
                                          "/api/v1/auth/reset-password","/api/v1/auth/forgot-password", "/swagger-ui.html", "/swagger-ui/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/attractions", "/api/v1/attractions/**","/api/v1/ticket-types","/api/v1/ticket-types/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/v1/discounts", "/api/v1/discounts/**").authenticated()
+                        .requestMatchers("/api/v1/chatbot/**").hasRole(ADMIN_ROLE)
                         .requestMatchers(HttpMethod.POST, "/api/v1/attractions/**","/api/v1/ticket-types/**","/api/v1/discounts", "/api/v1/discounts/**").hasRole(ADMIN_ROLE)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/attractions/**","/api/v1/ticket-types/**","/api/v1/discounts", "/api/v1/discounts/**").hasRole(ADMIN_ROLE)
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/attractions/**","/api/v1/ticket-types/**","/api/v1/discounts", "/api/v1/discounts/**").hasRole(ADMIN_ROLE)

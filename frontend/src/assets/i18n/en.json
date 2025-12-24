@@ -23,7 +23,8 @@
     "ADMIN_PANEL": "App endpoints",
     "DISCOUNT": "Discounts",
     "TICKET_TYPE": "Ticket Types",
-    "ATTRACTIONS": "Attractions"
+    "ATTRACTIONS": "Attractions",
+    "CHATBOT": "AI Assistant"
   },
   "HOME": {
     "TITLE": "Welcome to MagicWorld",
@@ -211,5 +212,17 @@
     "BUTTON_SAVE": "Save",
     "BUTTON_DELETE": "Delete",
     "CONFIRM_DELETE": "Are you sure you want to delete this attraction?"
+  },
+  "CHATBOT": {
+    "TITLE": "Admin Assistant",
+    "ONLINE": "Online",
+    "CLEAR": "Clear chat",
+    "PLACEHOLDER": "Type your message here...",
+    "CONFIRM_ACTION": "Confirm this action?",
+    "CONFIRM": "Confirm",
+    "CANCEL": "Cancel",
+    "ACTIVITY": "Activity Log",
+    "CLEAR_ACTIVITY": "Clear activity",
+    "NO_ACTIVITY": "No activity recorded yet"
   }
 }

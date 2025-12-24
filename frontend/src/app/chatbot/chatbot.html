@@ -1,0 +1,113 @@
+<div class="chatbot-page">
+  <div class="chatbot-main">
+    <div class="chatbot-container">
+      <div class="chatbot-header">
+        <div class="header-info">
+          <span class="bot-icon">🤖</span>
+          <div class="header-text">
+            <h2>{{ 'CHATBOT.TITLE' | translate }}</h2>
+            <span class="status-online">{{ 'CHATBOT.ONLINE' | translate }}</span>
+          </div>
+        </div>
+        <button class="clear-btn" (click)="clearChat()" [title]="'CHATBOT.CLEAR' | translate">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+
+      <div class="messages-container" #messagesContainer>
+        @for (message of messages; track $index) {
+          <div class="message" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">
+            <div class="message-avatar">
+              @if (message.role === 'user') {
+                <span>👤</span>
+              } @else {
+                <span>🤖</span>
+              }
+            </div>
+            <div class="message-content">
+              @if (message.isLoading) {
+                <div class="loading-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              } @else {
+                <div class="message-text" [innerHTML]="message.content | formatMarkdown"></div>
+                <div class="message-time">{{ message.timestamp | date:'HH:mm' }}</div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (pendingAction) {
+        <div class="confirmation-bar">
+          <span class="confirmation-text">{{ 'CHATBOT.CONFIRM_ACTION' | translate }}</span>
+          <div class="confirmation-buttons">
+            <button class="btn-confirm" (click)="confirmAction()">
+              <i class="fa-solid fa-check"></i> {{ 'CHATBOT.CONFIRM' | translate }}
+            </button>
+            <button class="btn-cancel" (click)="cancelAction()">
+              <i class="fa-solid fa-xmark"></i> {{ 'CHATBOT.CANCEL' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+
+      <div class="input-container">
+        <textarea
+          [(ngModel)]="inputMessage"
+          (keypress)="onKeyPress($event)"
+          [placeholder]="'CHATBOT.PLACEHOLDER' | translate"
+          [disabled]="isLoading"
+          rows="1"
+          class="message-input"
+        ></textarea>
+        <button
+          class="send-btn"
+          (click)="sendMessage()"
+          [disabled]="isLoading || !inputMessage.trim()"
+        >
+          @if (isLoading) {
+            <i class="fa-solid fa-spinner fa-spin"></i>
+          } @else {
+            <i class="fa-solid fa-paper-plane"></i>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="activity-panel">
+    <div class="activity-header">
+      <h3>📋 {{ 'CHATBOT.ACTIVITY' | translate }}</h3>
+      <button class="clear-activity-btn" (click)="clearActivity()" [title]="'CHATBOT.CLEAR_ACTIVITY' | translate">
+        <i class="fa-solid fa-eraser"></i>
+      </button>
+    </div>
+    <div class="activity-list">
+      @if (activityLog.length === 0) {
+        <div class="no-activity">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>{{ 'CHATBOT.NO_ACTIVITY' | translate }}</span>
+        </div>
+      } @else {
+        @for (activity of activityLog; track $index) {
+          <div class="activity-item" [class.success]="activity.success" [class.error]="!activity.success">
+            <div class="activity-icon">
+              @if (activity.success) {
+                <i class="fa-solid fa-circle-check"></i>
+              } @else {
+                <i class="fa-solid fa-circle-exclamation"></i>
+              }
+            </div>
+            <div class="activity-content">
+              <span class="activity-action">{{ activity.action }}</span>
+              <span class="activity-time">{{ activity.timestamp | date:'HH:mm:ss' }}</span>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

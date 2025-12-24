@@ -9,45 +9,61 @@
   <ul class="nav-list">
     @if (!isAuthenticated) {
       <li class="nav-list__item">
-        <a class="nav-btn" routerLink="/login">{{ 'NAV.LOGIN' | translate }}</a>
+        <a class="nav-btn" routerLink="/login">
+          <i class="fa-solid fa-right-to-bracket"></i>
+          {{ 'NAV.LOGIN' | translate }}
+        </a>
       </li>
       <li class="nav-list__item">
-        <a class="nav-btn" routerLink="/register">{{ 'NAV.REGISTER' | translate }}</a>
+        <a class="nav-btn" routerLink="/register">
+          <i class="fa-solid fa-user-plus"></i>
+          {{ 'NAV.REGISTER' | translate }}
+        </a>
       </li>
     }
     @if (isAuthenticated) {
       <li class="nav-list__item">
-        <button class="nav-btn" (click)="logout()">{{ 'NAV.LOGOUT' | translate }}</button>
+        <button class="nav-btn" (click)="logout()">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          {{ 'NAV.LOGOUT' | translate }}
+        </button>
       </li>
       <li class="nav-list__item">
         <a class="nav-btn" routerLink="/discounts">
-          <i class="fa fa-user"></i>
+          <i class="fa-solid fa-percent"></i>
           {{ 'NAV.DISCOUNT' | translate }}
         </a>
       </li>
     }
     <li class="nav-list__item">
       <a class="nav-btn" routerLink="/attractions">
+        <i class="fa-solid fa-star"></i>
         {{ 'NAV.ATTRACTIONS' | translate }}
       </a>
     </li>
     @if (role === 'ADMIN') {
       <li class="nav-list__item">
+        <a class="nav-btn" routerLink="/chatbot">
+          <i class="fa-solid fa-robot"></i>
+          {{ 'NAV.CHATBOT' | translate }}
+        </a>
+      </li>
+      <li class="nav-list__item">
         <a class="nav-btn" [href]="swaggerUrl" target="_blank" rel="noopener">
-          <i class="fa fa-user-shield"></i>
+          <i class="fa-solid fa-user-shield"></i>
           {{ 'NAV.ADMIN_PANEL' | translate }}
         </a>
       </li>
       <li class="nav-list__item">
         <a class="nav-btn" routerLink="/ticket-types">
-          <i class="fa fa-tachometer-alt"></i>
+          <i class="fa-solid fa-ticket"></i>
           {{ 'NAV.TICKET_TYPE' | translate }}
         </a>
       </li>
     }
     <li class="nav-list__item">
       <div class="lang-switcher">
-        <span class="world-icon">🌐</span>
+        <i class="fa-solid fa-globe"></i>
         <select class="lang-select" [value]="currentLang" (change)="changeLang($event)">
           <option value="es">ES</option>
           <option value="en">EN</option>

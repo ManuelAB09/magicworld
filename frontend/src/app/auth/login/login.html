@@ -30,7 +30,11 @@
         tabindex="-1"
         aria-label="Mostrar/Ocultar contraseña"
       >
-        {{ showPassword ? '👁️' : '🙈' }}
+        @if (showPassword) {
+          <i class="fa-solid fa-eye"></i>
+        } @else {
+          <i class="fa-solid fa-eye-slash"></i>
+        }
       </button>
     </div>
 
