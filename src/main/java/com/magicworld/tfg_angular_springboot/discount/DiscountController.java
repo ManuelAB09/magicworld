@@ -26,7 +26,7 @@ public class DiscountController {
     private final DiscountService discountService;
     private final DiscountTicketTypeService discountTicketTypeService;
 
-    // DTO para create/update
+
     @Getter
     @Setter
     public static class DiscountRequest {

@@ -11,11 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-
-/**
- * Main service for processing chatbot messages using Gemini AI.
- * Handles language detection, message processing, and response generation.
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j

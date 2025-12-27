@@ -9,6 +9,7 @@ class MockAuthService {
   authChanged = new Subject<boolean>();
   isAuthenticated(): Observable<boolean> { return of(false); }
   checkRole(): Observable<Role | null> { return of(null); }
+  checkRoleSecure(): Observable<Role | null> { return of(null); }
   logout(): Observable<any> { return of({}); }
   notifyAuthChanged(isAuth: boolean) { this.authChanged.next(isAuth); }
 }
