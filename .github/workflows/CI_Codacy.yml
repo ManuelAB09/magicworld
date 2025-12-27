@@ -2,7 +2,7 @@ name: CI with Codacy Analysis
 
 on:
   push:
-    branches: [ main, develop, testing/sprint2 ]
+    branches: [ main, develop, bugfix ]
   pull_request:
     branches: [ main, develop ]
 
