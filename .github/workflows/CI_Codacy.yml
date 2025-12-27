@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
 
   backend-tests:
@@ -100,12 +104,6 @@ jobs:
           coverage-reports: coverage/frontend/lcov.info
           language: TypeScript
 
-      - name: Run Codacy Analysis CLI
-        uses: codacy/codacy-analysis-cli-action@master
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          upload: true
-          max-allowed-issues: 2147483647
 
   static-analysis:
     name: Static Code Analysis
@@ -147,13 +145,7 @@ jobs:
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           verbose: true
-          output: results.sarif
-          format: sarif
-          gh-code-scanning-compat: true
+          upload: true
           max-allowed-issues: 2147483647
 
-      - name: Upload SARIF results to GitHub
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: results.sarif
 
