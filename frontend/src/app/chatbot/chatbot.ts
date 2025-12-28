@@ -24,7 +24,7 @@ interface ActivityLogEntry {
   standalone: true,
   imports: [CommonModule, FormsModule, TranslateModule, FormatMarkdownPipe],
   templateUrl: './chatbot.html',
-  styleUrls: ['./chatbot.css']
+  styleUrls: ['./chatbot.css', './chatbot-mobile.css']
 })
 export class ChatbotComponent implements AfterViewChecked {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
