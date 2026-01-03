@@ -21,7 +21,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,10 +57,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Descuentos")
-    @Description("Verifica que listDiscounts retorna éxito")
+    @Description("Verifica que listDiscounts retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("listDiscounts retorna éxito")
-    void testExecuteFunction_listDiscounts_returnsSuccess() {
+    @DisplayName("listDiscounts retorna exito")
+    void testExecuteFunctionListDiscountsReturnsSuccess() {
         when(discountExecutor.listDiscounts("en")).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("listDiscounts", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -69,10 +68,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Descuentos")
-    @Description("Verifica que getDiscountById retorna éxito")
+    @Description("Verifica que getDiscountById retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("getDiscountById retorna éxito")
-    void testExecuteFunction_getDiscountById_returnsSuccess() {
+    @DisplayName("getDiscountById retorna exito")
+    void testExecuteFunctionGetDiscountByIdReturnsSuccess() {
         when(discountExecutor.getDiscountById(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("getDiscountById", Map.of("id", 1L), "en");
         assertTrue(response.isSuccess());
@@ -80,10 +79,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Descuentos")
-    @Description("Verifica que createDiscount retorna éxito")
+    @Description("Verifica que createDiscount retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("createDiscount retorna éxito")
-    void testExecuteFunction_createDiscount_returnsSuccess() {
+    @DisplayName("createDiscount retorna exito")
+    void testExecuteFunctionCreateDiscountReturnsSuccess() {
         when(discountExecutor.createDiscount(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("createDiscount", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -91,10 +90,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Descuentos")
-    @Description("Verifica que updateDiscount retorna éxito")
+    @Description("Verifica que updateDiscount retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("updateDiscount retorna éxito")
-    void testExecuteFunction_updateDiscount_returnsSuccess() {
+    @DisplayName("updateDiscount retorna exito")
+    void testExecuteFunctionUpdateDiscountReturnsSuccess() {
         when(discountExecutor.updateDiscount(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("updateDiscount", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -102,10 +101,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Descuentos")
-    @Description("Verifica que requestDeleteDiscount retorna éxito")
+    @Description("Verifica que requestDeleteDiscount retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("requestDeleteDiscount retorna éxito")
-    void testExecuteFunction_requestDeleteDiscount_returnsSuccess() {
+    @DisplayName("requestDeleteDiscount retorna exito")
+    void testExecuteFunctionRequestDeleteDiscountReturnsSuccess() {
         when(discountExecutor.requestDeleteDiscount(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("requestDeleteDiscount", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -113,10 +112,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Tipos de Entrada")
-    @Description("Verifica que listTicketTypes retorna éxito")
+    @Description("Verifica que listTicketTypes retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("listTicketTypes retorna éxito")
-    void testExecuteFunction_listTicketTypes_returnsSuccess() {
+    @DisplayName("listTicketTypes retorna exito")
+    void testExecuteFunctionListTicketTypesReturnsSuccess() {
         when(ticketTypeExecutor.listTicketTypes("en")).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("listTicketTypes", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -124,10 +123,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Tipos de Entrada")
-    @Description("Verifica que getTicketTypeById retorna éxito")
+    @Description("Verifica que getTicketTypeById retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("getTicketTypeById retorna éxito")
-    void testExecuteFunction_getTicketTypeById_returnsSuccess() {
+    @DisplayName("getTicketTypeById retorna exito")
+    void testExecuteFunctionGetTicketTypeByIdReturnsSuccess() {
         when(ticketTypeExecutor.getTicketTypeById(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("getTicketTypeById", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -135,10 +134,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Tipos de Entrada")
-    @Description("Verifica que findTicketTypeByName retorna éxito")
+    @Description("Verifica que findTicketTypeByName retorna exito")
     @Severity(SeverityLevel.NORMAL)
-    @DisplayName("findTicketTypeByName retorna éxito")
-    void testExecuteFunction_findTicketTypeByName_returnsSuccess() {
+    @DisplayName("findTicketTypeByName retorna exito")
+    void testExecuteFunctionFindTicketTypeByNameReturnsSuccess() {
         when(ticketTypeExecutor.findTicketTypeByName(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("findTicketTypeByName", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -146,10 +145,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Tipos de Entrada")
-    @Description("Verifica que createTicketType retorna éxito")
+    @Description("Verifica que createTicketType retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("createTicketType retorna éxito")
-    void testExecuteFunction_createTicketType_returnsSuccess() {
+    @DisplayName("createTicketType retorna exito")
+    void testExecuteFunctionCreateTicketTypeReturnsSuccess() {
         when(ticketTypeExecutor.createTicketType(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("createTicketType", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -157,10 +156,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Tipos de Entrada")
-    @Description("Verifica que updateTicketType retorna éxito")
+    @Description("Verifica que updateTicketType retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("updateTicketType retorna éxito")
-    void testExecuteFunction_updateTicketType_returnsSuccess() {
+    @DisplayName("updateTicketType retorna exito")
+    void testExecuteFunctionUpdateTicketTypeReturnsSuccess() {
         when(ticketTypeExecutor.updateTicketType(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("updateTicketType", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -168,10 +167,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Tipos de Entrada")
-    @Description("Verifica que requestDeleteTicketType retorna éxito")
+    @Description("Verifica que requestDeleteTicketType retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("requestDeleteTicketType retorna éxito")
-    void testExecuteFunction_requestDeleteTicketType_returnsSuccess() {
+    @DisplayName("requestDeleteTicketType retorna exito")
+    void testExecuteFunctionRequestDeleteTicketTypeReturnsSuccess() {
         when(ticketTypeExecutor.requestDeleteTicketType(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("requestDeleteTicketType", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -179,10 +178,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Atracciones")
-    @Description("Verifica que listAttractions retorna éxito")
+    @Description("Verifica que listAttractions retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("listAttractions retorna éxito")
-    void testExecuteFunction_listAttractions_returnsSuccess() {
+    @DisplayName("listAttractions retorna exito")
+    void testExecuteFunctionListAttractionsReturnsSuccess() {
         when(attractionExecutor.listAttractions("en")).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("listAttractions", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -190,10 +189,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Atracciones")
-    @Description("Verifica que getAttractionById retorna éxito")
+    @Description("Verifica que getAttractionById retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("getAttractionById retorna éxito")
-    void testExecuteFunction_getAttractionById_returnsSuccess() {
+    @DisplayName("getAttractionById retorna exito")
+    void testExecuteFunctionGetAttractionByIdReturnsSuccess() {
         when(attractionExecutor.getAttractionById(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("getAttractionById", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -201,10 +200,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Atracciones")
-    @Description("Verifica que createAttraction retorna éxito")
+    @Description("Verifica que createAttraction retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("createAttraction retorna éxito")
-    void testExecuteFunction_createAttraction_returnsSuccess() {
+    @DisplayName("createAttraction retorna exito")
+    void testExecuteFunctionCreateAttractionReturnsSuccess() {
         when(attractionExecutor.createAttraction(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("createAttraction", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -212,10 +211,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Atracciones")
-    @Description("Verifica que updateAttraction retorna éxito")
+    @Description("Verifica que updateAttraction retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("updateAttraction retorna éxito")
-    void testExecuteFunction_updateAttraction_returnsSuccess() {
+    @DisplayName("updateAttraction retorna exito")
+    void testExecuteFunctionUpdateAttractionReturnsSuccess() {
         when(attractionExecutor.updateAttraction(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("updateAttraction", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -223,10 +222,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Funciones de Atracciones")
-    @Description("Verifica que requestDeleteAttraction retorna éxito")
+    @Description("Verifica que requestDeleteAttraction retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("requestDeleteAttraction retorna éxito")
-    void testExecuteFunction_requestDeleteAttraction_returnsSuccess() {
+    @DisplayName("requestDeleteAttraction retorna exito")
+    void testExecuteFunctionRequestDeleteAttractionReturnsSuccess() {
         when(attractionExecutor.requestDeleteAttraction(any(), eq("en"))).thenReturn(successResponse);
         ChatResponse response = executor.executeFunction("requestDeleteAttraction", Map.of(), "en");
         assertTrue(response.isSuccess());
@@ -234,30 +233,30 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Manejo de Errores")
-    @Description("Verifica que función desconocida retorna error")
+    @Description("Verifica que funcion desconocida retorna error")
     @Severity(SeverityLevel.NORMAL)
-    @DisplayName("Función desconocida retorna error")
-    void testExecuteFunction_unknownFunction_returnsError() {
+    @DisplayName("Funcion desconocida retorna error")
+    void testExecuteFunctionUnknownFunctionReturnsError() {
         ChatResponse response = executor.executeFunction("unknownFunction", Map.of(), "en");
         assertFalse(response.isSuccess());
     }
 
     @Test
     @Story("Manejo de Errores")
-    @Description("Verifica que función desconocida contiene mensaje de error")
+    @Description("Verifica que funcion desconocida contiene mensaje de error")
     @Severity(SeverityLevel.MINOR)
-    @DisplayName("Función desconocida contiene mensaje")
-    void testExecuteFunction_unknownFunction_containsErrorMessage() {
+    @DisplayName("Funcion desconocida contiene mensaje")
+    void testExecuteFunctionUnknownFunctionContainsErrorMessage() {
         ChatResponse response = executor.executeFunction("unknownFunction", Map.of(), "en");
         assertTrue(response.getMessage().contains("Unknown function"));
     }
 
     @Test
     @Story("Manejo de Errores")
-    @Description("Verifica mensaje de error para función desconocida en español")
+    @Description("Verifica mensaje de error para funcion desconocida en espanol")
     @Severity(SeverityLevel.MINOR)
-    @DisplayName("Función desconocida mensaje español")
-    void testExecuteFunction_unknownFunction_spanish() {
+    @DisplayName("Funcion desconocida mensaje espanol")
+    void testExecuteFunctionUnknownFunctionSpanish() {
         ChatResponse response = executor.executeFunction("unknownFunction", Map.of(), "es");
         assertTrue(response.getMessage().contains("Función no reconocida"));
     }
@@ -267,7 +266,7 @@ public class ChatbotFunctionExecutorTests {
     @Description("Verifica que DateTimeParseException retorna error")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("DateTimeParseException retorna error")
-    void testExecuteFunction_dateTimeParseException_returnsError() {
+    void testExecuteFunctionDateTimeParseExceptionReturnsError() {
         when(discountExecutor.createDiscount(any(), eq("en")))
                 .thenThrow(new DateTimeParseException("Invalid date", "invalid", 0));
         ChatResponse response = executor.executeFunction("createDiscount", Map.of(), "en");
@@ -279,7 +278,7 @@ public class ChatbotFunctionExecutorTests {
     @Description("Verifica que DateTimeParseException contiene mensaje de fecha")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("DateTimeParseException contiene mensaje fecha")
-    void testExecuteFunction_dateTimeParseException_containsDateMessage() {
+    void testExecuteFunctionDateTimeParseExceptionContainsDateMessage() {
         when(discountExecutor.createDiscount(any(), eq("en")))
                 .thenThrow(new DateTimeParseException("Invalid date", "invalid", 0));
         ChatResponse response = executor.executeFunction("createDiscount", Map.of(), "en");
@@ -291,7 +290,7 @@ public class ChatbotFunctionExecutorTests {
     @Description("Verifica que IllegalArgumentException retorna error")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("IllegalArgumentException retorna error")
-    void testExecuteFunction_illegalArgumentException_returnsError() {
+    void testExecuteFunctionIllegalArgumentExceptionReturnsError() {
         when(discountExecutor.createDiscount(any(), eq("en")))
                 .thenThrow(new IllegalArgumentException("Validation error"));
         ChatResponse response = executor.executeFunction("createDiscount", Map.of(), "en");
@@ -300,10 +299,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Manejo de Errores")
-    @Description("Verifica que excepción genérica retorna error")
+    @Description("Verifica que excepcion generica retorna error")
     @Severity(SeverityLevel.NORMAL)
-    @DisplayName("Excepción genérica retorna error")
-    void testExecuteFunction_genericException_returnsError() {
+    @DisplayName("Excepcion generica retorna error")
+    void testExecuteFunctionGenericExceptionReturnsError() {
         when(discountExecutor.createDiscount(any(), eq("en")))
                 .thenThrow(new RuntimeException("Unexpected error"));
         ChatResponse response = executor.executeFunction("createDiscount", Map.of(), "en");
@@ -312,10 +311,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Acciones Pendientes")
-    @Description("Verifica que deleteDiscount confirmado retorna éxito")
+    @Description("Verifica que deleteDiscount confirmado retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("deleteDiscount confirmado retorna éxito")
-    void testExecutePendingAction_confirmed_deleteDiscount_returnsSuccess() {
+    @DisplayName("deleteDiscount confirmado retorna exito")
+    void testExecutePendingActionConfirmedDeleteDiscountReturnsSuccess() {
         when(discountExecutor.executeDeleteDiscount(1L, "en")).thenReturn(successResponse);
         PendingAction pending = PendingAction.builder()
                 .actionType("deleteDiscount")
@@ -331,10 +330,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Acciones Pendientes")
-    @Description("Verifica que deleteTicketType confirmado retorna éxito")
+    @Description("Verifica que deleteTicketType confirmado retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("deleteTicketType confirmado retorna éxito")
-    void testExecutePendingAction_confirmed_deleteTicketType_returnsSuccess() {
+    @DisplayName("deleteTicketType confirmado retorna exito")
+    void testExecutePendingActionConfirmedDeleteTicketTypeReturnsSuccess() {
         when(ticketTypeExecutor.executeDeleteTicketType(1L, "en")).thenReturn(successResponse);
         PendingAction pending = PendingAction.builder()
                 .actionType("deleteTicketType")
@@ -350,10 +349,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Acciones Pendientes")
-    @Description("Verifica que deleteAttraction confirmado retorna éxito")
+    @Description("Verifica que deleteAttraction confirmado retorna exito")
     @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("deleteAttraction confirmado retorna éxito")
-    void testExecutePendingAction_confirmed_deleteAttraction_returnsSuccess() {
+    @DisplayName("deleteAttraction confirmado retorna exito")
+    void testExecutePendingActionConfirmedDeleteAttractionReturnsSuccess() {
         when(attractionExecutor.executeDeleteAttraction(1L, "en")).thenReturn(successResponse);
         PendingAction pending = PendingAction.builder()
                 .actionType("deleteAttraction")
@@ -369,10 +368,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Acciones Pendientes")
-    @Description("Verifica que acción cancelada retorna mensaje de cancelación")
+    @Description("Verifica que accion cancelada retorna mensaje de cancelacion")
     @Severity(SeverityLevel.NORMAL)
-    @DisplayName("Acción cancelada retorna mensaje cancelación")
-    void testExecutePendingAction_cancelled_returnsCancelledMessage() {
+    @DisplayName("Accion cancelada retorna mensaje cancelacion")
+    void testExecutePendingActionCancelledReturnsCancelledMessage() {
         PendingAction pending = PendingAction.builder()
                 .actionType("deleteDiscount")
                 .params(Map.of("id", 1L))
@@ -387,10 +386,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Acciones Pendientes")
-    @Description("Verifica mensaje de cancelación en español")
+    @Description("Verifica mensaje de cancelacion en espanol")
     @Severity(SeverityLevel.MINOR)
-    @DisplayName("Cancelación mensaje español")
-    void testExecutePendingAction_cancelled_spanish() {
+    @DisplayName("Cancelacion mensaje espanol")
+    void testExecutePendingActionCancelledSpanish() {
         PendingAction pending = PendingAction.builder()
                 .actionType("deleteDiscount")
                 .params(Map.of("id", 1L))
@@ -405,10 +404,10 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Acciones Pendientes")
-    @Description("Verifica que acción desconocida retorna error")
+    @Description("Verifica que accion desconocida retorna error")
     @Severity(SeverityLevel.NORMAL)
-    @DisplayName("Acción desconocida retorna error")
-    void testExecutePendingAction_unknownAction_returnsError() {
+    @DisplayName("Accion desconocida retorna error")
+    void testExecutePendingActionUnknownActionReturnsError() {
         PendingAction pending = PendingAction.builder()
                 .actionType("unknownAction")
                 .params(Map.of("id", 1L))
@@ -422,18 +421,18 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Confirmación en Español")
-    @Description("Verifica confirmación con 'sí'")
+    @Story("Confirmacion en Espanol")
+    @Description("Verifica confirmacion con si")
     @Severity(SeverityLevel.NORMAL)
-    @DisplayName("Confirmación con 'sí'")
-    void testExecutePendingAction_spanishConfirmation_sí() {
+    @DisplayName("Confirmacion con si")
+    void testExecutePendingActionSpanishConfirmationSi() {
         when(discountExecutor.executeDeleteDiscount(1L, "es")).thenReturn(successResponse);
         PendingAction pending = PendingAction.builder()
                 .actionType("deleteDiscount")
                 .params(Map.of("id", 1L))
                 .build();
         ChatRequest request = ChatRequest.builder()
-                .message("sí")
+                .message("si")
                 .pendingAction(pending)
                 .build();
         ChatResponse response = executor.executePendingAction(request, "es");
@@ -441,11 +440,11 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Confirmación en Español")
-    @Description("Verifica confirmación con 'confirmo'")
+    @Story("Confirmacion en Espanol")
+    @Description("Verifica confirmacion con confirmo")
     @Severity(SeverityLevel.NORMAL)
-    @DisplayName("Confirmación con 'confirmo'")
-    void testExecutePendingAction_spanishConfirmation_confirmo() {
+    @DisplayName("Confirmacion con confirmo")
+    void testExecutePendingActionSpanishConfirmationConfirmo() {
         when(discountExecutor.executeDeleteDiscount(1L, "es")).thenReturn(successResponse);
         PendingAction pending = PendingAction.builder()
                 .actionType("deleteDiscount")
@@ -460,11 +459,11 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Confirmación en Español")
-    @Description("Verifica confirmación con 'adelante'")
+    @Story("Confirmacion en Espanol")
+    @Description("Verifica confirmacion con adelante")
     @Severity(SeverityLevel.NORMAL)
-    @DisplayName("Confirmación con 'adelante'")
-    void testExecutePendingAction_spanishConfirmation_adelante() {
+    @DisplayName("Confirmacion con adelante")
+    void testExecutePendingActionSpanishConfirmationAdelante() {
         when(discountExecutor.executeDeleteDiscount(1L, "es")).thenReturn(successResponse);
         PendingAction pending = PendingAction.builder()
                 .actionType("deleteDiscount")
@@ -480,22 +479,22 @@ public class ChatbotFunctionExecutorTests {
 
     @Test
     @Story("Manejo de Errores")
-    @Description("Verifica IllegalArgumentException en español")
+    @Description("Verifica IllegalArgumentException en espanol")
     @Severity(SeverityLevel.MINOR)
-    @DisplayName("IllegalArgumentException español")
-    void testExecuteFunction_illegalArgumentException_spanish() {
+    @DisplayName("IllegalArgumentException espanol")
+    void testExecuteFunctionIllegalArgumentExceptionSpanish() {
         when(discountExecutor.createDiscount(any(), eq("es")))
-                .thenThrow(new IllegalArgumentException("Error de validación"));
+                .thenThrow(new IllegalArgumentException("Error de validacion"));
         ChatResponse response = executor.executeFunction("createDiscount", Map.of(), "es");
         assertFalse(response.isSuccess());
     }
 
     @Test
     @Story("Manejo de Errores")
-    @Description("Verifica excepción genérica en español")
+    @Description("Verifica excepcion generica en espanol")
     @Severity(SeverityLevel.MINOR)
-    @DisplayName("Excepción genérica español")
-    void testExecuteFunction_genericException_spanish() {
+    @DisplayName("Excepcion generica espanol")
+    void testExecuteFunctionGenericExceptionSpanish() {
         when(discountExecutor.createDiscount(any(), eq("es")))
                 .thenThrow(new RuntimeException("Error inesperado"));
         ChatResponse response = executor.executeFunction("createDiscount", Map.of(), "es");
@@ -503,11 +502,11 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Confirmación en Inglés")
-    @Description("Verifica confirmación con 'proceed'")
+    @Story("Confirmacion en Ingles")
+    @Description("Verifica confirmacion con proceed")
     @Severity(SeverityLevel.NORMAL)
-    @DisplayName("Confirmación con 'proceed'")
-    void testExecutePendingAction_englishConfirmation_proceed() {
+    @DisplayName("Confirmacion con proceed")
+    void testExecutePendingActionEnglishConfirmationProceed() {
         when(discountExecutor.executeDeleteDiscount(1L, "en")).thenReturn(successResponse);
         PendingAction pending = PendingAction.builder()
                 .actionType("deleteDiscount")
@@ -522,11 +521,11 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Denegación en Español")
-    @Description("Verifica denegación con 'cancelar'")
+    @Story("Denegacion en Espanol")
+    @Description("Verifica denegacion con cancelar")
     @Severity(SeverityLevel.NORMAL)
-    @DisplayName("Denegación con 'cancelar'")
-    void testExecutePendingAction_spanishDenial_cancelar() {
+    @DisplayName("Denegacion con cancelar")
+    void testExecutePendingActionSpanishDenialCancelar() {
         PendingAction pending = PendingAction.builder()
                 .actionType("deleteDiscount")
                 .params(Map.of("id", 1L))
@@ -540,11 +539,11 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Denegación en Inglés")
-    @Description("Verifica denegación con 'cancel'")
+    @Story("Denegacion en Ingles")
+    @Description("Verifica denegacion con cancel")
     @Severity(SeverityLevel.NORMAL)
-    @DisplayName("Denegación con 'cancel'")
-    void testExecutePendingAction_englishDenial_cancel() {
+    @DisplayName("Denegacion con cancel")
+    void testExecutePendingActionEnglishDenialCancel() {
         PendingAction pending = PendingAction.builder()
                 .actionType("deleteDiscount")
                 .params(Map.of("id", 1L))

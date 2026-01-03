@@ -50,7 +50,7 @@ public class GeminiServiceTests {
     @Description("Verifica que se delega a functionExecutor con acción pendiente")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Procesar mensaje con acción pendiente delega a executor")
-    void testProcessMessage_withPendingAction_delegatesToFunctionExecutor() {
+    void testProcessMessageWithPendingActionDelegatesToFunctionExecutor() {
         ChatResponse expectedResponse = ChatResponse.builder()
                 .success(true)
                 .message("Confirmed")
@@ -75,7 +75,7 @@ public class GeminiServiceTests {
     @Description("Verifica que retorna mensaje esperado con acción pendiente")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Procesar mensaje con acción pendiente retorna mensaje")
-    void testProcessMessage_withPendingAction_returnsExpectedMessage() {
+    void testProcessMessageWithPendingActionReturnsExpectedMessage() {
         ChatResponse expectedResponse = ChatResponse.builder()
                 .success(true)
                 .message("Discount deleted")
@@ -100,7 +100,7 @@ public class GeminiServiceTests {
     @Description("Verifica que detecta inglés correctamente")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Detecta idioma inglés")
-    void testProcessMessage_englishMessage_detectsEnglish() {
+    void testProcessMessageEnglishMessageDetectsEnglish() {
         ChatResponse expectedResponse = ChatResponse.builder()
                 .success(true)
                 .message("Operation completed")
@@ -125,7 +125,7 @@ public class GeminiServiceTests {
     @Description("Verifica que detecta español correctamente")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Detecta idioma español")
-    void testProcessMessage_spanishMessage_detectsSpanish() {
+    void testProcessMessageSpanishMessageDetectsSpanish() {
         ChatResponse expectedResponse = ChatResponse.builder()
                 .success(true)
                 .message("Operación completada")
@@ -150,7 +150,7 @@ public class GeminiServiceTests {
     @Description("Verifica que detecta español por caracteres especiales")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Detecta español por caracteres especiales")
-    void testProcessMessage_spanishCharacters_detectsSpanish() {
+    void testProcessMessageSpanishCharactersDetectsSpanish() {
         ChatResponse expectedResponse = ChatResponse.builder()
                 .success(true)
                 .message("Operación completada")
@@ -175,7 +175,7 @@ public class GeminiServiceTests {
     @Description("Verifica que mensaje vacío usa español por defecto")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Mensaje vacío usa español por defecto")
-    void testProcessMessage_emptyMessage_defaultsToSpanish() {
+    void testProcessMessageEmptyMessageDefaultsToSpanish() {
         ChatResponse expectedResponse = ChatResponse.builder()
                 .success(true)
                 .message("Done")
@@ -200,7 +200,7 @@ public class GeminiServiceTests {
     @Description("Verifica que mensaje null usa español por defecto")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Mensaje null usa español por defecto")
-    void testProcessMessage_nullMessage_defaultsToSpanish() {
+    void testProcessMessageNullMessageDefaultsToSpanish() {
         ChatResponse expectedResponse = ChatResponse.builder()
                 .success(true)
                 .message("Done")
@@ -225,7 +225,7 @@ public class GeminiServiceTests {
     @Description("Verifica que procesa mensaje con historial")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Procesa mensaje con historial")
-    void testProcessMessage_withHistory_returnsSuccess() {
+    void testProcessMessageWithHistoryReturnsSuccess() {
         ChatResponse expectedResponse = ChatResponse.builder()
                 .success(true)
                 .message("Done")
@@ -255,7 +255,7 @@ public class GeminiServiceTests {
     @Description("Verifica que procesa historial del modelo")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Procesa historial del modelo")
-    void testProcessMessage_modelHistory_returnsSuccess() {
+    void testProcessMessageModelHistoryReturnsSuccess() {
         ChatResponse expectedResponse = ChatResponse.builder()
                 .success(true)
                 .message("Done")
@@ -285,7 +285,7 @@ public class GeminiServiceTests {
     @Description("Verifica detección de idioma en mensajes mixtos")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Detecta idioma en mensajes mixtos")
-    void testProcessMessage_mixedEnglishSpanish_detectsLanguage() {
+    void testProcessMessageMixedEnglishSpanishDetectsLanguage() {
         ChatResponse expectedResponse = ChatResponse.builder()
                 .success(true)
                 .message("Done")
@@ -310,7 +310,7 @@ public class GeminiServiceTests {
     @Description("Verifica que keyword create detecta inglés")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Keyword create detecta inglés")
-    void testProcessMessage_createKeyword_detectsEnglish() {
+    void testProcessMessageCreateKeywordDetectsEnglish() {
         ChatResponse expectedResponse = ChatResponse.builder()
                 .success(true)
                 .message("Created")
@@ -335,7 +335,7 @@ public class GeminiServiceTests {
     @Description("Verifica que keyword crear detecta español")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Keyword crear detecta español")
-    void testProcessMessage_crearKeyword_detectsSpanish() {
+    void testProcessMessageCrearKeywordDetectsSpanish() {
         ChatResponse expectedResponse = ChatResponse.builder()
                 .success(true)
                 .message("Creado")

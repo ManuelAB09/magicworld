@@ -51,7 +51,7 @@ public class ChatbotControllerTests {
     @Description("Verifica que enviar mensaje retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Enviar mensaje retorna 200 OK")
-    public void testSendMessage_returnsOk() throws Exception {
+    public void testSendMessageReturnsOk() throws Exception {
         ChatRequest request = ChatRequest.builder()
                 .message("Hello")
                 .build();
@@ -74,7 +74,7 @@ public class ChatbotControllerTests {
     @Description("Verifica que enviar mensaje retorna mensaje de respuesta")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Enviar mensaje retorna mensaje")
-    public void testSendMessage_returnsMessage() throws Exception {
+    public void testSendMessageReturnsMessage() throws Exception {
         ChatRequest request = ChatRequest.builder()
                 .message("Hello")
                 .build();
@@ -97,7 +97,7 @@ public class ChatbotControllerTests {
     @Description("Verifica que enviar mensaje retorna success true")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Enviar mensaje retorna success")
-    public void testSendMessage_returnsSuccess() throws Exception {
+    public void testSendMessageReturnsSuccess() throws Exception {
         ChatRequest request = ChatRequest.builder()
                 .message("Hello")
                 .build();
@@ -120,7 +120,7 @@ public class ChatbotControllerTests {
     @Description("Verifica que mensaje vacío retorna 400 Bad Request")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Mensaje vacío retorna 400")
-    public void testSendMessage_emptyMessage_returnsBadRequest() throws Exception {
+    public void testSendMessageEmptyMessageReturnsBadRequest() throws Exception {
         ChatRequest request = ChatRequest.builder()
                 .message("")
                 .build();
@@ -136,7 +136,7 @@ public class ChatbotControllerTests {
     @Description("Verifica que mensaje null retorna 400 Bad Request")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Mensaje null retorna 400")
-    public void testSendMessage_nullMessage_returnsBadRequest() throws Exception {
+    public void testSendMessageNullMessageReturnsBadRequest() throws Exception {
         ChatRequest request = ChatRequest.builder()
                 .message(null)
                 .build();

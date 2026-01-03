@@ -35,6 +35,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Feature("API REST de Tipos de Entrada E2E")
 public class TicketTypeE2ETests {
 
+    private static final String API_TICKET_TYPES = "/api/v1/ticket-types";
+    private static final String TYPE_NAME_ADULT = "ADULT";
+    private static final String TYPE_NAME_PREMIUM = "PREMIUM";
+    private static final String TYPE_NAME_VIP = "VIP";
+    private static final String TYPE_NAME_ULTRA = "ULTRA";
+    private static final String ADULT_TICKET_DESC = "Adult ticket";
+    private static final String VIP_TICKET_DESC = "VIP ticket";
+    private static final String PREMIUM_TICKET_DESC = "Premium ticket";
+    private static final String ULTRA_TICKET_DESC = "Ultra ticket";
+    private static final String CURRENCY_EUR = "EUR";
+    private static final String CURRENCY_USD = "USD";
+    private static final String PHOTO_URL_ADULT = "https://example.com/adult.jpg";
+    private static final String TEST_IMAGE_CONTENT = "test image content";
+    private static final String NEW_IMAGE_CONTENT = "new image content";
+    private static final BigDecimal COST_50 = new BigDecimal("50.00");
+    private static final BigDecimal COST_75 = new BigDecimal("75.00");
+    private static final BigDecimal COST_100 = new BigDecimal("100.00");
+    private static final BigDecimal COST_150 = new BigDecimal("150.00");
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -50,12 +69,12 @@ public class TicketTypeE2ETests {
     void setUp() {
         ticketTypeRepository.deleteAll();
         sample = TicketType.builder()
-                .typeName("ADULT")
-                .cost(new BigDecimal("50.00"))
-                .currency("EUR")
-                .description("Adult ticket")
+                .typeName(TYPE_NAME_ADULT)
+                .cost(COST_50)
+                .currency(CURRENCY_EUR)
+                .description(ADULT_TICKET_DESC)
                 .maxPerDay(100)
-                .photoUrl("https://example.com/adult.jpg")
+                .photoUrl(PHOTO_URL_ADULT)
                 .build();
     }
 
@@ -70,8 +89,8 @@ public class TicketTypeE2ETests {
     @Description("Verifica que crear un tipo de entrada retorna 201 Created")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear tipo de entrada retorna 201")
-    void testCreateTicketType_returnsCreated() throws Exception {
-        mockMvc.perform(post("/api/v1/ticket-types")
+    void testCreateTicketTypeReturnsCreated() throws Exception {
+        mockMvc.perform(post(API_TICKET_TYPES)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -84,8 +103,8 @@ public class TicketTypeE2ETests {
     @Description("Verifica que crear un tipo de entrada retorna header Location")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear tipo de entrada retorna header Location")
-    void testCreateTicketType_returnsLocationHeader() throws Exception {
-        mockMvc.perform(post("/api/v1/ticket-types")
+    void testCreateTicketTypeReturnsLocationHeader() throws Exception {
+        mockMvc.perform(post(API_TICKET_TYPES)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -98,8 +117,8 @@ public class TicketTypeE2ETests {
     @Description("Verifica que crear un tipo de entrada retorna el ID generado")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear tipo de entrada retorna ID")
-    void testCreateTicketType_returnsTicketTypeWithId() throws Exception {
-        mockMvc.perform(post("/api/v1/ticket-types")
+    void testCreateTicketTypeReturnsTicketTypeWithId() throws Exception {
+        mockMvc.perform(post(API_TICKET_TYPES)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -112,12 +131,12 @@ public class TicketTypeE2ETests {
     @Description("Verifica que crear un tipo de entrada retorna el nombre correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear tipo de entrada retorna nombre correcto")
-    void testCreateTicketType_returnsCorrectTypeName() throws Exception {
-        mockMvc.perform(post("/api/v1/ticket-types")
+    void testCreateTicketTypeReturnsCorrectTypeName() throws Exception {
+        mockMvc.perform(post(API_TICKET_TYPES)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
-                .andExpect(jsonPath("$.typeName").value("ADULT"));
+                .andExpect(jsonPath("$.typeName").value(TYPE_NAME_ADULT));
     }
 
     @Test
@@ -125,8 +144,8 @@ public class TicketTypeE2ETests {
     @Description("Verifica que obtener todos los tipos retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Obtener todos los tipos retorna 200 OK")
-    void testGetAllTicketTypes_public_returnsOk() throws Exception {
-        mockMvc.perform(get("/api/v1/ticket-types"))
+    void testGetAllTicketTypesPublicReturnsOk() throws Exception {
+        mockMvc.perform(get(API_TICKET_TYPES))
                 .andExpect(status().isOk());
     }
 
@@ -135,8 +154,8 @@ public class TicketTypeE2ETests {
     @Description("Verifica que obtener todos los tipos retorna array vacío inicialmente")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener todos los tipos retorna array vacío")
-    void testGetAllTicketTypes_public_returnsEmptyArray() throws Exception {
-        mockMvc.perform(get("/api/v1/ticket-types"))
+    void testGetAllTicketTypesPublicReturnsEmptyArray() throws Exception {
+        mockMvc.perform(get(API_TICKET_TYPES))
                 .andExpect(jsonPath("$.length()").value(0));
     }
 
@@ -145,9 +164,9 @@ public class TicketTypeE2ETests {
     @Description("Verifica que obtener todos los tipos retorna los datos correctos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener todos los tipos retorna datos")
-    void testGetAllTicketTypes_withData_returnsTicketTypes() throws Exception {
+    void testGetAllTicketTypesWithDataReturnsTicketTypes() throws Exception {
         ticketTypeRepository.save(sample);
-        mockMvc.perform(get("/api/v1/ticket-types"))
+        mockMvc.perform(get(API_TICKET_TYPES))
                 .andExpect(jsonPath("$.length()").value(1));
     }
 
@@ -156,10 +175,10 @@ public class TicketTypeE2ETests {
     @Description("Verifica que obtener todos los tipos contiene el nombre del tipo")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener todos los tipos contiene nombre")
-    void testGetAllTicketTypes_withData_containsTypeName() throws Exception {
+    void testGetAllTicketTypesWithDataContainsTypeName() throws Exception {
         ticketTypeRepository.save(sample);
-        mockMvc.perform(get("/api/v1/ticket-types"))
-                .andExpect(jsonPath("$[0].typeName").value("ADULT"));
+        mockMvc.perform(get(API_TICKET_TYPES))
+                .andExpect(jsonPath("$[0].typeName").value(TYPE_NAME_ADULT));
     }
 
     @Test
@@ -167,9 +186,9 @@ public class TicketTypeE2ETests {
     @Description("Verifica que obtener tipo por ID retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Obtener tipo por ID retorna 200 OK")
-    void testGetTicketTypeById_exists_returnsOk() throws Exception {
+    void testGetTicketTypeByIdExistsReturnsOk() throws Exception {
         TicketType saved = ticketTypeRepository.save(sample);
-        mockMvc.perform(get("/api/v1/ticket-types/" + saved.getId()))
+        mockMvc.perform(get(API_TICKET_TYPES + "/" + saved.getId()))
                 .andExpect(status().isOk());
     }
 
@@ -178,10 +197,10 @@ public class TicketTypeE2ETests {
     @Description("Verifica que obtener tipo por ID retorna datos correctos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener tipo por ID retorna datos correctos")
-    void testGetTicketTypeById_exists_returnsCorrectData() throws Exception {
+    void testGetTicketTypeByIdExistsReturnsCorrectData() throws Exception {
         TicketType saved = ticketTypeRepository.save(sample);
-        mockMvc.perform(get("/api/v1/ticket-types/" + saved.getId()))
-                .andExpect(jsonPath("$.typeName").value("ADULT"));
+        mockMvc.perform(get(API_TICKET_TYPES + "/" + saved.getId()))
+                .andExpect(jsonPath("$.typeName").value(TYPE_NAME_ADULT));
     }
 
     @Test
@@ -189,8 +208,8 @@ public class TicketTypeE2ETests {
     @Description("Verifica que obtener tipo inexistente retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener tipo inexistente retorna 404")
-    void testGetTicketTypeById_notExists_returns404() throws Exception {
-        mockMvc.perform(get("/api/v1/ticket-types/999999"))
+    void testGetTicketTypeByIdNotExistsReturns404() throws Exception {
+        mockMvc.perform(get(API_TICKET_TYPES + "/999999"))
                 .andExpect(status().isNotFound());
     }
 
@@ -200,10 +219,10 @@ public class TicketTypeE2ETests {
     @Description("Verifica que actualizar tipo retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar tipo retorna 200 OK")
-    void testUpdateTicketType_returnsOk() throws Exception {
+    void testUpdateTicketTypeReturnsOk() throws Exception {
         TicketType saved = ticketTypeRepository.save(sample);
-        sample.setTypeName("PREMIUM");
-        mockMvc.perform(put("/api/v1/ticket-types/" + saved.getId())
+        sample.setTypeName(TYPE_NAME_PREMIUM);
+        mockMvc.perform(put(API_TICKET_TYPES + "/" + saved.getId())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -216,14 +235,14 @@ public class TicketTypeE2ETests {
     @Description("Verifica que actualizar tipo actualiza el nombre")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar tipo actualiza el nombre")
-    void testUpdateTicketType_updatesTypeName() throws Exception {
+    void testUpdateTicketTypeUpdatesTypeName() throws Exception {
         TicketType saved = ticketTypeRepository.save(sample);
-        sample.setTypeName("PREMIUM");
-        mockMvc.perform(put("/api/v1/ticket-types/" + saved.getId())
+        sample.setTypeName(TYPE_NAME_PREMIUM);
+        mockMvc.perform(put(API_TICKET_TYPES + "/" + saved.getId())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
-                .andExpect(jsonPath("$.typeName").value("PREMIUM"));
+                .andExpect(jsonPath("$.typeName").value(TYPE_NAME_PREMIUM));
     }
 
     @Test
@@ -232,8 +251,8 @@ public class TicketTypeE2ETests {
     @Description("Verifica que actualizar tipo inexistente retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar tipo inexistente retorna 404")
-    void testUpdateTicketType_notExists_returns404() throws Exception {
-        mockMvc.perform(put("/api/v1/ticket-types/999999")
+    void testUpdateTicketTypeNotExistsReturns404() throws Exception {
+        mockMvc.perform(put(API_TICKET_TYPES + "/999999")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -246,9 +265,9 @@ public class TicketTypeE2ETests {
     @Description("Verifica que eliminar tipo retorna 204 No Content")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Eliminar tipo retorna 204 No Content")
-    void testDeleteTicketType_exists_returns204() throws Exception {
+    void testDeleteTicketTypeExistsReturns204() throws Exception {
         TicketType saved = ticketTypeRepository.save(sample);
-        mockMvc.perform(delete("/api/v1/ticket-types/" + saved.getId())
+        mockMvc.perform(delete(API_TICKET_TYPES + "/" + saved.getId())
                         .with(csrf()))
                 .andExpect(status().isNoContent());
     }
@@ -259,8 +278,8 @@ public class TicketTypeE2ETests {
     @Description("Verifica que eliminar tipo inexistente retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Eliminar tipo inexistente retorna 404")
-    void testDeleteTicketType_notExists_returns404() throws Exception {
-        mockMvc.perform(delete("/api/v1/ticket-types/999999")
+    void testDeleteTicketTypeNotExistsReturns404() throws Exception {
+        mockMvc.perform(delete(API_TICKET_TYPES + "/999999")
                         .with(csrf()))
                 .andExpect(status().isNotFound());
     }
@@ -270,8 +289,8 @@ public class TicketTypeE2ETests {
     @Description("Verifica que crear tipo sin autenticación retorna 401")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear tipo sin autenticación retorna 401")
-    void testCreateTicketType_unauthorized_returns401() throws Exception {
-        mockMvc.perform(post("/api/v1/ticket-types")
+    void testCreateTicketTypeUnauthorizedReturns401() throws Exception {
+        mockMvc.perform(post(API_TICKET_TYPES)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -284,8 +303,8 @@ public class TicketTypeE2ETests {
     @Description("Verifica que crear tipo con rol USER retorna 403")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear tipo con rol USER retorna 403")
-    void testCreateTicketType_userRole_returns403() throws Exception {
-        mockMvc.perform(post("/api/v1/ticket-types")
+    void testCreateTicketTypeUserRoleReturns403() throws Exception {
+        mockMvc.perform(post(API_TICKET_TYPES)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -298,18 +317,18 @@ public class TicketTypeE2ETests {
     @Description("Verifica que crear tipo multipart retorna 201 Created")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear tipo multipart retorna 201")
-    void testCreateTicketTypeMultipart_returnsCreated() throws Exception {
+    void testCreateTicketTypeMultipartReturnsCreated() throws Exception {
         TicketTypeRequest request = new TicketTypeRequest();
-        request.setCost(new BigDecimal("75.00"));
-        request.setCurrency("USD");
-        request.setTypeName("VIP");
-        request.setDescription("VIP ticket");
+        request.setCost(COST_75);
+        request.setCurrency(CURRENCY_USD);
+        request.setTypeName(TYPE_NAME_VIP);
+        request.setDescription(VIP_TICKET_DESC);
         request.setMaxPerDay(50);
 
-        MockMultipartFile photo = new MockMultipartFile("photo", "test.jpg", "image/jpeg", "test image content".getBytes());
+        MockMultipartFile photo = new MockMultipartFile("photo", "test.jpg", "image/jpeg", TEST_IMAGE_CONTENT.getBytes());
         MockMultipartFile data = new MockMultipartFile("data", "", "application/json", objectMapper.writeValueAsBytes(request));
 
-        mockMvc.perform(multipart("/api/v1/ticket-types")
+        mockMvc.perform(multipart(API_TICKET_TYPES)
                         .file(photo)
                         .file(data)
                         .with(csrf()))
@@ -322,18 +341,18 @@ public class TicketTypeE2ETests {
     @Description("Verifica que crear tipo multipart retorna ID")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear tipo multipart retorna ID")
-    void testCreateTicketTypeMultipart_returnsId() throws Exception {
+    void testCreateTicketTypeMultipartReturnsId() throws Exception {
         TicketTypeRequest request = new TicketTypeRequest();
-        request.setCost(new BigDecimal("75.00"));
-        request.setCurrency("USD");
-        request.setTypeName("VIP");
-        request.setDescription("VIP ticket");
+        request.setCost(COST_75);
+        request.setCurrency(CURRENCY_USD);
+        request.setTypeName(TYPE_NAME_VIP);
+        request.setDescription(VIP_TICKET_DESC);
         request.setMaxPerDay(50);
 
-        MockMultipartFile photo = new MockMultipartFile("photo", "test.jpg", "image/jpeg", "test image content".getBytes());
+        MockMultipartFile photo = new MockMultipartFile("photo", "test.jpg", "image/jpeg", TEST_IMAGE_CONTENT.getBytes());
         MockMultipartFile data = new MockMultipartFile("data", "", "application/json", objectMapper.writeValueAsBytes(request));
 
-        mockMvc.perform(multipart("/api/v1/ticket-types")
+        mockMvc.perform(multipart(API_TICKET_TYPES)
                         .file(photo)
                         .file(data)
                         .with(csrf()))
@@ -346,19 +365,19 @@ public class TicketTypeE2ETests {
     @Description("Verifica que actualizar tipo multipart retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar tipo multipart retorna 200 OK")
-    void testUpdateTicketTypeMultipart_returnsOk() throws Exception {
+    void testUpdateTicketTypeMultipartReturnsOk() throws Exception {
         TicketType saved = ticketTypeRepository.save(sample);
 
         TicketTypeRequest request = new TicketTypeRequest();
-        request.setCost(new BigDecimal("100.00"));
-        request.setCurrency("EUR");
-        request.setTypeName("PREMIUM");
-        request.setDescription("Premium ticket");
+        request.setCost(COST_100);
+        request.setCurrency(CURRENCY_EUR);
+        request.setTypeName(TYPE_NAME_PREMIUM);
+        request.setDescription(PREMIUM_TICKET_DESC);
         request.setMaxPerDay(200);
 
         MockMultipartFile data = new MockMultipartFile("data", "", "application/json", objectMapper.writeValueAsBytes(request));
 
-        mockMvc.perform(multipart("/api/v1/ticket-types/" + saved.getId())
+        mockMvc.perform(multipart(API_TICKET_TYPES + "/" + saved.getId())
                         .file(data)
                         .with(csrf())
                         .with(req -> { req.setMethod("PUT"); return req; }))
@@ -371,25 +390,25 @@ public class TicketTypeE2ETests {
     @Description("Verifica que actualizar tipo multipart con foto actualiza datos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar tipo multipart con foto actualiza datos")
-    void testUpdateTicketTypeMultipart_withPhoto_updatesData() throws Exception {
+    void testUpdateTicketTypeMultipartWithPhotoUpdatesData() throws Exception {
         TicketType saved = ticketTypeRepository.save(sample);
 
         TicketTypeRequest request = new TicketTypeRequest();
-        request.setCost(new BigDecimal("150.00"));
-        request.setCurrency("USD");
-        request.setTypeName("ULTRA");
-        request.setDescription("Ultra ticket");
+        request.setCost(COST_150);
+        request.setCurrency(CURRENCY_USD);
+        request.setTypeName(TYPE_NAME_ULTRA);
+        request.setDescription(ULTRA_TICKET_DESC);
         request.setMaxPerDay(25);
 
-        MockMultipartFile photo = new MockMultipartFile("photo", "new.jpg", "image/jpeg", "new image content".getBytes());
+        MockMultipartFile photo = new MockMultipartFile("photo", "new.jpg", "image/jpeg", NEW_IMAGE_CONTENT.getBytes());
         MockMultipartFile data = new MockMultipartFile("data", "", "application/json", objectMapper.writeValueAsBytes(request));
 
-        mockMvc.perform(multipart("/api/v1/ticket-types/" + saved.getId())
+        mockMvc.perform(multipart(API_TICKET_TYPES + "/" + saved.getId())
                         .file(photo)
                         .file(data)
                         .with(csrf())
                         .with(req -> { req.setMethod("PUT"); return req; }))
-                .andExpect(jsonPath("$.typeName").value("ULTRA"));
+                .andExpect(jsonPath("$.typeName").value(TYPE_NAME_ULTRA));
     }
 }
 

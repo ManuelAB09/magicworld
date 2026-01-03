@@ -34,6 +34,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @Feature("Servicio de Tipos de Entrada")
 public class TicketTypeServiceTests {
 
+    private static final String TYPE_NAME_STANDARD = "STANDARD";
+    private static final String TYPE_NAME_PREMIUM = "PREMIUM";
+    private static final String STANDARD_TICKET_DESC = "Standard ticket";
+    private static final String PREMIUM_TICKET_DESC = "Premium ticket";
+    private static final String CURRENCY_EUR = "EUR";
+    private static final String CURRENCY_USD = "USD";
+    private static final String PHOTO_URL = "http://example.com/photo.jpg";
+    private static final String PHOTO_URL_UPDATED = "http://example.com/updated.jpg";
+    private static final BigDecimal COST_50 = new BigDecimal("50.00");
+    private static final BigDecimal COST_75_50 = new BigDecimal("75.50");
+
     @Autowired
     private TicketTypeService ticketTypeService;
 
@@ -54,12 +65,12 @@ public class TicketTypeServiceTests {
         discountRepository.deleteAll();
         ticketTypeRepository.deleteAll();
         sample = TicketType.builder()
-                .cost(new BigDecimal("50.00"))
-                .currency("EUR")
-                .typeName("STANDARD")
-                .description("Standard ticket")
+                .cost(COST_50)
+                .currency(CURRENCY_EUR)
+                .typeName(TYPE_NAME_STANDARD)
+                .description(STANDARD_TICKET_DESC)
                 .maxPerDay(10)
-                .photoUrl("http://example.com/photo.jpg")
+                .photoUrl(PHOTO_URL)
                 .build();
     }
 
@@ -85,7 +96,7 @@ public class TicketTypeServiceTests {
     @Description("Verifica que save retorna un ID generado")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("save retorna tipo de entrada con ID")
-    void testSaveTicketType_returnsId() {
+    void testSaveTicketTypeReturnsId() {
         TicketType saved = ticketTypeService.save(sample);
         assertNotNull(saved.getId());
     }
@@ -95,9 +106,9 @@ public class TicketTypeServiceTests {
     @Description("Verifica que save retorna el nombre del tipo correcto")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("save retorna tipo de entrada con nombre correcto")
-    void testSaveTicketType_returnsTypeName() {
+    void testSaveTicketTypeReturnsTypeName() {
         TicketType saved = ticketTypeService.save(sample);
-        assertEquals("STANDARD", saved.getTypeName());
+        assertEquals(TYPE_NAME_STANDARD, saved.getTypeName());
     }
 
     @Test
@@ -105,7 +116,7 @@ public class TicketTypeServiceTests {
     @Description("Verifica que findById retorna el ID correcto")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("findById retorna tipo de entrada con ID correcto")
-    void testFindByIdExists_returnsId() {
+    void testFindByIdExistsReturnsId() {
         TicketType saved = ticketTypeService.save(sample);
         TicketType found = ticketTypeService.findById(saved.getId());
         assertEquals(saved.getId(), found.getId());
@@ -116,10 +127,10 @@ public class TicketTypeServiceTests {
     @Description("Verifica que findById retorna el nombre correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("findById retorna tipo de entrada con nombre correcto")
-    void testFindByIdExists_returnsTypeName() {
+    void testFindByIdExistsReturnsTypeName() {
         TicketType saved = ticketTypeService.save(sample);
         TicketType found = ticketTypeService.findById(saved.getId());
-        assertEquals("STANDARD", found.getTypeName());
+        assertEquals(TYPE_NAME_STANDARD, found.getTypeName());
     }
 
     @Test
@@ -138,8 +149,8 @@ public class TicketTypeServiceTests {
     @DisplayName("findByTypeName retorna tipo de entrada correcto")
     void testFindByTypeNameExists() {
         ticketTypeService.save(sample);
-        TicketType found = ticketTypeService.findByTypeName("STANDARD");
-        assertEquals("STANDARD", found.getTypeName());
+        TicketType found = ticketTypeService.findByTypeName(TYPE_NAME_STANDARD);
+        assertEquals(TYPE_NAME_STANDARD, found.getTypeName());
     }
 
     @Test
@@ -151,23 +162,27 @@ public class TicketTypeServiceTests {
         assertThrows(ResourceNotFoundException.class, () -> ticketTypeService.findByTypeName("DOES_NOT_EXIST"));
     }
 
+    private TicketType buildUpdateTicketType() {
+        return TicketType.builder()
+                .cost(COST_75_50)
+                .currency(CURRENCY_USD)
+                .typeName(TYPE_NAME_PREMIUM)
+                .description(PREMIUM_TICKET_DESC)
+                .maxPerDay(20)
+                .photoUrl(PHOTO_URL_UPDATED)
+                .build();
+    }
+
     @Test
     @Story("Actualizar Tipo de Entrada")
     @Description("Verifica que update actualiza el costo")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("update actualiza el costo correctamente")
-    void testUpdateTicketType_updatesCost() {
+    void testUpdateTicketTypeUpdatesCost() {
         TicketType saved = ticketTypeService.save(sample);
-        TicketType update = TicketType.builder()
-                .cost(new BigDecimal("75.50"))
-                .currency("USD")
-                .typeName("PREMIUM")
-                .description("Premium ticket")
-                .maxPerDay(20)
-                .photoUrl("http://example.com/updated.jpg")
-                .build();
+        TicketType update = buildUpdateTicketType();
         TicketType updated = ticketTypeService.update(saved.getId(), update);
-        assertEquals(new BigDecimal("75.50"), updated.getCost());
+        assertEquals(COST_75_50, updated.getCost());
     }
 
     @Test
@@ -175,18 +190,11 @@ public class TicketTypeServiceTests {
     @Description("Verifica que update actualiza la moneda")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("update actualiza la moneda correctamente")
-    void testUpdateTicketType_updatesCurrency() {
+    void testUpdateTicketTypeUpdatesCurrency() {
         TicketType saved = ticketTypeService.save(sample);
-        TicketType update = TicketType.builder()
-                .cost(new BigDecimal("75.50"))
-                .currency("USD")
-                .typeName("PREMIUM")
-                .description("Premium ticket")
-                .maxPerDay(20)
-                .photoUrl("http://example.com/updated.jpg")
-                .build();
+        TicketType update = buildUpdateTicketType();
         TicketType updated = ticketTypeService.update(saved.getId(), update);
-        assertEquals("USD", updated.getCurrency());
+        assertEquals(CURRENCY_USD, updated.getCurrency());
     }
 
     @Test
@@ -194,18 +202,11 @@ public class TicketTypeServiceTests {
     @Description("Verifica que update actualiza el nombre del tipo")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("update actualiza el nombre del tipo correctamente")
-    void testUpdateTicketType_updatesTypeName() {
+    void testUpdateTicketTypeUpdatesTypeName() {
         TicketType saved = ticketTypeService.save(sample);
-        TicketType update = TicketType.builder()
-                .cost(new BigDecimal("75.50"))
-                .currency("USD")
-                .typeName("PREMIUM")
-                .description("Premium ticket")
-                .maxPerDay(20)
-                .photoUrl("http://example.com/updated.jpg")
-                .build();
+        TicketType update = buildUpdateTicketType();
         TicketType updated = ticketTypeService.update(saved.getId(), update);
-        assertEquals("PREMIUM", updated.getTypeName());
+        assertEquals(TYPE_NAME_PREMIUM, updated.getTypeName());
     }
 
     @Test
@@ -213,18 +214,11 @@ public class TicketTypeServiceTests {
     @Description("Verifica que update actualiza la descripción")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("update actualiza la descripción correctamente")
-    void testUpdateTicketType_updatesDescription() {
+    void testUpdateTicketTypeUpdatesDescription() {
         TicketType saved = ticketTypeService.save(sample);
-        TicketType update = TicketType.builder()
-                .cost(new BigDecimal("75.50"))
-                .currency("USD")
-                .typeName("PREMIUM")
-                .description("Premium ticket")
-                .maxPerDay(20)
-                .photoUrl("http://example.com/updated.jpg")
-                .build();
+        TicketType update = buildUpdateTicketType();
         TicketType updated = ticketTypeService.update(saved.getId(), update);
-        assertEquals("Premium ticket", updated.getDescription());
+        assertEquals(PREMIUM_TICKET_DESC, updated.getDescription());
     }
 
     @Test
@@ -232,16 +226,9 @@ public class TicketTypeServiceTests {
     @Description("Verifica que update actualiza el máximo por día")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("update actualiza el máximo por día correctamente")
-    void testUpdateTicketType_updatesMaxPerDay() {
+    void testUpdateTicketTypeUpdatesMaxPerDay() {
         TicketType saved = ticketTypeService.save(sample);
-        TicketType update = TicketType.builder()
-                .cost(new BigDecimal("75.50"))
-                .currency("USD")
-                .typeName("PREMIUM")
-                .description("Premium ticket")
-                .maxPerDay(20)
-                .photoUrl("http://example.com/updated.jpg")
-                .build();
+        TicketType update = buildUpdateTicketType();
         TicketType updated = ticketTypeService.update(saved.getId(), update);
         assertEquals(20, updated.getMaxPerDay());
     }
@@ -251,18 +238,18 @@ public class TicketTypeServiceTests {
     @Description("Verifica que update mantiene la URL de foto existente cuando es null")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("update mantiene URL de foto existente cuando es null")
-    void testUpdateTicketType_withNullPhotoUrl_keepsExisting() {
+    void testUpdateTicketTypeWithNullPhotoUrlKeepsExisting() {
         TicketType saved = ticketTypeService.save(sample);
         TicketType update = TicketType.builder()
-                .cost(new BigDecimal("75.50"))
-                .currency("USD")
-                .typeName("PREMIUM")
-                .description("Premium ticket")
+                .cost(COST_75_50)
+                .currency(CURRENCY_USD)
+                .typeName(TYPE_NAME_PREMIUM)
+                .description(PREMIUM_TICKET_DESC)
                 .maxPerDay(20)
                 .photoUrl(null)
                 .build();
         TicketType updated = ticketTypeService.update(saved.getId(), update);
-        assertEquals("http://example.com/photo.jpg", updated.getPhotoUrl());
+        assertEquals(PHOTO_URL, updated.getPhotoUrl());
     }
 
     @Test
@@ -270,7 +257,7 @@ public class TicketTypeServiceTests {
     @Description("Verifica que delete lanza excepción cuando tiene descuentos asociados")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("delete lanza excepción con descuentos asociados")
-    void testDeleteTicketType_withAssociations_throws() {
+    void testDeleteTicketTypeWithAssociationsThrows() {
         TicketType saved = ticketTypeService.save(sample);
         Discount discount = discountRepository.save(Discount.builder()
                 .discountCode("TEST10")

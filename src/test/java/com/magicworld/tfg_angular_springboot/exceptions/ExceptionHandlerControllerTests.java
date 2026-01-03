@@ -51,8 +51,8 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que ResourceNotFoundException retorna 404")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("ResourceNotFoundException retorna 404")
-    void testHandleResourceNotFoundException_returns404() {
-        ResourceNotFoundException ex = new ResourceNotFoundException("error.notfound");
+    void testHandleResourceNotFoundExceptionReturns404() {
+        ResourceNotFoundException ex = new ResourceNotFoundException("error.NOT_FOUND");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatusCode().value());
     }
@@ -62,7 +62,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que ResourceNotFoundException contiene código de error")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("ResourceNotFoundException contiene código")
-    void testHandleResourceNotFoundException_containsCode() {
+    void testHandleResourceNotFoundExceptionContainsCode() {
         ResourceNotFoundException ex = new ResourceNotFoundException("error.resource.not.found");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertNotNull(response.getBody());
@@ -74,7 +74,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que BadRequestException retorna 400")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("BadRequestException retorna 400")
-    void testHandleBadRequestException_returns400() {
+    void testHandleBadRequestExceptionReturns400() {
         BadRequestException ex = new BadRequestException("error.bad");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
@@ -85,7 +85,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que InvalidCredentialsException retorna 401")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("InvalidCredentialsException retorna 401")
-    void testHandleInvalidCredentialsException_returns401() {
+    void testHandleInvalidCredentialsExceptionReturns401() {
         InvalidCredentialsException ex = new InvalidCredentialsException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatusCode().value());
@@ -96,7 +96,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que EmailAlreadyExistsException retorna 409")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("EmailAlreadyExistsException retorna 409")
-    void testHandleEmailAlreadyExistsException_returns409() {
+    void testHandleEmailAlreadyExistsExceptionReturns409() {
         EmailAlreadyExistsException ex = new EmailAlreadyExistsException("test@test.com");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals(HttpStatus.CONFLICT.value(), response.getStatusCode().value());
@@ -107,7 +107,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que UsernameAlreadyExistsException retorna 409")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("UsernameAlreadyExistsException retorna 409")
-    void testHandleUsernameAlreadyExistsException_returns409() {
+    void testHandleUsernameAlreadyExistsExceptionReturns409() {
         UsernameAlreadyExistsException ex = new UsernameAlreadyExistsException("testuser");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals(HttpStatus.CONFLICT.value(), response.getStatusCode().value());
@@ -118,7 +118,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que ValidationException retorna 400")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("ValidationException retorna 400")
-    void testHandleValidationException_returns400() {
+    void testHandleValidationExceptionReturns400() {
         BindingResult bindingResult = mock(BindingResult.class);
         FieldError fieldError = new FieldError("object", "field", "must not be null");
         when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError));
@@ -132,7 +132,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que ValidationException contiene código de validación")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("ValidationException contiene código")
-    void testHandleValidationException_containsValidationCode() {
+    void testHandleValidationExceptionContainsValidationCode() {
         BindingResult bindingResult = mock(BindingResult.class);
         FieldError fieldError = new FieldError("object", "field", "must not be null");
         when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError));
@@ -147,7 +147,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que ConstraintViolation retorna 400")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("ConstraintViolation retorna 400")
-    void testHandleConstraintViolation_returns400() {
+    void testHandleConstraintViolationReturns400() {
         ConstraintViolation<?> violation = mock(ConstraintViolation.class);
         Path path = mock(Path.class);
         when(path.toString()).thenReturn("field");
@@ -163,7 +163,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que MaxUploadSizeExceededException retorna 413")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("MaxUploadSizeExceededException retorna 413")
-    void testHandleMaxUpload_returns413() {
+    void testHandleMaxUploadReturns413() {
         MaxUploadSizeExceededException ex = new MaxUploadSizeExceededException(10 * 1024 * 1024);
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleMaxUpload(ex, webRequest);
         assertEquals(HttpStatus.PAYLOAD_TOO_LARGE.value(), response.getStatusCode().value());
@@ -174,7 +174,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que MaxUploadSizeExceededException contiene código")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("MaxUploadSizeExceededException contiene código")
-    void testHandleMaxUpload_containsSizeExceededCode() {
+    void testHandleMaxUploadContainsSizeExceededCode() {
         MaxUploadSizeExceededException ex = new MaxUploadSizeExceededException(10 * 1024 * 1024);
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleMaxUpload(ex, webRequest);
         assertEquals("error.file.size_exceeded", response.getBody().getCode());
@@ -185,7 +185,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que MultipartException con causa de tamaño retorna 413")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("MultipartException con causa de tamaño retorna 413")
-    void testHandleMultipartException_withMaxUploadCause_returns413() {
+    void testHandleMultipartExceptionWithMaxUploadCauseReturns413() {
         MaxUploadSizeExceededException cause = new MaxUploadSizeExceededException(10 * 1024 * 1024);
         MultipartException ex = new MultipartException("Size exceeded", cause);
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleMultipartException(ex, webRequest);
@@ -197,7 +197,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que MultipartException con mensaje de tamaño retorna 413")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("MultipartException con mensaje de tamaño retorna 413")
-    void testHandleMultipartException_withSizeMessage_returns413() {
+    void testHandleMultipartExceptionWithSizeMessageReturns413() {
         MultipartException ex = new MultipartException("Maximum upload size exceeded");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleMultipartException(ex, webRequest);
         assertEquals(HttpStatus.PAYLOAD_TOO_LARGE.value(), response.getStatusCode().value());
@@ -208,7 +208,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que MultipartException genérica retorna 400")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("MultipartException genérica retorna 400")
-    void testHandleMultipartException_generic_returns400() {
+    void testHandleMultipartExceptionGenericReturns400() {
         MultipartException ex = new MultipartException("Some error");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleMultipartException(ex, webRequest);
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
@@ -219,7 +219,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que excepción no capturada retorna 500")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Excepción no capturada retorna 500")
-    void testHandleAllUncaught_returns500() {
+    void testHandleAllUncaughtReturns500() {
         Exception ex = new RuntimeException("Unexpected error");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleAllUncaught(ex, webRequest);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatusCode().value());
@@ -230,7 +230,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que excepción no capturada contiene código interno")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Excepción no capturada contiene código interno")
-    void testHandleAllUncaught_containsInternalCode() {
+    void testHandleAllUncaughtContainsInternalCode() {
         Exception ex = new RuntimeException("Unexpected error");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleAllUncaught(ex, webRequest);
         assertEquals("error.internal", response.getBody().getCode());
@@ -241,7 +241,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que InvalidTokenException retorna 401")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("InvalidTokenException retorna 401")
-    void testHandleInvalidTokenException_returns401() {
+    void testHandleInvalidTokenExceptionReturns401() {
         InvalidTokenException ex = new InvalidTokenException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatusCode().value());
@@ -252,7 +252,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que PasswordsDoNotMatchException retorna 400")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("PasswordsDoNotMatchException retorna 400")
-    void testHandlePasswordsDoNotMatchException_returns400() {
+    void testHandlePasswordsDoNotMatchExceptionReturns400() {
         PasswordsDoNoMatchException ex = new PasswordsDoNoMatchException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
@@ -263,7 +263,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que FileStorageException retorna 400")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("FileStorageException retorna 400")
-    void testHandleFileStorageException_returns400() {
+    void testHandleFileStorageExceptionReturns400() {
         FileStorageException ex = new FileStorageException("error.file");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
@@ -274,7 +274,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que NoDiscountsException retorna 409")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("NoDiscountsException retorna 409")
-    void testHandleNoDiscountsException_returns409() {
+    void testHandleNoDiscountsExceptionReturns409() {
         NoDiscountsCanBeAssignedToTicketTypeException ex = new NoDiscountsCanBeAssignedToTicketTypeException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals(HttpStatus.CONFLICT.value(), response.getStatusCode().value());
@@ -285,7 +285,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que AtLeastOneTicketTypeException retorna 400")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("AtLeastOneTicketTypeException retorna 400")
-    void testHandleAtLeastOneTicketTypeException_returns400() {
+    void testHandleAtLeastOneTicketTypeExceptionReturns400() {
         AtLeastOneTicketTypeMustBeProvidedException ex = new AtLeastOneTicketTypeMustBeProvidedException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
@@ -296,7 +296,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que TooManyRequestsException retorna 429")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("TooManyRequestsException retorna 429")
-    void testHandleTooManyRequestsException_returns429() {
+    void testHandleTooManyRequestsExceptionReturns429() {
         TooManyRequestsException ex = new TooManyRequestsException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals(HttpStatus.TOO_MANY_REQUESTS.value(), response.getStatusCode().value());
@@ -307,7 +307,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que TooManyRequestsException contiene código")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("TooManyRequestsException contiene código")
-    void testHandleTooManyRequestsException_containsCode() {
+    void testHandleTooManyRequestsExceptionContainsCode() {
         TooManyRequestsException ex = new TooManyRequestsException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals("error.too.many.requests", response.getBody().getCode());
@@ -318,7 +318,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que ConstraintViolation contiene código")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("ConstraintViolation contiene código")
-    void testHandleConstraintViolation_containsCode() {
+    void testHandleConstraintViolationContainsCode() {
         ConstraintViolation<?> violation = mock(ConstraintViolation.class);
         Path path = mock(Path.class);
         when(path.toString()).thenReturn("field");
@@ -334,7 +334,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que MultipartException genérica contiene código")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("MultipartException genérica contiene código")
-    void testHandleMultipartException_generic_containsCode() {
+    void testHandleMultipartExceptionGenericContainsCode() {
         MultipartException ex = new MultipartException("Some multipart error");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleMultipartException(ex, webRequest);
         assertEquals("error.internal", response.getBody().getCode());
@@ -345,7 +345,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que InvalidTokenException contiene código")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("InvalidTokenException contiene código")
-    void testHandleInvalidTokenException_containsCode() {
+    void testHandleInvalidTokenExceptionContainsCode() {
         InvalidTokenException ex = new InvalidTokenException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals("error.invalid.token", response.getBody().getCode());
@@ -356,7 +356,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que PasswordsDoNotMatchException contiene código")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("PasswordsDoNotMatchException contiene código")
-    void testHandlePasswordsDoNotMatchException_containsCode() {
+    void testHandlePasswordsDoNotMatchExceptionContainsCode() {
         PasswordsDoNoMatchException ex = new PasswordsDoNoMatchException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals("error.password.do.not.match", response.getBody().getCode());
@@ -367,7 +367,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que NoDiscountsException contiene código")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("NoDiscountsException contiene código")
-    void testHandleNoDiscountsException_containsCode() {
+    void testHandleNoDiscountsExceptionContainsCode() {
         NoDiscountsCanBeAssignedToTicketTypeException ex = new NoDiscountsCanBeAssignedToTicketTypeException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals("error.ticket_type.discounts.assigned", response.getBody().getCode());
@@ -378,7 +378,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que AtLeastOneTicketTypeException contiene código")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("AtLeastOneTicketTypeException contiene código")
-    void testHandleAtLeastOneTicketTypeException_containsCode() {
+    void testHandleAtLeastOneTicketTypeExceptionContainsCode() {
         AtLeastOneTicketTypeMustBeProvidedException ex = new AtLeastOneTicketTypeMustBeProvidedException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertEquals("error.at.least.one.ticket.type.must.be.provided", response.getBody().getCode());
@@ -389,7 +389,7 @@ public class ExceptionHandlerControllerTests {
     @Description("Verifica que ErrorMessage contiene timestamp")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("ErrorMessage contiene timestamp")
-    void testErrorMessage_containsTimestamp() {
+    void testErrorMessageContainsTimestamp() {
         ResourceNotFoundException ex = new ResourceNotFoundException("test");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
         assertNotNull(response.getBody().getTimestamp());

@@ -32,6 +32,14 @@ import static org.mockito.Mockito.*;
 @Feature("Filtro de Autenticación JWT")
 public class JwtAuthenticationFilterTests {
 
+    private static final String TOKEN_COOKIE_NAME = "token";
+    private static final String VALID_TOKEN = "valid-token";
+    private static final String INVALID_TOKEN = "invalid-token";
+    private static final String SOME_TOKEN = "some-token";
+    private static final String TEST_TOKEN = "test-token";
+    private static final String TEST_USERNAME = "testuser";
+    private static final String TEST_PASSWORD = "password";
+
     @Mock
     private JwtService jwtService;
 
@@ -59,7 +67,7 @@ public class JwtAuthenticationFilterTests {
     @Description("Verifica que sin token la cadena de filtros continúa")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Sin token continúa cadena de filtros")
-    void testDoFilterInternal_noToken_continuesChain() throws Exception {
+    void testDoFilterInternalNoTokenContinuesChain() throws Exception {
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
         verify(filterChain).doFilter(request, response);
     }
@@ -69,7 +77,7 @@ public class JwtAuthenticationFilterTests {
     @Description("Verifica que sin token no hay autenticación")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Sin token no hay autenticación")
-    void testDoFilterInternal_noToken_noAuthentication() throws Exception {
+    void testDoFilterInternalNoTokenNoAuthentication() throws Exception {
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
         assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
@@ -79,19 +87,18 @@ public class JwtAuthenticationFilterTests {
     @Description("Verifica que con token válido se establece autenticación")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Token válido establece autenticación")
-    void testDoFilterInternal_withValidToken_setsAuthentication() throws Exception {
-        String token = "valid-token";
-        request.setCookies(new Cookie("token", token));
+    void testDoFilterInternalWithValidTokenSetsAuthentication() throws Exception {
+        request.setCookies(new Cookie(TOKEN_COOKIE_NAME, VALID_TOKEN));
 
         UserDetails userDetails = User.builder()
-                .username("testuser")
-                .password("password")
+                .username(TEST_USERNAME)
+                .password(TEST_PASSWORD)
                 .authorities(Collections.emptyList())
                 .build();
 
-        when(jwtService.getUsernameFromToken(token)).thenReturn("testuser");
-        when(userDetailsService.loadUserByUsername("testuser")).thenReturn(userDetails);
-        when(jwtService.isTokenValid(token, userDetails)).thenReturn(true);
+        when(jwtService.getUsernameFromToken(VALID_TOKEN)).thenReturn(TEST_USERNAME);
+        when(userDetailsService.loadUserByUsername(TEST_USERNAME)).thenReturn(userDetails);
+        when(jwtService.isTokenValid(VALID_TOKEN, userDetails)).thenReturn(true);
 
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
@@ -103,19 +110,18 @@ public class JwtAuthenticationFilterTests {
     @Description("Verifica que con token válido la cadena de filtros continúa")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Token válido continúa cadena de filtros")
-    void testDoFilterInternal_withValidToken_continuesChain() throws Exception {
-        String token = "valid-token";
-        request.setCookies(new Cookie("token", token));
+    void testDoFilterInternalWithValidTokenContinuesChain() throws Exception {
+        request.setCookies(new Cookie(TOKEN_COOKIE_NAME, VALID_TOKEN));
 
         UserDetails userDetails = User.builder()
-                .username("testuser")
-                .password("password")
+                .username(TEST_USERNAME)
+                .password(TEST_PASSWORD)
                 .authorities(Collections.emptyList())
                 .build();
 
-        when(jwtService.getUsernameFromToken(token)).thenReturn("testuser");
-        when(userDetailsService.loadUserByUsername("testuser")).thenReturn(userDetails);
-        when(jwtService.isTokenValid(token, userDetails)).thenReturn(true);
+        when(jwtService.getUsernameFromToken(VALID_TOKEN)).thenReturn(TEST_USERNAME);
+        when(userDetailsService.loadUserByUsername(TEST_USERNAME)).thenReturn(userDetails);
+        when(jwtService.isTokenValid(VALID_TOKEN, userDetails)).thenReturn(true);
 
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
@@ -127,19 +133,18 @@ public class JwtAuthenticationFilterTests {
     @Description("Verifica que con token inválido no hay autenticación")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Token inválido no establece autenticación")
-    void testDoFilterInternal_withInvalidToken_noAuthentication() throws Exception {
-        String token = "invalid-token";
-        request.setCookies(new Cookie("token", token));
+    void testDoFilterInternalWithInvalidTokenNoAuthentication() throws Exception {
+        request.setCookies(new Cookie(TOKEN_COOKIE_NAME, INVALID_TOKEN));
 
         UserDetails userDetails = User.builder()
-                .username("testuser")
-                .password("password")
+                .username(TEST_USERNAME)
+                .password(TEST_PASSWORD)
                 .authorities(Collections.emptyList())
                 .build();
 
-        when(jwtService.getUsernameFromToken(token)).thenReturn("testuser");
-        when(userDetailsService.loadUserByUsername("testuser")).thenReturn(userDetails);
-        when(jwtService.isTokenValid(token, userDetails)).thenReturn(false);
+        when(jwtService.getUsernameFromToken(INVALID_TOKEN)).thenReturn(TEST_USERNAME);
+        when(userDetailsService.loadUserByUsername(TEST_USERNAME)).thenReturn(userDetails);
+        when(jwtService.isTokenValid(INVALID_TOKEN, userDetails)).thenReturn(false);
 
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
@@ -151,11 +156,10 @@ public class JwtAuthenticationFilterTests {
     @Description("Verifica que con username null no hay autenticación")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Username null no establece autenticación")
-    void testDoFilterInternal_nullUsername_noAuthentication() throws Exception {
-        String token = "some-token";
-        request.setCookies(new Cookie("token", token));
+    void testDoFilterInternalNullUsernameNoAuthentication() throws Exception {
+        request.setCookies(new Cookie(TOKEN_COOKIE_NAME, SOME_TOKEN));
 
-        when(jwtService.getUsernameFromToken(token)).thenReturn(null);
+        when(jwtService.getUsernameFromToken(SOME_TOKEN)).thenReturn(null);
 
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
@@ -167,10 +171,10 @@ public class JwtAuthenticationFilterTests {
     @Description("Verifica que con cookie de token retorna el token")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Con cookie de token retorna token")
-    void testGetTokenFromRequest_withTokenCookie_returnsToken() {
-        request.setCookies(new Cookie("token", "test-token"));
+    void testGetTokenFromRequestWithTokenCookieReturnsToken() {
+        request.setCookies(new Cookie(TOKEN_COOKIE_NAME, TEST_TOKEN));
         String token = jwtAuthenticationFilter.getTokenFromRequest(request);
-        assertEquals("test-token", token);
+        assertEquals(TEST_TOKEN, token);
     }
 
     @Test
@@ -178,7 +182,7 @@ public class JwtAuthenticationFilterTests {
     @Description("Verifica que sin cookies retorna null")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Sin cookies retorna null")
-    void testGetTokenFromRequest_withoutCookies_returnsNull() {
+    void testGetTokenFromRequestWithoutCookiesReturnsNull() {
         String token = jwtAuthenticationFilter.getTokenFromRequest(request);
         assertNull(token);
     }
@@ -188,7 +192,7 @@ public class JwtAuthenticationFilterTests {
     @Description("Verifica que con otra cookie retorna null")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Con otra cookie retorna null")
-    void testGetTokenFromRequest_withOtherCookie_returnsNull() {
+    void testGetTokenFromRequestWithOtherCookieReturnsNull() {
         request.setCookies(new Cookie("other", "value"));
         String token = jwtAuthenticationFilter.getTokenFromRequest(request);
         assertNull(token);

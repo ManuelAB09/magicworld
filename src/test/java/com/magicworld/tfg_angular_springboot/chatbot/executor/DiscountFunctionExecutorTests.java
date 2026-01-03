@@ -74,7 +74,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que listar descuentos vacíos retorna éxito en inglés")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar descuentos vacíos retorna éxito en inglés")
-    void testListDiscounts_empty_returnsSuccessEnglish() {
+    void testListDiscountsEmptyReturnsSuccessEnglish() {
         when(discountService.findAll()).thenReturn(List.of());
         ChatResponse response = executor.listDiscounts("en");
         assertTrue(response.isSuccess());
@@ -85,7 +85,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que el mensaje indica que no hay descuentos en inglés")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar descuentos vacíos muestra mensaje en inglés")
-    void testListDiscounts_empty_containsNoDiscountsMessageEnglish() {
+    void testListDiscountsEmptyContainsNoDiscountsMessageEnglish() {
         when(discountService.findAll()).thenReturn(List.of());
         ChatResponse response = executor.listDiscounts("en");
         assertTrue(response.getMessage().contains("No discounts"));
@@ -96,7 +96,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que listar descuentos vacíos retorna éxito en español")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar descuentos vacíos retorna éxito en español")
-    void testListDiscounts_empty_returnsSuccessSpanish() {
+    void testListDiscountsEmptyReturnsSuccessSpanish() {
         when(discountService.findAll()).thenReturn(List.of());
         ChatResponse response = executor.listDiscounts("es");
         assertTrue(response.isSuccess());
@@ -107,7 +107,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que el mensaje indica que no hay descuentos en español")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar descuentos vacíos muestra mensaje en español")
-    void testListDiscounts_empty_containsNoDiscountsMessageSpanish() {
+    void testListDiscountsEmptyContainsNoDiscountsMessageSpanish() {
         when(discountService.findAll()).thenReturn(List.of());
         ChatResponse response = executor.listDiscounts("es");
         assertTrue(response.getMessage().contains("No hay descuentos"));
@@ -118,7 +118,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que listar descuentos con datos retorna éxito")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar descuentos con datos retorna éxito")
-    void testListDiscounts_withData_returnsSuccess() {
+    void testListDiscountsWithDataReturnsSuccess() {
         when(discountService.findAll()).thenReturn(List.of(sample));
         ChatResponse response = executor.listDiscounts("en");
         assertTrue(response.isSuccess());
@@ -129,7 +129,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que la respuesta contiene el código del descuento")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar descuentos muestra código de descuento")
-    void testListDiscounts_withData_containsDiscountCode() {
+    void testListDiscountsWithDataContainsDiscountCode() {
         when(discountService.findAll()).thenReturn(List.of(sample));
         ChatResponse response = executor.listDiscounts("en");
         assertTrue(response.getMessage().contains("SAVE20"));
@@ -140,7 +140,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que la respuesta tiene lista de datos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar descuentos retorna lista de datos")
-    void testListDiscounts_withData_hasDataList() {
+    void testListDiscountsWithDataHasDataList() {
         when(discountService.findAll()).thenReturn(List.of(sample));
         ChatResponse response = executor.listDiscounts("en");
         assertNotNull(response.getData());
@@ -151,7 +151,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que buscar descuento por ID retorna éxito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Buscar descuento por ID retorna éxito")
-    void testGetDiscountById_found_returnsSuccess() {
+    void testGetDiscountByIdFoundReturnsSuccess() {
         when(discountService.findById(1L)).thenReturn(sample);
         when(discountTicketTypeService.findTicketsTypesByDiscountId(1L)).thenReturn(List.of(ticketType));
         Map<String, Object> args = Map.of("id", 1L);
@@ -164,7 +164,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que la respuesta contiene el código del descuento")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar descuento por ID muestra código")
-    void testGetDiscountById_found_containsDiscountCode() {
+    void testGetDiscountByIdFoundContainsDiscountCode() {
         when(discountService.findById(1L)).thenReturn(sample);
         when(discountTicketTypeService.findTicketsTypesByDiscountId(1L)).thenReturn(List.of(ticketType));
         Map<String, Object> args = Map.of("id", 1L);
@@ -177,7 +177,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que la respuesta en español contiene detalles")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar descuento por ID en español muestra detalles")
-    void testGetDiscountById_spanish_containsDetails() {
+    void testGetDiscountByIdSpanishContainsDetails() {
         when(discountService.findById(1L)).thenReturn(sample);
         when(discountTicketTypeService.findTicketsTypesByDiscountId(1L)).thenReturn(List.of());
         Map<String, Object> args = Map.of("id", 1L);
@@ -190,7 +190,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que sin tipos asociados muestra All")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar descuento sin tipos asociados muestra All")
-    void testGetDiscountById_noAssociatedTypes_showsAll() {
+    void testGetDiscountByIdNoAssociatedTypesShowsAll() {
         when(discountService.findById(1L)).thenReturn(sample);
         when(discountTicketTypeService.findTicketsTypesByDiscountId(1L)).thenReturn(List.of());
         Map<String, Object> args = Map.of("id", 1L);
@@ -203,7 +203,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que crear descuento retorna éxito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear descuento retorna éxito")
-    void testCreateDiscount_returnsSuccess() {
+    void testCreateDiscountReturnsSuccess() {
         when(ticketTypeService.findAll()).thenReturn(List.of(ticketType));
         when(discountService.save(any(Discount.class), any())).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
@@ -220,7 +220,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que el mensaje contiene confirmación de creación")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear descuento muestra mensaje de creación")
-    void testCreateDiscount_containsCreatedMessage() {
+    void testCreateDiscountContainsCreatedMessage() {
         when(ticketTypeService.findAll()).thenReturn(List.of(ticketType));
         when(discountService.save(any(Discount.class), any())).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
@@ -237,7 +237,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que crear descuento en español muestra mensaje correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear descuento en español muestra mensaje de creación")
-    void testCreateDiscount_spanish_containsCreatedMessage() {
+    void testCreateDiscountSpanishContainsCreatedMessage() {
         when(ticketTypeService.findAll()).thenReturn(List.of(ticketType));
         when(discountService.save(any(Discount.class), any())).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
@@ -254,7 +254,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que crear con tipos inválidos retorna error")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear descuento con tipos inválidos retorna error")
-    void testCreateDiscount_invalidTicketTypes_returnsError() {
+    void testCreateDiscountInvalidTicketTypesReturnsError() {
         when(ticketTypeService.findAll()).thenReturn(List.of());
         Map<String, Object> args = new HashMap<>();
         args.put("discountCode", "SAVE20");
@@ -270,7 +270,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que crear con fecha pasada retorna error")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear descuento con fecha pasada retorna error")
-    void testCreateDiscount_pastExpiryDate_returnsError() {
+    void testCreateDiscountPastExpiryDateReturnsError() {
         when(ticketTypeService.findAll()).thenReturn(List.of(ticketType));
         Map<String, Object> args = new HashMap<>();
         args.put("discountCode", "SAVE20");
@@ -286,7 +286,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que actualizar descuento retorna éxito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar descuento retorna éxito")
-    void testUpdateDiscount_returnsSuccess() {
+    void testUpdateDiscountReturnsSuccess() {
         when(discountService.findById(1L)).thenReturn(sample);
         when(ticketTypeService.findAll()).thenReturn(List.of(ticketType));
         when(discountService.update(any(Discount.class), any())).thenReturn(sample);
@@ -303,7 +303,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que el mensaje contiene confirmación de actualización")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar descuento muestra mensaje de actualización")
-    void testUpdateDiscount_containsUpdatedMessage() {
+    void testUpdateDiscountContainsUpdatedMessage() {
         when(discountService.findById(1L)).thenReturn(sample);
         when(ticketTypeService.findAll()).thenReturn(List.of(ticketType));
         when(discountService.update(any(Discount.class), any())).thenReturn(sample);
@@ -320,7 +320,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que actualizar descuento en español muestra mensaje correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar descuento en español muestra mensaje de actualización")
-    void testUpdateDiscount_spanish_containsUpdatedMessage() {
+    void testUpdateDiscountSpanishContainsUpdatedMessage() {
         when(discountService.findById(1L)).thenReturn(sample);
         when(ticketTypeService.findAll()).thenReturn(List.of(ticketType));
         when(discountService.update(any(Discount.class), any())).thenReturn(sample);
@@ -336,7 +336,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que solicitar eliminación retorna éxito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Solicitar eliminación de descuento retorna éxito")
-    void testRequestDeleteDiscount_returnsSuccess() {
+    void testRequestDeleteDiscountReturnsSuccess() {
         when(discountService.findById(1L)).thenReturn(sample);
         Map<String, Object> args = Map.of("id", 1L);
         ChatResponse response = executor.requestDeleteDiscount(args, "en");
@@ -348,7 +348,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que solicitar eliminación contiene acción pendiente")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Solicitar eliminación contiene acción pendiente")
-    void testRequestDeleteDiscount_containsPendingAction() {
+    void testRequestDeleteDiscountContainsPendingAction() {
         when(discountService.findById(1L)).thenReturn(sample);
         Map<String, Object> args = Map.of("id", 1L);
         ChatResponse response = executor.requestDeleteDiscount(args, "en");
@@ -360,7 +360,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que la acción pendiente tiene el tipo correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Acción pendiente tiene tipo deleteDiscount")
-    void testRequestDeleteDiscount_pendingActionHasCorrectType() {
+    void testRequestDeleteDiscountPendingActionHasCorrectType() {
         when(discountService.findById(1L)).thenReturn(sample);
         Map<String, Object> args = Map.of("id", 1L);
         ChatResponse response = executor.requestDeleteDiscount(args, "en");
@@ -372,7 +372,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que ejecutar eliminación retorna éxito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Ejecutar eliminación de descuento retorna éxito")
-    void testExecuteDeleteDiscount_returnsSuccess() {
+    void testExecuteDeleteDiscountReturnsSuccess() {
         ChatResponse response = executor.executeDeleteDiscount(1L, "en");
         assertTrue(response.isSuccess());
     }
@@ -382,7 +382,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que el mensaje contiene confirmación de eliminación")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Ejecutar eliminación muestra mensaje de eliminación")
-    void testExecuteDeleteDiscount_containsDeletedMessage() {
+    void testExecuteDeleteDiscountContainsDeletedMessage() {
         ChatResponse response = executor.executeDeleteDiscount(1L, "en");
         assertTrue(response.getMessage().contains("deleted"));
     }
@@ -392,7 +392,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que ejecutar eliminación en español muestra mensaje correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Ejecutar eliminación en español muestra mensaje de eliminación")
-    void testExecuteDeleteDiscount_spanish_containsDeletedMessage() {
+    void testExecuteDeleteDiscountSpanishContainsDeletedMessage() {
         ChatResponse response = executor.executeDeleteDiscount(1L, "es");
         assertTrue(response.getMessage().contains("eliminado"));
     }
@@ -403,7 +403,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que actualizar con valores null preserva existentes")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar descuento con valores null preserva existentes")
-    void testUpdateDiscount_withNullValues_preservesExisting() {
+    void testUpdateDiscountWithNullValuesPreservesExisting() {
         when(discountService.findById(1L)).thenReturn(sample);
         when(ticketTypeService.findAll()).thenReturn(List.of(ticketType));
         when(discountService.update(any(Discount.class), any())).thenReturn(sample);
@@ -419,7 +419,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que actualizar con nueva fecha actualiza la fecha")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar descuento con nueva fecha actualiza la fecha")
-    void testUpdateDiscount_withNewExpiryDate_updatesDate() {
+    void testUpdateDiscountWithNewExpiryDateUpdatesDate() {
         when(discountService.findById(1L)).thenReturn(sample);
         when(ticketTypeService.findAll()).thenReturn(List.of(ticketType));
         when(discountService.update(any(Discount.class), any())).thenReturn(sample);
@@ -436,7 +436,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que actualizar con nuevo porcentaje actualiza el porcentaje")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar descuento con nuevo porcentaje actualiza el porcentaje")
-    void testUpdateDiscount_withNewPercentage_updatesPercentage() {
+    void testUpdateDiscountWithNewPercentageUpdatesPercentage() {
         when(discountService.findById(1L)).thenReturn(sample);
         when(ticketTypeService.findAll()).thenReturn(List.of(ticketType));
         when(discountService.update(any(Discount.class), any())).thenReturn(sample);
@@ -453,7 +453,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que solicitar eliminación en español muestra confirmación")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Solicitar eliminación en español muestra confirmación")
-    void testRequestDeleteDiscount_spanish_containsConfirmation() {
+    void testRequestDeleteDiscountSpanishContainsConfirmation() {
         when(discountService.findById(1L)).thenReturn(sample);
         Map<String, Object> args = Map.of("id", 1L);
         ChatResponse response = executor.requestDeleteDiscount(args, "es");
@@ -465,7 +465,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que con tipos asociados muestra nombres")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar descuento con tipos asociados muestra nombres")
-    void testGetDiscountById_withAssociatedTypes_showsTypeNames() {
+    void testGetDiscountByIdWithAssociatedTypesShowsTypeNames() {
         when(discountService.findById(1L)).thenReturn(sample);
         when(discountTicketTypeService.findTicketsTypesByDiscountId(1L)).thenReturn(List.of(ticketType));
         Map<String, Object> args = Map.of("id", 1L);
@@ -478,7 +478,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que en español muestra detalles")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar descuento en español muestra detalles")
-    void testGetDiscountById_spanish_showsDetails() {
+    void testGetDiscountByIdSpanishShowsDetails() {
         when(discountService.findById(1L)).thenReturn(sample);
         when(discountTicketTypeService.findTicketsTypesByDiscountId(1L)).thenReturn(List.of(ticketType));
         Map<String, Object> args = Map.of("id", 1L);
@@ -491,7 +491,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que crear con tipos inválidos en español retorna error")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear descuento con tipos inválidos en español retorna error")
-    void testCreateDiscount_spanish_invalidTicketTypes_returnsError() {
+    void testCreateDiscountSpanishInvalidTicketTypesReturnsError() {
         when(ticketTypeService.findAll()).thenReturn(List.of());
         Map<String, Object> args = new HashMap<>();
         args.put("discountCode", "SAVE20");
@@ -507,7 +507,7 @@ public class DiscountFunctionExecutorTests {
     @Description("Verifica que crear con fecha pasada en español retorna error")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear descuento con fecha pasada en español retorna error")
-    void testCreateDiscount_spanish_pastExpiryDate_returnsError() {
+    void testCreateDiscountSpanishPastExpiryDateReturnsError() {
         when(ticketTypeService.findAll()).thenReturn(List.of(ticketType));
         Map<String, Object> args = new HashMap<>();
         args.put("discountCode", "SAVE20");

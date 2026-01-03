@@ -39,6 +39,21 @@ import static org.mockito.Mockito.*;
 @Feature("Servicio de Restablecimiento de Contraseña")
 public class PasswordResetServiceTests {
 
+    private static final String TEST_USERNAME = "testuser";
+    private static final String TEST_FIRSTNAME = "Test";
+    private static final String TEST_LASTNAME = "User";
+    private static final String TEST_EMAIL = "test@example.com";
+    private static final String NONEXISTENT_EMAIL = "nonexistent@example.com";
+    private static final String OLD_PASSWORD = "OldPassword1@";
+    private static final String NEW_PASSWORD = "NewPassword1@";
+    private static final String WEAK_PASSWORD = "weak";
+    private static final String VALID_TOKEN = "valid-token";
+    private static final String VALID_TOKEN_2 = "valid-token-2";
+    private static final String INVALID_TOKEN = "invalid-token";
+    private static final String EXPIRED_TOKEN = "expired-token";
+    private static final String TOKEN_FOR_NULL = "token-for-null";
+    private static final String TOKEN_FOR_WEAK = "token-for-weak";
+
     @Autowired
     private PasswordResetService passwordResetService;
 
@@ -61,11 +76,11 @@ public class PasswordResetServiceTests {
         tokenRepository.deleteAll();
         userRepository.deleteAll();
         testUser = userRepository.save(User.builder()
-                .username("testuser")
-                .firstname("Test")
-                .lastname("User")
-                .email("test@example.com")
-                .password(passwordEncoder.encode("OldPassword1@"))
+                .username(TEST_USERNAME)
+                .firstname(TEST_FIRSTNAME)
+                .lastname(TEST_LASTNAME)
+                .email(TEST_EMAIL)
+                .password(passwordEncoder.encode(OLD_PASSWORD))
                 .userRole(Role.USER)
                 .build());
         doNothing().when(emailService).sendSimpleMessage(anyString(), anyString(), anyString());
@@ -82,8 +97,8 @@ public class PasswordResetServiceTests {
     @Description("Verifica que se crea un token de restablecimiento de contraseña")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear token de restablecimiento crea token")
-    void testCreatePasswordResetToken_createsToken() {
-        passwordResetService.createPasswordResetToken("test@example.com");
+    void testCreatePasswordResetTokenCreatesToken() {
+        passwordResetService.createPasswordResetToken(TEST_EMAIL);
         assertFalse(tokenRepository.findAll().isEmpty());
     }
 
@@ -92,9 +107,9 @@ public class PasswordResetServiceTests {
     @Description("Verifica que se envía email con el token")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear token envía email")
-    void testCreatePasswordResetToken_sendsEmail() {
-        passwordResetService.createPasswordResetToken("test@example.com");
-        verify(emailService).sendSimpleMessage(eq("test@example.com"), anyString(), anyString());
+    void testCreatePasswordResetTokenSendsEmail() {
+        passwordResetService.createPasswordResetToken(TEST_EMAIL);
+        verify(emailService).sendSimpleMessage(eq(TEST_EMAIL), anyString(), anyString());
     }
 
     @Test
@@ -102,9 +117,9 @@ public class PasswordResetServiceTests {
     @Description("Verifica que lanza excepción si el usuario no existe")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear token con usuario inexistente lanza excepción")
-    void testCreatePasswordResetToken_userNotFound() {
+    void testCreatePasswordResetTokenUserNotFound() {
         assertThrows(ResourceNotFoundException.class,
-                () -> passwordResetService.createPasswordResetToken("nonexistent@example.com"));
+                () -> passwordResetService.createPasswordResetToken(NONEXISTENT_EMAIL));
     }
 
     @Test
@@ -112,9 +127,9 @@ public class PasswordResetServiceTests {
     @Description("Verifica que se eliminan tokens antiguos al crear uno nuevo")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear token elimina tokens antiguos")
-    void testCreatePasswordResetToken_deletesOldTokens() {
-        passwordResetService.createPasswordResetToken("test@example.com");
-        passwordResetService.createPasswordResetToken("test@example.com");
+    void testCreatePasswordResetTokenDeletesOldTokens() {
+        passwordResetService.createPasswordResetToken(TEST_EMAIL);
+        passwordResetService.createPasswordResetToken(TEST_EMAIL);
         assertEquals(1, tokenRepository.findAll().size());
     }
 
@@ -123,15 +138,15 @@ public class PasswordResetServiceTests {
     @Description("Verifica que se restablece la contraseña correctamente")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Restablecer contraseña exitoso")
-    void testResetPassword_success() {
+    void testResetPasswordSuccess() {
         PasswordResetToken token = tokenRepository.save(PasswordResetToken.builder()
-                .token("valid-token")
+                .token(VALID_TOKEN)
                 .user(testUser)
                 .expiryDate(LocalDateTime.now().plusMinutes(15))
                 .build());
-        passwordResetService.resetPassword("valid-token", "NewPassword1@");
+        passwordResetService.resetPassword(VALID_TOKEN, NEW_PASSWORD);
         User updatedUser = userRepository.findById(testUser.getId()).orElseThrow();
-        assertTrue(passwordEncoder.matches("NewPassword1@", updatedUser.getPassword()));
+        assertTrue(passwordEncoder.matches(NEW_PASSWORD, updatedUser.getPassword()));
     }
 
     @Test
@@ -139,14 +154,14 @@ public class PasswordResetServiceTests {
     @Description("Verifica que se elimina el token después de usarlo")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Restablecer contraseña elimina token")
-    void testResetPassword_deletesToken() {
+    void testResetPasswordDeletesToken() {
         tokenRepository.save(PasswordResetToken.builder()
-                .token("valid-token-2")
+                .token(VALID_TOKEN_2)
                 .user(testUser)
                 .expiryDate(LocalDateTime.now().plusMinutes(15))
                 .build());
-        passwordResetService.resetPassword("valid-token-2", "NewPassword1@");
-        assertTrue(tokenRepository.findByToken("valid-token-2").isEmpty());
+        passwordResetService.resetPassword(VALID_TOKEN_2, NEW_PASSWORD);
+        assertTrue(tokenRepository.findByToken(VALID_TOKEN_2).isEmpty());
     }
 
     @Test
@@ -154,9 +169,9 @@ public class PasswordResetServiceTests {
     @Description("Verifica que lanza excepción con token no encontrado")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Restablecer con token inexistente lanza excepción")
-    void testResetPassword_tokenNotFound() {
+    void testResetPasswordTokenNotFound() {
         assertThrows(ResourceNotFoundException.class,
-                () -> passwordResetService.resetPassword("invalid-token", "NewPassword1@"));
+                () -> passwordResetService.resetPassword(INVALID_TOKEN, NEW_PASSWORD));
     }
 
     @Test
@@ -164,14 +179,14 @@ public class PasswordResetServiceTests {
     @Description("Verifica que lanza excepción con token expirado")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Restablecer con token expirado lanza excepción")
-    void testResetPassword_tokenExpired() {
+    void testResetPasswordTokenExpired() {
         tokenRepository.save(PasswordResetToken.builder()
-                .token("expired-token")
+                .token(EXPIRED_TOKEN)
                 .user(testUser)
                 .expiryDate(LocalDateTime.now().minusMinutes(1))
                 .build());
         assertThrows(InvalidTokenException.class,
-                () -> passwordResetService.resetPassword("expired-token", "NewPassword1@"));
+                () -> passwordResetService.resetPassword(EXPIRED_TOKEN, NEW_PASSWORD));
     }
 
     @Test
@@ -179,14 +194,14 @@ public class PasswordResetServiceTests {
     @Description("Verifica que lanza excepción con contraseña null")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Restablecer con contraseña null lanza excepción")
-    void testResetPassword_invalidPassword_null() {
+    void testResetPasswordInvalidPasswordNull() {
         tokenRepository.save(PasswordResetToken.builder()
-                .token("token-for-null")
+                .token(TOKEN_FOR_NULL)
                 .user(testUser)
                 .expiryDate(LocalDateTime.now().plusMinutes(15))
                 .build());
         assertThrows(InvalidPasswordPattern.class,
-                () -> passwordResetService.resetPassword("token-for-null", null));
+                () -> passwordResetService.resetPassword(TOKEN_FOR_NULL, null));
     }
 
     @Test
@@ -194,13 +209,13 @@ public class PasswordResetServiceTests {
     @Description("Verifica que lanza excepción con contraseña débil")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Restablecer con contraseña débil lanza excepción")
-    void testResetPassword_invalidPassword_weak() {
+    void testResetPasswordInvalidPasswordWeak() {
         tokenRepository.save(PasswordResetToken.builder()
-                .token("token-for-weak")
+                .token(TOKEN_FOR_WEAK)
                 .user(testUser)
                 .expiryDate(LocalDateTime.now().plusMinutes(15))
                 .build());
         assertThrows(InvalidPasswordPattern.class,
-                () -> passwordResetService.resetPassword("token-for-weak", "weak"));
+                () -> passwordResetService.resetPassword(TOKEN_FOR_WEAK, WEAK_PASSWORD));
     }
 }

@@ -33,6 +33,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Feature("API REST de Atracciones E2E")
 public class AttractionE2ETests {
 
+    private static final String API_ATTRACTIONS = "/api/v1/attractions";
+    private static final String ROLLER_COASTER_NAME = "Roller Coaster";
+    private static final String SUPER_COASTER_NAME = "Super Coaster";
+    private static final String WATER_SLIDE_NAME = "Water Slide";
+    private static final String UPDATED_COASTER_NAME = "Updated Coaster";
+    private static final String PHOTO_UPDATED_COASTER_NAME = "Photo Updated Coaster";
+    private static final String EXTREME_COASTER_DESC = "Extreme roller coaster";
+    private static final String FUN_WATER_SLIDE_DESC = "Fun water slide";
+    private static final String UPDATED_DESC = "Updated description";
+    private static final String PHOTO_UPDATED_DESC = "Photo updated description";
+    private static final String PHOTO_URL = "https://example.com/coaster.jpg";
+    private static final String TEST_IMAGE_CONTENT = "test image content";
+    private static final String NEW_IMAGE_CONTENT = "new image content";
+    private static final int MIN_HEIGHT_140 = 140;
+    private static final int MIN_HEIGHT_120 = 120;
+    private static final int MIN_HEIGHT_100 = 100;
+    private static final int MIN_HEIGHT_150 = 150;
+    private static final int MIN_AGE_12 = 12;
+    private static final int MIN_AGE_8 = 8;
+    private static final int MIN_AGE_6 = 6;
+    private static final int MIN_AGE_14 = 14;
+    private static final int MIN_WEIGHT_30 = 30;
+    private static final int MIN_WEIGHT_25 = 25;
+    private static final int MIN_WEIGHT_20 = 20;
+    private static final int MIN_WEIGHT_40 = 40;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -48,13 +74,13 @@ public class AttractionE2ETests {
     void setUp() {
         attractionRepository.deleteAll();
         sample = Attraction.builder()
-                .name("Roller Coaster")
+                .name(ROLLER_COASTER_NAME)
                 .intensity(Intensity.HIGH)
-                .minimumHeight(140)
-                .minimumAge(12)
-                .minimumWeight(30)
-                .description("Extreme roller coaster")
-                .photoUrl("https://example.com/coaster.jpg")
+                .minimumHeight(MIN_HEIGHT_140)
+                .minimumAge(MIN_AGE_12)
+                .minimumWeight(MIN_WEIGHT_30)
+                .description(EXTREME_COASTER_DESC)
+                .photoUrl(PHOTO_URL)
                 .isActive(true)
                 .build();
     }
@@ -70,8 +96,8 @@ public class AttractionE2ETests {
     @Description("Verifica que crear una atracción retorna 201 Created")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear atracción retorna 201")
-    void testCreateAttraction_returnsCreated() throws Exception {
-        mockMvc.perform(post("/api/v1/attractions")
+    void testCreateAttractionReturnsCreated() throws Exception {
+        mockMvc.perform(post(API_ATTRACTIONS)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -84,8 +110,8 @@ public class AttractionE2ETests {
     @Description("Verifica que crear una atracción retorna header Location")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear atracción retorna header Location")
-    void testCreateAttraction_returnsLocationHeader() throws Exception {
-        mockMvc.perform(post("/api/v1/attractions")
+    void testCreateAttractionReturnsLocationHeader() throws Exception {
+        mockMvc.perform(post(API_ATTRACTIONS)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -98,8 +124,8 @@ public class AttractionE2ETests {
     @Description("Verifica que crear una atracción retorna ID generado")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear atracción retorna ID")
-    void testCreateAttraction_returnsAttractionWithId() throws Exception {
-        mockMvc.perform(post("/api/v1/attractions")
+    void testCreateAttractionReturnsAttractionWithId() throws Exception {
+        mockMvc.perform(post(API_ATTRACTIONS)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -112,12 +138,12 @@ public class AttractionE2ETests {
     @Description("Verifica que crear una atracción retorna nombre correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear atracción retorna nombre correcto")
-    void testCreateAttraction_returnsCorrectName() throws Exception {
-        mockMvc.perform(post("/api/v1/attractions")
+    void testCreateAttractionReturnsCorrectName() throws Exception {
+        mockMvc.perform(post(API_ATTRACTIONS)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
-                .andExpect(jsonPath("$.name").value("Roller Coaster"));
+                .andExpect(jsonPath("$.name").value(ROLLER_COASTER_NAME));
     }
 
     @Test
@@ -125,8 +151,8 @@ public class AttractionE2ETests {
     @Description("Verifica que obtener todas las atracciones retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Obtener atracciones retorna 200 OK")
-    void testGetAllAttractions_public_returnsOk() throws Exception {
-        mockMvc.perform(get("/api/v1/attractions"))
+    void testGetAllAttractionsPublicReturnsOk() throws Exception {
+        mockMvc.perform(get(API_ATTRACTIONS))
                 .andExpect(status().isOk());
     }
 
@@ -135,8 +161,8 @@ public class AttractionE2ETests {
     @Description("Verifica que obtener atracciones retorna array vacío inicialmente")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener atracciones retorna array vacío")
-    void testGetAllAttractions_public_returnsEmptyArray() throws Exception {
-        mockMvc.perform(get("/api/v1/attractions"))
+    void testGetAllAttractionsPublicReturnsEmptyArray() throws Exception {
+        mockMvc.perform(get(API_ATTRACTIONS))
                 .andExpect(jsonPath("$.length()").value(0));
     }
 
@@ -145,9 +171,9 @@ public class AttractionE2ETests {
     @Description("Verifica que obtener atracciones con datos retorna elementos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener atracciones con datos retorna elementos")
-    void testGetAllAttractions_withData_returnsAttractions() throws Exception {
+    void testGetAllAttractionsWithDataReturnsAttractions() throws Exception {
         attractionRepository.save(sample);
-        mockMvc.perform(get("/api/v1/attractions"))
+        mockMvc.perform(get(API_ATTRACTIONS))
                 .andExpect(jsonPath("$.length()").value(1));
     }
 
@@ -156,10 +182,10 @@ public class AttractionE2ETests {
     @Description("Verifica que obtener atracciones contiene nombre")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener atracciones contiene nombre")
-    void testGetAllAttractions_withData_containsName() throws Exception {
+    void testGetAllAttractionsWithDataContainsName() throws Exception {
         attractionRepository.save(sample);
-        mockMvc.perform(get("/api/v1/attractions"))
-                .andExpect(jsonPath("$[0].name").value("Roller Coaster"));
+        mockMvc.perform(get(API_ATTRACTIONS))
+                .andExpect(jsonPath("$[0].name").value(ROLLER_COASTER_NAME));
     }
 
     @Test
@@ -167,9 +193,9 @@ public class AttractionE2ETests {
     @Description("Verifica que filtrar por altura mínima retorna resultados")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Filtrar por altura mínima retorna resultados")
-    void testGetAllAttractions_filterByMinHeight_returnsFiltered() throws Exception {
+    void testGetAllAttractionsFilterByMinHeightReturnsFiltered() throws Exception {
         attractionRepository.save(sample);
-        mockMvc.perform(get("/api/v1/attractions").param("minHeight", "150"))
+        mockMvc.perform(get(API_ATTRACTIONS).param("minHeight", "150"))
                 .andExpect(jsonPath("$.length()").value(1));
     }
 
@@ -178,9 +204,9 @@ public class AttractionE2ETests {
     @Description("Verifica que filtrar excluye atracciones con altura alta")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Filtrar excluye atracciones con altura alta")
-    void testGetAllAttractions_filterByMinHeight_excludesTall() throws Exception {
+    void testGetAllAttractionsFilterByMinHeightExcludesTall() throws Exception {
         attractionRepository.save(sample);
-        mockMvc.perform(get("/api/v1/attractions").param("minHeight", "100"))
+        mockMvc.perform(get(API_ATTRACTIONS).param("minHeight", "100"))
                 .andExpect(jsonPath("$.length()").value(0));
     }
 
@@ -189,9 +215,9 @@ public class AttractionE2ETests {
     @Description("Verifica que obtener atracción por ID retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Obtener atracción por ID retorna 200 OK")
-    void testGetAttractionById_exists_returnsOk() throws Exception {
+    void testGetAttractionByIdExistsReturnsOk() throws Exception {
         Attraction saved = attractionRepository.save(sample);
-        mockMvc.perform(get("/api/v1/attractions/" + saved.getId()))
+        mockMvc.perform(get(API_ATTRACTIONS + "/" + saved.getId()))
                 .andExpect(status().isOk());
     }
 
@@ -200,10 +226,10 @@ public class AttractionE2ETests {
     @Description("Verifica que obtener atracción por ID retorna datos correctos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener atracción por ID retorna datos correctos")
-    void testGetAttractionById_exists_returnsCorrectData() throws Exception {
+    void testGetAttractionByIdExistsReturnsCorrectData() throws Exception {
         Attraction saved = attractionRepository.save(sample);
-        mockMvc.perform(get("/api/v1/attractions/" + saved.getId()))
-                .andExpect(jsonPath("$.name").value("Roller Coaster"));
+        mockMvc.perform(get(API_ATTRACTIONS + "/" + saved.getId()))
+                .andExpect(jsonPath("$.name").value(ROLLER_COASTER_NAME));
     }
 
     @Test
@@ -211,8 +237,8 @@ public class AttractionE2ETests {
     @Description("Verifica que obtener atracción inexistente retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener atracción inexistente retorna 404")
-    void testGetAttractionById_notExists_returns404() throws Exception {
-        mockMvc.perform(get("/api/v1/attractions/999999"))
+    void testGetAttractionByIdNotExistsReturns404() throws Exception {
+        mockMvc.perform(get(API_ATTRACTIONS + "/999999"))
                 .andExpect(status().isNotFound());
     }
 
@@ -222,10 +248,10 @@ public class AttractionE2ETests {
     @Description("Verifica que actualizar atracción retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar atracción retorna 200 OK")
-    void testUpdateAttraction_returnsOk() throws Exception {
+    void testUpdateAttractionReturnsOk() throws Exception {
         Attraction saved = attractionRepository.save(sample);
-        sample.setName("Super Coaster");
-        mockMvc.perform(put("/api/v1/attractions/" + saved.getId())
+        sample.setName(SUPER_COASTER_NAME);
+        mockMvc.perform(put(API_ATTRACTIONS + "/" + saved.getId())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -238,14 +264,14 @@ public class AttractionE2ETests {
     @Description("Verifica que actualizar atracción actualiza el nombre")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar atracción actualiza nombre")
-    void testUpdateAttraction_updatesName() throws Exception {
+    void testUpdateAttractionUpdatesName() throws Exception {
         Attraction saved = attractionRepository.save(sample);
-        sample.setName("Super Coaster");
-        mockMvc.perform(put("/api/v1/attractions/" + saved.getId())
+        sample.setName(SUPER_COASTER_NAME);
+        mockMvc.perform(put(API_ATTRACTIONS + "/" + saved.getId())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
-                .andExpect(jsonPath("$.name").value("Super Coaster"));
+                .andExpect(jsonPath("$.name").value(SUPER_COASTER_NAME));
     }
 
     @Test
@@ -254,8 +280,8 @@ public class AttractionE2ETests {
     @Description("Verifica que actualizar atracción inexistente retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar atracción inexistente retorna 404")
-    void testUpdateAttraction_notExists_returns404() throws Exception {
-        mockMvc.perform(put("/api/v1/attractions/999999")
+    void testUpdateAttractionNotExistsReturns404() throws Exception {
+        mockMvc.perform(put(API_ATTRACTIONS + "/999999")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -268,9 +294,9 @@ public class AttractionE2ETests {
     @Description("Verifica que eliminar atracción retorna 204 No Content")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Eliminar atracción retorna 204")
-    void testDeleteAttraction_exists_returns204() throws Exception {
+    void testDeleteAttractionExistsReturns204() throws Exception {
         Attraction saved = attractionRepository.save(sample);
-        mockMvc.perform(delete("/api/v1/attractions/" + saved.getId())
+        mockMvc.perform(delete(API_ATTRACTIONS + "/" + saved.getId())
                         .with(csrf()))
                 .andExpect(status().isNoContent());
     }
@@ -281,8 +307,8 @@ public class AttractionE2ETests {
     @Description("Verifica que eliminar atracción inexistente retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Eliminar atracción inexistente retorna 404")
-    void testDeleteAttraction_notExists_returns404() throws Exception {
-        mockMvc.perform(delete("/api/v1/attractions/999999")
+    void testDeleteAttractionNotExistsReturns404() throws Exception {
+        mockMvc.perform(delete(API_ATTRACTIONS + "/999999")
                         .with(csrf()))
                 .andExpect(status().isNotFound());
     }
@@ -292,8 +318,8 @@ public class AttractionE2ETests {
     @Description("Verifica que crear atracción sin autenticación retorna 401")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear atracción sin autenticación retorna 401")
-    void testCreateAttraction_unauthorized_returns401() throws Exception {
-        mockMvc.perform(post("/api/v1/attractions")
+    void testCreateAttractionUnauthorizedReturns401() throws Exception {
+        mockMvc.perform(post(API_ATTRACTIONS)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -306,8 +332,8 @@ public class AttractionE2ETests {
     @Description("Verifica que crear atracción con rol USER retorna 403")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear atracción con rol USER retorna 403")
-    void testCreateAttraction_userRole_returns403() throws Exception {
-        mockMvc.perform(post("/api/v1/attractions")
+    void testCreateAttractionUserRoleReturns403() throws Exception {
+        mockMvc.perform(post(API_ATTRACTIONS)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sample)))
@@ -320,20 +346,20 @@ public class AttractionE2ETests {
     @Description("Verifica que crear atracción multipart retorna 201")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear atracción multipart retorna 201")
-    void testCreateAttractionMultipart_returnsCreated() throws Exception {
+    void testCreateAttractionMultipartReturnsCreated() throws Exception {
         AttractionRequest request = new AttractionRequest();
-        request.setName("Water Slide");
+        request.setName(WATER_SLIDE_NAME);
         request.setIntensity(Intensity.MEDIUM);
-        request.setMinimumHeight(120);
-        request.setMinimumAge(8);
-        request.setMinimumWeight(25);
-        request.setDescription("Fun water slide");
+        request.setMinimumHeight(MIN_HEIGHT_120);
+        request.setMinimumAge(MIN_AGE_8);
+        request.setMinimumWeight(MIN_WEIGHT_25);
+        request.setDescription(FUN_WATER_SLIDE_DESC);
         request.setIsActive(true);
 
-        MockMultipartFile photo = new MockMultipartFile("photo", "test.jpg", "image/jpeg", "test image content".getBytes());
+        MockMultipartFile photo = new MockMultipartFile("photo", "test.jpg", "image/jpeg", TEST_IMAGE_CONTENT.getBytes());
         MockMultipartFile data = new MockMultipartFile("data", "", "application/json", objectMapper.writeValueAsBytes(request));
 
-        mockMvc.perform(multipart("/api/v1/attractions")
+        mockMvc.perform(multipart(API_ATTRACTIONS)
                         .file(photo)
                         .file(data)
                         .with(csrf()))
@@ -346,20 +372,20 @@ public class AttractionE2ETests {
     @Description("Verifica que crear atracción multipart retorna ID")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear atracción multipart retorna ID")
-    void testCreateAttractionMultipart_returnsId() throws Exception {
+    void testCreateAttractionMultipartReturnsId() throws Exception {
         AttractionRequest request = new AttractionRequest();
-        request.setName("Water Slide");
+        request.setName(WATER_SLIDE_NAME);
         request.setIntensity(Intensity.MEDIUM);
-        request.setMinimumHeight(120);
-        request.setMinimumAge(8);
-        request.setMinimumWeight(25);
-        request.setDescription("Fun water slide");
+        request.setMinimumHeight(MIN_HEIGHT_120);
+        request.setMinimumAge(MIN_AGE_8);
+        request.setMinimumWeight(MIN_WEIGHT_25);
+        request.setDescription(FUN_WATER_SLIDE_DESC);
         request.setIsActive(true);
 
-        MockMultipartFile photo = new MockMultipartFile("photo", "test.jpg", "image/jpeg", "test image content".getBytes());
+        MockMultipartFile photo = new MockMultipartFile("photo", "test.jpg", "image/jpeg", TEST_IMAGE_CONTENT.getBytes());
         MockMultipartFile data = new MockMultipartFile("data", "", "application/json", objectMapper.writeValueAsBytes(request));
 
-        mockMvc.perform(multipart("/api/v1/attractions")
+        mockMvc.perform(multipart(API_ATTRACTIONS)
                         .file(photo)
                         .file(data)
                         .with(csrf()))
@@ -372,21 +398,21 @@ public class AttractionE2ETests {
     @Description("Verifica que actualizar atracción multipart retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar atracción multipart retorna 200 OK")
-    void testUpdateAttractionMultipart_returnsOk() throws Exception {
+    void testUpdateAttractionMultipartReturnsOk() throws Exception {
         Attraction saved = attractionRepository.save(sample);
 
         AttractionRequest request = new AttractionRequest();
-        request.setName("Updated Coaster");
+        request.setName(UPDATED_COASTER_NAME);
         request.setIntensity(Intensity.LOW);
-        request.setMinimumHeight(100);
-        request.setMinimumAge(6);
-        request.setMinimumWeight(20);
-        request.setDescription("Updated description");
+        request.setMinimumHeight(MIN_HEIGHT_100);
+        request.setMinimumAge(MIN_AGE_6);
+        request.setMinimumWeight(MIN_WEIGHT_20);
+        request.setDescription(UPDATED_DESC);
         request.setIsActive(false);
 
         MockMultipartFile data = new MockMultipartFile("data", "", "application/json", objectMapper.writeValueAsBytes(request));
 
-        mockMvc.perform(multipart("/api/v1/attractions/" + saved.getId())
+        mockMvc.perform(multipart(API_ATTRACTIONS + "/" + saved.getId())
                         .file(data)
                         .with(csrf())
                         .with(req -> { req.setMethod("PUT"); return req; }))
@@ -399,27 +425,27 @@ public class AttractionE2ETests {
     @Description("Verifica que actualizar atracción multipart con foto actualiza datos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar atracción multipart con foto actualiza datos")
-    void testUpdateAttractionMultipart_withPhoto_updatesData() throws Exception {
+    void testUpdateAttractionMultipartWithPhotoUpdatesData() throws Exception {
         Attraction saved = attractionRepository.save(sample);
 
         AttractionRequest request = new AttractionRequest();
-        request.setName("Photo Updated Coaster");
+        request.setName(PHOTO_UPDATED_COASTER_NAME);
         request.setIntensity(Intensity.HIGH);
-        request.setMinimumHeight(150);
-        request.setMinimumAge(14);
-        request.setMinimumWeight(40);
-        request.setDescription("Photo updated description");
+        request.setMinimumHeight(MIN_HEIGHT_150);
+        request.setMinimumAge(MIN_AGE_14);
+        request.setMinimumWeight(MIN_WEIGHT_40);
+        request.setDescription(PHOTO_UPDATED_DESC);
         request.setIsActive(true);
 
-        MockMultipartFile photo = new MockMultipartFile("photo", "new.jpg", "image/jpeg", "new image content".getBytes());
+        MockMultipartFile photo = new MockMultipartFile("photo", "new.jpg", "image/jpeg", NEW_IMAGE_CONTENT.getBytes());
         MockMultipartFile data = new MockMultipartFile("data", "", "application/json", objectMapper.writeValueAsBytes(request));
 
-        mockMvc.perform(multipart("/api/v1/attractions/" + saved.getId())
+        mockMvc.perform(multipart(API_ATTRACTIONS + "/" + saved.getId())
                         .file(photo)
                         .file(data)
                         .with(csrf())
                         .with(req -> { req.setMethod("PUT"); return req; }))
-                .andExpect(jsonPath("$.name").value("Photo Updated Coaster"));
+                .andExpect(jsonPath("$.name").value(PHOTO_UPDATED_COASTER_NAME));
     }
 }
 

@@ -74,7 +74,7 @@ public class AuthE2ETests {
     @Description("Verifica que login con credenciales válidas retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Login válido retorna 200 OK")
-    void testLogin_validCredentials_returnsOk() throws Exception {
+    void testLoginValidCredentialsReturnsOk() throws Exception {
         LoginRequest request = LoginRequest.builder()
                 .username("existinguser")
                 .password("Password1@")
@@ -92,7 +92,7 @@ public class AuthE2ETests {
     @Description("Verifica que login con credenciales válidas establece cookie")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Login válido establece cookie")
-    void testLogin_validCredentials_setsCookie() throws Exception {
+    void testLoginValidCredentialsSetsCookie() throws Exception {
         LoginRequest request = LoginRequest.builder()
                 .username("existinguser")
                 .password("Password1@")
@@ -110,7 +110,7 @@ public class AuthE2ETests {
     @Description("Verifica que login con contraseña inválida retorna 401")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Login con contraseña inválida retorna 401")
-    void testLogin_invalidPassword_returns401() throws Exception {
+    void testLoginInvalidPasswordReturns401() throws Exception {
         LoginRequest request = LoginRequest.builder()
                 .username("existinguser")
                 .password("WrongPassword1@")
@@ -128,7 +128,7 @@ public class AuthE2ETests {
     @Description("Verifica que login con usuario inexistente retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Login con usuario inexistente retorna 404")
-    void testLogin_nonexistentUser_returns404() throws Exception {
+    void testLoginNonexistentUserReturns404() throws Exception {
         LoginRequest request = LoginRequest.builder()
                 .username("nonexistent")
                 .password("Password1@")
@@ -146,7 +146,7 @@ public class AuthE2ETests {
     @Description("Verifica que registro con datos válidos retorna 201")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Registro válido retorna 201")
-    void testRegister_validData_returns201() throws Exception {
+    void testRegisterValidDataReturns201() throws Exception {
         RegisterRequest request = RegisterRequest.builder()
                 .username("newuser")
                 .email("newuser@example.com")
@@ -168,7 +168,7 @@ public class AuthE2ETests {
     @Description("Verifica que registro con datos válidos establece cookie")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Registro válido establece cookie")
-    void testRegister_validData_setsCookie() throws Exception {
+    void testRegisterValidDataSetsCookie() throws Exception {
         RegisterRequest request = RegisterRequest.builder()
                 .username("newuser2")
                 .email("newuser2@example.com")
@@ -190,7 +190,7 @@ public class AuthE2ETests {
     @Description("Verifica que registro con username existente retorna 409")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Registro con username existente retorna 409")
-    void testRegister_existingUsername_returns409() throws Exception {
+    void testRegisterExistingUsernameReturns409() throws Exception {
         RegisterRequest request = RegisterRequest.builder()
                 .username("existinguser")
                 .email("new@example.com")
@@ -212,7 +212,7 @@ public class AuthE2ETests {
     @Description("Verifica que registro con email existente retorna 409")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Registro con email existente retorna 409")
-    void testRegister_existingEmail_returns409() throws Exception {
+    void testRegisterExistingEmailReturns409() throws Exception {
         RegisterRequest request = RegisterRequest.builder()
                 .username("differentuser")
                 .email("existing@example.com")
@@ -235,7 +235,7 @@ public class AuthE2ETests {
     @Description("Verifica que logout retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Logout retorna 200 OK")
-    void testLogout_returnsOk() throws Exception {
+    void testLogoutReturnsOk() throws Exception {
         mockMvc.perform(post("/api/v1/auth/logout")
                         .with(csrf()))
                 .andExpect(status().isOk());
@@ -247,7 +247,7 @@ public class AuthE2ETests {
     @Description("Verifica que logout expira la cookie")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Logout expira cookie")
-    void testLogout_expiresCookie() throws Exception {
+    void testLogoutExpiresCookie() throws Exception {
         mockMvc.perform(post("/api/v1/auth/logout")
                         .with(csrf()))
                 .andExpect(cookie().maxAge("token", 0));
@@ -259,7 +259,7 @@ public class AuthE2ETests {
     @Description("Verifica que obtener CSRF token retorna 200 OK")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("CSRF token retorna 200 OK")
-    void testCsrfToken_returnsOk() throws Exception {
+    void testCsrfTokenReturnsOk() throws Exception {
         mockMvc.perform(get("/api/v1/auth/csrf-token")
                         .with(csrf()))
                 .andExpect(status().isOk());
@@ -271,7 +271,7 @@ public class AuthE2ETests {
     @Description("Verifica que obtener CSRF token establece header X-XSRF-TOKEN")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("CSRF token establece header")
-    void testCsrfToken_setsXsrfHeader() throws Exception {
+    void testCsrfTokenSetsXsrfHeader() throws Exception {
         mockMvc.perform(get("/api/v1/auth/csrf-token")
                         .with(csrf()))
                 .andExpect(header().exists("X-XSRF-TOKEN"));
@@ -282,7 +282,7 @@ public class AuthE2ETests {
     @Description("Verifica que reset password con token inválido retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Reset password con token inválido retorna 404")
-    void testResetPassword_invalidToken_returns404() throws Exception {
+    void testResetPasswordInvalidTokenReturns404() throws Exception {
         String requestBody = "{\"token\":\"invalidtoken\",\"newPassword\":\"NewPassword1@\"}";
 
         mockMvc.perform(post("/api/v1/auth/reset-password")

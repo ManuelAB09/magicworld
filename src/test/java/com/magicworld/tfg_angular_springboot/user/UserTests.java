@@ -19,16 +19,24 @@ import static org.junit.jupiter.api.Assertions.*;
 @Feature("Entidad Usuario")
 public class UserTests {
 
+    private static final String TEST_USERNAME = "testuser";
+    private static final String TEST_FIRSTNAME = "Test";
+    private static final String TEST_LASTNAME = "User";
+    private static final String TEST_EMAIL = "test@example.com";
+    private static final String TEST_PASSWORD = "Password1@";
+    private static final String ROLE_USER = "ROLE_USER";
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+
     private User user;
 
     @BeforeEach
     void setUp() {
         user = User.builder()
-                .username("testuser")
-                .firstname("Test")
-                .lastname("User")
-                .email("test@example.com")
-                .password("Password1@")
+                .username(TEST_USERNAME)
+                .firstname(TEST_FIRSTNAME)
+                .lastname(TEST_LASTNAME)
+                .email(TEST_EMAIL)
+                .password(TEST_PASSWORD)
                 .userRole(Role.USER)
                 .build();
     }
@@ -38,10 +46,10 @@ public class UserTests {
     @Description("Verifica que getAuthorities retorna el rol correcto para USER")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("getAuthorities retorna ROLE_USER para usuario con rol USER")
-    void testGetAuthorities_returnsCorrectRole() {
+    void testGetAuthoritiesReturnsCorrectRole() {
         Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
         assertTrue(authorities.stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_USER")));
+                .anyMatch(a -> a.getAuthority().equals(ROLE_USER)));
     }
 
     @Test
@@ -49,11 +57,11 @@ public class UserTests {
     @Description("Verifica que getAuthorities retorna el rol correcto para ADMIN")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("getAuthorities retorna ROLE_ADMIN para usuario con rol ADMIN")
-    void testGetAuthorities_adminRole_returnsCorrectRole() {
+    void testGetAuthoritiesAdminRoleReturnsCorrectRole() {
         user.setUserRole(Role.ADMIN);
         Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
         assertTrue(authorities.stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
+                .anyMatch(a -> a.getAuthority().equals(ROLE_ADMIN)));
     }
 
     @Test
@@ -61,7 +69,7 @@ public class UserTests {
     @Description("Verifica que isAccountNonExpired retorna true")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("isAccountNonExpired retorna true")
-    void testIsAccountNonExpired_returnsTrue() {
+    void testIsAccountNonExpiredReturnsTrue() {
         assertTrue(user.isAccountNonExpired());
     }
 
@@ -70,7 +78,7 @@ public class UserTests {
     @Description("Verifica que isAccountNonLocked retorna true")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("isAccountNonLocked retorna true")
-    void testIsAccountNonLocked_returnsTrue() {
+    void testIsAccountNonLockedReturnsTrue() {
         assertTrue(user.isAccountNonLocked());
     }
 
@@ -79,7 +87,7 @@ public class UserTests {
     @Description("Verifica que isCredentialsNonExpired retorna true")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("isCredentialsNonExpired retorna true")
-    void testIsCredentialsNonExpired_returnsTrue() {
+    void testIsCredentialsNonExpiredReturnsTrue() {
         assertTrue(user.isCredentialsNonExpired());
     }
 
@@ -88,7 +96,7 @@ public class UserTests {
     @Description("Verifica que isEnabled retorna true")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("isEnabled retorna true")
-    void testIsEnabled_returnsTrue() {
+    void testIsEnabledReturnsTrue() {
         assertTrue(user.isEnabled());
     }
 
@@ -97,8 +105,8 @@ public class UserTests {
     @Description("Verifica que getUsername retorna el nombre de usuario correcto")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("getUsername retorna el nombre de usuario correcto")
-    void testGetUsername_returnsCorrectUsername() {
-        assertEquals("testuser", user.getUsername());
+    void testGetUsernameReturnsCorrectUsername() {
+        assertEquals(TEST_USERNAME, user.getUsername());
     }
 
     @Test
@@ -106,8 +114,7 @@ public class UserTests {
     @Description("Verifica que getPassword retorna la contraseña correcta")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("getPassword retorna la contraseña correcta")
-    void testGetPassword_returnsCorrectPassword() {
-        assertEquals("Password1@", user.getPassword());
+    void testGetPasswordReturnsCorrectPassword() {
+        assertEquals(TEST_PASSWORD, user.getPassword());
     }
 }
-

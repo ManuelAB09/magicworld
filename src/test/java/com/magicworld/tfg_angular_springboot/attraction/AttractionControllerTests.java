@@ -41,6 +41,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Feature("API REST de Atracciones")
 public class AttractionControllerTests {
 
+    private static final String API_ATTRACTIONS = "/api/v1/attractions";
+    private static final String API_ATTRACTIONS_ID = "/api/v1/attractions/";
+    private static final String NEW_RIDE_NAME = "New Ride";
+    private static final String NICE_RIDE_DESC = "Nice ride";
+    private static final String UPDATED_NAME = "Updated";
+    private static final String UPDATED_DESC = "up";
+    private static final String PHOTO_URL = "https://example.com/new.jpg";
+    private static final String ERROR_ATTRACTION_NOT_FOUND = "error.attraction.notfound";
+    private static final int MIN_HEIGHT_90 = 90;
+    private static final int MIN_HEIGHT_80 = 80;
+    private static final int MIN_HEIGHT_100 = 100;
+    private static final int MIN_HEIGHT_120 = 120;
+    private static final int MIN_AGE_6 = 6;
+    private static final int MIN_AGE_5 = 5;
+    private static final int MIN_AGE_8 = 8;
+    private static final int MIN_AGE_12 = 12;
+    private static final int MIN_WEIGHT_20 = 20;
+    private static final int MIN_WEIGHT_30 = 30;
+    private static final int MIN_WEIGHT_40 = 40;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -64,23 +84,20 @@ public class AttractionControllerTests {
         Mockito.reset(attractionService);
     }
 
-    @Test
-    @Story("Crear Atracción")
-    @Description("Verifica que crear atracción retorna 201 Created con header Location")
-    @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("Crear atracción retorna 201 Created")
-    public void testCreateAttraction_returnsCreated() throws Exception {
-        Attraction request = Attraction.builder()
-                .name("New Ride")
+    private Attraction buildNewRideRequest() {
+        return Attraction.builder()
+                .name(NEW_RIDE_NAME)
                 .intensity(Intensity.LOW)
-                .minimumHeight(90)
-                .minimumAge(6)
-                .minimumWeight(20)
-                .description("Nice ride")
-                .photoUrl("https://example.com/new.jpg")
+                .minimumHeight(MIN_HEIGHT_90)
+                .minimumAge(MIN_AGE_6)
+                .minimumWeight(MIN_WEIGHT_20)
+                .description(NICE_RIDE_DESC)
+                .photoUrl(PHOTO_URL)
                 .isActive(true)
                 .build();
+    }
 
+    private Attraction buildSavedAttraction(Attraction request, Long id) {
         Attraction saved = Attraction.builder()
                 .name(request.getName())
                 .intensity(request.getIntensity())
@@ -91,15 +108,26 @@ public class AttractionControllerTests {
                 .photoUrl(request.getPhotoUrl())
                 .isActive(request.getIsActive())
                 .build();
-        saved.setId(1L);
+        saved.setId(id);
+        return saved;
+    }
+
+    @Test
+    @Story("Crear Atracción")
+    @Description("Verifica que crear atracción retorna 201 Created con header Location")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("Crear atracción retorna 201 Created")
+    public void testCreateAttractionReturnsCreated() throws Exception {
+        Attraction request = buildNewRideRequest();
+        Attraction saved = buildSavedAttraction(request, 1L);
 
         when(attractionService.saveAttraction(any(Attraction.class))).thenReturn(saved);
 
-        mockMvc.perform(post("/api/v1/attractions")
+        mockMvc.perform(post(API_ATTRACTIONS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/api/v1/attractions/1"));
+                .andExpect(header().string("Location", API_ATTRACTIONS_ID + "1"));
     }
 
     @Test
@@ -107,37 +135,17 @@ public class AttractionControllerTests {
     @Description("Verifica que crear atracción retorna ID y nombre")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear atracción retorna ID y nombre")
-    public void testCreateAttraction_returnsId() throws Exception {
-        Attraction request = Attraction.builder()
-                .name("New Ride")
-                .intensity(Intensity.LOW)
-                .minimumHeight(90)
-                .minimumAge(6)
-                .minimumWeight(20)
-                .description("Nice ride")
-                .photoUrl("https://example.com/new.jpg")
-                .isActive(true)
-                .build();
-
-        Attraction saved = Attraction.builder()
-                .name(request.getName())
-                .intensity(request.getIntensity())
-                .minimumHeight(request.getMinimumHeight())
-                .minimumAge(request.getMinimumAge())
-                .minimumWeight(request.getMinimumWeight())
-                .description(request.getDescription())
-                .photoUrl(request.getPhotoUrl())
-                .isActive(request.getIsActive())
-                .build();
-        saved.setId(1L);
+    public void testCreateAttractionReturnsId() throws Exception {
+        Attraction request = buildNewRideRequest();
+        Attraction saved = buildSavedAttraction(request, 1L);
 
         when(attractionService.saveAttraction(any(Attraction.class))).thenReturn(saved);
 
-        mockMvc.perform(post("/api/v1/attractions")
+        mockMvc.perform(post(API_ATTRACTIONS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("New Ride"));
+                .andExpect(jsonPath("$.name").value(NEW_RIDE_NAME));
     }
 
     @Test
@@ -145,13 +153,13 @@ public class AttractionControllerTests {
     @Description("Verifica que obtener atracciones retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Obtener atracciones retorna 200 OK")
-    public void testGetAllAttractions_returnsOk() throws Exception {
+    public void testGetAllAttractionsReturnsOk() throws Exception {
         Attraction one = Attraction.builder()
                 .name("A")
                 .intensity(Intensity.LOW)
-                .minimumHeight(80)
-                .minimumAge(5)
-                .minimumWeight(20)
+                .minimumHeight(MIN_HEIGHT_80)
+                .minimumAge(MIN_AGE_5)
+                .minimumWeight(MIN_WEIGHT_20)
                 .description("d")
                 .photoUrl("u")
                 .isActive(true)
@@ -160,7 +168,7 @@ public class AttractionControllerTests {
 
         when(attractionService.getAllAttractions(any(), any(), any())).thenReturn(List.of(one));
 
-        mockMvc.perform(get("/api/v1/attractions").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(API_ATTRACTIONS).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
     }
@@ -170,12 +178,12 @@ public class AttractionControllerTests {
     @Description("Verifica que obtener atracción por ID retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Obtener atracción por ID retorna 200 OK")
-    public void testGetAttractionById_found_returnsOk() throws Exception {
-        Attraction one = Attraction.builder().name("B").intensity(Intensity.MEDIUM).minimumHeight(100).minimumAge(8).minimumWeight(30).description("desc").photoUrl("u").isActive(true).build();
+    public void testGetAttractionByIdFoundReturnsOk() throws Exception {
+        Attraction one = Attraction.builder().name("B").intensity(Intensity.MEDIUM).minimumHeight(MIN_HEIGHT_100).minimumAge(MIN_AGE_8).minimumWeight(MIN_WEIGHT_30).description("desc").photoUrl("u").isActive(true).build();
         one.setId(2L);
         when(attractionService.getAttractionById(2L)).thenReturn(one);
 
-        mockMvc.perform(get("/api/v1/attractions/2").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(API_ATTRACTIONS_ID + "2").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(2));
     }
@@ -185,10 +193,10 @@ public class AttractionControllerTests {
     @Description("Verifica que obtener atracción inexistente retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener atracción inexistente retorna 404")
-    public void testGetAttractionById_notFound() throws Exception {
-        when(attractionService.getAttractionById(999L)).thenThrow(new ResourceNotFoundException("error.attraction.notfound"));
+    public void testGetAttractionByIdNotFound() throws Exception {
+        when(attractionService.getAttractionById(999L)).thenThrow(new ResourceNotFoundException(ERROR_ATTRACTION_NOT_FOUND));
 
-        mockMvc.perform(get("/api/v1/attractions/999").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(API_ATTRACTIONS_ID + "999").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
@@ -197,14 +205,14 @@ public class AttractionControllerTests {
     @Description("Verifica que actualizar atracción retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar atracción retorna 200 OK")
-    public void testUpdateAttraction_returnsOk() throws Exception {
-        Attraction update = Attraction.builder().name("Updated").intensity(Intensity.HIGH).minimumHeight(120).minimumAge(12).minimumWeight(40).description("up").photoUrl("u").isActive(false).build();
-        Attraction returned = Attraction.builder().name("Updated").intensity(Intensity.HIGH).minimumHeight(120).minimumAge(12).minimumWeight(40).description("up").photoUrl("u").isActive(false).build();
+    public void testUpdateAttractionReturnsOk() throws Exception {
+        Attraction update = Attraction.builder().name(UPDATED_NAME).intensity(Intensity.HIGH).minimumHeight(MIN_HEIGHT_120).minimumAge(MIN_AGE_12).minimumWeight(MIN_WEIGHT_40).description(UPDATED_DESC).photoUrl("u").isActive(false).build();
+        Attraction returned = Attraction.builder().name(UPDATED_NAME).intensity(Intensity.HIGH).minimumHeight(MIN_HEIGHT_120).minimumAge(MIN_AGE_12).minimumWeight(MIN_WEIGHT_40).description(UPDATED_DESC).photoUrl("u").isActive(false).build();
         returned.setId(3L);
 
         when(attractionService.updateAttraction(eq(3L), any(Attraction.class))).thenReturn(returned);
 
-        mockMvc.perform(put("/api/v1/attractions/3")
+        mockMvc.perform(put(API_ATTRACTIONS_ID + "3")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isOk())
@@ -219,7 +227,7 @@ public class AttractionControllerTests {
     public void testDeleteAttraction() throws Exception {
         doNothing().when(attractionService).deleteAttraction(4L);
 
-        mockMvc.perform(delete("/api/v1/attractions/4").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(delete(API_ATTRACTIONS_ID + "4").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         verify(attractionService).deleteAttraction(4L);
