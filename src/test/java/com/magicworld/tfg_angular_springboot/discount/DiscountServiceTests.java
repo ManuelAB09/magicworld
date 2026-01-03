@@ -63,10 +63,6 @@ public class DiscountServiceTests {
     @Autowired
     private EntityManager entityManager;
 
-    private TicketType adult;
-    private TicketType child;
-    private TicketType vip;
-
     @BeforeEach
     void setUp() {
         discountTicketTypeRepository.deleteAll();
@@ -75,7 +71,7 @@ public class DiscountServiceTests {
         entityManager.flush();
         entityManager.clear();
 
-        adult = ticketTypeRepository.save(TicketType.builder()
+        TicketType adult = ticketTypeRepository.save(TicketType.builder()
                 .cost(COST_50)
                 .currency(CURRENCY_EUR)
                 .typeName(TYPE_NAME_ADULT)
@@ -84,7 +80,7 @@ public class DiscountServiceTests {
                 .photoUrl(PHOTO_URL_ADULT)
                 .build());
 
-        child = ticketTypeRepository.save(TicketType.builder()
+        TicketType child = ticketTypeRepository.save(TicketType.builder()
                 .cost(COST_25)
                 .currency(CURRENCY_EUR)
                 .typeName(TYPE_NAME_CHILD)
@@ -93,7 +89,7 @@ public class DiscountServiceTests {
                 .photoUrl(PHOTO_URL_CHILD)
                 .build());
 
-        vip = ticketTypeRepository.save(TicketType.builder()
+        TicketType vip = ticketTypeRepository.save(TicketType.builder()
                 .cost(COST_120)
                 .currency(CURRENCY_EUR)
                 .typeName(TYPE_NAME_VIP)
@@ -240,7 +236,7 @@ public class DiscountServiceTests {
         discountService.update(updatedData, List.of(TYPE_NAME_VIP));
         List<TicketType> associated = discountTicketTypeRepository.findByDiscountId(id);
         assertEquals(1, associated.size());
-        assertEquals(TYPE_NAME_VIP, associated.get(0).getTypeName());
+        assertEquals(TYPE_NAME_VIP, associated.getFirst().getTypeName());
     }
 
     @Test

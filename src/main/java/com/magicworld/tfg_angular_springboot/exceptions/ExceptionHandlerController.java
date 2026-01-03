@@ -135,25 +135,26 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    private static final Map<String, Long> SIZE_MULTIPLIERS = Map.of(
+            "KB", 1024L,
+            "MB", 1024L * 1024L,
+            "GB", 1024L * 1024L * 1024L
+    );
+
     private long parseSizeToBytes(String s, long defaultValue) {
         if (s == null || s.isBlank()) return defaultValue;
         String t = s.trim().toUpperCase();
+
         try {
-            if (t.endsWith("B") && !t.endsWith("KB") && !t.endsWith("MB") && !t.endsWith("GB")) {
-                t = t.substring(0, t.length() - 1).trim();
-                return Long.parseLong(t);
+            for (Map.Entry<String, Long> entry : SIZE_MULTIPLIERS.entrySet()) {
+                if (t.endsWith(entry.getKey())) {
+                    long v = Long.parseLong(t.substring(0, t.length() - entry.getKey().length()).trim());
+                    return v * entry.getValue();
+                }
             }
-            if (t.endsWith("KB")) {
-                long v = Long.parseLong(t.substring(0, t.length() - 2).trim());
-                return v * 1024L;
-            }
-            if (t.endsWith("MB")) {
-                long v = Long.parseLong(t.substring(0, t.length() - 2).trim());
-                return v * 1024L * 1024L;
-            }
-            if (t.endsWith("GB")) {
-                long v = Long.parseLong(t.substring(0, t.length() - 2).trim());
-                return v * 1024L * 1024L * 1024L;
+
+            if (t.endsWith("B")) {
+                return Long.parseLong(t.substring(0, t.length() - 1).trim());
             }
 
             return Long.parseLong(t);

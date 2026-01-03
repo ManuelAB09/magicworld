@@ -28,6 +28,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
@@ -101,11 +103,13 @@ public class DiscountControllerTests {
 
         DiscountRequest request = requestWith(toSave, List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
 
-        mockMvc.perform(post(API_DISCOUNTS)
+        var result = mockMvc.perform(post(API_DISCOUNTS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", API_DISCOUNTS_ID + "1"));
+                .andExpect(header().string("Location", API_DISCOUNTS_ID + "1"))
+                .andReturn();
+        assertEquals(201, result.getResponse().getStatus());
     }
 
     @Test
@@ -122,11 +126,13 @@ public class DiscountControllerTests {
 
         DiscountRequest request = requestWith(toSave, List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
 
-        mockMvc.perform(post(API_DISCOUNTS)
+        var result = mockMvc.perform(post(API_DISCOUNTS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.discountCode").value(DISCOUNT_CODE_WELCOME10));
+                .andExpect(jsonPath("$.discountCode").value(DISCOUNT_CODE_WELCOME10))
+                .andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains(DISCOUNT_CODE_WELCOME10));
     }
 
     @Test
@@ -139,9 +145,11 @@ public class DiscountControllerTests {
         one.setId(10L);
         when(discountService.findAll()).thenReturn(List.of(one));
 
-        mockMvc.perform(get(API_DISCOUNTS).contentType(MediaType.APPLICATION_JSON))
+        var result = mockMvc.perform(get(API_DISCOUNTS).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.length()").value(1))
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -154,9 +162,11 @@ public class DiscountControllerTests {
         one.setId(2L);
         when(discountService.findById(2L)).thenReturn(one);
 
-        mockMvc.perform(get(API_DISCOUNTS_ID + "2").contentType(MediaType.APPLICATION_JSON))
+        var result = mockMvc.perform(get(API_DISCOUNTS_ID + "2").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(2));
+                .andExpect(jsonPath("$.id").value(2))
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -167,8 +177,10 @@ public class DiscountControllerTests {
     public void testFindByIdNotFound() throws Exception {
         when(discountService.findById(999L)).thenThrow(new ResourceNotFoundException(ERROR_DISCOUNT_NOT_FOUND));
 
-        mockMvc.perform(get(API_DISCOUNTS_ID + "999").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+        var result = mockMvc.perform(get(API_DISCOUNTS_ID + "999").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn();
+        assertEquals(404, result.getResponse().getStatus());
     }
 
     @Test
@@ -190,11 +202,13 @@ public class DiscountControllerTests {
 
         DiscountRequest request = requestWith(in, List.of(TYPE_NAME_VIP));
 
-        mockMvc.perform(put(API_DISCOUNTS_ID + "3")
+        var result = mockMvc.perform(put(API_DISCOUNTS_ID + "3")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(3));
+                .andExpect(jsonPath("$.id").value(3))
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -232,9 +246,11 @@ public class DiscountControllerTests {
 
         when(discountTicketTypeService.findTicketsTypesByDiscountId(5L)).thenReturn(List.of(tt));
 
-        mockMvc.perform(get(API_DISCOUNTS_ID + "5/ticket-types").contentType(MediaType.APPLICATION_JSON))
+        var result = mockMvc.perform(get(API_DISCOUNTS_ID + "5/ticket-types").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.length()").value(1))
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -245,8 +261,10 @@ public class DiscountControllerTests {
     public void testGetTicketTypesByDiscountNotFound() throws Exception {
         when(discountService.findById(888L)).thenThrow(new ResourceNotFoundException(ERROR_DISCOUNT_NOT_FOUND));
 
-        mockMvc.perform(get(API_DISCOUNTS_ID + "888/ticket-types").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+        var result = mockMvc.perform(get(API_DISCOUNTS_ID + "888/ticket-types").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn();
+        assertEquals(404, result.getResponse().getStatus());
     }
 
     @Test
@@ -258,10 +276,12 @@ public class DiscountControllerTests {
         Discount invalid = sampleDiscount();
         DiscountRequest request = requestWith(invalid, List.of());
 
-        mockMvc.perform(post(API_DISCOUNTS)
+        var result = mockMvc.perform(post(API_DISCOUNTS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        assertEquals(400, result.getResponse().getStatus());
     }
 
     @Test
@@ -277,10 +297,12 @@ public class DiscountControllerTests {
                 .build();
         DiscountRequest request = requestWith(invalid, List.of(TYPE_NAME_ADULT));
 
-        mockMvc.perform(post(API_DISCOUNTS)
+        var result = mockMvc.perform(post(API_DISCOUNTS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        assertEquals(400, result.getResponse().getStatus());
     }
 
     @TestConfiguration

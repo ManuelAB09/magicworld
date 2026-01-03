@@ -25,6 +25,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -67,10 +70,12 @@ public class AuthControllerTests {
         when(authService.login(any(LoginRequest.class)))
                 .thenReturn(AuthResponse.builder().token("fake-token").build());
 
-        mockMvc.perform(post("/api/v1/auth/login")
+        var result = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -87,10 +92,12 @@ public class AuthControllerTests {
         when(authService.login(any(LoginRequest.class)))
                 .thenReturn(AuthResponse.builder().token("fake-token").build());
 
-        mockMvc.perform(post("/api/v1/auth/login")
+        var result = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(cookie().exists("token"));
+                .andExpect(cookie().exists("token"))
+                .andReturn();
+        assertNotNull(result.getResponse().getCookie("token"));
     }
 
     @Test
@@ -107,10 +114,12 @@ public class AuthControllerTests {
         when(authService.login(any(LoginRequest.class)))
                 .thenThrow(new InvalidCredentialsException());
 
-        mockMvc.perform(post("/api/v1/auth/login")
+        var result = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+        assertEquals(401, result.getResponse().getStatus());
     }
 
     @Test
@@ -127,10 +136,12 @@ public class AuthControllerTests {
         when(authService.login(any(LoginRequest.class)))
                 .thenThrow(new ResourceNotFoundException("nonexistent"));
 
-        mockMvc.perform(post("/api/v1/auth/login")
+        var result = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andReturn();
+        assertEquals(404, result.getResponse().getStatus());
     }
 
     @Test
@@ -151,10 +162,12 @@ public class AuthControllerTests {
         when(authService.register(any(RegisterRequest.class)))
                 .thenReturn(AuthResponse.builder().token("fake-token").build());
 
-        mockMvc.perform(post("/api/v1/auth/register")
+        var result = mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andReturn();
+        assertEquals(201, result.getResponse().getStatus());
     }
 
     @Test
@@ -175,10 +188,12 @@ public class AuthControllerTests {
         when(authService.register(any(RegisterRequest.class)))
                 .thenReturn(AuthResponse.builder().token("fake-token").build());
 
-        mockMvc.perform(post("/api/v1/auth/register")
+        var result = mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(cookie().exists("token"));
+                .andExpect(cookie().exists("token"))
+                .andReturn();
+        assertNotNull(result.getResponse().getCookie("token"));
     }
 
     @Test
@@ -187,8 +202,10 @@ public class AuthControllerTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Logout retorna 200 OK")
     public void testLogoutReturnsOk() throws Exception {
-        mockMvc.perform(post("/api/v1/auth/logout"))
-                .andExpect(status().isOk());
+        var result = mockMvc.perform(post("/api/v1/auth/logout"))
+                .andExpect(status().isOk())
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -197,8 +214,10 @@ public class AuthControllerTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Logout limpia cookie token")
     public void testLogoutClearsTokenCookie() throws Exception {
-        mockMvc.perform(post("/api/v1/auth/logout"))
-                .andExpect(cookie().maxAge("token", 0));
+        var result = mockMvc.perform(post("/api/v1/auth/logout"))
+                .andExpect(cookie().maxAge("token", 0))
+                .andReturn();
+        assertEquals(0, Objects.requireNonNull(result.getResponse().getCookie("token")).getMaxAge());
     }
 
     @Test
@@ -212,9 +231,11 @@ public class AuthControllerTests {
         when(jwtAuthenticationFilter.getTokenFromRequest(any())).thenReturn("fake-token");
         when(authService.getCurrentUser("fake-token")).thenReturn(userDTO);
 
-        mockMvc.perform(get("/api/v1/auth/me")
+        var result = mockMvc.perform(get("/api/v1/auth/me")
                         .cookie(new jakarta.servlet.http.Cookie("token", "fake-token")))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -223,8 +244,10 @@ public class AuthControllerTests {
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("CSRF token retorna 200 OK")
     public void testCsrfTokenReturnsOk() throws Exception {
-        mockMvc.perform(get("/api/v1/auth/csrf-token"))
-                .andExpect(status().isOk());
+        var result = mockMvc.perform(get("/api/v1/auth/csrf-token"))
+                .andExpect(status().isOk())
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @TestConfiguration

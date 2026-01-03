@@ -54,10 +54,9 @@ export class ChatbotComponent implements AfterViewChecked {
     } catch (err) {}
   }
 
-  private extractActionFromMessage(userMessage: string, response: ChatResponse): string {
+  private extractActionFromMessage(response: ChatResponse): string {
     const responseMsg = response.message.toLowerCase();
 
-    // Detect operation type from response
     if (responseMsg.includes('✅') && (responseMsg.includes('created') || responseMsg.includes('creado'))) {
       if (responseMsg.includes('discount') || responseMsg.includes('descuento')) {
         return '✨ Discount created';
@@ -119,14 +118,14 @@ export class ChatbotComponent implements AfterViewChecked {
     const userMessage = this.inputMessage.trim();
     this.inputMessage = '';
 
-    // Add user message
+
     this.messages.push({
       role: 'user',
       content: userMessage,
       timestamp: new Date()
     });
 
-    // Add loading message
+
     this.messages.push({
       role: 'assistant',
       content: '',
@@ -163,25 +162,25 @@ export class ChatbotComponent implements AfterViewChecked {
           pendingAction: response.pendingAction
         });
 
-        // Add to activity log
-        const actionDescription = this.extractActionFromMessage(userMessage, response);
+
+        const actionDescription = this.extractActionFromMessage(response);
         this.activityLog.unshift({
           action: actionDescription,
           success: response.success,
           timestamp: new Date()
         });
 
-        // Keep only last 20 activities
+
         if (this.activityLog.length > 20) {
           this.activityLog = this.activityLog.slice(0, 20);
         }
 
-        // Save pending action if exists
+
         this.pendingAction = response.pendingAction || null;
         this.isLoading = false;
       },
       error: (error) => {
-        // Remove loading message
+
         this.messages = this.messages.filter(m => !m.isLoading);
 
         const errorMessage = this.interpretError(error);
@@ -191,7 +190,7 @@ export class ChatbotComponent implements AfterViewChecked {
           timestamp: new Date()
         });
 
-        // Add to activity log
+
         this.activityLog.unshift({
           action: '❌ Request failed',
           success: false,

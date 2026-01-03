@@ -9,14 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * Service responsible for executing attraction-related chatbot functions.
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -146,40 +142,16 @@ public class AttractionFunctionExecutor {
 
     public ChatResponse updateAttraction(Map<String, Object> args, String lang) {
         Long id = ((Number) args.get("id")).longValue();
-
-        // Fetch existing attraction to preserve fields not being updated
         Attraction existing = attractionService.getAttractionById(id);
 
-        // Only update fields that are provided, otherwise keep existing values
-        String name = args.containsKey("name") && args.get("name") != null ?
-                (String) args.get("name") : existing.getName();
-
-        Intensity intensity;
-        if (args.containsKey("intensity") && args.get("intensity") != null) {
-            intensity = Intensity.valueOf(((String) args.get("intensity")).toUpperCase());
-        } else {
-            intensity = existing.getIntensity();
-        }
-
-        int minHeight = args.containsKey("minimumHeight") && args.get("minimumHeight") != null ?
-                ((Number) args.get("minimumHeight")).intValue() : existing.getMinimumHeight();
-        int minAge = args.containsKey("minimumAge") && args.get("minimumAge") != null ?
-                ((Number) args.get("minimumAge")).intValue() : existing.getMinimumAge();
-        int minWeight = args.containsKey("minimumWeight") && args.get("minimumWeight") != null ?
-                ((Number) args.get("minimumWeight")).intValue() : existing.getMinimumWeight();
-        String description = args.containsKey("description") && args.get("description") != null ?
-                (String) args.get("description") : existing.getDescription();
-        boolean isActive = args.containsKey("isActive") && args.get("isActive") != null ?
-                (Boolean) args.get("isActive") : existing.getIsActive();
-
-        // Handle photo URL - only update if explicitly provided
-        String photoUrl = null;
-        if (args.containsKey("photoUrl") && args.get("photoUrl") != null) {
-            String providedUrl = (String) args.get("photoUrl");
-            if (!providedUrl.isBlank() && !providedUrl.equals(DEFAULT_PHOTO_URL)) {
-                photoUrl = providedUrl;
-            }
-        }
+        String name = getOrDefault(args, "name", existing.getName());
+        Intensity intensity = getIntensityOrDefault(args, existing.getIntensity());
+        int minHeight = getOrDefaultInt(args, "minimumHeight", existing.getMinimumHeight());
+        int minAge = getOrDefaultInt(args, "minimumAge", existing.getMinimumAge());
+        int minWeight = getOrDefaultInt(args, "minimumWeight", existing.getMinimumWeight());
+        String description = getOrDefault(args, "description", existing.getDescription());
+        boolean isActive = getOrDefaultBool(args, "isActive", existing.getIsActive());
+        String photoUrl = extractPhotoUrlForUpdate(args);
 
         Attraction attraction = Attraction.builder()
                 .name(name)
@@ -202,6 +174,30 @@ public class AttractionFunctionExecutor {
                         updated.getId(), updated.getName(), updated.getIntensity()))
                 .data(updated)
                 .build();
+    }
+
+    private String extractPhotoUrlForUpdate(Map<String, Object> args) {
+        return TicketTypeFunctionExecutor.getString(args, DEFAULT_PHOTO_URL);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T getOrDefault(Map<String, Object> args, String key, T defaultValue) {
+        return args.containsKey(key) && args.get(key) != null ? (T) args.get(key) : defaultValue;
+    }
+
+    private int getOrDefaultInt(Map<String, Object> args, String key, int defaultValue) {
+        return args.containsKey(key) && args.get(key) != null ? ((Number) args.get(key)).intValue() : defaultValue;
+    }
+
+    private boolean getOrDefaultBool(Map<String, Object> args, String key, boolean defaultValue) {
+        return args.containsKey(key) && args.get(key) != null ? (Boolean) args.get(key) : defaultValue;
+    }
+
+    private Intensity getIntensityOrDefault(Map<String, Object> args, Intensity defaultValue) {
+        if (args.containsKey("intensity") && args.get("intensity") != null) {
+            return Intensity.valueOf(((String) args.get("intensity")).toUpperCase());
+        }
+        return defaultValue;
     }
 
     public ChatResponse requestDeleteAttraction(Map<String, Object> args, String lang) {

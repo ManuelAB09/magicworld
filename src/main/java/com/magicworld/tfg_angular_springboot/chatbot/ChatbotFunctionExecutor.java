@@ -11,7 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.BiFunction;
 
 @Service
 @RequiredArgsConstructor
@@ -22,46 +25,95 @@ public class ChatbotFunctionExecutor {
     private final TicketTypeFunctionExecutor ticketTypeExecutor;
     private final AttractionFunctionExecutor attractionExecutor;
 
+    private Map<String, BiFunction<Map<String, Object>, String, ChatResponse>> functionRegistry;
+    private Map<String, BiFunction<Long, String, ChatResponse>> deleteActionRegistry;
+
+    private static final Set<String> CONFIRMATION_KEYWORDS = Set.of(
+            "sí", "si", "yes", "confirmo", "confirm", "ok", "adelante", "proceed"
+    );
+
+    private record ErrorPattern(List<String> keywords, String enMessage, String esMessage) {}
+
+    private static final List<ErrorPattern> ERROR_PATTERNS = List.of(
+            new ErrorPattern(
+                    List.of("duplicate", "already exists", "unique", "constraint"),
+                    "This item already exists. Please use a different name or code.",
+                    "Este elemento ya existe. Por favor, usa un nombre o código diferente."
+            ),
+            new ErrorPattern(
+                    List.of("not found", "no encontr"),
+                    "The requested item was not found. Please verify the ID or name.",
+                    "El elemento solicitado no fue encontrado. Por favor, verifica el ID o nombre."
+            ),
+            new ErrorPattern(
+                    List.of("validation", "invalid", "must be", "cannot be"),
+                    "The provided data is invalid. Please check your input and try again.",
+                    "Los datos proporcionados no son válidos. Por favor, revisa tu entrada e inténtalo de nuevo."
+            ),
+            new ErrorPattern(
+                    List.of("date", "fecha"),
+                    "There was a problem with the date. Make sure it's in the correct format (YYYY-MM-DD) and is a valid date.",
+                    "Hubo un problema con la fecha. Asegúrate de que esté en el formato correcto (AAAA-MM-DD) y sea una fecha válida."
+            ),
+            new ErrorPattern(
+                    List.of("percentage", "porcentaje"),
+                    "The percentage must be between 1 and 100.",
+                    "El porcentaje debe estar entre 1 y 100."
+            ),
+            new ErrorPattern(
+                    List.of("foreign key", "reference", "in use", "associated"),
+                    "This item cannot be deleted because it's being used by other records.",
+                    "Este elemento no puede ser eliminado porque está siendo utilizado por otros registros."
+            )
+    );
+
+    private void ensureInitialized() {
+        if (functionRegistry == null) {
+            functionRegistry = Map.ofEntries(
+                    Map.entry("listDiscounts", (args, lang) -> discountExecutor.listDiscounts(lang)),
+                    Map.entry("getDiscountById", discountExecutor::getDiscountById),
+                    Map.entry("createDiscount", discountExecutor::createDiscount),
+                    Map.entry("updateDiscount", discountExecutor::updateDiscount),
+                    Map.entry("requestDeleteDiscount", discountExecutor::requestDeleteDiscount),
+                    Map.entry("listTicketTypes", (args, lang) -> ticketTypeExecutor.listTicketTypes(lang)),
+                    Map.entry("getTicketTypeById", ticketTypeExecutor::getTicketTypeById),
+                    Map.entry("findTicketTypeByName", ticketTypeExecutor::findTicketTypeByName),
+                    Map.entry("createTicketType", ticketTypeExecutor::createTicketType),
+                    Map.entry("updateTicketType", ticketTypeExecutor::updateTicketType),
+                    Map.entry("requestDeleteTicketType", ticketTypeExecutor::requestDeleteTicketType),
+                    Map.entry("listAttractions", (args, lang) -> attractionExecutor.listAttractions(lang)),
+                    Map.entry("getAttractionById", attractionExecutor::getAttractionById),
+                    Map.entry("createAttraction", attractionExecutor::createAttraction),
+                    Map.entry("updateAttraction", attractionExecutor::updateAttraction),
+                    Map.entry("requestDeleteAttraction", attractionExecutor::requestDeleteAttraction)
+            );
+        }
+        if (deleteActionRegistry == null) {
+            deleteActionRegistry = Map.of(
+                    "deleteDiscount", discountExecutor::executeDeleteDiscount,
+                    "deleteTicketType", ticketTypeExecutor::executeDeleteTicketType,
+                    "deleteAttraction", attractionExecutor::executeDeleteAttraction
+            );
+        }
+    }
+
     public ChatResponse executeFunction(String functionName, Map<String, Object> args, String detectedLanguage) {
+        ensureInitialized();
         log.info("Executing function: {} with args: {}", functionName, args);
 
         try {
-            return switch (functionName) {
-                // Discounts
-                case "listDiscounts" -> discountExecutor.listDiscounts(detectedLanguage);
-                case "getDiscountById" -> discountExecutor.getDiscountById(args, detectedLanguage);
-                case "createDiscount" -> discountExecutor.createDiscount(args, detectedLanguage);
-                case "updateDiscount" -> discountExecutor.updateDiscount(args, detectedLanguage);
-                case "requestDeleteDiscount" -> discountExecutor.requestDeleteDiscount(args, detectedLanguage);
-
-                // Ticket Types
-                case "listTicketTypes" -> ticketTypeExecutor.listTicketTypes(detectedLanguage);
-                case "getTicketTypeById" -> ticketTypeExecutor.getTicketTypeById(args, detectedLanguage);
-                case "findTicketTypeByName" -> ticketTypeExecutor.findTicketTypeByName(args, detectedLanguage);
-                case "createTicketType" -> ticketTypeExecutor.createTicketType(args, detectedLanguage);
-                case "updateTicketType" -> ticketTypeExecutor.updateTicketType(args, detectedLanguage);
-                case "requestDeleteTicketType" -> ticketTypeExecutor.requestDeleteTicketType(args, detectedLanguage);
-
-                // Attractions
-                case "listAttractions" -> attractionExecutor.listAttractions(detectedLanguage);
-                case "getAttractionById" -> attractionExecutor.getAttractionById(args, detectedLanguage);
-                case "createAttraction" -> attractionExecutor.createAttraction(args, detectedLanguage);
-                case "updateAttraction" -> attractionExecutor.updateAttraction(args, detectedLanguage);
-                case "requestDeleteAttraction" -> attractionExecutor.requestDeleteAttraction(args, detectedLanguage);
-
-                default -> buildErrorResponse(
-                        detectedLanguage.equals("en") ?
-                                "Unknown function: " + functionName :
-                                "Función no reconocida: " + functionName
-                );
-            };
+            BiFunction<Map<String, Object>, String, ChatResponse> handler = functionRegistry.get(functionName);
+            if (handler == null) {
+                return buildErrorResponse(getMessage(detectedLanguage,
+                        "Unknown function: " + functionName,
+                        "Función no reconocida: " + functionName));
+            }
+            return handler.apply(args, detectedLanguage);
         } catch (DateTimeParseException e) {
             log.error("Invalid date format: {}", e.getMessage());
-            return buildErrorResponse(
-                    detectedLanguage.equals("en") ?
-                            "Invalid date format. Please use YYYY-MM-DD format (e.g., 2025-12-31)." :
-                            "Formato de fecha inválido. Por favor, usa el formato AAAA-MM-DD (ej: 2025-12-31)."
-            );
+            return buildErrorResponse(getMessage(detectedLanguage,
+                    "Invalid date format. Please use YYYY-MM-DD format (e.g., 2025-12-31).",
+                    "Formato de fecha inválido. Por favor, usa el formato AAAA-MM-DD (ej: 2025-12-31)."));
         } catch (IllegalArgumentException e) {
             log.error("Validation error: {}", e.getMessage());
             return buildErrorResponse(interpretError(e.getMessage(), detectedLanguage));
@@ -71,106 +123,58 @@ public class ChatbotFunctionExecutor {
         }
     }
 
-    /**
-     * Execute a pending confirmation action
-     */
     public ChatResponse executePendingAction(ChatRequest request, String detectedLanguage) {
+        ensureInitialized();
         PendingAction pending = request.getPendingAction();
         String message = request.getMessage().toLowerCase();
 
-        // Check confirmation keywords in both languages
-        boolean confirmed = message.contains("sí") || message.contains("si") ||
-                message.contains("yes") || message.contains("confirmo") ||
-                message.contains("confirm") || message.contains("ok") ||
-                message.contains("adelante") || message.contains("proceed");
-
-        if (!confirmed) {
+        if (!isConfirmed(message)) {
             return ChatResponse.builder()
                     .success(true)
-                    .message(detectedLanguage.equals("en") ?
-                            "❌ Operation cancelled. How else can I help you?" :
-                            "❌ Operación cancelada. ¿En qué más puedo ayudarte?")
+                    .message(getMessage(detectedLanguage,
+                            "❌ Operation cancelled. How else can I help you?",
+                            "❌ Operación cancelada. ¿En qué más puedo ayudarte?"))
                     .build();
         }
 
         Long id = ((Number) pending.getParams().get("id")).longValue();
 
         try {
-            return switch (pending.getActionType()) {
-                case "deleteDiscount" -> discountExecutor.executeDeleteDiscount(id, detectedLanguage);
-                case "deleteTicketType" -> ticketTypeExecutor.executeDeleteTicketType(id, detectedLanguage);
-                case "deleteAttraction" -> attractionExecutor.executeDeleteAttraction(id, detectedLanguage);
-                default -> buildErrorResponse(
-                        detectedLanguage.equals("en") ? "Unknown action" : "Acción no reconocida"
-                );
-            };
+            BiFunction<Long, String, ChatResponse> handler = deleteActionRegistry.get(pending.getActionType());
+            if (handler == null) {
+                return buildErrorResponse(getMessage(detectedLanguage, "Unknown action", "Acción no reconocida"));
+            }
+            return handler.apply(id, detectedLanguage);
         } catch (Exception e) {
             log.error("Error executing pending action: {}", e.getMessage());
             return buildErrorResponse(interpretError(e.getMessage(), detectedLanguage));
         }
     }
 
-    /**
-     * Interpret technical errors into user-friendly messages
-     */
+    private boolean isConfirmed(String message) {
+        return CONFIRMATION_KEYWORDS.stream().anyMatch(message::contains);
+    }
+
     private String interpretError(String errorMessage, String lang) {
         if (errorMessage == null) {
-            return lang.equals("en") ?
-                    "An unexpected error occurred. Please try again." :
-                    "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.";
+            return getMessage(lang,
+                    "An unexpected error occurred. Please try again.",
+                    "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.");
         }
 
         String lowerError = errorMessage.toLowerCase();
 
-        // Duplicate entry errors
-        if (lowerError.contains("duplicate") || lowerError.contains("already exists") ||
-                lowerError.contains("unique") || lowerError.contains("constraint")) {
-            return lang.equals("en") ?
-                    "This item already exists. Please use a different name or code." :
-                    "Este elemento ya existe. Por favor, usa un nombre o código diferente.";
-        }
+        return ERROR_PATTERNS.stream()
+                .filter(pattern -> pattern.keywords().stream().anyMatch(lowerError::contains))
+                .findFirst()
+                .map(pattern -> getMessage(lang, pattern.enMessage(), pattern.esMessage()))
+                .orElse(getMessage(lang,
+                        "An error occurred while processing your request. Please check the data and try again.",
+                        "Ha ocurrido un error al procesar tu solicitud. Por favor, verifica los datos e inténtalo de nuevo."));
+    }
 
-        // Not found errors
-        if (lowerError.contains("not found") || lowerError.contains("no encontr")) {
-            return lang.equals("en") ?
-                    "The requested item was not found. Please verify the ID or name." :
-                    "El elemento solicitado no fue encontrado. Por favor, verifica el ID o nombre.";
-        }
-
-        // Validation errors
-        if (lowerError.contains("validation") || lowerError.contains("invalid") ||
-                lowerError.contains("must be") || lowerError.contains("cannot be")) {
-            return lang.equals("en") ?
-                    "The provided data is invalid. Please check your input and try again." :
-                    "Los datos proporcionados no son válidos. Por favor, revisa tu entrada e inténtalo de nuevo.";
-        }
-
-        // Date errors
-        if (lowerError.contains("date") || lowerError.contains("fecha")) {
-            return lang.equals("en") ?
-                    "There was a problem with the date. Make sure it's in the correct format (YYYY-MM-DD) and is a valid date." :
-                    "Hubo un problema con la fecha. Asegúrate de que esté en el formato correcto (AAAA-MM-DD) y sea una fecha válida.";
-        }
-
-        // Percentage errors
-        if (lowerError.contains("percentage") || lowerError.contains("porcentaje")) {
-            return lang.equals("en") ?
-                    "The percentage must be between 1 and 100." :
-                    "El porcentaje debe estar entre 1 y 100.";
-        }
-
-        // Foreign key / relationship errors
-        if (lowerError.contains("foreign key") || lowerError.contains("reference") ||
-                lowerError.contains("in use") || lowerError.contains("associated")) {
-            return lang.equals("en") ?
-                    "This item cannot be deleted because it's being used by other records." :
-                    "Este elemento no puede ser eliminado porque está siendo utilizado por otros registros.";
-        }
-
-        // Default message
-        return lang.equals("en") ?
-                "An error occurred while processing your request. Please check the data and try again." :
-                "Ha ocurrido un error al procesar tu solicitud. Por favor, verifica los datos e inténtalo de nuevo.";
+    private String getMessage(String lang, String enMessage, String esMessage) {
+        return "en".equals(lang) ? enMessage : esMessage;
     }
 
     private ChatResponse buildErrorResponse(String message) {
