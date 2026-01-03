@@ -28,6 +28,19 @@ import static org.junit.jupiter.api.Assertions.*;
 @Feature("Servicio de Atracciones")
 public class AttractionServiceTests {
 
+    private static final String TEST_RIDE_NAME = "Test Ride";
+    private static final String UPDATED_RIDE_NAME = "Updated Ride";
+    private static final String TEST_DESCRIPTION = "A fun ride";
+    private static final String UPDATED_DESCRIPTION = "An updated ride";
+    private static final String TEST_PHOTO_URL = "http://example.com/photo.jpg";
+    private static final String UPDATED_PHOTO_URL = "http://example.com/updated.jpg";
+    private static final int TEST_MIN_HEIGHT = 100;
+    private static final int TEST_MIN_AGE = 8;
+    private static final int TEST_MIN_WEIGHT = 30;
+    private static final int UPDATED_MIN_HEIGHT = 120;
+    private static final int UPDATED_MIN_AGE = 12;
+    private static final int UPDATED_MIN_WEIGHT = 40;
+
     @Autowired
     private AttractionService attractionService;
 
@@ -40,13 +53,13 @@ public class AttractionServiceTests {
     public void setUp() {
         attractionRepository.deleteAll();
         sample = Attraction.builder()
-                .name("Test Ride")
+                .name(TEST_RIDE_NAME)
                 .intensity(Intensity.MEDIUM)
-                .minimumHeight(100)
-                .minimumAge(8)
-                .minimumWeight(30)
-                .description("A fun ride")
-                .photoUrl("http://example.com/photo.jpg")
+                .minimumHeight(TEST_MIN_HEIGHT)
+                .minimumAge(TEST_MIN_AGE)
+                .minimumWeight(TEST_MIN_WEIGHT)
+                .description(TEST_DESCRIPTION)
+                .photoUrl(TEST_PHOTO_URL)
                 .isActive(true)
                 .build();
     }
@@ -64,7 +77,7 @@ public class AttractionServiceTests {
     public void testSaveAttraction() {
         Attraction saved = attractionService.saveAttraction(sample);
         assertNotNull(saved.getId());
-        assertEquals("Test Ride", saved.getName());
+        assertEquals(TEST_RIDE_NAME, saved.getName());
     }
 
     @Test
@@ -84,7 +97,7 @@ public class AttractionServiceTests {
     @Description("Verifica que se puede obtener una atracción existente por su ID")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Buscar atracción por ID existente retorna atracción")
-    public void testGetAttractionById_exists() {
+    public void testGetAttractionByIdExists() {
         Attraction saved = attractionService.saveAttraction(sample);
         Attraction found = attractionService.getAttractionById(saved.getId());
         assertEquals(saved.getId(), found.getId());
@@ -95,8 +108,21 @@ public class AttractionServiceTests {
     @Description("Verifica que se lanza excepción cuando no existe la atracción")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar atracción por ID inexistente lanza excepción")
-    public void testGetAttractionById_notFound() {
+    public void testGetAttractionByIdNotFound() {
         assertThrows(ResourceNotFoundException.class, () -> attractionService.getAttractionById(999L));
+    }
+
+    private Attraction buildUpdateAttraction() {
+        return Attraction.builder()
+                .name(UPDATED_RIDE_NAME)
+                .intensity(Intensity.HIGH)
+                .minimumHeight(UPDATED_MIN_HEIGHT)
+                .minimumAge(UPDATED_MIN_AGE)
+                .minimumWeight(UPDATED_MIN_WEIGHT)
+                .description(UPDATED_DESCRIPTION)
+                .photoUrl(UPDATED_PHOTO_URL)
+                .isActive(false)
+                .build();
     }
 
     @Test
@@ -104,20 +130,11 @@ public class AttractionServiceTests {
     @Description("Verifica que se puede actualizar el nombre de una atracción")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar atracción cambia el nombre")
-    public void testUpdateAttraction_updatesName() {
+    public void testUpdateAttractionUpdatesName() {
         Attraction saved = attractionService.saveAttraction(sample);
-        Attraction update = Attraction.builder()
-                .name("Updated Ride")
-                .intensity(Intensity.HIGH)
-                .minimumHeight(120)
-                .minimumAge(12)
-                .minimumWeight(40)
-                .description("An updated ride")
-                .photoUrl("http://example.com/updated.jpg")
-                .isActive(false)
-                .build();
+        Attraction update = buildUpdateAttraction();
         Attraction updated = attractionService.updateAttraction(saved.getId(), update);
-        assertEquals("Updated Ride", updated.getName());
+        assertEquals(UPDATED_RIDE_NAME, updated.getName());
     }
 
     @Test
@@ -125,18 +142,9 @@ public class AttractionServiceTests {
     @Description("Verifica que se puede actualizar la intensidad de una atracción")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar atracción cambia la intensidad")
-    public void testUpdateAttraction_updatesIntensity() {
+    public void testUpdateAttractionUpdatesIntensity() {
         Attraction saved = attractionService.saveAttraction(sample);
-        Attraction update = Attraction.builder()
-                .name("Updated Ride")
-                .intensity(Intensity.HIGH)
-                .minimumHeight(120)
-                .minimumAge(12)
-                .minimumWeight(40)
-                .description("An updated ride")
-                .photoUrl("http://example.com/updated.jpg")
-                .isActive(false)
-                .build();
+        Attraction update = buildUpdateAttraction();
         Attraction updated = attractionService.updateAttraction(saved.getId(), update);
         assertEquals(Intensity.HIGH, updated.getIntensity());
     }
@@ -146,20 +154,11 @@ public class AttractionServiceTests {
     @Description("Verifica que se puede actualizar la altura mínima de una atracción")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar atracción cambia la altura mínima")
-    public void testUpdateAttraction_updatesMinimumHeight() {
+    public void testUpdateAttractionUpdatesMinimumHeight() {
         Attraction saved = attractionService.saveAttraction(sample);
-        Attraction update = Attraction.builder()
-                .name("Updated Ride")
-                .intensity(Intensity.HIGH)
-                .minimumHeight(120)
-                .minimumAge(12)
-                .minimumWeight(40)
-                .description("An updated ride")
-                .photoUrl("http://example.com/updated.jpg")
-                .isActive(false)
-                .build();
+        Attraction update = buildUpdateAttraction();
         Attraction updated = attractionService.updateAttraction(saved.getId(), update);
-        assertEquals(120, updated.getMinimumHeight());
+        assertEquals(UPDATED_MIN_HEIGHT, updated.getMinimumHeight());
     }
 
     @Test
@@ -167,20 +166,11 @@ public class AttractionServiceTests {
     @Description("Verifica que se puede actualizar la descripción de una atracción")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar atracción cambia la descripción")
-    public void testUpdateAttraction_updatesDescription() {
+    public void testUpdateAttractionUpdatesDescription() {
         Attraction saved = attractionService.saveAttraction(sample);
-        Attraction update = Attraction.builder()
-                .name("Updated Ride")
-                .intensity(Intensity.HIGH)
-                .minimumHeight(120)
-                .minimumAge(12)
-                .minimumWeight(40)
-                .description("An updated ride")
-                .photoUrl("http://example.com/updated.jpg")
-                .isActive(false)
-                .build();
+        Attraction update = buildUpdateAttraction();
         Attraction updated = attractionService.updateAttraction(saved.getId(), update);
-        assertEquals("An updated ride", updated.getDescription());
+        assertEquals(UPDATED_DESCRIPTION, updated.getDescription());
     }
 
     @Test
@@ -188,18 +178,9 @@ public class AttractionServiceTests {
     @Description("Verifica que se puede actualizar el estado activo de una atracción")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar atracción cambia el estado activo")
-    public void testUpdateAttraction_updatesIsActive() {
+    public void testUpdateAttractionUpdatesIsActive() {
         Attraction saved = attractionService.saveAttraction(sample);
-        Attraction update = Attraction.builder()
-                .name("Updated Ride")
-                .intensity(Intensity.HIGH)
-                .minimumHeight(120)
-                .minimumAge(12)
-                .minimumWeight(40)
-                .description("An updated ride")
-                .photoUrl("http://example.com/updated.jpg")
-                .isActive(false)
-                .build();
+        Attraction update = buildUpdateAttraction();
         Attraction updated = attractionService.updateAttraction(saved.getId(), update);
         assertFalse(updated.getIsActive());
     }
@@ -209,7 +190,7 @@ public class AttractionServiceTests {
     @Description("Verifica que se pueden filtrar atracciones con filtros válidos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Filtrar atracciones con parámetros válidos retorna resultados")
-    public void testGetAllAttractionsWithFilters_validFilters() {
+    public void testGetAllAttractionsWithFiltersValidFilters() {
         attractionService.saveAttraction(sample);
         List<Attraction> result = attractionService.getAllAttractions(150, 50, 10);
         assertEquals(1, result.size());
@@ -220,7 +201,7 @@ public class AttractionServiceTests {
     @Description("Verifica que se lanza excepción con altura mínima negativa")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Filtrar con altura negativa lanza excepción")
-    public void testGetAllAttractionsWithFilters_negativeMinHeight() {
+    public void testGetAllAttractionsWithFiltersNegativeMinHeight() {
         assertThrows(BadRequestException.class, () -> attractionService.getAllAttractions(-1, null, null));
     }
 
@@ -229,7 +210,7 @@ public class AttractionServiceTests {
     @Description("Verifica que se lanza excepción con peso mínimo negativo")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Filtrar con peso negativo lanza excepción")
-    public void testGetAllAttractionsWithFilters_negativeMinWeight() {
+    public void testGetAllAttractionsWithFiltersNegativeMinWeight() {
         assertThrows(BadRequestException.class, () -> attractionService.getAllAttractions(null, -1, null));
     }
 
@@ -238,7 +219,7 @@ public class AttractionServiceTests {
     @Description("Verifica que se lanza excepción con edad mínima negativa")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Filtrar con edad negativa lanza excepción")
-    public void testGetAllAttractionsWithFilters_negativeMinAge() {
+    public void testGetAllAttractionsWithFiltersNegativeMinAge() {
         assertThrows(BadRequestException.class, () -> attractionService.getAllAttractions(null, null, -1));
     }
 
@@ -247,20 +228,20 @@ public class AttractionServiceTests {
     @Description("Verifica que al actualizar con photoUrl null se mantiene la existente")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar con photoUrl null mantiene URL existente")
-    public void testUpdateAttraction_withNullPhotoUrl_keepsExisting() {
+    public void testUpdateAttractionWithNullPhotoUrlKeepsExisting() {
         Attraction saved = attractionService.saveAttraction(sample);
         Attraction update = Attraction.builder()
-                .name("Updated Ride")
+                .name(UPDATED_RIDE_NAME)
                 .intensity(Intensity.HIGH)
-                .minimumHeight(120)
-                .minimumAge(12)
-                .minimumWeight(40)
-                .description("An updated ride")
+                .minimumHeight(UPDATED_MIN_HEIGHT)
+                .minimumAge(UPDATED_MIN_AGE)
+                .minimumWeight(UPDATED_MIN_WEIGHT)
+                .description(UPDATED_DESCRIPTION)
                 .photoUrl(null)
                 .isActive(false)
                 .build();
         Attraction updated = attractionService.updateAttraction(saved.getId(), update);
-        assertEquals("http://example.com/photo.jpg", updated.getPhotoUrl());
+        assertEquals(TEST_PHOTO_URL, updated.getPhotoUrl());
     }
 
     @Test

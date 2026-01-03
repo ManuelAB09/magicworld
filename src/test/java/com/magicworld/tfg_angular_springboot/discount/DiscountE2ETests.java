@@ -39,6 +39,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Feature("Tests E2E de Descuentos")
 public class DiscountE2ETests {
 
+    private static final String API_DISCOUNTS = "/api/v1/discounts";
+    private static final String DISCOUNT_CODE_SAVE20 = "SAVE20";
+    private static final String TYPE_NAME_ADULT = "ADULT";
+    private static final String CURRENCY_EUR = "EUR";
+    private static final String ADULT_TICKET_DESC = "Adult ticket";
+    private static final String PHOTO_URL_ADULT = "https://example.com/adult.jpg";
+    private static final BigDecimal COST_50 = new BigDecimal("50.00");
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -64,21 +72,21 @@ public class DiscountE2ETests {
         ticketTypeRepository.deleteAll();
 
         ticketType = ticketTypeRepository.save(TicketType.builder()
-                .typeName("ADULT")
-                .cost(new BigDecimal("50.00"))
-                .currency("EUR")
-                .description("Adult ticket")
+                .typeName(TYPE_NAME_ADULT)
+                .cost(COST_50)
+                .currency(CURRENCY_EUR)
+                .description(ADULT_TICKET_DESC)
                 .maxPerDay(100)
-                .photoUrl("https://example.com/adult.jpg")
+                .photoUrl(PHOTO_URL_ADULT)
                 .build());
 
         discountRequest = new DiscountController.DiscountRequest();
         discountRequest.setDiscount(Discount.builder()
-                .discountCode("SAVE20")
+                .discountCode(DISCOUNT_CODE_SAVE20)
                 .discountPercentage(20)
                 .expiryDate(LocalDate.now().plusDays(30))
                 .build());
-        discountRequest.setApplicableTicketTypesNames(List.of("ADULT"));
+        discountRequest.setApplicableTicketTypesNames(List.of(TYPE_NAME_ADULT));
     }
 
     @AfterEach
@@ -94,8 +102,8 @@ public class DiscountE2ETests {
     @Description("Verifica que crear descuento retorna estado 201 Created")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear descuento retorna 201 Created")
-    void testCreateDiscount_returnsCreated() throws Exception {
-        mockMvc.perform(post("/api/v1/discounts")
+    void testCreateDiscountReturnsCreated() throws Exception {
+        mockMvc.perform(post(API_DISCOUNTS)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(discountRequest)))
@@ -108,8 +116,8 @@ public class DiscountE2ETests {
     @Description("Verifica que crear descuento retorna header Location")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear descuento retorna header Location")
-    void testCreateDiscount_returnsLocationHeader() throws Exception {
-        mockMvc.perform(post("/api/v1/discounts")
+    void testCreateDiscountReturnsLocationHeader() throws Exception {
+        mockMvc.perform(post(API_DISCOUNTS)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(discountRequest)))
@@ -122,8 +130,8 @@ public class DiscountE2ETests {
     @Description("Verifica que crear descuento retorna descuento con ID")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear descuento retorna descuento con ID")
-    void testCreateDiscount_returnsDiscountWithId() throws Exception {
-        mockMvc.perform(post("/api/v1/discounts")
+    void testCreateDiscountReturnsDiscountWithId() throws Exception {
+        mockMvc.perform(post(API_DISCOUNTS)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(discountRequest)))
@@ -136,12 +144,12 @@ public class DiscountE2ETests {
     @Description("Verifica que crear descuento retorna código correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear descuento retorna código correcto")
-    void testCreateDiscount_returnsCorrectCode() throws Exception {
-        mockMvc.perform(post("/api/v1/discounts")
+    void testCreateDiscountReturnsCorrectCode() throws Exception {
+        mockMvc.perform(post(API_DISCOUNTS)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(discountRequest)))
-                .andExpect(jsonPath("$.discountCode").value("SAVE20"));
+                .andExpect(jsonPath("$.discountCode").value(DISCOUNT_CODE_SAVE20));
     }
 
     @Test
@@ -150,8 +158,8 @@ public class DiscountE2ETests {
     @Description("Verifica que usuario autenticado puede obtener descuentos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Usuario autenticado obtiene descuentos con 200 OK")
-    void testGetAllDiscounts_authenticated_returnsOk() throws Exception {
-        mockMvc.perform(get("/api/v1/discounts"))
+    void testGetAllDiscountsAuthenticatedReturnsOk() throws Exception {
+        mockMvc.perform(get(API_DISCOUNTS))
                 .andExpect(status().isOk());
     }
 
@@ -161,8 +169,8 @@ public class DiscountE2ETests {
     @Description("Verifica que lista vacía retorna array vacío")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Lista vacía retorna array vacío")
-    void testGetAllDiscounts_empty_returnsEmptyArray() throws Exception {
-        mockMvc.perform(get("/api/v1/discounts"))
+    void testGetAllDiscountsEmptyReturnsEmptyArray() throws Exception {
+        mockMvc.perform(get(API_DISCOUNTS))
                 .andExpect(jsonPath("$.length()").value(0));
     }
 
@@ -172,9 +180,9 @@ public class DiscountE2ETests {
     @Description("Verifica que con datos retorna descuentos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Con datos retorna descuentos")
-    void testGetAllDiscounts_withData_returnsDiscounts() throws Exception {
+    void testGetAllDiscountsWithDataReturnsDiscounts() throws Exception {
         discountRepository.save(discountRequest.getDiscount());
-        mockMvc.perform(get("/api/v1/discounts"))
+        mockMvc.perform(get(API_DISCOUNTS))
                 .andExpect(jsonPath("$.length()").value(1));
     }
 
@@ -184,10 +192,10 @@ public class DiscountE2ETests {
     @Description("Verifica que con datos contiene código del descuento")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Con datos contiene código del descuento")
-    void testGetAllDiscounts_withData_containsCode() throws Exception {
+    void testGetAllDiscountsWithDataContainsCode() throws Exception {
         discountRepository.save(discountRequest.getDiscount());
-        mockMvc.perform(get("/api/v1/discounts"))
-                .andExpect(jsonPath("$[0].discountCode").value("SAVE20"));
+        mockMvc.perform(get(API_DISCOUNTS))
+                .andExpect(jsonPath("$[0].discountCode").value(DISCOUNT_CODE_SAVE20));
     }
 
 
@@ -197,9 +205,9 @@ public class DiscountE2ETests {
     @Description("Verifica que buscar descuento existente retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Buscar descuento existente retorna 200 OK")
-    void testGetDiscountById_exists_returnsOk() throws Exception {
+    void testGetDiscountByIdExistsReturnsOk() throws Exception {
         Discount saved = discountRepository.save(discountRequest.getDiscount());
-        mockMvc.perform(get("/api/v1/discounts/" + saved.getId()))
+        mockMvc.perform(get(API_DISCOUNTS + "/" + saved.getId()))
                 .andExpect(status().isOk());
     }
 
@@ -209,10 +217,10 @@ public class DiscountE2ETests {
     @Description("Verifica que buscar descuento existente retorna datos correctos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar descuento existente retorna datos correctas")
-    void testGetDiscountById_exists_returnsCorrectData() throws Exception {
+    void testGetDiscountByIdExistsReturnsCorrectData() throws Exception {
         Discount saved = discountRepository.save(discountRequest.getDiscount());
-        mockMvc.perform(get("/api/v1/discounts/" + saved.getId()))
-                .andExpect(jsonPath("$.discountCode").value("SAVE20"));
+        mockMvc.perform(get(API_DISCOUNTS + "/" + saved.getId()))
+                .andExpect(jsonPath("$.discountCode").value(DISCOUNT_CODE_SAVE20));
     }
 
     @Test
@@ -221,8 +229,8 @@ public class DiscountE2ETests {
     @Description("Verifica que buscar descuento inexistente retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar descuento inexistente retorna 404")
-    void testGetDiscountById_notExists_returns404() throws Exception {
-        mockMvc.perform(get("/api/v1/discounts/999999"))
+    void testGetDiscountByIdNotExistsReturns404() throws Exception {
+        mockMvc.perform(get(API_DISCOUNTS + "/999999"))
                 .andExpect(status().isNotFound());
     }
 
@@ -232,9 +240,9 @@ public class DiscountE2ETests {
     @Description("Verifica que eliminar descuento existente retorna 204")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Eliminar descuento existente retorna 204")
-    void testDeleteDiscount_exists_returns204() throws Exception {
+    void testDeleteDiscountExistsReturns204() throws Exception {
         Discount saved = discountRepository.save(discountRequest.getDiscount());
-        mockMvc.perform(delete("/api/v1/discounts/" + saved.getId())
+        mockMvc.perform(delete(API_DISCOUNTS + "/" + saved.getId())
                         .with(csrf()))
                 .andExpect(status().isNoContent());
     }
@@ -245,8 +253,8 @@ public class DiscountE2ETests {
     @Description("Verifica que eliminar descuento inexistente retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Eliminar descuento inexistente retorna 404")
-    void testDeleteDiscount_notExists_returns404() throws Exception {
-        mockMvc.perform(delete("/api/v1/discounts/999999")
+    void testDeleteDiscountNotExistsReturns404() throws Exception {
+        mockMvc.perform(delete(API_DISCOUNTS + "/999999")
                         .with(csrf()))
                 .andExpect(status().isNotFound());
     }
@@ -256,8 +264,8 @@ public class DiscountE2ETests {
     @Description("Verifica que obtener descuentos sin autenticación retorna 401")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Sin autenticación obtener descuentos retorna 401")
-    void testGetAllDiscounts_unauthorized_returns401() throws Exception {
-        mockMvc.perform(get("/api/v1/discounts"))
+    void testGetAllDiscountsUnauthorizedReturns401() throws Exception {
+        mockMvc.perform(get(API_DISCOUNTS))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -266,8 +274,8 @@ public class DiscountE2ETests {
     @Description("Verifica que crear descuento sin autenticación retorna 401")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Sin autenticación crear descuento retorna 401")
-    void testCreateDiscount_unauthorized_returns401() throws Exception {
-        mockMvc.perform(post("/api/v1/discounts")
+    void testCreateDiscountUnauthorizedReturns401() throws Exception {
+        mockMvc.perform(post(API_DISCOUNTS)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(discountRequest)))
@@ -280,10 +288,10 @@ public class DiscountE2ETests {
     @Description("Verifica que obtener tipos de entrada por descuento retorna 200 OK")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener tipos de entrada por descuento retorna 200 OK")
-    void testGetTicketTypesByDiscount_returnsOk() throws Exception {
+    void testGetTicketTypesByDiscountReturnsOk() throws Exception {
         Discount discount = discountRequest.getDiscount();
         discount = discountRepository.save(discount);
-        mockMvc.perform(get("/api/v1/discounts/" + discount.getId() + "/ticket-types"))
+        mockMvc.perform(get(API_DISCOUNTS + "/" + discount.getId() + "/ticket-types"))
                 .andExpect(status().isOk());
     }
 }

@@ -58,7 +58,7 @@ public class AuthControllerTests {
     @Description("Verifica que login exitoso retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Login exitoso retorna 200 OK")
-    public void testLogin_success_returnsOk() throws Exception {
+    public void testLoginSuccessReturnsOk() throws Exception {
         LoginRequest request = LoginRequest.builder()
                 .username("testuser")
                 .password("Password1@")
@@ -78,7 +78,7 @@ public class AuthControllerTests {
     @Description("Verifica que login exitoso establece cookie de token")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Login exitoso establece cookie token")
-    public void testLogin_success_setsCookie() throws Exception {
+    public void testLoginSuccessSetsCookie() throws Exception {
         LoginRequest request = LoginRequest.builder()
                 .username("testuser")
                 .password("Password1@")
@@ -98,7 +98,7 @@ public class AuthControllerTests {
     @Description("Verifica que login con credenciales inválidas retorna 401")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Login inválido retorna 401")
-    public void testLogin_invalidCredentials_returns401() throws Exception {
+    public void testLoginInvalidCredentialsReturns401() throws Exception {
         LoginRequest request = LoginRequest.builder()
                 .username("testuser")
                 .password("WrongPassword")
@@ -118,7 +118,7 @@ public class AuthControllerTests {
     @Description("Verifica que login con usuario no encontrado retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Login usuario no encontrado retorna 404")
-    public void testLogin_userNotFound_returns404() throws Exception {
+    public void testLoginUserNotFoundReturns404() throws Exception {
         LoginRequest request = LoginRequest.builder()
                 .username("nonexistent")
                 .password("Password1@")
@@ -138,7 +138,7 @@ public class AuthControllerTests {
     @Description("Verifica que registro exitoso retorna 201 Created")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Registro exitoso retorna 201")
-    public void testRegister_success_returns201() throws Exception {
+    public void testRegisterSuccessReturns201() throws Exception {
         RegisterRequest request = RegisterRequest.builder()
                 .username("newuser")
                 .firstname("Jane")
@@ -162,7 +162,7 @@ public class AuthControllerTests {
     @Description("Verifica que registro exitoso establece cookie de token")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Registro exitoso establece cookie token")
-    public void testRegister_success_setsCookie() throws Exception {
+    public void testRegisterSuccessSetsCookie() throws Exception {
         RegisterRequest request = RegisterRequest.builder()
                 .username("newuser")
                 .firstname("Jane")
@@ -186,7 +186,7 @@ public class AuthControllerTests {
     @Description("Verifica que logout retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Logout retorna 200 OK")
-    public void testLogout_returnsOk() throws Exception {
+    public void testLogoutReturnsOk() throws Exception {
         mockMvc.perform(post("/api/v1/auth/logout"))
                 .andExpect(status().isOk());
     }
@@ -196,7 +196,7 @@ public class AuthControllerTests {
     @Description("Verifica que logout limpia cookie de token")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Logout limpia cookie token")
-    public void testLogout_clearsTokenCookie() throws Exception {
+    public void testLogoutClearsTokenCookie() throws Exception {
         mockMvc.perform(post("/api/v1/auth/logout"))
                 .andExpect(cookie().maxAge("token", 0));
     }
@@ -206,7 +206,7 @@ public class AuthControllerTests {
     @Description("Verifica que /me retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("/me retorna 200 OK")
-    public void testMe_returnsOk() throws Exception {
+    public void testMeReturnsOk() throws Exception {
         UserDTO userDTO = new UserDTO("testuser", "Test", "User", "test@example.com", Role.USER);
 
         when(jwtAuthenticationFilter.getTokenFromRequest(any())).thenReturn("fake-token");
@@ -222,7 +222,7 @@ public class AuthControllerTests {
     @Description("Verifica que obtener CSRF token retorna 200 OK")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("CSRF token retorna 200 OK")
-    public void testCsrfToken_returnsOk() throws Exception {
+    public void testCsrfTokenReturnsOk() throws Exception {
         mockMvc.perform(get("/api/v1/auth/csrf-token"))
                 .andExpect(status().isOk());
     }

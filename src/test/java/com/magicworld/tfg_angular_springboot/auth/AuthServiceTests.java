@@ -72,7 +72,7 @@ public class AuthServiceTests {
     @Description("Verifica que login exitoso retorna token")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Login exitoso retorna token")
-    void testLoginSuccess_returnsToken() {
+    void testLoginSuccessReturnsToken() {
         LoginRequest request = LoginRequest.builder()
                 .username("existinguser")
                 .password("Password1@")
@@ -86,7 +86,7 @@ public class AuthServiceTests {
     @Description("Verifica que el token retornado es válido")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Login exitoso retorna token válido")
-    void testLoginSuccess_tokenIsValid() {
+    void testLoginSuccessTokenIsValid() {
         LoginRequest request = LoginRequest.builder()
                 .username("existinguser")
                 .password("Password1@")
@@ -127,7 +127,7 @@ public class AuthServiceTests {
     @Description("Verifica que registro exitoso retorna token")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Registro exitoso retorna token")
-    void testRegisterSuccess_returnsToken() {
+    void testRegisterSuccessReturnsToken() {
         RegisterRequest request = RegisterRequest.builder()
                 .username("newuser")
                 .firstname("Jane")
@@ -145,7 +145,7 @@ public class AuthServiceTests {
     @Description("Verifica que registro exitoso crea usuario")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Registro exitoso crea usuario")
-    void testRegisterSuccess_createsUser() {
+    void testRegisterSuccessCreatesUser() {
         RegisterRequest request = RegisterRequest.builder()
                 .username("newuser")
                 .firstname("Jane")
@@ -214,7 +214,7 @@ public class AuthServiceTests {
     @Description("Verifica que getCurrentUser retorna username correcto")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("getCurrentUser retorna username correcto")
-    void testGetCurrentUser_returnsUsername() {
+    void testGetCurrentUserReturnsUsername() {
         String token = jwtService.getToken(existingUser);
         UserDTO dto = authService.getCurrentUser(token);
         assertEquals("existinguser", dto.getUsername());
@@ -225,7 +225,7 @@ public class AuthServiceTests {
     @Description("Verifica que getCurrentUser retorna email correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("getCurrentUser retorna email correcto")
-    void testGetCurrentUser_returnsEmail() {
+    void testGetCurrentUserReturnsEmail() {
         String token = jwtService.getToken(existingUser);
         UserDTO dto = authService.getCurrentUser(token);
         assertEquals("john@example.com", dto.getEmail());
@@ -236,7 +236,7 @@ public class AuthServiceTests {
     @Description("Verifica que getCurrentUser con token de usuario inexistente lanza excepción")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("getCurrentUser con usuario inexistente lanza excepción")
-    void testGetCurrentUser_notFound() {
+    void testGetCurrentUserNotFound() {
         String fakeToken = jwtService.getToken(User.builder()
                 .username("nonexistent")
                 .password("fake")

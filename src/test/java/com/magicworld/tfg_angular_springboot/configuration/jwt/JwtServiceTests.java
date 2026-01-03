@@ -23,6 +23,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @Feature("Servicio JWT")
 public class JwtServiceTests {
 
+    private static final String TEST_USERNAME = "testuser";
+    private static final String TEST_EMAIL = "test@example.com";
+    private static final String TEST_PASSWORD = "Password1@";
+    private static final String TEST_FIRSTNAME = "Test";
+    private static final String TEST_LASTNAME = "User";
+    private static final String ADMIN_USERNAME = "admin";
+    private static final String ADMIN_EMAIL = "admin@example.com";
+    private static final String DIFFERENT_USERNAME = "differentuser";
+    private static final String DIFFERENT_EMAIL = "different@example.com";
+
     @Autowired
     private JwtService jwtService;
 
@@ -31,11 +41,11 @@ public class JwtServiceTests {
     @BeforeEach
     void setUp() {
         testUser = User.builder()
-                .username("testuser")
-                .email("test@example.com")
-                .password("Password1@")
-                .firstname("Test")
-                .lastname("User")
+                .username(TEST_USERNAME)
+                .email(TEST_EMAIL)
+                .password(TEST_PASSWORD)
+                .firstname(TEST_FIRSTNAME)
+                .lastname(TEST_LASTNAME)
                 .userRole(Role.USER)
                 .build();
     }
@@ -45,7 +55,7 @@ public class JwtServiceTests {
     @Description("Verifica que generar token retorna un token no nulo")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Generar token retorna token no nulo")
-    void testGetToken_returnsNonNullToken() {
+    void testGetTokenReturnsNonNullToken() {
         String token = jwtService.getToken(testUser);
         assertNotNull(token);
     }
@@ -55,7 +65,7 @@ public class JwtServiceTests {
     @Description("Verifica que generar token retorna un token no vacío")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Generar token retorna token no vacío")
-    void testGetToken_returnsNonEmptyToken() {
+    void testGetTokenReturnsNonEmptyToken() {
         String token = jwtService.getToken(testUser);
         assertFalse(token.isEmpty());
     }
@@ -65,10 +75,10 @@ public class JwtServiceTests {
     @Description("Verifica que extraer username del token retorna el username correcto")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Extraer username retorna username correcto")
-    void testGetUsernameFromToken_returnsCorrectUsername() {
+    void testGetUsernameFromTokenReturnsCorrectUsername() {
         String token = jwtService.getToken(testUser);
         String username = jwtService.getUsernameFromToken(token);
-        assertEquals("testuser", username);
+        assertEquals(TEST_USERNAME, username);
     }
 
     @Test
@@ -76,7 +86,7 @@ public class JwtServiceTests {
     @Description("Verifica que validar token válido retorna true")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Token válido retorna true")
-    void testIsTokenValid_withValidToken_returnsTrue() {
+    void testIsTokenValidWithValidTokenReturnsTrue() {
         String token = jwtService.getToken(testUser);
         boolean isValid = jwtService.isTokenValid(token, testUser);
         assertTrue(isValid);
@@ -87,12 +97,12 @@ public class JwtServiceTests {
     @Description("Verifica que validar token con usuario diferente retorna false")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Token con usuario diferente retorna false")
-    void testIsTokenValid_withDifferentUser_returnsFalse() {
+    void testIsTokenValidWithDifferentUserReturnsFalse() {
         String token = jwtService.getToken(testUser);
         User differentUser = User.builder()
-                .username("differentuser")
-                .email("different@example.com")
-                .password("Password1@")
+                .username(DIFFERENT_USERNAME)
+                .email(DIFFERENT_EMAIL)
+                .password(TEST_PASSWORD)
                 .userRole(Role.USER)
                 .build();
         boolean isValid = jwtService.isTokenValid(token, differentUser);
@@ -104,7 +114,7 @@ public class JwtServiceTests {
     @Description("Verifica que token nuevo no está expirado")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Token nuevo no está expirado")
-    void testIsTokenExpired_withNewToken_returnsFalse() {
+    void testIsTokenExpiredWithNewTokenReturnsFalse() {
         String token = jwtService.getToken(testUser);
         boolean isExpired = jwtService.isTokenExpired(token);
         assertFalse(isExpired);
@@ -115,11 +125,11 @@ public class JwtServiceTests {
     @Description("Verifica que generar token para admin retorna token válido")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Generar token para admin retorna token válido")
-    void testGetToken_forAdminUser_returnsValidToken() {
+    void testGetTokenForAdminUserReturnsValidToken() {
         User adminUser = User.builder()
-                .username("admin")
-                .email("admin@example.com")
-                .password("Password1@")
+                .username(ADMIN_USERNAME)
+                .email(ADMIN_EMAIL)
+                .password(TEST_PASSWORD)
                 .userRole(Role.ADMIN)
                 .build();
         String token = jwtService.getToken(adminUser);
@@ -131,15 +141,14 @@ public class JwtServiceTests {
     @Description("Verifica que extraer username para admin retorna username correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Extraer username para admin retorna username correcto")
-    void testGetUsernameFromToken_forAdminUser_returnsCorrectUsername() {
+    void testGetUsernameFromTokenForAdminUserReturnsCorrectUsername() {
         User adminUser = User.builder()
-                .username("admin")
-                .email("admin@example.com")
-                .password("Password1@")
+                .username(ADMIN_USERNAME)
+                .email(ADMIN_EMAIL)
+                .password(TEST_PASSWORD)
                 .userRole(Role.ADMIN)
                 .build();
         String token = jwtService.getToken(adminUser);
-        assertEquals("admin", jwtService.getUsernameFromToken(token));
+        assertEquals(ADMIN_USERNAME, jwtService.getUsernameFromToken(token));
     }
 }
-

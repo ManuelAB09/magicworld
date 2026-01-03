@@ -31,7 +31,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que buildTools retorna lista no vacía")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("buildTools retorna lista no vacía")
-    void testBuildTools_returnsNonEmptyList() {
+    void testBuildToolsReturnsNonEmptyList() {
         List<Tool> tools = toolsBuilder.buildTools();
         assertFalse(tools.isEmpty());
     }
@@ -41,7 +41,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que buildTools retorna una sola herramienta")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("buildTools retorna una herramienta")
-    void testBuildTools_returnsSingleTool() {
+    void testBuildToolsReturnsSingleTool() {
         List<Tool> tools = toolsBuilder.buildTools();
         assertEquals(1, tools.size());
     }
@@ -51,7 +51,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que la herramienta tiene declaraciones de funciones")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Herramienta tiene declaraciones de funciones")
-    void testBuildTools_toolHasFunctionDeclarations() {
+    void testBuildToolsToolHasFunctionDeclarations() {
         List<Tool> tools = toolsBuilder.buildTools();
         assertNotNull(tools.getFirst().functionDeclarations());
     }
@@ -61,7 +61,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que las declaraciones de funciones están presentes")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Declaraciones de funciones presentes")
-    void testBuildTools_hasFunctionDeclarations() {
+    void testBuildToolsHasFunctionDeclarations() {
         List<Tool> tools = toolsBuilder.buildTools();
         assertTrue(tools.getFirst().functionDeclarations().isPresent());
     }
@@ -71,7 +71,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función listDiscounts")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función listDiscounts")
-    void testBuildTools_containsListDiscountsFunction() {
+    void testBuildToolsContainsListDiscountsFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasListDiscounts = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("listDiscounts"));
@@ -83,7 +83,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función getDiscountById")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función getDiscountById")
-    void testBuildTools_containsGetDiscountByIdFunction() {
+    void testBuildToolsContainsGetDiscountByIdFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasGetDiscountById = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("getDiscountById"));
@@ -95,7 +95,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función createDiscount")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función createDiscount")
-    void testBuildTools_containsCreateDiscountFunction() {
+    void testBuildToolsContainsCreateDiscountFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasCreateDiscount = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("createDiscount"));
@@ -107,7 +107,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función updateDiscount")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función updateDiscount")
-    void testBuildTools_containsUpdateDiscountFunction() {
+    void testBuildToolsContainsUpdateDiscountFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasUpdateDiscount = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("updateDiscount"));
@@ -119,7 +119,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función requestDeleteDiscount")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función requestDeleteDiscount")
-    void testBuildTools_containsRequestDeleteDiscountFunction() {
+    void testBuildToolsContainsRequestDeleteDiscountFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasRequestDeleteDiscount = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("requestDeleteDiscount"));
@@ -131,7 +131,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función listTicketTypes")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función listTicketTypes")
-    void testBuildTools_containsListTicketTypesFunction() {
+    void testBuildToolsContainsListTicketTypesFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasListTicketTypes = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("listTicketTypes"));
@@ -143,7 +143,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función getTicketTypeById")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función getTicketTypeById")
-    void testBuildTools_containsGetTicketTypeByIdFunction() {
+    void testBuildToolsContainsGetTicketTypeByIdFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasGetTicketTypeById = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("getTicketTypeById"));
@@ -155,7 +155,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función findTicketTypeByName")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función findTicketTypeByName")
-    void testBuildTools_containsFindTicketTypeByNameFunction() {
+    void testBuildToolsContainsFindTicketTypeByNameFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasFindTicketTypeByName = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("findTicketTypeByName"));
@@ -167,7 +167,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función createTicketType")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función createTicketType")
-    void testBuildTools_containsCreateTicketTypeFunction() {
+    void testBuildToolsContainsCreateTicketTypeFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasCreateTicketType = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("createTicketType"));
@@ -179,7 +179,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función updateTicketType")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función updateTicketType")
-    void testBuildTools_containsUpdateTicketTypeFunction() {
+    void testBuildToolsContainsUpdateTicketTypeFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasUpdateTicketType = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("updateTicketType"));
@@ -191,7 +191,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función requestDeleteTicketType")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función requestDeleteTicketType")
-    void testBuildTools_containsRequestDeleteTicketTypeFunction() {
+    void testBuildToolsContainsRequestDeleteTicketTypeFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasRequestDeleteTicketType = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("requestDeleteTicketType"));
@@ -203,7 +203,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función listAttractions")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función listAttractions")
-    void testBuildTools_containsListAttractionsFunction() {
+    void testBuildToolsContainsListAttractionsFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasListAttractions = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("listAttractions"));
@@ -215,7 +215,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función getAttractionById")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función getAttractionById")
-    void testBuildTools_containsGetAttractionByIdFunction() {
+    void testBuildToolsContainsGetAttractionByIdFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasGetAttractionById = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("getAttractionById"));
@@ -227,7 +227,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función createAttraction")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función createAttraction")
-    void testBuildTools_containsCreateAttractionFunction() {
+    void testBuildToolsContainsCreateAttractionFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasCreateAttraction = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("createAttraction"));
@@ -239,7 +239,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función updateAttraction")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función updateAttraction")
-    void testBuildTools_containsUpdateAttractionFunction() {
+    void testBuildToolsContainsUpdateAttractionFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasUpdateAttraction = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("updateAttraction"));
@@ -251,7 +251,7 @@ public class ChatbotToolsBuilderTests {
     @Description("Verifica que contiene función requestDeleteAttraction")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Contiene función requestDeleteAttraction")
-    void testBuildTools_containsRequestDeleteAttractionFunction() {
+    void testBuildToolsContainsRequestDeleteAttractionFunction() {
         List<Tool> tools = toolsBuilder.buildTools();
         boolean hasRequestDeleteAttraction = tools.getFirst().functionDeclarations().get().stream()
                 .anyMatch(f -> f.name().isPresent() && f.name().get().equals("requestDeleteAttraction"));

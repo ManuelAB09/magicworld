@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtAuthenticationFilter;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtService;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
+import com.magicworld.tfg_angular_springboot.storage.ImageStorageService;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
@@ -42,6 +43,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Feature("API REST de Tipos de Entrada")
 public class TicketTypeControllerTests {
 
+    private static final String API_TICKET_TYPES = "/api/v1/ticket-types";
+    private static final String API_TICKET_TYPES_ID = "/api/v1/ticket-types/";
+    private static final String TYPE_NAME_STANDARD = "STANDARD";
+    private static final String TYPE_NAME_PREMIUM = "PREMIUM";
+    private static final String STANDARD_TICKET_DESC = "Standard ticket";
+    private static final String PREMIUM_TICKET_DESC = "Premium ticket";
+    private static final String CURRENCY_EUR = "EUR";
+    private static final String CURRENCY_USD = "USD";
+    private static final String PHOTO_URL_STANDARD = "http://example.com/standard.jpg";
+    private static final String PHOTO_URL_PREMIUM = "http://example.com/premium.jpg";
+    private static final String PHOTO_URL_INVALID = "http://example.com/invalid.jpg";
+    private static final String ERROR_TICKET_TYPE_NOT_FOUND = "error.ticket_type.notfound";
+    private static final BigDecimal COST_50 = new BigDecimal("50.00");
+    private static final BigDecimal COST_75_50 = new BigDecimal("75.50");
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -53,12 +69,12 @@ public class TicketTypeControllerTests {
 
     private TicketType sample() {
         return TicketType.builder()
-                .cost(new BigDecimal("50.00"))
-                .currency("EUR")
-                .typeName("STANDARD")
-                .description("Standard ticket")
+                .cost(COST_50)
+                .currency(CURRENCY_EUR)
+                .typeName(TYPE_NAME_STANDARD)
+                .description(STANDARD_TICKET_DESC)
                 .maxPerDay(10)
-                .photoUrl("http://example.com/standard.jpg")
+                .photoUrl(PHOTO_URL_STANDARD)
                 .build();
     }
 
@@ -67,18 +83,18 @@ public class TicketTypeControllerTests {
     @Description("Verifica que crear tipo de entrada retorna 201 Created con header Location")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear tipo de entrada retorna 201 Created")
-    public void testCreateTicketType_returnsCreated() throws Exception {
+    public void testCreateTicketTypeReturnsCreated() throws Exception {
         TicketType req = sample();
         TicketType saved = sample();
         saved.setId(1L);
 
         when(ticketTypeService.save(any(TicketType.class))).thenReturn(saved);
 
-        mockMvc.perform(post("/api/v1/ticket-types")
+        mockMvc.perform(post(API_TICKET_TYPES)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/api/v1/ticket-types/1"));
+                .andExpect(header().string("Location", API_TICKET_TYPES_ID + "1"));
     }
 
     @Test
@@ -86,18 +102,18 @@ public class TicketTypeControllerTests {
     @Description("Verifica que crear tipo de entrada retorna el cuerpo correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear tipo de entrada retorna cuerpo correcto")
-    public void testCreateTicketType_returnsBody() throws Exception {
+    public void testCreateTicketTypeReturnsBody() throws Exception {
         TicketType req = sample();
         TicketType saved = sample();
         saved.setId(1L);
 
         when(ticketTypeService.save(any(TicketType.class))).thenReturn(saved);
 
-        mockMvc.perform(post("/api/v1/ticket-types")
+        mockMvc.perform(post(API_TICKET_TYPES)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.typeName").value("STANDARD"));
+                .andExpect(jsonPath("$.typeName").value(TYPE_NAME_STANDARD));
     }
 
     @Test
@@ -105,12 +121,12 @@ public class TicketTypeControllerTests {
     @Description("Verifica que obtener todos los tipos retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Obtener todos los tipos retorna 200 OK")
-    public void testGetAllTicketTypes_returnsOk() throws Exception {
+    public void testGetAllTicketTypesReturnsOk() throws Exception {
         TicketType one = sample();
         one.setId(2L);
         when(ticketTypeService.findAll()).thenReturn(List.of(one));
 
-        mockMvc.perform(get("/api/v1/ticket-types").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(API_TICKET_TYPES).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
     }
@@ -120,12 +136,12 @@ public class TicketTypeControllerTests {
     @Description("Verifica que obtener tipo por ID existente retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Obtener tipo por ID existente retorna 200 OK")
-    public void testGetTicketTypeById_found_returnsOk() throws Exception {
+    public void testGetTicketTypeByIdFoundReturnsOk() throws Exception {
         TicketType tt = sample();
         tt.setId(3L);
         when(ticketTypeService.findById(3L)).thenReturn(tt);
 
-        mockMvc.perform(get("/api/v1/ticket-types/3").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(API_TICKET_TYPES_ID + "3").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(3));
     }
@@ -135,10 +151,10 @@ public class TicketTypeControllerTests {
     @Description("Verifica que obtener tipo por ID inexistente retorna 404")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Obtener tipo por ID inexistente retorna 404")
-    public void testGetTicketTypeById_notFound() throws Exception {
-        when(ticketTypeService.findById(999L)).thenThrow(new ResourceNotFoundException("error.ticket_type.notfound"));
+    public void testGetTicketTypeByIdNotFound() throws Exception {
+        when(ticketTypeService.findById(999L)).thenThrow(new ResourceNotFoundException(ERROR_TICKET_TYPE_NOT_FOUND));
 
-        mockMvc.perform(get("/api/v1/ticket-types/999").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(API_TICKET_TYPES_ID + "999").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
@@ -147,29 +163,29 @@ public class TicketTypeControllerTests {
     @Description("Verifica que actualizar tipo retorna 200 OK")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar tipo retorna 200 OK")
-    public void testUpdateTicketType_returnsOk() throws Exception {
+    public void testUpdateTicketTypeReturnsOk() throws Exception {
         TicketType update = TicketType.builder()
-                .cost(new BigDecimal("75.50"))
-                .currency("USD")
-                .typeName("PREMIUM")
-                .description("Premium ticket")
+                .cost(COST_75_50)
+                .currency(CURRENCY_USD)
+                .typeName(TYPE_NAME_PREMIUM)
+                .description(PREMIUM_TICKET_DESC)
                 .maxPerDay(20)
-                .photoUrl("http://example.com/premium.jpg")
+                .photoUrl(PHOTO_URL_PREMIUM)
                 .build();
 
         TicketType returned = TicketType.builder()
-                .cost(new BigDecimal("75.50"))
-                .currency("USD")
-                .typeName("PREMIUM")
-                .description("Premium ticket")
+                .cost(COST_75_50)
+                .currency(CURRENCY_USD)
+                .typeName(TYPE_NAME_PREMIUM)
+                .description(PREMIUM_TICKET_DESC)
                 .maxPerDay(20)
-                .photoUrl("http://example.com/premium.jpg")
+                .photoUrl(PHOTO_URL_PREMIUM)
                 .build();
         returned.setId(4L);
 
         when(ticketTypeService.update(4L, update)).thenReturn(returned);
 
-        mockMvc.perform(put("/api/v1/ticket-types/4")
+        mockMvc.perform(put(API_TICKET_TYPES_ID + "4")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isOk())
@@ -184,7 +200,7 @@ public class TicketTypeControllerTests {
     public void testDeleteTicketType() throws Exception {
         doNothing().when(ticketTypeService).delete(5L);
 
-        mockMvc.perform(delete("/api/v1/ticket-types/5").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(delete(API_TICKET_TYPES_ID + "5").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         verify(ticketTypeService).delete(5L);
@@ -195,17 +211,17 @@ public class TicketTypeControllerTests {
     @Description("Verifica que crear tipo con datos inválidos retorna 400 Bad Request")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear tipo con datos inválidos retorna 400")
-    public void testCreateTicketType_badRequest_whenInvalid() throws Exception {
+    public void testCreateTicketTypeBadRequestWhenInvalid() throws Exception {
         TicketType invalid = TicketType.builder()
                 .cost(null)
                 .currency("")
                 .typeName("")
                 .description("")
                 .maxPerDay(null)
-                .photoUrl("http://example.com/invalid.jpg")
+                .photoUrl(PHOTO_URL_INVALID)
                 .build();
 
-        mockMvc.perform(post("/api/v1/ticket-types")
+        mockMvc.perform(post(API_TICKET_TYPES)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
@@ -229,8 +245,8 @@ public class TicketTypeControllerTests {
         }
 
         @Bean
-        public com.magicworld.tfg_angular_springboot.storage.ImageStorageService imageStorageService() {
-            return Mockito.mock(com.magicworld.tfg_angular_springboot.storage.ImageStorageService.class);
+        public ImageStorageService imageStorageService() {
+            return Mockito.mock(ImageStorageService.class);
         }
     }
 }

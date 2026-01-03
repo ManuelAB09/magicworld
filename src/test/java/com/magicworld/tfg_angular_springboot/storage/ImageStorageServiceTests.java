@@ -25,6 +25,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @Feature("Servicio de Almacenamiento de Imágenes")
 public class ImageStorageServiceTests {
 
+    private static final String FILE_PARAM = "file";
+    private static final String TEST_FOLDER = "test-folder";
+    private static final String IMAGE_JPEG = "image/jpeg";
+    private static final String IMAGE_PNG = "image/png";
+    private static final String IMAGE_GIF = "image/gif";
+    private static final String IMAGE_WEBP = "image/webp";
+    private static final String TEXT_PLAIN = "text/plain";
+    private static final String MAX_FILE_SIZE_PROP = "spring.servlet.multipart.max-file-size";
+    private static final String MAX_FILE_SIZE_10MB = "10MB";
+    private static final String MAX_FILE_SIZE_1B = "1B";
+    private static final String INVALID_SIZE = "invalid";
+
     private ImageStorageService imageStorageService;
 
     @TempDir
@@ -33,7 +45,7 @@ public class ImageStorageServiceTests {
     @BeforeEach
     void setUp() {
         MockEnvironment env = new MockEnvironment();
-        env.setProperty("spring.servlet.multipart.max-file-size", "10MB");
+        env.setProperty(MAX_FILE_SIZE_PROP, MAX_FILE_SIZE_10MB);
         imageStorageService = new ImageStorageService(env);
     }
 
@@ -57,12 +69,12 @@ public class ImageStorageServiceTests {
     @Description("Verifica que almacenar una imagen retorna la ruta correcta")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Almacenar imagen retorna ruta")
-    void testStore_success_returnsPath() {
+    void testStoreSuccessReturnsPath() {
         byte[] content = "fake image content".getBytes();
         MockMultipartFile file = new MockMultipartFile(
-                "file", "test.jpg", "image/jpeg", content);
-        String result = imageStorageService.store(file, "test-folder");
-        assertTrue(result.startsWith("/images/test-folder/"));
+                FILE_PARAM, "test.jpg", IMAGE_JPEG, content);
+        String result = imageStorageService.store(file, TEST_FOLDER);
+        assertTrue(result.startsWith("/images/" + TEST_FOLDER + "/"));
     }
 
     @Test
@@ -70,11 +82,11 @@ public class ImageStorageServiceTests {
     @Description("Verifica que la ruta termina con la extensión correcta")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Almacenar imagen retorna ruta con extensión")
-    void testStore_success_endsWithExtension() {
+    void testStoreSuccessEndsWithExtension() {
         byte[] content = "fake image content 2".getBytes();
         MockMultipartFile file = new MockMultipartFile(
-                "file", "test.png", "image/png", content);
-        String result = imageStorageService.store(file, "test-folder");
+                FILE_PARAM, "test.png", IMAGE_PNG, content);
+        String result = imageStorageService.store(file, TEST_FOLDER);
         assertTrue(result.endsWith(".png"));
     }
 
@@ -83,9 +95,9 @@ public class ImageStorageServiceTests {
     @Description("Verifica que almacenar archivo null lanza excepción")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Almacenar archivo null lanza excepción")
-    void testStore_nullFile_throws() {
+    void testStoreNullFileThrows() {
         assertThrows(FileStorageException.class,
-                () -> imageStorageService.store(null, "test-folder"));
+                () -> imageStorageService.store(null, TEST_FOLDER));
     }
 
     @Test
@@ -93,11 +105,11 @@ public class ImageStorageServiceTests {
     @Description("Verifica que almacenar archivo vacío lanza excepción")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Almacenar archivo vacío lanza excepción")
-    void testStore_emptyFile_throws() {
+    void testStoreEmptyFileThrows() {
         MockMultipartFile emptyFile = new MockMultipartFile(
-                "file", "empty.jpg", "image/jpeg", new byte[0]);
+                FILE_PARAM, "empty.jpg", IMAGE_JPEG, new byte[0]);
         assertThrows(FileStorageException.class,
-                () -> imageStorageService.store(emptyFile, "test-folder"));
+                () -> imageStorageService.store(emptyFile, TEST_FOLDER));
     }
 
     @Test
@@ -105,12 +117,12 @@ public class ImageStorageServiceTests {
     @Description("Verifica que almacenar archivo con tipo inválido lanza excepción")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Almacenar archivo con tipo inválido lanza excepción")
-    void testStore_invalidContentType_throws() {
+    void testStoreInvalidContentTypeThrows() {
         byte[] content = "not an image".getBytes();
         MockMultipartFile file = new MockMultipartFile(
-                "file", "test.txt", "text/plain", content);
+                FILE_PARAM, "test.txt", TEXT_PLAIN, content);
         assertThrows(FileStorageException.class,
-                () -> imageStorageService.store(file, "test-folder"));
+                () -> imageStorageService.store(file, TEST_FOLDER));
     }
 
     @Test
@@ -118,12 +130,12 @@ public class ImageStorageServiceTests {
     @Description("Verifica que almacenar archivo sin tipo de contenido lanza excepción")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Almacenar archivo sin tipo de contenido lanza excepción")
-    void testStore_nullContentType_throws() {
+    void testStoreNullContentTypeThrows() {
         byte[] content = "content".getBytes();
         MockMultipartFile file = new MockMultipartFile(
-                "file", "test.jpg", null, content);
+                FILE_PARAM, "test.jpg", null, content);
         assertThrows(FileStorageException.class,
-                () -> imageStorageService.store(file, "test-folder"));
+                () -> imageStorageService.store(file, TEST_FOLDER));
     }
 
     @Test
@@ -131,12 +143,12 @@ public class ImageStorageServiceTests {
     @Description("Verifica que archivos duplicados retornan la misma ruta")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Archivos duplicados retornan misma ruta")
-    void testStore_duplicateFile_returnsSamePath() {
+    void testStoreDuplicateFileReturnsSamePath() {
         byte[] content = "duplicate content".getBytes();
         MockMultipartFile file1 = new MockMultipartFile(
-                "file", "first.jpg", "image/jpeg", content);
+                FILE_PARAM, "first.jpg", IMAGE_JPEG, content);
         MockMultipartFile file2 = new MockMultipartFile(
-                "file", "second.jpg", "image/jpeg", content);
+                FILE_PARAM, "second.jpg", IMAGE_JPEG, content);
         String path1 = imageStorageService.store(file1, "duplicates");
         String path2 = imageStorageService.store(file2, "duplicates");
         assertEquals(path1, path2);
@@ -147,11 +159,11 @@ public class ImageStorageServiceTests {
     @Description("Verifica que archivos diferentes retornan rutas diferentes")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Archivos diferentes retornan rutas diferentes")
-    void testStore_differentFiles_returnsDifferentPaths() {
+    void testStoreDifferentFilesReturnsDifferentPaths() {
         MockMultipartFile file1 = new MockMultipartFile(
-                "file", "first.jpg", "image/jpeg", "content1".getBytes());
+                FILE_PARAM, "first.jpg", IMAGE_JPEG, "content1".getBytes());
         MockMultipartFile file2 = new MockMultipartFile(
-                "file", "second.jpg", "image/jpeg", "content2".getBytes());
+                FILE_PARAM, "second.jpg", IMAGE_JPEG, "content2".getBytes());
         String path1 = imageStorageService.store(file1, "different");
         String path2 = imageStorageService.store(file2, "different");
         assertNotEquals(path1, path2);
@@ -162,10 +174,10 @@ public class ImageStorageServiceTests {
     @Description("Verifica que almacenar archivo GIF retorna ruta correcta")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Almacenar archivo GIF retorna ruta")
-    void testStore_gifFile_returnsPath() {
+    void testStoreGifFileReturnsPath() {
         byte[] content = "fake gif content".getBytes();
         MockMultipartFile file = new MockMultipartFile(
-                "file", "test.gif", "image/gif", content);
+                FILE_PARAM, "test.gif", IMAGE_GIF, content);
         String result = imageStorageService.store(file, "gifs");
         assertTrue(result.endsWith(".gif"));
     }
@@ -175,15 +187,15 @@ public class ImageStorageServiceTests {
     @Description("Verifica que archivo muy grande lanza excepción")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Archivo muy grande lanza excepción")
-    void testStore_fileTooLarge_throws() {
+    void testStoreFileTooLargeThrows() {
         MockEnvironment env = new MockEnvironment();
-        env.setProperty("spring.servlet.multipart.max-file-size", "1B");
+        env.setProperty(MAX_FILE_SIZE_PROP, MAX_FILE_SIZE_1B);
         ImageStorageService service = new ImageStorageService(env);
         byte[] content = "content larger than 1 byte".getBytes();
         MockMultipartFile file = new MockMultipartFile(
-                "file", "test.jpg", "image/jpeg", content);
+                FILE_PARAM, "test.jpg", IMAGE_JPEG, content);
         assertThrows(FileStorageException.class,
-                () -> service.store(file, "test-folder"));
+                () -> service.store(file, TEST_FOLDER));
     }
 
     @Test
@@ -191,14 +203,14 @@ public class ImageStorageServiceTests {
     @Description("Verifica que configuración inválida usa valor por defecto")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Configuración inválida usa valor por defecto")
-    void testStore_invalidConfiguredSize_fallsBackToDefault() {
+    void testStoreInvalidConfiguredSizeFallsBackToDefault() {
         MockEnvironment env = new MockEnvironment();
-        env.setProperty("spring.servlet.multipart.max-file-size", "invalid");
+        env.setProperty(MAX_FILE_SIZE_PROP, INVALID_SIZE);
         ImageStorageService service = new ImageStorageService(env);
         byte[] content = "fake content".getBytes();
         MockMultipartFile file = new MockMultipartFile(
-                "file", "test.jpg", "image/jpeg", content);
-        String result = service.store(file, "test-folder");
+                FILE_PARAM, "test.jpg", IMAGE_JPEG, content);
+        String result = service.store(file, TEST_FOLDER);
         assertNotNull(result);
     }
 
@@ -207,11 +219,11 @@ public class ImageStorageServiceTests {
     @Description("Verifica que archivo sin extensión funciona correctamente")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Archivo sin extensión funciona correctamente")
-    void testStore_fileWithNoExtension_works() {
+    void testStoreFileWithNoExtensionWorks() {
         byte[] content = "content without extension".getBytes();
         MockMultipartFile file = new MockMultipartFile(
-                "file", "noextension", "image/jpeg", content);
-        String result = imageStorageService.store(file, "test-folder");
+                FILE_PARAM, "noextension", IMAGE_JPEG, content);
+        String result = imageStorageService.store(file, TEST_FOLDER);
         assertNotNull(result);
     }
 
@@ -220,12 +232,11 @@ public class ImageStorageServiceTests {
     @Description("Verifica que almacenar archivo WebP retorna ruta correcta")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Almacenar archivo WebP retorna ruta")
-    void testStore_webpFile_returnsPath() {
+    void testStoreWebpFileReturnsPath() {
         byte[] content = "fake webp content".getBytes();
         MockMultipartFile file = new MockMultipartFile(
-                "file", "test.webp", "image/webp", content);
+                FILE_PARAM, "test.webp", IMAGE_WEBP, content);
         String result = imageStorageService.store(file, "webp-folder");
         assertTrue(result.endsWith(".webp"));
     }
 }
-

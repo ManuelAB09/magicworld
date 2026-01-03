@@ -34,6 +34,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @Feature("Servicio de Descuentos")
 public class DiscountServiceTests {
 
+    private static final String CURRENCY_EUR = "EUR";
+    private static final String TYPE_NAME_ADULT = "ADULT";
+    private static final String TYPE_NAME_CHILD = "CHILD";
+    private static final String TYPE_NAME_VIP = "VIP";
+    private static final String ADULT_TICKET_DESC = "Adult ticket";
+    private static final String CHILD_TICKET_DESC = "Child ticket";
+    private static final String VIP_TICKET_DESC = "VIP ticket";
+    private static final String PHOTO_URL_ADULT = "https://example.com/adult.jpg";
+    private static final String PHOTO_URL_CHILD = "https://example.com/child.jpg";
+    private static final String PHOTO_URL_VIP = "https://example.com/vip.jpg";
+    private static final BigDecimal COST_50 = new BigDecimal("50.00");
+    private static final BigDecimal COST_25 = new BigDecimal("25.00");
+    private static final BigDecimal COST_120 = new BigDecimal("120.00");
+
     @Autowired
     private DiscountService discountService;
 
@@ -62,30 +76,30 @@ public class DiscountServiceTests {
         entityManager.clear();
 
         adult = ticketTypeRepository.save(TicketType.builder()
-                .cost(new BigDecimal("50.00"))
-                .currency("EUR")
-                .typeName("ADULT")
-                .description("Adult ticket")
+                .cost(COST_50)
+                .currency(CURRENCY_EUR)
+                .typeName(TYPE_NAME_ADULT)
+                .description(ADULT_TICKET_DESC)
                 .maxPerDay(10)
-                .photoUrl("https://example.com/adult.jpg")
+                .photoUrl(PHOTO_URL_ADULT)
                 .build());
 
         child = ticketTypeRepository.save(TicketType.builder()
-                .cost(new BigDecimal("25.00"))
-                .currency("EUR")
-                .typeName("CHILD")
-                .description("Child ticket")
+                .cost(COST_25)
+                .currency(CURRENCY_EUR)
+                .typeName(TYPE_NAME_CHILD)
+                .description(CHILD_TICKET_DESC)
                 .maxPerDay(10)
-                .photoUrl("https://example.com/child.jpg")
+                .photoUrl(PHOTO_URL_CHILD)
                 .build());
 
         vip = ticketTypeRepository.save(TicketType.builder()
-                .cost(new BigDecimal("120.00"))
-                .currency("EUR")
-                .typeName("VIP")
-                .description("VIP ticket")
+                .cost(COST_120)
+                .currency(CURRENCY_EUR)
+                .typeName(TYPE_NAME_VIP)
+                .description(VIP_TICKET_DESC)
                 .maxPerDay(5)
-                .photoUrl("https://example.com/vip.jpg")
+                .photoUrl(PHOTO_URL_VIP)
                 .build());
         entityManager.flush();
         entityManager.clear();
@@ -125,7 +139,7 @@ public class DiscountServiceTests {
     @DisplayName("Guardar descuento con tipos válidos crea descuento")
     void testSaveDiscountWithValidTicketTypesCreatesDiscount() {
         Discount toSave = newDiscount("WELCOME10", 10, LocalDate.now().plusDays(30));
-        Discount saved = discountService.save(toSave, List.of("ADULT", "CHILD"));
+        Discount saved = discountService.save(toSave, List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
         assertNotNull(saved.getId());
         assertEquals("WELCOME10", saved.getDiscountCode());
     }
@@ -137,7 +151,7 @@ public class DiscountServiceTests {
     @DisplayName("Guardar descuento crea asociaciones")
     void testSaveDiscountWithValidTicketTypesCreatesAssociations() {
         Discount toSave = newDiscount("WELCOME11", 10, LocalDate.now().plusDays(30));
-        Discount saved = discountService.save(toSave, List.of("ADULT", "CHILD"));
+        Discount saved = discountService.save(toSave, List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
         List<TicketType> associated = discountTicketTypeRepository.findByDiscountId(saved.getId());
         assertEquals(2, associated.size());
     }
@@ -170,7 +184,7 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Buscar descuento existente lo encuentra")
     void testFindByIdExists() {
-        Discount saved = discountService.save(newDiscount("FINDME", 12, LocalDate.now().plusDays(15)), List.of("ADULT"));
+        Discount saved = discountService.save(newDiscount("FINDME", 12, LocalDate.now().plusDays(15)), List.of(TYPE_NAME_ADULT));
         Discount found = discountService.findById(saved.getId());
         assertEquals(saved.getId(), found.getId());
         assertEquals("FINDME", found.getDiscountCode());
@@ -191,11 +205,11 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar descuento cambia el código")
     void testUpdateDiscountFieldsUpdatesCode() {
-        Discount saved = discountService.save(newDiscount("UPD10", 10, LocalDate.now().plusDays(30)), List.of("ADULT", "CHILD"));
+        Discount saved = discountService.save(newDiscount("UPD10", 10, LocalDate.now().plusDays(30)), List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
         Long id = saved.getId();
         Discount updatedData = newDiscount("UPD20", 20, LocalDate.now().plusDays(60));
         updatedData.setId(id);
-        Discount updated = discountService.update(updatedData, List.of("VIP"));
+        Discount updated = discountService.update(updatedData, List.of(TYPE_NAME_VIP));
         assertEquals("UPD20", updated.getDiscountCode());
     }
 
@@ -205,11 +219,11 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar descuento cambia el porcentaje")
     void testUpdateDiscountFieldsUpdatesPercentage() {
-        Discount saved = discountService.save(newDiscount("UPD11", 10, LocalDate.now().plusDays(30)), List.of("ADULT", "CHILD"));
+        Discount saved = discountService.save(newDiscount("UPD11", 10, LocalDate.now().plusDays(30)), List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
         Long id = saved.getId();
         Discount updatedData = newDiscount("UPD21", 20, LocalDate.now().plusDays(60));
         updatedData.setId(id);
-        Discount updated = discountService.update(updatedData, List.of("VIP"));
+        Discount updated = discountService.update(updatedData, List.of(TYPE_NAME_VIP));
         assertEquals(20, updated.getDiscountPercentage());
     }
 
@@ -219,14 +233,14 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar descuento reemplaza asociaciones")
     void testUpdateDiscountReplacesAssociations() {
-        Discount saved = discountService.save(newDiscount("UPD12", 10, LocalDate.now().plusDays(30)), List.of("ADULT", "CHILD"));
+        Discount saved = discountService.save(newDiscount("UPD12", 10, LocalDate.now().plusDays(30)), List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
         Long id = saved.getId();
         Discount updatedData = newDiscount("UPD22", 20, LocalDate.now().plusDays(60));
         updatedData.setId(id);
-        discountService.update(updatedData, List.of("VIP"));
+        discountService.update(updatedData, List.of(TYPE_NAME_VIP));
         List<TicketType> associated = discountTicketTypeRepository.findByDiscountId(id);
         assertEquals(1, associated.size());
-        assertEquals("VIP", associated.get(0).getTypeName());
+        assertEquals(TYPE_NAME_VIP, associated.get(0).getTypeName());
     }
 
     @Test
@@ -235,7 +249,7 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar con tipos vacíos lanza excepción")
     void testUpdateWithEmptyTicketTypesThrows() {
-        Discount saved = discountService.save(newDiscount("UPD_EMPTY", 5, LocalDate.now().plusDays(5)), List.of("ADULT"));
+        Discount saved = discountService.save(newDiscount("UPD_EMPTY", 5, LocalDate.now().plusDays(5)), List.of(TYPE_NAME_ADULT));
         Discount updatedData = newDiscount("UPD_EMPTY", 7, LocalDate.now().plusDays(8));
         updatedData.setId(saved.getId());
         assertThrows(AtLeastOneTicketTypeMustBeProvidedException.class,
@@ -248,7 +262,7 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar con tipo desconocido lanza excepción")
     void testUpdateWithUnknownTicketTypeThrows() {
-        Discount saved = discountService.save(newDiscount("UPD_UNK", 5, LocalDate.now().plusDays(5)), List.of("ADULT"));
+        Discount saved = discountService.save(newDiscount("UPD_UNK", 5, LocalDate.now().plusDays(5)), List.of(TYPE_NAME_ADULT));
         Discount updatedData = newDiscount("UPD_UNK", 9, LocalDate.now().plusDays(9));
         updatedData.setId(saved.getId());
         assertThrows(ResourceNotFoundException.class,
@@ -261,7 +275,7 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Eliminar descuento lo remueve")
     void testDeleteByIdRemovesDiscount() {
-        Discount saved = discountService.save(newDiscount("DEL", 18, LocalDate.now().plusDays(20)), List.of("ADULT", "VIP"));
+        Discount saved = discountService.save(newDiscount("DEL", 18, LocalDate.now().plusDays(20)), List.of(TYPE_NAME_ADULT, TYPE_NAME_VIP));
         Long id = saved.getId();
         discountService.deleteById(id);
         entityManager.flush();
@@ -275,7 +289,7 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Eliminar descuento remueve asociaciones")
     void testDeleteByIdRemovesAssociations() {
-        Discount saved = discountService.save(newDiscount("DEL2", 18, LocalDate.now().plusDays(20)), List.of("ADULT", "VIP"));
+        Discount saved = discountService.save(newDiscount("DEL2", 18, LocalDate.now().plusDays(20)), List.of(TYPE_NAME_ADULT, TYPE_NAME_VIP));
         Long id = saved.getId();
         discountService.deleteById(id);
         entityManager.flush();
