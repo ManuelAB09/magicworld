@@ -63,8 +63,18 @@ export class AuthService {
     );
   }
   getCookie(name: string): string | null {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? decodeURIComponent(match[2]) : null;
+    if (!document.cookie) {
+      return null;
+    }
+    const cookies = document.cookie.split(';');
+    for (let c of cookies) {
+      c = c.trim();
+      const prefix = name + '=';
+      if (c.startsWith(prefix)) {
+        return decodeURIComponent(c.substring(prefix.length));
+      }
+    }
+    return null;
   }
 
   getCsrfTokenFromServer(): Observable<string> {

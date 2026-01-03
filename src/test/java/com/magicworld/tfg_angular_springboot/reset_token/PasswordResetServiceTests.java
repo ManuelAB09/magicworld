@@ -2,6 +2,7 @@ package com.magicworld.tfg_angular_springboot.reset_token;
 
 import com.magicworld.tfg_angular_springboot.email.EmailService;
 import com.magicworld.tfg_angular_springboot.exceptions.BadRequestException;
+import com.magicworld.tfg_angular_springboot.exceptions.InvalidPasswordPattern;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidTokenException;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import com.magicworld.tfg_angular_springboot.user.Role;
@@ -184,7 +185,7 @@ public class PasswordResetServiceTests {
                 .user(testUser)
                 .expiryDate(LocalDateTime.now().plusMinutes(15))
                 .build());
-        assertThrows(BadRequestException.class,
+        assertThrows(InvalidPasswordPattern.class,
                 () -> passwordResetService.resetPassword("token-for-null", null));
     }
 
@@ -199,7 +200,7 @@ public class PasswordResetServiceTests {
                 .user(testUser)
                 .expiryDate(LocalDateTime.now().plusMinutes(15))
                 .build());
-        assertThrows(BadRequestException.class,
+        assertThrows(InvalidPasswordPattern.class,
                 () -> passwordResetService.resetPassword("token-for-weak", "weak"));
     }
 }

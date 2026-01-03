@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+
 set -euo pipefail
 
 echo "Seed script: esperando a que la base de datos acepte conexiones..."

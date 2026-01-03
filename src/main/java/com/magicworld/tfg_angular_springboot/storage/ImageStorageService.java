@@ -58,7 +58,10 @@ public class ImageStorageService {
         String ext = "";
         int dot = original.lastIndexOf('.');
         if (dot > 0 && dot < original.length() - 1) {
-            ext = original.substring(dot);
+            String rawExt = original.substring(dot + 1);
+            if (rawExt.matches("^[a-zA-Z0-9]+$")) {
+                ext = "." + rawExt;
+            }
         }
         try {
             Path targetDir = baseDir.resolve(subfolder).normalize();

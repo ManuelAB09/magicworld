@@ -1,16 +1,14 @@
-#!/usr/bin/env bash
-# Explicación:
-# Script para parar y borrar los contenedores y volúmenes creados por docker-compose
+
 
 set -euo pipefail
 
-# Determinar directorio del script y rutas importantes
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCKER_DIR="$SCRIPT_DIR/.."
 PROJECT_ROOT="$DOCKER_DIR/.."
 COMPOSE_FILE="$DOCKER_DIR/docker-compose.yml"
 
-# Localizar .env preferentemente en la raíz del proyecto
+
 if [ -f "$PROJECT_ROOT/.env" ]; then
   ENV_FILE="$PROJECT_ROOT/.env"
 elif [ -f "$DOCKER_DIR/.env" ]; then
@@ -26,7 +24,7 @@ if [ ! -f "$COMPOSE_FILE" ]; then
   exit 1
 fi
 
-# Cambiar al root del proyecto para que las rutas relativas funcionen siempre
+
 echo "Cambiando al directorio del proyecto: $PROJECT_ROOT"
 cd "$PROJECT_ROOT"
 

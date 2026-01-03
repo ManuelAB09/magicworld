@@ -61,7 +61,7 @@
   "error.ticket_type.discounts.assigned": "A ticket type with assigned discounts cannot be deleted",
   "error.discount.expiryDate.past": "A discount cannot have an expiry date in the past or today",
   "error.attraction.notfound": "Attraction not found",
-
+  "error.bad.request": "Bad request parameters",
   "error.file.empty": "No file uploaded",
   "error.file.size_exceeded": "File too large (max {{0}} bytes)",
   "error.file.invalid_type": "Only image uploads are allowed",

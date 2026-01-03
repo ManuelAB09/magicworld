@@ -2,6 +2,7 @@ package com.magicworld.tfg_angular_springboot.reset_token;
 
 import com.magicworld.tfg_angular_springboot.email.EmailService;
 import com.magicworld.tfg_angular_springboot.exceptions.BadRequestException;
+import com.magicworld.tfg_angular_springboot.exceptions.InvalidPasswordPattern;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidTokenException;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import com.magicworld.tfg_angular_springboot.user.User;
@@ -50,7 +51,7 @@ public class PasswordResetService {
 
         String passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
         if (newPassword == null || !newPassword.matches(passwordPattern)) {
-            throw new BadRequestException(newPassword);
+            throw new InvalidPasswordPattern();
         }
         PasswordResetToken resetToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException(token));

@@ -61,9 +61,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-
-  # Servicio opcional que aplica los seeds (INSERTs) después de que el backend
-  # haya arrancado y creado las tablas con Hibernate.
   db-seed:
     image: mysql:8.0
     restart: "no"

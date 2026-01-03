@@ -1,15 +1,5 @@
 <div class="register-background">
   <form class="auth-form" (ngSubmit)="onRegister()">
-    @if (errorMessages.length > 0) {
-      <div class="error">
-        @for (msg of errorMessages; track $index) {
-          {{ msg }}<br />
-        }
-      </div>
-    }
-    @else if (errorCode) {
-      <div class="error">{{ errorCode | translate:errorArgs }}</div>
-    }
     <h2>{{ 'REGISTER.TITLE' | translate }}</h2>
     <label for="username">{{ 'REGISTER.USERNAME' | translate }}</label>
     <input id="username" [(ngModel)]="username" name="username" required/>
@@ -70,6 +60,17 @@
         }
       </button>
     </div>
+    @if (errorMessages.length > 0) {
+      <div class="error">
+        @for (msg of errorMessages; track $index) {
+          {{ msg }}<br />
+        }
+      </div>
+    }
+    @else if (errorCode) {
+      <div class="error">{{ errorCode | translate:errorArgs }}</div>
+    }
     <button type="submit">{{ 'REGISTER.BUTTON' | translate }}</button>
   </form>
+
 </div>
