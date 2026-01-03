@@ -44,6 +44,31 @@ public class ImageStorageService {
     }
 
     public String store(MultipartFile file, String subfolder) {
+        validateFile(file);
+        String ext = extractExtension(file.getOriginalFilename());
+
+        try {
+            Path targetDir = baseDir.resolve(subfolder).normalize();
+            Files.createDirectories(targetDir);
+
+            String incomingHash = computeHash(file.getInputStream());
+            String existingFile = findDuplicateByHash(targetDir, incomingHash);
+
+            if (existingFile != null) {
+                return buildImagePath(subfolder, existingFile);
+            }
+
+            return saveNewFile(targetDir, file, ext, subfolder);
+        } catch (IOException e) {
+            log.error("Failed to store file", e);
+            throw new FileStorageException("error.file.save_failed");
+        } catch (NoSuchAlgorithmException e) {
+            log.error("Hash algorithm not found", e);
+            throw new FileStorageException("error.file.save_failed");
+        }
+    }
+
+    private void validateFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new FileStorageException("error.file.empty");
         }
@@ -54,51 +79,48 @@ public class ImageStorageService {
         if (contentType == null || !contentType.startsWith("image/")) {
             throw new FileStorageException("error.file.invalid_type");
         }
-        String original = StringUtils.cleanPath(file.getOriginalFilename() == null ? "" : file.getOriginalFilename());
-        String ext = "";
+    }
+
+    private String extractExtension(String originalFilename) {
+        String original = StringUtils.cleanPath(originalFilename == null ? "" : originalFilename);
         int dot = original.lastIndexOf('.');
         if (dot > 0 && dot < original.length() - 1) {
             String rawExt = original.substring(dot + 1);
             if (rawExt.matches("^[a-zA-Z0-9]+$")) {
-                ext = "." + rawExt;
+                return "." + rawExt;
             }
         }
-        try {
-            Path targetDir = baseDir.resolve(subfolder).normalize();
-            Files.createDirectories(targetDir);
+        return "";
+    }
 
-
-            String incomingHash = computeHash(file.getInputStream());
-
-
-            try (var stream = Files.list(targetDir)) {
-                var found = stream.filter(Files::isRegularFile).filter(p -> {
-                    try (InputStream is = Files.newInputStream(p)) {
-                        String h = computeHash(is);
-                        return incomingHash.equals(h);
-                    } catch (IOException | NoSuchAlgorithmException ex) {
-                        log.warn("Could not read existing file for hash compare: {}", p, ex);
-                        return false;
-                    }
-                }).findFirst();
-
-                if (found.isPresent()) {
-                    String existing = found.get().getFileName().toString();
-                    return "/images/" + subfolder.replace('\\', '/').replace("..", "_") + "/" + existing;
-                }
-            }
-
-            String filename = UUID.randomUUID() + ext.toLowerCase();
-            Path target = targetDir.resolve(filename);
-            file.transferTo(target);
-            return "/images/" + subfolder.replace('\\', '/').replace("..", "_") + "/" + filename;
-        } catch (IOException e) {
-            log.error("Failed to store file", e);
-            throw new FileStorageException("error.file.save_failed");
-        } catch (NoSuchAlgorithmException e) {
-            log.error("Hash algorithm not found", e);
-            throw new FileStorageException("error.file.save_failed");
+    private String findDuplicateByHash(Path targetDir, String incomingHash) throws IOException {
+        try (var stream = Files.list(targetDir)) {
+            return stream.filter(Files::isRegularFile)
+                    .filter(p -> matchesHash(p, incomingHash))
+                    .findFirst()
+                    .map(p -> p.getFileName().toString())
+                    .orElse(null);
         }
+    }
+
+    private boolean matchesHash(Path path, String expectedHash) {
+        try (InputStream is = Files.newInputStream(path)) {
+            return expectedHash.equals(computeHash(is));
+        } catch (IOException | NoSuchAlgorithmException ex) {
+            log.warn("Could not read existing file for hash compare: {}", path, ex);
+            return false;
+        }
+    }
+
+    private String saveNewFile(Path targetDir, MultipartFile file, String ext, String subfolder) throws IOException {
+        String filename = UUID.randomUUID() + ext.toLowerCase();
+        Path target = targetDir.resolve(filename);
+        file.transferTo(target);
+        return buildImagePath(subfolder, filename);
+    }
+
+    private String buildImagePath(String subfolder, String filename) {
+        return "/images/" + subfolder.replace('\\', '/').replace("..", "_") + "/" + filename;
     }
 
     private String computeHash(InputStream is) throws IOException, NoSuchAlgorithmException {

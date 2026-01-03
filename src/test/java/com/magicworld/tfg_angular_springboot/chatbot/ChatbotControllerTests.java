@@ -22,6 +22,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -63,10 +65,12 @@ public class ChatbotControllerTests {
 
         when(geminiService.processMessage(any(ChatRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/v1/chatbot/message")
+        var result = mockMvc.perform(post("/api/v1/chatbot/message")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -86,10 +90,12 @@ public class ChatbotControllerTests {
 
         when(geminiService.processMessage(any(ChatRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/v1/chatbot/message")
+        var result = mockMvc.perform(post("/api/v1/chatbot/message")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(jsonPath("$.message").value("Hello! How can I help you?"));
+                .andExpect(jsonPath("$.message").value("Hello! How can I help you?"))
+                .andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("Hello! How can I help you?"));
     }
 
     @Test
@@ -109,10 +115,12 @@ public class ChatbotControllerTests {
 
         when(geminiService.processMessage(any(ChatRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/v1/chatbot/message")
+        var result = mockMvc.perform(post("/api/v1/chatbot/message")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(jsonPath("$.success").value(true));
+                .andExpect(jsonPath("$.success").value(true))
+                .andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("true"));
     }
 
     @Test
@@ -125,10 +133,12 @@ public class ChatbotControllerTests {
                 .message("")
                 .build();
 
-        mockMvc.perform(post("/api/v1/chatbot/message")
+        var result = mockMvc.perform(post("/api/v1/chatbot/message")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        assertEquals(400, result.getResponse().getStatus());
     }
 
     @Test
@@ -141,10 +151,12 @@ public class ChatbotControllerTests {
                 .message(null)
                 .build();
 
-        mockMvc.perform(post("/api/v1/chatbot/message")
+        var result = mockMvc.perform(post("/api/v1/chatbot/message")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        assertEquals(400, result.getResponse().getStatus());
     }
 
     @TestConfiguration

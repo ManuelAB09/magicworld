@@ -25,6 +25,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -90,11 +92,13 @@ public class TicketTypeControllerTests {
 
         when(ticketTypeService.save(any(TicketType.class))).thenReturn(saved);
 
-        mockMvc.perform(post(API_TICKET_TYPES)
+        var result = mockMvc.perform(post(API_TICKET_TYPES)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", API_TICKET_TYPES_ID + "1"));
+                .andExpect(header().string("Location", API_TICKET_TYPES_ID + "1"))
+                .andReturn();
+        assertEquals(201, result.getResponse().getStatus());
     }
 
     @Test
@@ -109,11 +113,13 @@ public class TicketTypeControllerTests {
 
         when(ticketTypeService.save(any(TicketType.class))).thenReturn(saved);
 
-        mockMvc.perform(post(API_TICKET_TYPES)
+        var result = mockMvc.perform(post(API_TICKET_TYPES)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.typeName").value(TYPE_NAME_STANDARD));
+                .andExpect(jsonPath("$.typeName").value(TYPE_NAME_STANDARD))
+                .andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains(TYPE_NAME_STANDARD));
     }
 
     @Test
@@ -126,9 +132,11 @@ public class TicketTypeControllerTests {
         one.setId(2L);
         when(ticketTypeService.findAll()).thenReturn(List.of(one));
 
-        mockMvc.perform(get(API_TICKET_TYPES).contentType(MediaType.APPLICATION_JSON))
+        var result = mockMvc.perform(get(API_TICKET_TYPES).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.length()").value(1))
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -141,9 +149,11 @@ public class TicketTypeControllerTests {
         tt.setId(3L);
         when(ticketTypeService.findById(3L)).thenReturn(tt);
 
-        mockMvc.perform(get(API_TICKET_TYPES_ID + "3").contentType(MediaType.APPLICATION_JSON))
+        var result = mockMvc.perform(get(API_TICKET_TYPES_ID + "3").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(3));
+                .andExpect(jsonPath("$.id").value(3))
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -154,8 +164,10 @@ public class TicketTypeControllerTests {
     public void testGetTicketTypeByIdNotFound() throws Exception {
         when(ticketTypeService.findById(999L)).thenThrow(new ResourceNotFoundException(ERROR_TICKET_TYPE_NOT_FOUND));
 
-        mockMvc.perform(get(API_TICKET_TYPES_ID + "999").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+        var result = mockMvc.perform(get(API_TICKET_TYPES_ID + "999").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn();
+        assertEquals(404, result.getResponse().getStatus());
     }
 
     @Test
@@ -185,11 +197,13 @@ public class TicketTypeControllerTests {
 
         when(ticketTypeService.update(4L, update)).thenReturn(returned);
 
-        mockMvc.perform(put(API_TICKET_TYPES_ID + "4")
+        var result = mockMvc.perform(put(API_TICKET_TYPES_ID + "4")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(4));
+                .andExpect(jsonPath("$.id").value(4))
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -221,10 +235,12 @@ public class TicketTypeControllerTests {
                 .photoUrl(PHOTO_URL_INVALID)
                 .build();
 
-        mockMvc.perform(post(API_TICKET_TYPES)
+        var result = mockMvc.perform(post(API_TICKET_TYPES)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        assertEquals(400, result.getResponse().getStatus());
     }
 
     @TestConfiguration

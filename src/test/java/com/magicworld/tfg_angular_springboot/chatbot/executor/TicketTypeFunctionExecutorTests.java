@@ -32,6 +32,24 @@ import static org.mockito.Mockito.when;
 @Feature("Ejecutor de Funciones de Tipos de Entrada")
 public class TicketTypeFunctionExecutorTests {
 
+    private static final String STORY_LISTAR_TIPOS = "Listar Tipos de Entrada";
+    private static final String STORY_BUSCAR_TIPO_ID = "Buscar Tipo por ID";
+    private static final String STORY_BUSCAR_TIPO_NOMBRE = "Buscar Tipo por Nombre";
+    private static final String STORY_CREAR_TIPO = "Crear Tipo de Entrada";
+    private static final String STORY_ACTUALIZAR_TIPO = "Actualizar Tipo de Entrada";
+    private static final String STORY_ELIMINAR_TIPO = "Eliminar Tipo de Entrada";
+
+    private static final String TYPE_NAME_ADULT = "ADULT";
+    private static final String CURRENCY_EUR = "EUR";
+    private static final String DESCRIPTION_ADULT_TICKET = "Adult ticket";
+    private static final String FIELD_COST = "cost";
+    private static final String FIELD_TYPE_NAME = "typeName";
+    private static final String FIELD_CURRENCY = "currency";
+    private static final String FIELD_DESCRIPTION = "description";
+    private static final String FIELD_MAX_PER_DAY = "maxPerDay";
+    private static final String FIELD_PHOTO_URL = "photoUrl";
+    private static final String PHOTO_URL_EXAMPLE = "https://example.com/photo.jpg";
+
     @Mock
     private TicketTypeService ticketTypeService;
 
@@ -43,10 +61,10 @@ public class TicketTypeFunctionExecutorTests {
     @BeforeEach
     void setUp() {
         sample = TicketType.builder()
-                .typeName("ADULT")
+                .typeName(TYPE_NAME_ADULT)
                 .cost(new BigDecimal("50.00"))
-                .currency("EUR")
-                .description("Adult ticket")
+                .currency(CURRENCY_EUR)
+                .description(DESCRIPTION_ADULT_TICKET)
                 .maxPerDay(100)
                 .photoUrl("https://example.com/adult.jpg")
                 .build();
@@ -54,7 +72,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Listar Tipos de Entrada")
+    @Story(STORY_LISTAR_TIPOS)
     @Description("Verifica que listar tipos vacíos retorna éxito en inglés")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar tipos vacíos retorna éxito en inglés")
@@ -65,7 +83,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Listar Tipos de Entrada")
+    @Story(STORY_LISTAR_TIPOS)
     @Description("Verifica que el mensaje indica que no hay tipos en inglés")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar tipos vacíos muestra mensaje en inglés")
@@ -76,7 +94,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Listar Tipos de Entrada")
+    @Story(STORY_LISTAR_TIPOS)
     @Description("Verifica que listar tipos vacíos retorna éxito en español")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar tipos vacíos retorna éxito en español")
@@ -87,7 +105,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Listar Tipos de Entrada")
+    @Story(STORY_LISTAR_TIPOS)
     @Description("Verifica que el mensaje indica que no hay tipos en español")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar tipos vacíos muestra mensaje en español")
@@ -98,7 +116,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Listar Tipos de Entrada")
+    @Story(STORY_LISTAR_TIPOS)
     @Description("Verifica que listar tipos con datos retorna éxito")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar tipos con datos retorna éxito")
@@ -109,18 +127,18 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Listar Tipos de Entrada")
+    @Story(STORY_LISTAR_TIPOS)
     @Description("Verifica que la respuesta contiene el nombre del tipo")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar tipos muestra nombre de tipo")
     void testListTicketTypesWithDataContainsTypeName() {
         when(ticketTypeService.findAll()).thenReturn(List.of(sample));
         ChatResponse response = executor.listTicketTypes("en");
-        assertTrue(response.getMessage().contains("ADULT"));
+        assertTrue(response.getMessage().contains(TYPE_NAME_ADULT));
     }
 
     @Test
-    @Story("Listar Tipos de Entrada")
+    @Story(STORY_LISTAR_TIPOS)
     @Description("Verifica que la respuesta tiene lista de datos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Listar tipos retorna lista de datos")
@@ -131,7 +149,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Buscar Tipo por ID")
+    @Story(STORY_BUSCAR_TIPO_ID)
     @Description("Verifica que buscar tipo por ID retorna éxito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Buscar tipo por ID retorna éxito")
@@ -143,7 +161,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Buscar Tipo por ID")
+    @Story(STORY_BUSCAR_TIPO_ID)
     @Description("Verifica que la respuesta contiene el nombre del tipo")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar tipo por ID muestra nombre")
@@ -151,11 +169,11 @@ public class TicketTypeFunctionExecutorTests {
         when(ticketTypeService.findById(1L)).thenReturn(sample);
         Map<String, Object> args = Map.of("id", 1L);
         ChatResponse response = executor.getTicketTypeById(args, "en");
-        assertTrue(response.getMessage().contains("ADULT"));
+        assertTrue(response.getMessage().contains(TYPE_NAME_ADULT));
     }
 
     @Test
-    @Story("Buscar Tipo por ID")
+    @Story(STORY_BUSCAR_TIPO_ID)
     @Description("Verifica que la respuesta en español contiene detalles")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar tipo por ID en español muestra detalles")
@@ -167,7 +185,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Buscar Tipo por Nombre")
+    @Story(STORY_BUSCAR_TIPO_NOMBRE)
     @Description("Verifica que buscar tipo por nombre retorna éxito")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar tipo por nombre retorna éxito")
@@ -179,19 +197,19 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Buscar Tipo por Nombre")
+    @Story(STORY_BUSCAR_TIPO_NOMBRE)
     @Description("Verifica que buscar tipo por nombre contiene datos")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar tipo por nombre contiene datos")
     void testFindTicketTypeByNameFoundContainsData() {
         when(ticketTypeService.findAll()).thenReturn(List.of(sample));
-        Map<String, Object> args = Map.of("name", "ADULT");
+        Map<String, Object> args = Map.of("name", TYPE_NAME_ADULT);
         ChatResponse response = executor.findTicketTypeByName(args, "en");
         assertNotNull(response.getData());
     }
 
     @Test
-    @Story("Buscar Tipo por Nombre")
+    @Story(STORY_BUSCAR_TIPO_NOMBRE)
     @Description("Verifica que buscar tipo inexistente retorna éxito")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar tipo inexistente retorna éxito")
@@ -203,7 +221,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Buscar Tipo por Nombre")
+    @Story(STORY_BUSCAR_TIPO_NOMBRE)
     @Description("Verifica que buscar tipo inexistente muestra mensaje")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar tipo inexistente muestra mensaje no encontrado")
@@ -215,76 +233,76 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Crear Tipo de Entrada")
+    @Story(STORY_CREAR_TIPO)
     @Description("Verifica que crear tipo retorna éxito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear tipo de entrada retorna éxito")
     void testCreateTicketTypeReturnsSuccess() {
         when(ticketTypeService.save(any(TicketType.class))).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
-        args.put("typeName", "ADULT");
-        args.put("cost", 50.0);
-        args.put("currency", "EUR");
-        args.put("description", "Adult ticket");
-        args.put("maxPerDay", 100);
+        args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
+        args.put(FIELD_COST, 50.0);
+        args.put(FIELD_CURRENCY, CURRENCY_EUR);
+        args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
+        args.put(FIELD_MAX_PER_DAY, 100);
         ChatResponse response = executor.createTicketType(args, "en");
         assertTrue(response.isSuccess());
     }
 
     @Test
-    @Story("Crear Tipo de Entrada")
+    @Story(STORY_CREAR_TIPO)
     @Description("Verifica que el mensaje contiene confirmación de creación")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear tipo muestra mensaje de creación")
     void testCreateTicketTypeContainsCreatedMessage() {
         when(ticketTypeService.save(any(TicketType.class))).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
-        args.put("typeName", "ADULT");
-        args.put("cost", 50.0);
-        args.put("currency", "EUR");
-        args.put("description", "Adult ticket");
-        args.put("maxPerDay", 100);
+        args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
+        args.put(FIELD_COST, 50.0);
+        args.put(FIELD_CURRENCY, CURRENCY_EUR);
+        args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
+        args.put(FIELD_MAX_PER_DAY, 100);
         ChatResponse response = executor.createTicketType(args, "en");
         assertTrue(response.getMessage().contains("Ticket type created"));
     }
 
     @Test
-    @Story("Crear Tipo de Entrada")
+    @Story(STORY_CREAR_TIPO)
     @Description("Verifica que crear tipo en español muestra mensaje correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear tipo en español muestra mensaje de creación")
     void testCreateTicketTypeSpanishContainsCreatedMessage() {
         when(ticketTypeService.save(any(TicketType.class))).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
-        args.put("typeName", "ADULT");
-        args.put("cost", 50.0);
-        args.put("currency", "EUR");
-        args.put("description", "Adult ticket");
-        args.put("maxPerDay", 100);
+        args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
+        args.put(FIELD_COST, 50.0);
+        args.put(FIELD_CURRENCY, CURRENCY_EUR);
+        args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
+        args.put(FIELD_MAX_PER_DAY, 100);
         ChatResponse response = executor.createTicketType(args, "es");
         assertTrue(response.getMessage().contains("Tipo de entrada creado"));
     }
 
     @Test
-    @Story("Crear Tipo de Entrada")
+    @Story(STORY_CREAR_TIPO)
     @Description("Verifica que crear tipo con photoUrl retorna éxito")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear tipo con photoUrl retorna éxito")
     void testCreateTicketTypeWithPhotoUrlReturnsSuccess() {
         when(ticketTypeService.save(any(TicketType.class))).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
-        args.put("typeName", "ADULT");
-        args.put("cost", 50.0);
-        args.put("currency", "EUR");
-        args.put("description", "Adult ticket");
-        args.put("maxPerDay", 100);
-        args.put("photoUrl", "https://example.com/photo.jpg");
+        args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
+        args.put(FIELD_COST, 50.0);
+        args.put(FIELD_CURRENCY, CURRENCY_EUR);
+        args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
+        args.put(FIELD_MAX_PER_DAY, 100);
+        args.put(FIELD_PHOTO_URL, PHOTO_URL_EXAMPLE);
         ChatResponse response = executor.createTicketType(args, "en");
         assertTrue(response.isSuccess());
     }
 
     @Test
-    @Story("Actualizar Tipo de Entrada")
+    @Story(STORY_ACTUALIZAR_TIPO)
     @Description("Verifica que actualizar tipo retorna éxito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar tipo de entrada retorna éxito")
@@ -293,13 +311,13 @@ public class TicketTypeFunctionExecutorTests {
         when(ticketTypeService.update(any(Long.class), any(TicketType.class))).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
         args.put("id", 1L);
-        args.put("typeName", "PREMIUM");
+        args.put(FIELD_TYPE_NAME, "PREMIUM");
         ChatResponse response = executor.updateTicketType(args, "en");
         assertTrue(response.isSuccess());
     }
 
     @Test
-    @Story("Actualizar Tipo de Entrada")
+    @Story(STORY_ACTUALIZAR_TIPO)
     @Description("Verifica que el mensaje contiene confirmación de actualización")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar tipo muestra mensaje de actualización")
@@ -308,13 +326,13 @@ public class TicketTypeFunctionExecutorTests {
         when(ticketTypeService.update(any(Long.class), any(TicketType.class))).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
         args.put("id", 1L);
-        args.put("typeName", "PREMIUM");
+        args.put(FIELD_TYPE_NAME, "PREMIUM");
         ChatResponse response = executor.updateTicketType(args, "en");
         assertTrue(response.getMessage().contains("Ticket type updated"));
     }
 
     @Test
-    @Story("Actualizar Tipo de Entrada")
+    @Story(STORY_ACTUALIZAR_TIPO)
     @Description("Verifica que actualizar tipo en español muestra mensaje correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar tipo en español muestra mensaje de actualización")
@@ -328,7 +346,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Eliminar Tipo de Entrada")
+    @Story(STORY_ELIMINAR_TIPO)
     @Description("Verifica que solicitar eliminación retorna éxito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Solicitar eliminación de tipo retorna éxito")
@@ -340,7 +358,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Eliminar Tipo de Entrada")
+    @Story(STORY_ELIMINAR_TIPO)
     @Description("Verifica que solicitar eliminación contiene acción pendiente")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Solicitar eliminación contiene acción pendiente")
@@ -352,7 +370,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Eliminar Tipo de Entrada")
+    @Story(STORY_ELIMINAR_TIPO)
     @Description("Verifica que la acción pendiente tiene el tipo correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Acción pendiente tiene tipo deleteTicketType")
@@ -364,7 +382,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Eliminar Tipo de Entrada")
+    @Story(STORY_ELIMINAR_TIPO)
     @Description("Verifica que ejecutar eliminación retorna éxito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Ejecutar eliminación de tipo retorna éxito")
@@ -374,7 +392,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Eliminar Tipo de Entrada")
+    @Story(STORY_ELIMINAR_TIPO)
     @Description("Verifica que el mensaje contiene confirmación de eliminación")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Ejecutar eliminación muestra mensaje de eliminación")
@@ -384,7 +402,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Eliminar Tipo de Entrada")
+    @Story(STORY_ELIMINAR_TIPO)
     @Description("Verifica que ejecutar eliminación en español muestra mensaje correcto")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Ejecutar eliminación en español muestra mensaje de eliminación")
@@ -394,79 +412,79 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Crear Tipo de Entrada")
+    @Story(STORY_CREAR_TIPO)
     @Description("Verifica que crear con photoUrl en blanco usa valor por defecto")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Crear tipo con photoUrl en blanco usa defecto")
     void testCreateTicketTypeWithBlankPhotoUrlUsesDefault() {
         when(ticketTypeService.save(any(TicketType.class))).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
-        args.put("typeName", "ADULT");
-        args.put("cost", 50.0);
-        args.put("currency", "EUR");
-        args.put("description", "Adult ticket");
-        args.put("maxPerDay", 100);
-        args.put("photoUrl", "   ");
+        args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
+        args.put(FIELD_COST, 50.0);
+        args.put(FIELD_CURRENCY, CURRENCY_EUR);
+        args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
+        args.put(FIELD_MAX_PER_DAY, 100);
+        args.put(FIELD_PHOTO_URL, "   ");
         ChatResponse response = executor.createTicketType(args, "en");
         assertTrue(response.isSuccess());
     }
 
     @Test
-    @Story("Crear Tipo de Entrada")
+    @Story(STORY_CREAR_TIPO)
     @Description("Verifica que crear con photoUrl null usa valor por defecto")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Crear tipo con photoUrl null usa defecto")
     void testCreateTicketTypeWithNullPhotoUrlUsesDefault() {
         when(ticketTypeService.save(any(TicketType.class))).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
-        args.put("typeName", "ADULT");
-        args.put("cost", 50.0);
-        args.put("currency", "EUR");
-        args.put("description", "Adult ticket");
-        args.put("maxPerDay", 100);
-        args.put("photoUrl", null);
+        args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
+        args.put(FIELD_COST, 50.0);
+        args.put(FIELD_CURRENCY, CURRENCY_EUR);
+        args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
+        args.put(FIELD_MAX_PER_DAY, 100);
+        args.put(FIELD_PHOTO_URL, null);
         ChatResponse response = executor.createTicketType(args, "en");
         assertTrue(response.isSuccess());
     }
 
     @Test
-    @Story("Crear Tipo de Entrada")
+    @Story(STORY_CREAR_TIPO)
     @Description("Verifica que crear con photoUrl inválido usa valor por defecto")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Crear tipo con photoUrl inválido usa defecto")
     void testCreateTicketTypeWithInvalidPhotoUrlUsesDefault() {
         when(ticketTypeService.save(any(TicketType.class))).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
-        args.put("typeName", "ADULT");
-        args.put("cost", 50.0);
-        args.put("currency", "EUR");
-        args.put("description", "Adult ticket");
-        args.put("maxPerDay", 100);
-        args.put("photoUrl", "not-a-url");
+        args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
+        args.put(FIELD_COST, 50.0);
+        args.put(FIELD_CURRENCY, CURRENCY_EUR);
+        args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
+        args.put(FIELD_MAX_PER_DAY, 100);
+        args.put(FIELD_PHOTO_URL, "not-a-url");
         ChatResponse response = executor.createTicketType(args, "en");
         assertTrue(response.isSuccess());
     }
 
     @Test
-    @Story("Crear Tipo de Entrada")
+    @Story(STORY_CREAR_TIPO)
     @Description("Verifica que crear con URL http usa URL proporcionada")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Crear tipo con URL http usa URL proporcionada")
     void testCreateTicketTypeWithHttpUrlUsesProvidedUrl() {
         when(ticketTypeService.save(any(TicketType.class))).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
-        args.put("typeName", "ADULT");
-        args.put("cost", 50.0);
-        args.put("currency", "EUR");
-        args.put("description", "Adult ticket");
-        args.put("maxPerDay", 100);
-        args.put("photoUrl", "http://example.com/photo.jpg");
+        args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
+        args.put(FIELD_COST, 50.0);
+        args.put(FIELD_CURRENCY, CURRENCY_EUR);
+        args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
+        args.put(FIELD_MAX_PER_DAY, 100);
+        args.put(FIELD_PHOTO_URL, "http://example.com/photo.jpg");
         ChatResponse response = executor.createTicketType(args, "en");
         assertTrue(response.isSuccess());
     }
 
     @Test
-    @Story("Actualizar Tipo de Entrada")
+    @Story(STORY_ACTUALIZAR_TIPO)
     @Description("Verifica que actualizar con valores null preserva existentes")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar tipo con valores null preserva existentes")
@@ -480,7 +498,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Actualizar Tipo de Entrada")
+    @Story(STORY_ACTUALIZAR_TIPO)
     @Description("Verifica que actualizar con photoUrl por defecto establece null")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Actualizar tipo con photoUrl por defecto establece null")
@@ -489,13 +507,13 @@ public class TicketTypeFunctionExecutorTests {
         when(ticketTypeService.update(any(Long.class), any(TicketType.class))).thenReturn(sample);
         Map<String, Object> args = new HashMap<>();
         args.put("id", 1L);
-        args.put("photoUrl", "https://placeholder.com/default.jpg");
+        args.put(FIELD_PHOTO_URL, "https://placeholder.com/default.jpg");
         ChatResponse response = executor.updateTicketType(args, "en");
         assertTrue(response.isSuccess());
     }
 
     @Test
-    @Story("Buscar Tipo por Nombre")
+    @Story(STORY_BUSCAR_TIPO_NOMBRE)
     @Description("Verifica que buscar tipo inexistente en español muestra mensaje")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar tipo inexistente en español muestra mensaje")
@@ -507,19 +525,19 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Buscar Tipo por Nombre")
+    @Story(STORY_BUSCAR_TIPO_NOMBRE)
     @Description("Verifica que buscar tipo encontrado en español muestra mensaje")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Buscar tipo encontrado en español muestra mensaje")
     void testFindTicketTypeByNameSpanishFoundContainsMessage() {
         when(ticketTypeService.findAll()).thenReturn(List.of(sample));
-        Map<String, Object> args = Map.of("name", "ADULT");
+        Map<String, Object> args = Map.of("name", TYPE_NAME_ADULT);
         ChatResponse response = executor.findTicketTypeByName(args, "es");
         assertTrue(response.getMessage().contains("Tipo de entrada encontrado"));
     }
 
     @Test
-    @Story("Buscar Tipo por ID")
+    @Story(STORY_BUSCAR_TIPO_ID)
     @Description("Verifica que photoUrl null se maneja correctamente")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Buscar tipo con photoUrl null muestra None")
@@ -532,7 +550,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Buscar Tipo por ID")
+    @Story(STORY_BUSCAR_TIPO_ID)
     @Description("Verifica que photoUrl null en español se maneja correctamente")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Buscar tipo con photoUrl null en español muestra Ninguna")
@@ -545,7 +563,7 @@ public class TicketTypeFunctionExecutorTests {
     }
 
     @Test
-    @Story("Eliminar Tipo de Entrada")
+    @Story(STORY_ELIMINAR_TIPO)
     @Description("Verifica que solicitar eliminación en español muestra confirmación")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Solicitar eliminación en español muestra confirmación")

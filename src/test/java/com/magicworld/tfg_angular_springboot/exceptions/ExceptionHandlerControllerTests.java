@@ -177,6 +177,7 @@ public class ExceptionHandlerControllerTests {
     void testHandleMaxUploadContainsSizeExceededCode() {
         MaxUploadSizeExceededException ex = new MaxUploadSizeExceededException(10 * 1024 * 1024);
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleMaxUpload(ex, webRequest);
+        assertNotNull(response.getBody());
         assertEquals("error.file.size_exceeded", response.getBody().getCode());
     }
 
@@ -233,6 +234,7 @@ public class ExceptionHandlerControllerTests {
     void testHandleAllUncaughtContainsInternalCode() {
         Exception ex = new RuntimeException("Unexpected error");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleAllUncaught(ex, webRequest);
+        assertNotNull(response.getBody());
         assertEquals("error.internal", response.getBody().getCode());
     }
 
@@ -310,6 +312,7 @@ public class ExceptionHandlerControllerTests {
     void testHandleTooManyRequestsExceptionContainsCode() {
         TooManyRequestsException ex = new TooManyRequestsException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
+        assertNotNull(response.getBody());
         assertEquals("error.too.many.requests", response.getBody().getCode());
     }
 
@@ -326,6 +329,7 @@ public class ExceptionHandlerControllerTests {
         when(violation.getMessage()).thenReturn("must be valid");
         ConstraintViolationException ex = new ConstraintViolationException(Set.of(violation));
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleConstraintViolation(ex, webRequest);
+        assertNotNull(response.getBody());
         assertEquals("error.validation", response.getBody().getCode());
     }
 
@@ -337,6 +341,7 @@ public class ExceptionHandlerControllerTests {
     void testHandleMultipartExceptionGenericContainsCode() {
         MultipartException ex = new MultipartException("Some multipart error");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleMultipartException(ex, webRequest);
+        assertNotNull(response.getBody());
         assertEquals("error.internal", response.getBody().getCode());
     }
 
@@ -348,6 +353,7 @@ public class ExceptionHandlerControllerTests {
     void testHandleInvalidTokenExceptionContainsCode() {
         InvalidTokenException ex = new InvalidTokenException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
+        assertNotNull(response.getBody());
         assertEquals("error.invalid.token", response.getBody().getCode());
     }
 
@@ -359,6 +365,7 @@ public class ExceptionHandlerControllerTests {
     void testHandlePasswordsDoNotMatchExceptionContainsCode() {
         PasswordsDoNoMatchException ex = new PasswordsDoNoMatchException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
+        assertNotNull(response.getBody());
         assertEquals("error.password.do.not.match", response.getBody().getCode());
     }
 
@@ -370,6 +377,7 @@ public class ExceptionHandlerControllerTests {
     void testHandleNoDiscountsExceptionContainsCode() {
         NoDiscountsCanBeAssignedToTicketTypeException ex = new NoDiscountsCanBeAssignedToTicketTypeException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
+        assertNotNull(response.getBody());
         assertEquals("error.ticket_type.discounts.assigned", response.getBody().getCode());
     }
 
@@ -381,6 +389,7 @@ public class ExceptionHandlerControllerTests {
     void testHandleAtLeastOneTicketTypeExceptionContainsCode() {
         AtLeastOneTicketTypeMustBeProvidedException ex = new AtLeastOneTicketTypeMustBeProvidedException();
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
+        assertNotNull(response.getBody());
         assertEquals("error.at.least.one.ticket.type.must.be.provided", response.getBody().getCode());
     }
 
@@ -392,6 +401,7 @@ public class ExceptionHandlerControllerTests {
     void testErrorMessageContainsTimestamp() {
         ResourceNotFoundException ex = new ResourceNotFoundException("test");
         ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
+        assertNotNull(response.getBody());
         assertNotNull(response.getBody().getTimestamp());
     }
 }

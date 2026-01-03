@@ -24,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -48,12 +49,10 @@ public class AuthE2ETests {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private User existingUser;
-
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
-        existingUser = User.builder()
+        User existingUser = User.builder()
                 .username("existinguser")
                 .email("existing@example.com")
                 .password(passwordEncoder.encode("Password1@"))
@@ -80,11 +79,13 @@ public class AuthE2ETests {
                 .password("Password1@")
                 .build();
 
-        mockMvc.perform(post("/api/v1/auth/login")
+        var result = mockMvc.perform(post("/api/v1/auth/login")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -98,11 +99,13 @@ public class AuthE2ETests {
                 .password("Password1@")
                 .build();
 
-        mockMvc.perform(post("/api/v1/auth/login")
+        var result = mockMvc.perform(post("/api/v1/auth/login")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(cookie().exists("token"));
+                .andExpect(cookie().exists("token"))
+                .andReturn();
+        assertNotNull(result.getResponse().getCookie("token"));
     }
 
     @Test
@@ -116,11 +119,13 @@ public class AuthE2ETests {
                 .password("WrongPassword1@")
                 .build();
 
-        mockMvc.perform(post("/api/v1/auth/login")
+        var result = mockMvc.perform(post("/api/v1/auth/login")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+        assertEquals(401, result.getResponse().getStatus());
     }
 
     @Test
@@ -134,11 +139,13 @@ public class AuthE2ETests {
                 .password("Password1@")
                 .build();
 
-        mockMvc.perform(post("/api/v1/auth/login")
+        var result = mockMvc.perform(post("/api/v1/auth/login")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andReturn();
+        assertEquals(404, result.getResponse().getStatus());
     }
 
     @Test
@@ -156,11 +163,13 @@ public class AuthE2ETests {
                 .lastname("User")
                 .build();
 
-        mockMvc.perform(post("/api/v1/auth/register")
+        var result = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andReturn();
+        assertEquals(201, result.getResponse().getStatus());
     }
 
     @Test
@@ -178,11 +187,13 @@ public class AuthE2ETests {
                 .lastname("User")
                 .build();
 
-        mockMvc.perform(post("/api/v1/auth/register")
+        var result = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(cookie().exists("token"));
+                .andExpect(cookie().exists("token"))
+                .andReturn();
+        assertNotNull(result.getResponse().getCookie("token"));
     }
 
     @Test
@@ -200,11 +211,13 @@ public class AuthE2ETests {
                 .lastname("User")
                 .build();
 
-        mockMvc.perform(post("/api/v1/auth/register")
+        var result = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andReturn();
+        assertEquals(409, result.getResponse().getStatus());
     }
 
     @Test
@@ -222,11 +235,13 @@ public class AuthE2ETests {
                 .lastname("User")
                 .build();
 
-        mockMvc.perform(post("/api/v1/auth/register")
+        var result = mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andReturn();
+        assertEquals(409, result.getResponse().getStatus());
     }
 
     @Test
@@ -236,9 +251,11 @@ public class AuthE2ETests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Logout retorna 200 OK")
     void testLogoutReturnsOk() throws Exception {
-        mockMvc.perform(post("/api/v1/auth/logout")
+        var result = mockMvc.perform(post("/api/v1/auth/logout")
                         .with(csrf()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -248,9 +265,11 @@ public class AuthE2ETests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Logout expira cookie")
     void testLogoutExpiresCookie() throws Exception {
-        mockMvc.perform(post("/api/v1/auth/logout")
+        var result = mockMvc.perform(post("/api/v1/auth/logout")
                         .with(csrf()))
-                .andExpect(cookie().maxAge("token", 0));
+                .andExpect(cookie().maxAge("token", 0))
+                .andReturn();
+        assertEquals(0, result.getResponse().getCookie("token").getMaxAge());
     }
 
     @Test
@@ -260,9 +279,11 @@ public class AuthE2ETests {
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("CSRF token retorna 200 OK")
     void testCsrfTokenReturnsOk() throws Exception {
-        mockMvc.perform(get("/api/v1/auth/csrf-token")
+        var result = mockMvc.perform(get("/api/v1/auth/csrf-token")
                         .with(csrf()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -272,9 +293,11 @@ public class AuthE2ETests {
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("CSRF token establece header")
     void testCsrfTokenSetsXsrfHeader() throws Exception {
-        mockMvc.perform(get("/api/v1/auth/csrf-token")
+        var result = mockMvc.perform(get("/api/v1/auth/csrf-token")
                         .with(csrf()))
-                .andExpect(header().exists("X-XSRF-TOKEN"));
+                .andExpect(header().exists("X-XSRF-TOKEN"))
+                .andReturn();
+        assertNotNull(result.getResponse().getHeader("X-XSRF-TOKEN"));
     }
 
     @Test
@@ -285,10 +308,12 @@ public class AuthE2ETests {
     void testResetPasswordInvalidTokenReturns404() throws Exception {
         String requestBody = "{\"token\":\"invalidtoken\",\"newPassword\":\"NewPassword1@\"}";
 
-        mockMvc.perform(post("/api/v1/auth/reset-password")
+        var result = mockMvc.perform(post("/api/v1/auth/reset-password")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andReturn();
+        assertEquals(404, result.getResponse().getStatus());
     }
 }

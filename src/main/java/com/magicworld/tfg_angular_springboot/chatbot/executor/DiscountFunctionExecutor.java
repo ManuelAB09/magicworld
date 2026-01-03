@@ -110,22 +110,13 @@ public class DiscountFunctionExecutor {
         @SuppressWarnings("unchecked")
         List<String> ticketTypeNames = (List<String>) args.get("ticketTypeNames");
 
-        // Validate ticket type names exist (case insensitive search)
         List<String> resolvedNames = resolveTicketTypeNames(ticketTypeNames);
-        if (resolvedNames.isEmpty() && ticketTypeNames != null && !ticketTypeNames.isEmpty()) {
-            return buildErrorResponse(lang.equals("en") ?
-                    "Could not find any of the specified ticket types. Available types: " + getAvailableTicketTypeNames() :
-                    "No se encontró ninguno de los tipos de entrada especificados. Tipos disponibles: " + getAvailableTicketTypeNames());
-        }
+        ChatResponse validationError = validateTicketTypeNames(ticketTypeNames, resolvedNames, lang);
+        if (validationError != null) return validationError;
 
         LocalDate expiryDate = LocalDate.parse(expiryDateStr, DateTimeFormatter.ISO_LOCAL_DATE);
-
-        // Validate expiry date is in the future
-        if (expiryDate.isBefore(LocalDate.now())) {
-            return buildErrorResponse(lang.equals("en") ?
-                    "The expiry date must be in the future." :
-                    "La fecha de expiración debe ser en el futuro.");
-        }
+        ChatResponse dateError = validateExpiryDate(expiryDate, lang);
+        if (dateError != null) return dateError;
 
         Discount discount = Discount.builder()
                 .discountCode(code)
@@ -134,16 +125,34 @@ public class DiscountFunctionExecutor {
                 .build();
 
         Discount saved = discountService.save(discount, resolvedNames);
+        return buildCreateSuccessResponse(saved, resolvedNames, lang);
+    }
 
-        String ticketTypesStr = resolvedNames.isEmpty() ?
-                (lang.equals("en") ? "All" : "Todos") :
-                String.join(", ", resolvedNames);
+    private ChatResponse validateTicketTypeNames(List<String> names, List<String> resolved, String lang) {
+        if (resolved.isEmpty() && names != null && !names.isEmpty()) {
+            return buildErrorResponse(getMessage(lang,
+                    "Could not find any of the specified ticket types. Available types: " + getAvailableTicketTypeNames(),
+                    "No se encontró ninguno de los tipos de entrada especificados. Tipos disponibles: " + getAvailableTicketTypeNames()));
+        }
+        return null;
+    }
 
+    private ChatResponse validateExpiryDate(LocalDate expiryDate, String lang) {
+        if (expiryDate.isBefore(LocalDate.now())) {
+            return buildErrorResponse(getMessage(lang,
+                    "The expiry date must be in the future.",
+                    "La fecha de expiración debe ser en el futuro."));
+        }
+        return null;
+    }
+
+    private ChatResponse buildCreateSuccessResponse(Discount saved, List<String> resolvedNames, String lang) {
+        String ticketTypesStr = resolvedNames.isEmpty() ? getMessage(lang, "All", "Todos") : String.join(", ", resolvedNames);
         return ChatResponse.builder()
                 .success(true)
-                .message(String.format(lang.equals("en") ?
-                                "✅ Discount created successfully!\n\n• **ID:** %d\n• **Code:** %s\n• **Percentage:** %d%%\n• **Expires:** %s\n• **Applies to:** %s" :
-                                "✅ ¡Descuento creado exitosamente!\n\n• **ID:** %d\n• **Código:** %s\n• **Porcentaje:** %d%%\n• **Expira:** %s\n• **Aplica a:** %s",
+                .message(String.format(getMessage(lang,
+                                "✅ Discount created successfully!\n\n• **ID:** %d\n• **Code:** %s\n• **Percentage:** %d%%\n• **Expires:** %s\n• **Applies to:** %s",
+                                "✅ ¡Descuento creado exitosamente!\n\n• **ID:** %d\n• **Código:** %s\n• **Porcentaje:** %d%%\n• **Expira:** %s\n• **Aplica a:** %s"),
                         saved.getId(), saved.getDiscountCode(), saved.getDiscountPercentage(),
                         saved.getExpiryDate(), ticketTypesStr))
                 .data(saved)
@@ -152,23 +161,11 @@ public class DiscountFunctionExecutor {
 
     public ChatResponse updateDiscount(Map<String, Object> args, String lang) {
         Long id = ((Number) args.get("id")).longValue();
-
-        // Fetch existing discount to preserve fields not being updated
         Discount existing = discountService.findById(id);
 
-        // Only update fields that are provided
-        String code = args.containsKey("discountCode") && args.get("discountCode") != null ?
-                (String) args.get("discountCode") : existing.getDiscountCode();
-        int percentage = args.containsKey("discountPercentage") && args.get("discountPercentage") != null ?
-                ((Number) args.get("discountPercentage")).intValue() : existing.getDiscountPercentage();
-
-        LocalDate expiryDate;
-        if (args.containsKey("expiryDate") && args.get("expiryDate") != null) {
-            String expiryDateStr = (String) args.get("expiryDate");
-            expiryDate = LocalDate.parse(expiryDateStr, DateTimeFormatter.ISO_LOCAL_DATE);
-        } else {
-            expiryDate = existing.getExpiryDate();
-        }
+        String code = getOrDefault(args, "discountCode", existing.getDiscountCode());
+        int percentage = getOrDefaultInt(args, "discountPercentage", existing.getDiscountPercentage());
+        LocalDate expiryDate = getExpiryDateOrDefault(args, existing.getExpiryDate());
 
         @SuppressWarnings("unchecked")
         List<String> ticketTypeNames = (List<String>) args.get("ticketTypeNames");
@@ -185,13 +182,33 @@ public class DiscountFunctionExecutor {
 
         return ChatResponse.builder()
                 .success(true)
-                .message(String.format(lang.equals("en") ?
-                                "✅ Discount updated!\n\n• **ID:** %d\n• **Code:** %s\n• **Percentage:** %d%%\n• **Expires:** %s" :
-                                "✅ ¡Descuento actualizado!\n\n• **ID:** %d\n• **Código:** %s\n• **Porcentaje:** %d%%\n• **Expira:** %s",
+                .message(String.format(getMessage(lang,
+                                "✅ Discount updated!\n\n• **ID:** %d\n• **Code:** %s\n• **Percentage:** %d%%\n• **Expires:** %s",
+                                "✅ ¡Descuento actualizado!\n\n• **ID:** %d\n• **Código:** %s\n• **Porcentaje:** %d%%\n• **Expira:** %s"),
                         updated.getId(), updated.getDiscountCode(),
                         updated.getDiscountPercentage(), updated.getExpiryDate()))
                 .data(updated)
                 .build();
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T getOrDefault(Map<String, Object> args, String key, T defaultValue) {
+        return args.containsKey(key) && args.get(key) != null ? (T) args.get(key) : defaultValue;
+    }
+
+    private int getOrDefaultInt(Map<String, Object> args, String key, int defaultValue) {
+        return args.containsKey(key) && args.get(key) != null ? ((Number) args.get(key)).intValue() : defaultValue;
+    }
+
+    private LocalDate getExpiryDateOrDefault(Map<String, Object> args, LocalDate defaultValue) {
+        if (args.containsKey("expiryDate") && args.get("expiryDate") != null) {
+            return LocalDate.parse((String) args.get("expiryDate"), DateTimeFormatter.ISO_LOCAL_DATE);
+        }
+        return defaultValue;
+    }
+
+    private String getMessage(String lang, String enMessage, String esMessage) {
+        return "en".equals(lang) ? enMessage : esMessage;
     }
 
     public ChatResponse requestDeleteDiscount(Map<String, Object> args, String lang) {

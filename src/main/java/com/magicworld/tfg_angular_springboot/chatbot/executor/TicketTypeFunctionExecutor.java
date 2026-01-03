@@ -6,6 +6,7 @@ import com.magicworld.tfg_angular_springboot.ticket_type.TicketType;
 import com.magicworld.tfg_angular_springboot.ticket_type.TicketTypeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -144,30 +145,14 @@ public class TicketTypeFunctionExecutor {
 
     public ChatResponse updateTicketType(Map<String, Object> args, String lang) {
         Long id = ((Number) args.get("id")).longValue();
-
-        // Fetch existing ticket type to preserve fields not being updated
         TicketType existing = ticketTypeService.findById(id);
 
-        // Only update fields that are provided, otherwise keep existing values
-        String typeName = args.containsKey("typeName") && args.get("typeName") != null ?
-                (String) args.get("typeName") : existing.getTypeName();
-        BigDecimal cost = args.containsKey("cost") && args.get("cost") != null ?
-                BigDecimal.valueOf(((Number) args.get("cost")).doubleValue()) : existing.getCost();
-        String currency = args.containsKey("currency") && args.get("currency") != null ?
-                (String) args.get("currency") : existing.getCurrency();
-        String description = args.containsKey("description") && args.get("description") != null ?
-                (String) args.get("description") : existing.getDescription();
-        int maxPerDay = args.containsKey("maxPerDay") && args.get("maxPerDay") != null ?
-                ((Number) args.get("maxPerDay")).intValue() : existing.getMaxPerDay();
-
-        // Handle photo URL - only update if explicitly provided
-        String photoUrl = null;
-        if (args.containsKey("photoUrl") && args.get("photoUrl") != null) {
-            String providedUrl = (String) args.get("photoUrl");
-            if (!providedUrl.isBlank() && !providedUrl.equals(DEFAULT_PHOTO_URL)) {
-                photoUrl = providedUrl;
-            }
-        }
+        String typeName = getOrDefault(args, "typeName", existing.getTypeName());
+        BigDecimal cost = getOrDefaultBigDecimal(args, "cost", existing.getCost());
+        String currency = getOrDefault(args, "currency", existing.getCurrency());
+        String description = getOrDefault(args, "description", existing.getDescription());
+        int maxPerDay = getOrDefaultInt(args, "maxPerDay", existing.getMaxPerDay());
+        String photoUrl = extractPhotoUrlForUpdate(args);
 
         TicketType ticketType = TicketType.builder()
                 .typeName(typeName)
@@ -188,6 +173,37 @@ public class TicketTypeFunctionExecutor {
                         updated.getId(), updated.getTypeName(), updated.getCost(), updated.getCurrency()))
                 .data(updated)
                 .build();
+    }
+
+    private String extractPhotoUrlForUpdate(Map<String, Object> args) {
+        return getString(args, DEFAULT_PHOTO_URL);
+    }
+
+    @Nullable
+    static String getString(Map<String, Object> args, String defaultPhotoUrl) {
+        if (!args.containsKey("photoUrl") || args.get("photoUrl") == null) {
+            return null;
+        }
+        String providedUrl = (String) args.get("photoUrl");
+        if (providedUrl.isBlank() || providedUrl.equals(defaultPhotoUrl)) {
+            return null;
+        }
+        return providedUrl;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T getOrDefault(Map<String, Object> args, String key, T defaultValue) {
+        return args.containsKey(key) && args.get(key) != null ? (T) args.get(key) : defaultValue;
+    }
+
+    private int getOrDefaultInt(Map<String, Object> args, String key, int defaultValue) {
+        return args.containsKey(key) && args.get(key) != null ? ((Number) args.get(key)).intValue() : defaultValue;
+    }
+
+    private BigDecimal getOrDefaultBigDecimal(Map<String, Object> args, String key, BigDecimal defaultValue) {
+        return args.containsKey(key) && args.get(key) != null
+                ? BigDecimal.valueOf(((Number) args.get(key)).doubleValue())
+                : defaultValue;
     }
 
     public ChatResponse requestDeleteTicketType(Map<String, Object> args, String lang) {

@@ -14,30 +14,42 @@ public class DotenvLoader {
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(f, StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty() || line.startsWith("#") || line.startsWith("//")) {
-                    continue;
-                }
-                // Split on first '='
-                int idx = line.indexOf('=');
-                if (idx <= 0) continue;
-                String key = line.substring(0, idx).trim();
-                String value = line.substring(idx + 1).trim();
-                // Remove surrounding quotes if present
-                if ((value.startsWith("\"") && value.endsWith("\"")) || (value.startsWith("'") && value.endsWith("'"))) {
-                    value = value.substring(1, value.length() - 1);
-                }
-
-                if (System.getenv(key) == null && System.getProperty(key) == null) {
-                    System.setProperty(key, value);
-                }
-            }
+            br.lines()
+                    .map(String::trim)
+                    .filter(DotenvLoader::isValidLine)
+                    .forEach(DotenvLoader::processLine);
 
             System.out.println("[DotenvLoader] .env cargado: " + f.getAbsolutePath());
         } catch (Exception e) {
             System.err.println("[DotenvLoader] Error cargando .env: " + e.getMessage());
         }
+    }
+
+    private static boolean isValidLine(String line) {
+        return !line.startsWith("#") && !line.startsWith("//") && line.contains("=");
+    }
+
+    private static void processLine(String line) {
+        int idx = line.indexOf('=');
+        if (idx <= 0) return;
+
+        String key = line.substring(0, idx).trim();
+        String value = removeQuotes(line.substring(idx + 1).trim());
+
+        if (shouldSetProperty(key)) {
+            System.setProperty(key, value);
+        }
+    }
+
+    private static String removeQuotes(String value) {
+        if ((value.startsWith("\"") && value.endsWith("\"")) ||
+                (value.startsWith("'") && value.endsWith("'"))) {
+            return value.substring(1, value.length() - 1);
+        }
+        return value;
+    }
+
+    private static boolean shouldSetProperty(String key) {
+        return System.getenv(key) == null && System.getProperty(key) == null;
     }
 }

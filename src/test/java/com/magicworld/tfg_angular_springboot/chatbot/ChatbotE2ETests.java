@@ -19,6 +19,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -46,11 +48,13 @@ public class ChatbotE2ETests {
         ChatRequest request = ChatRequest.builder()
                 .message("Hello")
                 .build();
-        mockMvc.perform(post("/api/v1/chatbot/message")
+        var result = mockMvc.perform(post("/api/v1/chatbot/message")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+        assertEquals(401, result.getResponse().getStatus());
     }
 
     @Test
@@ -63,11 +67,13 @@ public class ChatbotE2ETests {
         ChatRequest request = ChatRequest.builder()
                 .message("Hello")
                 .build();
-        mockMvc.perform(post("/api/v1/chatbot/message")
+        var result = mockMvc.perform(post("/api/v1/chatbot/message")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andReturn();
+        assertEquals(403, result.getResponse().getStatus());
     }
 
     @Test
@@ -80,11 +86,13 @@ public class ChatbotE2ETests {
         ChatRequest request = ChatRequest.builder()
                 .message("")
                 .build();
-        mockMvc.perform(post("/api/v1/chatbot/message")
+        var result = mockMvc.perform(post("/api/v1/chatbot/message")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        assertEquals(400, result.getResponse().getStatus());
     }
 
     @Test
@@ -97,11 +105,13 @@ public class ChatbotE2ETests {
         ChatRequest request = ChatRequest.builder()
                 .message(null)
                 .build();
-        mockMvc.perform(post("/api/v1/chatbot/message")
+        var result = mockMvc.perform(post("/api/v1/chatbot/message")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        assertEquals(400, result.getResponse().getStatus());
     }
 
     @Test
@@ -114,10 +124,12 @@ public class ChatbotE2ETests {
         ChatRequest request = ChatRequest.builder()
                 .message("   ")
                 .build();
-        mockMvc.perform(post("/api/v1/chatbot/message")
+        var result = mockMvc.perform(post("/api/v1/chatbot/message")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        assertEquals(400, result.getResponse().getStatus());
     }
 }

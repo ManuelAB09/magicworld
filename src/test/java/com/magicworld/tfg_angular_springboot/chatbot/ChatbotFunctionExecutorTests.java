@@ -33,6 +33,13 @@ import static org.mockito.Mockito.when;
 @Feature("Ejecutor de Funciones")
 public class ChatbotFunctionExecutorTests {
 
+    private static final String STORY_FUNCIONES_DESCUENTOS = "Funciones de Descuentos";
+    private static final String STORY_FUNCIONES_TIPOS_ENTRADA = "Funciones de Tipos de Entrada";
+    private static final String STORY_FUNCIONES_ATRACCIONES = "Funciones de Atracciones";
+    private static final String STORY_MANEJO_ERRORES = "Manejo de Errores";
+    private static final String STORY_ACCIONES_PENDIENTES = "Acciones Pendientes";
+    private static final String ACTION_DELETE_DISCOUNT = "deleteDiscount";
+
     @Mock
     private DiscountFunctionExecutor discountExecutor;
 
@@ -56,7 +63,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Descuentos")
+    @Story(STORY_FUNCIONES_DESCUENTOS)
     @Description("Verifica que listDiscounts retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("listDiscounts retorna exito")
@@ -67,7 +74,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Descuentos")
+    @Story(STORY_FUNCIONES_DESCUENTOS)
     @Description("Verifica que getDiscountById retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("getDiscountById retorna exito")
@@ -78,7 +85,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Descuentos")
+    @Story(STORY_FUNCIONES_DESCUENTOS)
     @Description("Verifica que createDiscount retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("createDiscount retorna exito")
@@ -89,7 +96,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Descuentos")
+    @Story(STORY_FUNCIONES_DESCUENTOS)
     @Description("Verifica que updateDiscount retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("updateDiscount retorna exito")
@@ -100,7 +107,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Descuentos")
+    @Story(STORY_FUNCIONES_DESCUENTOS)
     @Description("Verifica que requestDeleteDiscount retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("requestDeleteDiscount retorna exito")
@@ -111,7 +118,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Tipos de Entrada")
+    @Story(STORY_FUNCIONES_TIPOS_ENTRADA)
     @Description("Verifica que listTicketTypes retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("listTicketTypes retorna exito")
@@ -122,7 +129,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Tipos de Entrada")
+    @Story(STORY_FUNCIONES_TIPOS_ENTRADA)
     @Description("Verifica que getTicketTypeById retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("getTicketTypeById retorna exito")
@@ -133,7 +140,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Tipos de Entrada")
+    @Story(STORY_FUNCIONES_TIPOS_ENTRADA)
     @Description("Verifica que findTicketTypeByName retorna exito")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("findTicketTypeByName retorna exito")
@@ -144,7 +151,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Tipos de Entrada")
+    @Story(STORY_FUNCIONES_TIPOS_ENTRADA)
     @Description("Verifica que createTicketType retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("createTicketType retorna exito")
@@ -155,7 +162,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Tipos de Entrada")
+    @Story(STORY_FUNCIONES_TIPOS_ENTRADA)
     @Description("Verifica que updateTicketType retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("updateTicketType retorna exito")
@@ -166,7 +173,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Tipos de Entrada")
+    @Story(STORY_FUNCIONES_TIPOS_ENTRADA)
     @Description("Verifica que requestDeleteTicketType retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("requestDeleteTicketType retorna exito")
@@ -177,7 +184,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Atracciones")
+    @Story(STORY_FUNCIONES_ATRACCIONES)
     @Description("Verifica que listAttractions retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("listAttractions retorna exito")
@@ -188,7 +195,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Atracciones")
+    @Story(STORY_FUNCIONES_ATRACCIONES)
     @Description("Verifica que getAttractionById retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("getAttractionById retorna exito")
@@ -199,7 +206,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Atracciones")
+    @Story(STORY_FUNCIONES_ATRACCIONES)
     @Description("Verifica que createAttraction retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("createAttraction retorna exito")
@@ -210,7 +217,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Atracciones")
+    @Story(STORY_FUNCIONES_ATRACCIONES)
     @Description("Verifica que updateAttraction retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("updateAttraction retorna exito")
@@ -221,7 +228,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Funciones de Atracciones")
+    @Story(STORY_FUNCIONES_ATRACCIONES)
     @Description("Verifica que requestDeleteAttraction retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("requestDeleteAttraction retorna exito")
@@ -232,7 +239,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Manejo de Errores")
+    @Story(STORY_MANEJO_ERRORES)
     @Description("Verifica que funcion desconocida retorna error")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Funcion desconocida retorna error")
@@ -242,7 +249,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Manejo de Errores")
+    @Story(STORY_MANEJO_ERRORES)
     @Description("Verifica que funcion desconocida contiene mensaje de error")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Funcion desconocida contiene mensaje")
@@ -252,7 +259,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Manejo de Errores")
+    @Story(STORY_MANEJO_ERRORES)
     @Description("Verifica mensaje de error para funcion desconocida en espanol")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Funcion desconocida mensaje espanol")
@@ -262,7 +269,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Manejo de Errores")
+    @Story(STORY_MANEJO_ERRORES)
     @Description("Verifica que DateTimeParseException retorna error")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("DateTimeParseException retorna error")
@@ -274,7 +281,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Manejo de Errores")
+    @Story(STORY_MANEJO_ERRORES)
     @Description("Verifica que DateTimeParseException contiene mensaje de fecha")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("DateTimeParseException contiene mensaje fecha")
@@ -286,7 +293,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Manejo de Errores")
+    @Story(STORY_MANEJO_ERRORES)
     @Description("Verifica que IllegalArgumentException retorna error")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("IllegalArgumentException retorna error")
@@ -298,7 +305,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Manejo de Errores")
+    @Story(STORY_MANEJO_ERRORES)
     @Description("Verifica que excepcion generica retorna error")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Excepcion generica retorna error")
@@ -310,14 +317,14 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Acciones Pendientes")
+    @Story(STORY_ACCIONES_PENDIENTES)
     @Description("Verifica que deleteDiscount confirmado retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("deleteDiscount confirmado retorna exito")
     void testExecutePendingActionConfirmedDeleteDiscountReturnsSuccess() {
         when(discountExecutor.executeDeleteDiscount(1L, "en")).thenReturn(successResponse);
         PendingAction pending = PendingAction.builder()
-                .actionType("deleteDiscount")
+                .actionType(ACTION_DELETE_DISCOUNT)
                 .params(Map.of("id", 1L))
                 .build();
         ChatRequest request = ChatRequest.builder()
@@ -329,7 +336,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Acciones Pendientes")
+    @Story(STORY_ACCIONES_PENDIENTES)
     @Description("Verifica que deleteTicketType confirmado retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("deleteTicketType confirmado retorna exito")
@@ -348,7 +355,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Acciones Pendientes")
+    @Story(STORY_ACCIONES_PENDIENTES)
     @Description("Verifica que deleteAttraction confirmado retorna exito")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("deleteAttraction confirmado retorna exito")
@@ -367,13 +374,13 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Acciones Pendientes")
+    @Story(STORY_ACCIONES_PENDIENTES)
     @Description("Verifica que accion cancelada retorna mensaje de cancelacion")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Accion cancelada retorna mensaje cancelacion")
     void testExecutePendingActionCancelledReturnsCancelledMessage() {
         PendingAction pending = PendingAction.builder()
-                .actionType("deleteDiscount")
+                .actionType(ACTION_DELETE_DISCOUNT)
                 .params(Map.of("id", 1L))
                 .build();
         ChatRequest request = ChatRequest.builder()
@@ -385,13 +392,13 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Acciones Pendientes")
+    @Story(STORY_ACCIONES_PENDIENTES)
     @Description("Verifica mensaje de cancelacion en espanol")
     @Severity(SeverityLevel.MINOR)
     @DisplayName("Cancelacion mensaje espanol")
     void testExecutePendingActionCancelledSpanish() {
         PendingAction pending = PendingAction.builder()
-                .actionType("deleteDiscount")
+                .actionType(ACTION_DELETE_DISCOUNT)
                 .params(Map.of("id", 1L))
                 .build();
         ChatRequest request = ChatRequest.builder()
@@ -403,7 +410,7 @@ public class ChatbotFunctionExecutorTests {
     }
 
     @Test
-    @Story("Acciones Pendientes")
+    @Story(STORY_ACCIONES_PENDIENTES)
     @Description("Verifica que accion desconocida retorna error")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Accion desconocida retorna error")

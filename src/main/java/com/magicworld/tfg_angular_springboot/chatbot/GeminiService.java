@@ -34,22 +34,21 @@ public class GeminiService {
 
     public ChatResponse processMessage(ChatRequest request) {
         try {
-            // Detect language from user message
             String detectedLanguage = detectLanguage(request.getMessage());
             log.debug("Detected language: {}", detectedLanguage);
 
-            // If there's a pending action confirmation
+
             if (request.getPendingAction() != null) {
                 return functionExecutor.executePendingAction(request, detectedLanguage);
             }
 
-            // Build contents with history
+
             List<Content> contents = buildContents(request);
 
-            // Build tools (function declarations)
+
             List<Tool> tools = toolsBuilder.buildTools();
 
-            // Create generation config
+
             GenerateContentConfig config = GenerateContentConfig.builder()
                     .tools(tools)
                     .systemInstruction(Content.builder()
@@ -59,14 +58,14 @@ public class GeminiService {
                             .build())
                     .build();
 
-            // Call Gemini
+
             GenerateContentResponse response = client.models.generateContent(
                     modelName,
                     contents,
                     config
             );
 
-            // Process response
+
             return processGeminiResponse(response, detectedLanguage);
 
         } catch (Exception e) {
@@ -78,9 +77,22 @@ public class GeminiService {
         }
     }
 
-    /**
-     * Detect language from message content
-     */
+    private static final Set<String> ENGLISH_PATTERNS = Set.of(
+            "create", "delete", "update", "list", "show", "get", "add", "remove",
+            "please", "want", "would", "could", "can you", "i need", "help me",
+            "the", "this", "that", "what", "when", "where", "how", "why",
+            "discount", "attraction", "ticket", "type", "active", "inactive",
+            "yes", "no", "confirm", "cancel", "name", "price", "description"
+    );
+
+    private static final Set<String> SPANISH_PATTERNS = Set.of(
+            "crear", "borrar", "eliminar", "actualizar", "listar", "mostrar", "añadir",
+            "por favor", "quiero", "necesito", "puedes", "ayuda", "ayúdame",
+            "el", "la", "los", "las", "que", "qué", "cuando", "cuándo", "donde", "dónde",
+            "cómo", "por qué", "descuento", "atracción", "entrada", "tipo", "activo",
+            "sí", "no", "confirmar", "cancelar", "nombre", "precio", "descripción"
+    );
+
     private String detectLanguage(String message) {
         if (message == null || message.isBlank()) {
             return "es";
@@ -88,40 +100,9 @@ public class GeminiService {
 
         String lowerMessage = message.toLowerCase();
 
-        // English keywords and patterns
-        String[] englishPatterns = {
-                "create", "delete", "update", "list", "show", "get", "add", "remove",
-                "please", "want", "would", "could", "can you", "i need", "help me",
-                "the", "this", "that", "what", "when", "where", "how", "why",
-                "discount", "attraction", "ticket", "type", "active", "inactive",
-                "yes", "no", "confirm", "cancel", "name", "price", "description"
-        };
+        long englishScore = ENGLISH_PATTERNS.stream().filter(lowerMessage::contains).count();
+        long spanishScore = SPANISH_PATTERNS.stream().filter(lowerMessage::contains).count();
 
-        // Spanish keywords and patterns
-        String[] spanishPatterns = {
-                "crear", "borrar", "eliminar", "actualizar", "listar", "mostrar", "añadir",
-                "por favor", "quiero", "necesito", "puedes", "ayuda", "ayúdame",
-                "el", "la", "los", "las", "que", "qué", "cuando", "cuándo", "donde", "dónde",
-                "cómo", "por qué", "descuento", "atracción", "entrada", "tipo", "activo",
-                "sí", "no", "confirmar", "cancelar", "nombre", "precio", "descripción"
-        };
-
-        int englishScore = 0;
-        int spanishScore = 0;
-
-        for (String pattern : englishPatterns) {
-            if (lowerMessage.contains(pattern)) {
-                englishScore++;
-            }
-        }
-
-        for (String pattern : spanishPatterns) {
-            if (lowerMessage.contains(pattern)) {
-                spanishScore++;
-            }
-        }
-
-        // Check for Spanish-specific characters
         if (lowerMessage.matches(".*[áéíóúüñ¿¡].*")) {
             spanishScore += 3;
         }
@@ -131,9 +112,6 @@ public class GeminiService {
         return englishScore > spanishScore ? "en" : "es";
     }
 
-    /**
-     * Get system prompt based on detected language
-     */
     private String getSystemPrompt(String language) {
         if ("en".equals(language)) {
             return """
@@ -211,42 +189,43 @@ public class GeminiService {
         return contents;
     }
 
-    /**
-     * Process the Gemini API response
-     */
     private ChatResponse processGeminiResponse(GenerateContentResponse response, String detectedLanguage) {
-        if (response.candidates().isEmpty()) {
-            return ChatResponse.builder()
-                    .success(false)
-                    .message(detectedLanguage.equals("en") ?
-                            "No response received from the AI." :
-                            "No se recibió respuesta del AI.")
-                    .build();
+        Optional<Content> contentOpt = extractContent(response);
+        if (contentOpt.isEmpty()) {
+            return buildEmptyResponse(detectedLanguage);
         }
 
-        Candidate candidate = response.candidates().get().getFirst();
-
-        if (candidate.content().isEmpty()) {
-            return ChatResponse.builder()
-                    .success(false)
-                    .message(detectedLanguage.equals("en") ?
-                            "Empty response from the AI." :
-                            "Respuesta vacía del AI.")
-                    .build();
-        }
-
-        Content content = candidate.content().get();
-
+        Content content = contentOpt.get();
         if (content.parts().isEmpty()) {
-            return ChatResponse.builder()
-                    .success(false)
-                    .message(detectedLanguage.equals("en") ?
-                            "No content in the AI response." :
-                            "Sin contenido en la respuesta del AI.")
-                    .build();
+            return buildNoContentResponse(detectedLanguage);
         }
 
-        List<Part> parts = content.parts().get();
+        return processContentParts(content.parts().get(), detectedLanguage);
+    }
+
+    private Optional<Content> extractContent(GenerateContentResponse response) {
+        if (response.candidates().isEmpty()) {
+            return Optional.empty();
+        }
+        Candidate candidate = response.candidates().get().getFirst();
+        return candidate.content();
+    }
+
+    private ChatResponse buildEmptyResponse(String lang) {
+        return ChatResponse.builder()
+                .success(false)
+                .message("en".equals(lang) ? "No response received from the AI." : "No se recibió respuesta del AI.")
+                .build();
+    }
+
+    private ChatResponse buildNoContentResponse(String lang) {
+        return ChatResponse.builder()
+                .success(false)
+                .message("en".equals(lang) ? "No content in the AI response." : "Sin contenido en la respuesta del AI.")
+                .build();
+    }
+
+    private ChatResponse processContentParts(List<Part> parts, String detectedLanguage) {
         for (Part part : parts) {
             if (part.functionCall().isPresent()) {
                 FunctionCall functionCall = part.functionCall().get();
@@ -264,9 +243,7 @@ public class GeminiService {
 
         return ChatResponse.builder()
                 .success(true)
-                .message(detectedLanguage.equals("en") ?
-                        "Understood, how else can I help you?" :
-                        "Entendido, ¿en qué más puedo ayudarte?")
+                .message("en".equals(detectedLanguage) ? "Understood, how else can I help you?" : "Entendido, ¿en qué más puedo ayudarte?")
                 .build();
     }
 }

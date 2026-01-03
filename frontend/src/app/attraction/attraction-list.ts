@@ -75,21 +75,30 @@ export class AttractionList implements OnInit {
 
   applyFilters() {
     this.validationMessages = [];
-    if (this.filters.minHeight != null && this.filters.minHeight < 0) this.validationMessages.push(this.translate.instant('ATTRACTIONS.FILTER.INVALID_NEGATIVE'));
-    if (this.filters.minWeight != null && this.filters.minWeight < 0) this.validationMessages.push(this.translate.instant('ATTRACTIONS.FILTER.INVALID_NEGATIVE'));
-    if (this.filters.minAge != null && this.filters.minAge < 0) this.validationMessages.push(this.translate.instant('ATTRACTIONS.FILTER.INVALID_NEGATIVE'));
+    this.validateFilters();
     if (this.validationMessages.length) return;
 
+    const f = this.buildFilterParams();
+    this.load(f);
+  }
+
+  private validateFilters(): void {
+    const fields = [this.filters.minHeight, this.filters.minWeight, this.filters.minAge];
+    if (fields.some(v => v != null && v < 0)) {
+      this.validationMessages.push(this.translate.instant('ATTRACTIONS.FILTER.INVALID_NEGATIVE'));
+    }
+  }
+
+  private buildFilterParams(): any {
     const f: any = {};
     if (this.filters.minHeight != null) f.minHeight = this.filters.minHeight;
     if (this.filters.minWeight != null) f.minWeight = this.filters.minWeight;
     if (this.filters.minAge != null) f.minAge = this.filters.minAge;
-
-    this.load(f);
+    return f;
   }
 
   clearFilters() {
-    // Restaurar a valores por defecto 0
+
     this.filters = { minHeight: 0, minWeight: 0, minAge: 0 };
     this.load();
   }

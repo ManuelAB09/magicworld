@@ -22,6 +22,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -97,7 +100,7 @@ public class AttractionControllerTests {
                 .build();
     }
 
-    private Attraction buildSavedAttraction(Attraction request, Long id) {
+    private Attraction buildSavedAttraction(Attraction request) {
         Attraction saved = Attraction.builder()
                 .name(request.getName())
                 .intensity(request.getIntensity())
@@ -108,7 +111,7 @@ public class AttractionControllerTests {
                 .photoUrl(request.getPhotoUrl())
                 .isActive(request.getIsActive())
                 .build();
-        saved.setId(id);
+        saved.setId(1L);
         return saved;
     }
 
@@ -119,15 +122,17 @@ public class AttractionControllerTests {
     @DisplayName("Crear atracción retorna 201 Created")
     public void testCreateAttractionReturnsCreated() throws Exception {
         Attraction request = buildNewRideRequest();
-        Attraction saved = buildSavedAttraction(request, 1L);
+        Attraction saved = buildSavedAttraction(request);
 
         when(attractionService.saveAttraction(any(Attraction.class))).thenReturn(saved);
 
-        mockMvc.perform(post(API_ATTRACTIONS)
+        var result = mockMvc.perform(post(API_ATTRACTIONS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", API_ATTRACTIONS_ID + "1"));
+                .andExpect(header().string("Location", API_ATTRACTIONS_ID + "1"))
+                .andReturn();
+        assertEquals(201, result.getResponse().getStatus());
     }
 
     @Test
@@ -137,15 +142,17 @@ public class AttractionControllerTests {
     @DisplayName("Crear atracción retorna ID y nombre")
     public void testCreateAttractionReturnsId() throws Exception {
         Attraction request = buildNewRideRequest();
-        Attraction saved = buildSavedAttraction(request, 1L);
+        Attraction saved = buildSavedAttraction(request);
 
         when(attractionService.saveAttraction(any(Attraction.class))).thenReturn(saved);
 
-        mockMvc.perform(post(API_ATTRACTIONS)
+        var result = mockMvc.perform(post(API_ATTRACTIONS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value(NEW_RIDE_NAME));
+                .andExpect(jsonPath("$.name").value(NEW_RIDE_NAME))
+                .andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("id"));
     }
 
     @Test
@@ -168,9 +175,11 @@ public class AttractionControllerTests {
 
         when(attractionService.getAllAttractions(any(), any(), any())).thenReturn(List.of(one));
 
-        mockMvc.perform(get(API_ATTRACTIONS).contentType(MediaType.APPLICATION_JSON))
+        var result = mockMvc.perform(get(API_ATTRACTIONS).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.length()").value(1))
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -183,9 +192,11 @@ public class AttractionControllerTests {
         one.setId(2L);
         when(attractionService.getAttractionById(2L)).thenReturn(one);
 
-        mockMvc.perform(get(API_ATTRACTIONS_ID + "2").contentType(MediaType.APPLICATION_JSON))
+        var result = mockMvc.perform(get(API_ATTRACTIONS_ID + "2").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(2));
+                .andExpect(jsonPath("$.id").value(2))
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
@@ -196,8 +207,10 @@ public class AttractionControllerTests {
     public void testGetAttractionByIdNotFound() throws Exception {
         when(attractionService.getAttractionById(999L)).thenThrow(new ResourceNotFoundException(ERROR_ATTRACTION_NOT_FOUND));
 
-        mockMvc.perform(get(API_ATTRACTIONS_ID + "999").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+        var result = mockMvc.perform(get(API_ATTRACTIONS_ID + "999").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn();
+        assertEquals(404, result.getResponse().getStatus());
     }
 
     @Test
@@ -212,11 +225,13 @@ public class AttractionControllerTests {
 
         when(attractionService.updateAttraction(eq(3L), any(Attraction.class))).thenReturn(returned);
 
-        mockMvc.perform(put(API_ATTRACTIONS_ID + "3")
+        var result = mockMvc.perform(put(API_ATTRACTIONS_ID + "3")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(3));
+                .andExpect(jsonPath("$.id").value(3))
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
