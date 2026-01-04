@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { ErrorService } from '../../error/error-service';
-import {RouterLink} from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { getBackendBaseUrl } from '../../config/backend';
 
 @Component({
   selector: 'app-login',
@@ -29,8 +30,7 @@ export class Login {
 
   constructor(
     private auth: AuthService,
-    private errorService: ErrorService,
-    private translate: TranslateService
+    private errorService: ErrorService
   ) {}
 
   onLogin() {
@@ -49,5 +49,9 @@ export class Login {
           this.errorMessages = this.errorService.getValidationMessages(code, args);
         }
       });
+  }
+
+  loginWithGoogle() {
+    window.location.href = `${getBackendBaseUrl()}/oauth2/authorization/google`;
   }
 }

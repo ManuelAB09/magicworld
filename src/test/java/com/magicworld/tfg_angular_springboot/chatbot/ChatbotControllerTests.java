@@ -5,6 +5,8 @@ import com.magicworld.tfg_angular_springboot.chatbot.dto.ChatRequest;
 import com.magicworld.tfg_angular_springboot.chatbot.dto.ChatResponse;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtAuthenticationFilter;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtService;
+import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationFailureHandler;
+import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationSuccessHandler;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
@@ -20,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,9 +35,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ChatbotController.class, excludeAutoConfiguration = {
         org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
-        org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class
+        org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration.class
 })
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 @Epic("Chatbot IA")
 @Feature("API REST de Chatbot")
 public class ChatbotControllerTests {
@@ -174,6 +179,16 @@ public class ChatbotControllerTests {
         @Bean
         public JwtAuthenticationFilter jwtAuthenticationFilter() {
             return Mockito.mock(JwtAuthenticationFilter.class);
+        }
+
+        @Bean
+        public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+            return Mockito.mock(OAuth2AuthenticationSuccessHandler.class);
+        }
+
+        @Bean
+        public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
+            return Mockito.mock(OAuth2AuthenticationFailureHandler.class);
         }
     }
 }

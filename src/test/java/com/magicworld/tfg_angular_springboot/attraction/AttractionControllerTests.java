@@ -2,6 +2,8 @@ package com.magicworld.tfg_angular_springboot.attraction;
 
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtAuthenticationFilter;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtService;
+import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationFailureHandler;
+import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import com.magicworld.tfg_angular_springboot.storage.ImageStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
@@ -38,8 +41,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = AttractionController.class, excludeAutoConfiguration = {org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class})
+@WebMvcTest(controllers = AttractionController.class, excludeAutoConfiguration = {
+    org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+    org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class,
+    org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration.class
+})
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 @Epic("Gestión de Atracciones")
 @Feature("API REST de Atracciones")
 public class AttractionControllerTests {
@@ -81,6 +89,12 @@ public class AttractionControllerTests {
 
     @MockitoBean
     private ImageStorageService imageStorageService;
+
+    @MockitoBean
+    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
+    @MockitoBean
+    private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     @BeforeEach
     void setUp() {

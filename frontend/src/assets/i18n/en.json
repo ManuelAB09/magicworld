@@ -4,7 +4,9 @@
     "USERNAME": "Username",
     "PASSWORD": "Password",
     "BUTTON": "Sign in",
-    "FORGOT_PASSWORD": "Forgot your password?"
+    "FORGOT_PASSWORD": "Forgot your password?",
+    "OR": "or",
+    "GOOGLE": "Sign in with Google"
   },
   "REGISTER": {
     "TITLE": "Register",

@@ -43,8 +43,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @NotBlank(message = "validation.password.required")
-    @Size(min = 8, max = 100, message = "validation.password.size")
+    @Size(max = 100, message = "validation.password.size")
     private String password;
 
     @Enumerated(EnumType.STRING)

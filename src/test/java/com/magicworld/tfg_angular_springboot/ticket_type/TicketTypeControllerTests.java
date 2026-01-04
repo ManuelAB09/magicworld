@@ -3,6 +3,8 @@ package com.magicworld.tfg_angular_springboot.ticket_type;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtAuthenticationFilter;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtService;
+import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationFailureHandler;
+import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import com.magicworld.tfg_angular_springboot.storage.ImageStorageService;
 import io.qameta.allure.Description;
@@ -34,13 +36,20 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import org.springframework.test.context.ActiveProfiles;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = TicketTypeController.class, excludeAutoConfiguration = {org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class})
+@WebMvcTest(controllers = TicketTypeController.class, excludeAutoConfiguration = {
+    org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+    org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class,
+    org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration.class
+})
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 @Epic("Gestión de Tipos de Entrada")
 @Feature("API REST de Tipos de Entrada")
 public class TicketTypeControllerTests {
@@ -263,6 +272,16 @@ public class TicketTypeControllerTests {
         @Bean
         public ImageStorageService imageStorageService() {
             return Mockito.mock(ImageStorageService.class);
+        }
+
+        @Bean
+        public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+            return Mockito.mock(OAuth2AuthenticationSuccessHandler.class);
+        }
+
+        @Bean
+        public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
+            return Mockito.mock(OAuth2AuthenticationFailureHandler.class);
         }
     }
 }

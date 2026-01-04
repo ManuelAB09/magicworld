@@ -3,6 +3,8 @@ package com.magicworld.tfg_angular_springboot.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtAuthenticationFilter;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtService;
+import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationFailureHandler;
+import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidCredentialsException;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import com.magicworld.tfg_angular_springboot.reset_token.PasswordResetService;
@@ -23,9 +25,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Objects;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,9 +41,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = AuthController.class, excludeAutoConfiguration = {
         org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
-        org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class
+        org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration.class
 })
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 @Epic("Autenticación y Autorización")
 @Feature("API REST de Autenticación")
 public class AuthControllerTests {
@@ -270,6 +276,16 @@ public class AuthControllerTests {
         @Bean
         public PasswordResetService passwordResetService() {
             return Mockito.mock(PasswordResetService.class);
+        }
+
+        @Bean
+        public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+            return Mockito.mock(OAuth2AuthenticationSuccessHandler.class);
+        }
+
+        @Bean
+        public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
+            return Mockito.mock(OAuth2AuthenticationFailureHandler.class);
         }
     }
 }

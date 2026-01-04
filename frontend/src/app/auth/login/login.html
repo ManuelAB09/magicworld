@@ -45,5 +45,14 @@
     </div>
 
     <button type="submit">{{ 'LOGIN.BUTTON' | translate }}</button>
+
+    <div class="divider">
+      <span>{{ 'LOGIN.OR' | translate }}</span>
+    </div>
+
+    <button type="button" class="google-btn" (click)="loginWithGoogle()">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+      {{ 'LOGIN.GOOGLE' | translate }}
+    </button>
   </form>
 </div>

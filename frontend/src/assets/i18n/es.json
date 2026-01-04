@@ -4,7 +4,9 @@
     "USERNAME": "Usuario",
     "PASSWORD": "Contraseña",
     "BUTTON": "Entrar",
-    "FORGOT_PASSWORD": "¿Has olvidado tu contraseña?"
+    "FORGOT_PASSWORD": "¿Has olvidado tu contraseña?",
+    "OR": "o",
+    "GOOGLE": "Iniciar sesión con Google"
   },
   "REGISTER": {
     "TITLE": "Registrarse",

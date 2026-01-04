@@ -3,6 +3,8 @@ package com.magicworld.tfg_angular_springboot.discount;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtAuthenticationFilter;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtService;
+import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationFailureHandler;
+import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.magicworld.tfg_angular_springboot.discount.DiscountController.DiscountRequest;
 import com.magicworld.tfg_angular_springboot.discount_ticket_type.DiscountTicketTypeService;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
@@ -38,13 +40,20 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import org.springframework.test.context.ActiveProfiles;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = DiscountController.class, excludeAutoConfiguration = {org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class})
+@WebMvcTest(controllers = DiscountController.class, excludeAutoConfiguration = {
+    org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+    org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class,
+    org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration.class
+})
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 @Epic("Gestión de Descuentos")
 @Feature("Controlador de Descuentos")
 public class DiscountControllerTests {
@@ -325,6 +334,16 @@ public class DiscountControllerTests {
         @Bean
         public JwtAuthenticationFilter jwtAuthenticationFilter() {
             return Mockito.mock(JwtAuthenticationFilter.class);
+        }
+
+        @Bean
+        public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+            return Mockito.mock(OAuth2AuthenticationSuccessHandler.class);
+        }
+
+        @Bean
+        public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
+            return Mockito.mock(OAuth2AuthenticationFailureHandler.class);
         }
     }
 }
