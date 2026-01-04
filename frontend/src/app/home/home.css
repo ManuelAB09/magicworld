@@ -66,6 +66,26 @@
   height: auto;
 }
 
+.buy-tickets-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #ffb700 0%, #ff9500 100%);
+  border: 3px solid #2c0d0d;
+  color: #2c0d0d;
+  font-weight: bold;
+  font-size: 1.3rem;
+  padding: 1rem 2.5rem;
+  border-radius: 30px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: transform 0.2s, box-shadow 0.3s;
+  margin-top: 2rem;
+}
+
+.buy-tickets-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(255, 183, 0, 0.4);
+}
+
 .btn-primary {
   display: inline-block;
   background-color: #ffb700;
@@ -91,9 +111,9 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Estilos adicionales para móvil */
+
 @media (max-width: 768px) {
-  /* Hacer el video más ancho en tablet y móviles */
+
   .promo-video-container {
     width: 100%;
   }

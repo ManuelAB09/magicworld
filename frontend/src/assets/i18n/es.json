@@ -226,5 +226,58 @@
     "ACTIVITY": "Registro de Actividad",
     "CLEAR_ACTIVITY": "Limpiar actividad",
     "NO_ACTIVITY": "Sin actividad registrada"
-  }
+  },
+  "CHECKOUT": {
+    "LOADING": "Cargando...",
+    "STEP1": {
+      "TICKETS_TITLE": "Tipos de Entrada",
+      "AVAILABLE": "disponibles",
+      "VISIT_DATE": "Día de visita al parque",
+      "ORDER_SUMMARY": "Resumen del pedido",
+      "CART_EMPTY": "Tu carrito está vacío",
+      "SUBTOTAL": "Subtotal",
+      "PROCEED": "Continuar al pago"
+    },
+    "STEP2": {
+      "BACK": "Volver",
+      "ORDER_SUMMARY": "Resumen del Pedido",
+      "DISCOUNT_CODE": "Código de descuento",
+      "DISCOUNT_HINT": "Puedes introducir varios códigos separados por comas",
+      "DISCOUNT_PLACEHOLDER": "Ej: VERANO2024, FAMILIA10",
+      "DISCOUNT_APPLIED": "¡Descuento aplicado correctamente!",
+      "DISCOUNT_INVALID": "Código no válido o expirado",
+      "DISCOUNT_NOT_APPLICABLE": "Código válido pero no aplicable a las entradas seleccionadas",
+      "APPLIES_TO": "Aplica a",
+      "SUBTOTAL": "Subtotal",
+      "DISCOUNT": "Descuento",
+      "TOTAL": "Total",
+      "CALCULATING": "Calculando precio...",
+      "PAYMENT_DETAILS": "Datos de Pago",
+      "FIRST_NAME": "Nombre",
+      "LAST_NAME": "Apellidos",
+      "EMAIL": "Correo electrónico",
+      "CARD_DETAILS": "Datos de la tarjeta",
+      "PAY_NOW": "Pagar ahora",
+      "PROCESSING": "Procesando pago...",
+      "SECURE_PAYMENT": "Pago seguro con Stripe"
+    },
+    "CONFIRMATION": {
+      "SUCCESS_TITLE": "¡Compra realizada con éxito!",
+      "SUCCESS_MESSAGE": "Tu pedido ha sido procesado correctamente. Recibirás un correo de confirmación con tu código QR de entrada.",
+      "PURCHASE_ID": "Nº de pedido",
+      "VISIT_DATE": "Fecha de visita",
+      "EMAIL_SENT": "Hemos enviado un correo de confirmación con tu entrada QR",
+      "GO_HOME": "Volver al inicio",
+      "ERROR_TITLE": "Error en el pago",
+      "ERROR_MESSAGE": "Ha ocurrido un problema procesando tu pago. Por favor, inténtalo de nuevo.",
+      "TRY_AGAIN": "Intentar de nuevo"
+    }
+  },
+  "error.payment.date.past": "No puedes comprar entradas para fechas pasadas",
+  "error.payment.insufficient.availability": "No hay suficiente disponibilidad para la cantidad seleccionada",
+  "error.payment.invalid.total": "El total del pago no es válido",
+  "error.payment.failed": "El pago ha fallado. Por favor, revisa los datos de tu tarjeta",
+  "error.payment.stripe.failed": "Error al procesar el pago con Stripe",
+  "error.payment.discount.changed": "Los siguientes códigos de descuento ya no son válidos o han cambiado: {{0}}. Por favor, revisa tu pedido.",
+  "success.payment.completed": "Pago completado correctamente"
 }

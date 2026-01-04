@@ -16,6 +16,14 @@ export interface UserDTO {
   role: Role | null;
 }
 
+export interface UserProfile {
+  username: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  role: Role | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = `${getBackendBaseUrl()}/api/v1/auth`;
@@ -143,6 +151,11 @@ export class AuthService {
     }, { withCredentials: true });
   }
 
-
+  getProfile(): Observable<UserProfile> {
+    const headers = new HttpHeaders();
+    return this.ensureCsrfToken(headers).pipe(
+      switchMap(h => this.http.get<UserProfile>(`${this.apiUrl}/me`, { withCredentials: true, headers: h }))
+    );
+  }
 
 }

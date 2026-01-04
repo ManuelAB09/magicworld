@@ -29,6 +29,11 @@ public class DiscountService {
         return discountRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("error.discount.not_found"));
     }
 
+    @Transactional(readOnly = true)
+    public Discount findByCode(String code) {
+        return discountRepository.findByDiscountCode(code).orElse(null);
+    }
+
     @Transactional
     public Discount save(Discount discount, List<String> applicableTicketTypesNames) {
         List<TicketType> applicableTicketTypes = applicableTicketTypesNames.stream()

@@ -13,6 +13,9 @@ import { TicketTypeForm } from './ticket-type/ticket-type-form';
 import { AttractionList } from './attraction/attraction-list';
 import { AttractionForm } from './attraction/attraction-form';
 import { ChatbotComponent } from './chatbot/chatbot';
+import { CheckoutStep1Component } from './checkout/step1/checkout-step1';
+import { CheckoutStep2Component } from './checkout/step2/checkout-step2';
+import { CheckoutConfirmationComponent } from './checkout/confirmation/checkout-confirmation';
 
 export const routes: Routes = [
   { path: 'login',
@@ -51,5 +54,10 @@ export const routes: Routes = [
   { path: 'attractions/:id', component: AttractionForm, canActivate: [AdminGuard] },
 
   // Chatbot: solo admin
-  { path: 'chatbot', component: ChatbotComponent, canActivate: [AdminGuard] }
+  { path: 'chatbot', component: ChatbotComponent, canActivate: [AdminGuard] },
+
+  // Checkout: pasarela de pago (público)
+  { path: 'checkout', component: CheckoutStep1Component },
+  { path: 'checkout/step2', component: CheckoutStep2Component },
+  { path: 'checkout/confirmation', component: CheckoutConfirmationComponent }
 ];

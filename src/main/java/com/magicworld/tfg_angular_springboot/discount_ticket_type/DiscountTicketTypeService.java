@@ -40,6 +40,10 @@ public class DiscountTicketTypeService {
         return discountTicketTypeRepository.existsByTicketTypeId(ticketTypeId);
     }
 
+    public boolean discountAppliesToTicketType(Long discountId, String ticketTypeName) {
+        return discountTicketTypeRepository.existsByDiscountIdAndTicketTypeName(discountId, ticketTypeName);
+    }
+
     @Transactional
     public void deleteByDiscountId(Long discountId) {
         discountTicketTypeRepository.deleteByDiscountId(discountId);

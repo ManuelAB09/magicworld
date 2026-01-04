@@ -226,5 +226,58 @@
     "ACTIVITY": "Activity Log",
     "CLEAR_ACTIVITY": "Clear activity",
     "NO_ACTIVITY": "No activity recorded yet"
-  }
+  },
+  "CHECKOUT": {
+    "LOADING": "Loading...",
+    "STEP1": {
+      "TICKETS_TITLE": "Ticket Types",
+      "AVAILABLE": "available",
+      "VISIT_DATE": "Park Visit Date",
+      "ORDER_SUMMARY": "Order Summary",
+      "CART_EMPTY": "Your cart is empty",
+      "SUBTOTAL": "Subtotal",
+      "PROCEED": "Continue to payment"
+    },
+    "STEP2": {
+      "BACK": "Back",
+      "ORDER_SUMMARY": "Order Summary",
+      "DISCOUNT_CODE": "Discount Code",
+      "DISCOUNT_HINT": "You can enter multiple codes separated by commas",
+      "DISCOUNT_PLACEHOLDER": "E.g.: SUMMER2024, FAMILY10",
+      "DISCOUNT_APPLIED": "Discount applied successfully!",
+      "DISCOUNT_INVALID": "Invalid or expired code",
+      "DISCOUNT_NOT_APPLICABLE": "Valid code but not applicable to selected tickets",
+      "APPLIES_TO": "Applies to",
+      "SUBTOTAL": "Subtotal",
+      "DISCOUNT": "Discount",
+      "TOTAL": "Total",
+      "CALCULATING": "Calculating price...",
+      "PAYMENT_DETAILS": "Payment Details",
+      "FIRST_NAME": "First Name",
+      "LAST_NAME": "Last Name",
+      "EMAIL": "Email",
+      "CARD_DETAILS": "Card Details",
+      "PAY_NOW": "Pay Now",
+      "PROCESSING": "Processing payment...",
+      "SECURE_PAYMENT": "Secure payment with Stripe"
+    },
+    "CONFIRMATION": {
+      "SUCCESS_TITLE": "Purchase Successful!",
+      "SUCCESS_MESSAGE": "Your order has been processed successfully. You will receive a confirmation email with your QR entry code.",
+      "PURCHASE_ID": "Order #",
+      "VISIT_DATE": "Visit Date",
+      "EMAIL_SENT": "We have sent a confirmation email with your QR ticket",
+      "GO_HOME": "Go Home",
+      "ERROR_TITLE": "Payment Error",
+      "ERROR_MESSAGE": "There was a problem processing your payment. Please try again.",
+      "TRY_AGAIN": "Try Again"
+    }
+  },
+  "error.payment.date.past": "You cannot purchase tickets for past dates",
+  "error.payment.insufficient.availability": "Not enough availability for the selected quantity",
+  "error.payment.invalid.total": "The payment total is not valid",
+  "error.payment.failed": "Payment failed. Please check your card details",
+  "error.payment.stripe.failed": "Error processing payment with Stripe",
+  "error.payment.discount.changed": "The following discount codes are no longer valid or have changed: {{0}}. Please review your order.",
+  "success.payment.completed": "Payment completed successfully"
 }

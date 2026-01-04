@@ -19,4 +19,8 @@ public interface DiscountTicketTypeRepository extends JpaRepository<DiscountTick
     void deleteByDiscountId(Long discountId);
 
     Boolean existsByTicketTypeId(Long ticketTypeId);
+
+    @Query("SELECT CASE WHEN COUNT(dtt) > 0 THEN true ELSE false END FROM DiscountTicketType dtt " +
+           "WHERE dtt.discount.id = :discountId AND dtt.ticketType.typeName = :ticketTypeName")
+    boolean existsByDiscountIdAndTicketTypeName(Long discountId, String ticketTypeName);
 }

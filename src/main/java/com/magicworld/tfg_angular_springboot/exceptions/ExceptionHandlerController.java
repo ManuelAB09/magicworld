@@ -46,6 +46,7 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(body, status);
     }
 
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorMessage> handleValidationException(MethodArgumentNotValidException ex, WebRequest request) {
         Map<String, String> errors = ex.getBindingResult()

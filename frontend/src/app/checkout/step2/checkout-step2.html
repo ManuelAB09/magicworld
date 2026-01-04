@@ -1,0 +1,178 @@
+<div class="checkout-container">
+  <div class="order-section">
+    <button class="back-btn" (click)="goBack()">
+      ← {{ 'CHECKOUT.STEP2.BACK' | translate }}
+    </button>
+
+    <h2>{{ 'CHECKOUT.STEP2.ORDER_SUMMARY' | translate }}</h2>
+
+    @if (cart) {
+      <div class="visit-date-badge">
+        <span class="date-icon">📅</span>
+        <span>{{ 'CHECKOUT.STEP1.VISIT_DATE' | translate }}: <strong>{{ cart.visitDate }}</strong></span>
+      </div>
+
+      <div class="order-items">
+        @for (item of cart.items; track item.ticketTypeName) {
+          <div class="order-item">
+            <div class="item-image">
+              <img [src]="item.photoUrl" [alt]="item.ticketTypeName">
+            </div>
+            <div class="item-details">
+              <h4>{{ item.ticketTypeName }}</h4>
+              <p class="item-desc">{{ item.description }}</p>
+              <div class="item-pricing">
+                <span class="unit-price">{{ item.unitPrice | number:'1.2-2' }} € x {{ item.quantity }}</span>
+                <span class="line-total">{{ item.totalPrice | number:'1.2-2' }} €</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Código de descuento -->
+    <div class="discount-section">
+      <h3>{{ 'CHECKOUT.STEP2.DISCOUNT_CODE' | translate }}</h3>
+      <p class="discount-hint">{{ 'CHECKOUT.STEP2.DISCOUNT_HINT' | translate }}</p>
+      <input
+        type="text"
+        class="discount-input"
+        [(ngModel)]="discountInput"
+        (input)="onDiscountInputChange()"
+        [placeholder]="'CHECKOUT.STEP2.DISCOUNT_PLACEHOLDER' | translate">
+
+      @if (validCodes.length > 0 || invalidCodes.length > 0 || validButNotApplicableCodes.length > 0) {
+        <div class="discount-feedback">
+          @if (validCodes.length > 0) {
+            <div class="valid-codes">
+              @for (code of validCodes; track code) {
+                <div class="code-detail">
+                  <span class="code-tag valid">
+                    ✓ {{ code }} (-{{ discountPercentages[code] }}%)
+                  </span>
+                  <span class="applies-to">
+                    {{ 'CHECKOUT.STEP2.APPLIES_TO' | translate }}: {{ discountAppliesTo[code] ? discountAppliesTo[code].join(', ') : '' }}
+                  </span>
+                </div>
+              }
+              <p class="discount-applied">{{ 'CHECKOUT.STEP2.DISCOUNT_APPLIED' | translate }}</p>
+            </div>
+          }
+          @if (validButNotApplicableCodes.length > 0) {
+            <div class="not-applicable-codes">
+              @for (code of validButNotApplicableCodes; track code) {
+                <span class="code-tag not-applicable">
+                  ⚠ {{ code }} (-{{ discountPercentages[code] }}%)
+                </span>
+              }
+              <p class="discount-not-applicable">{{ 'CHECKOUT.STEP2.DISCOUNT_NOT_APPLICABLE' | translate }}</p>
+            </div>
+          }
+          @if (invalidCodes.length > 0) {
+            <div class="invalid-codes">
+              @for (code of invalidCodes; track code) {
+                <span class="code-tag invalid">
+                  ✗ {{ code }}
+                </span>
+              }
+              <p class="discount-invalid">{{ 'CHECKOUT.STEP2.DISCOUNT_INVALID' | translate }}</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Totales -->
+    @if (priceCalc) {
+      <div class="price-summary">
+        <div class="price-row">
+          <span>{{ 'CHECKOUT.STEP2.SUBTOTAL' | translate }}</span>
+          <span>{{ priceCalc.subtotal | number:'1.2-2' }} €</span>
+        </div>
+        @if (priceCalc.discountAmount > 0) {
+          <div class="price-row discount">
+            <span>{{ 'CHECKOUT.STEP2.DISCOUNT' | translate }}</span>
+            <span>-{{ priceCalc.discountAmount | number:'1.2-2' }} €</span>
+          </div>
+        }
+        <div class="price-row total">
+          <span>{{ 'CHECKOUT.STEP2.TOTAL' | translate }}</span>
+          <span>{{ priceCalc.total | number:'1.2-2' }} €</span>
+        </div>
+      </div>
+    }
+
+    @if (calculatingPrice) {
+      <div class="calculating">
+        {{ 'CHECKOUT.STEP2.CALCULATING' | translate }}
+      </div>
+    }
+  </div>
+
+  <!-- Lado derecho: Datos personales y pago -->
+  <div class="payment-section">
+    <h2>{{ 'CHECKOUT.STEP2.PAYMENT_DETAILS' | translate }}</h2>
+
+    <div class="form-group">
+      <label>{{ 'CHECKOUT.STEP2.FIRST_NAME' | translate }} *</label>
+      <input
+        type="text"
+        [(ngModel)]="firstName"
+        [placeholder]="'CHECKOUT.STEP2.FIRST_NAME' | translate"
+        [readonly]="isLoggedIn">
+    </div>
+
+    <div class="form-group">
+      <label>{{ 'CHECKOUT.STEP2.LAST_NAME' | translate }} *</label>
+      <input
+        type="text"
+        [(ngModel)]="lastName"
+        [placeholder]="'CHECKOUT.STEP2.LAST_NAME' | translate"
+        [readonly]="isLoggedIn">
+    </div>
+
+    <div class="form-group">
+      <label>{{ 'CHECKOUT.STEP2.EMAIL' | translate }} *</label>
+      <input
+        type="email"
+        [(ngModel)]="email"
+        [placeholder]="'CHECKOUT.STEP2.EMAIL' | translate"
+        [readonly]="isLoggedIn">
+    </div>
+
+    <div class="form-group">
+      <label>{{ 'CHECKOUT.STEP2.CARD_DETAILS' | translate }} *</label>
+      <div class="card-element-container" #cardElement></div>
+    </div>
+
+    @if (error) {
+      <div class="error-message">
+        {{ error }}
+      </div>
+    }
+
+    <button
+      class="pay-btn"
+      [disabled]="!isFormValid() || processingPayment"
+      (click)="processPayment()">
+      @if (!processingPayment) {
+        <span>
+          {{ 'CHECKOUT.STEP2.PAY_NOW' | translate }}
+          @if (priceCalc) {
+            <span> - {{ priceCalc.total | number:'1.2-2' }} €</span>
+          }
+        </span>
+      } @else {
+        <span>
+          {{ 'CHECKOUT.STEP2.PROCESSING' | translate }}
+        </span>
+      }
+    </button>
+
+    <p class="secure-notice">
+      🔒 {{ 'CHECKOUT.STEP2.SECURE_PAYMENT' | translate }}
+    </p>
+  </div>
+</div>
+

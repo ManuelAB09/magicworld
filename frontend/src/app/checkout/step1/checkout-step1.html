@@ -1,0 +1,126 @@
+<div class="checkout-container">
+  <div class="tickets-section">
+    <h2>{{ 'CHECKOUT.STEP1.TICKETS_TITLE' | translate }}</h2>
+
+    @if (loading) {
+      <div class="loading">
+        {{ 'CHECKOUT.LOADING' | translate }}
+      </div>
+    }
+
+    @if (error) {
+      <div class="error-message">
+        {{ error }}
+      </div>
+    }
+
+    @if (!loading && !error) {
+      <div class="tickets-grid">
+        @for (ticket of tickets; track ticket.id) {
+          <div class="ticket-card">
+            <div class="ticket-image">
+              <img [src]="ticket.photoUrl" [alt]="ticket.typeName">
+              <span class="availability-badge" [class.low]="ticket.available <= 10" [class.sold-out]="ticket.available === 0">
+                {{ ticket.available }} {{ 'CHECKOUT.STEP1.AVAILABLE' | translate }}
+              </span>
+            </div>
+            <div class="ticket-info">
+              <h3>{{ ticket.typeName }}</h3>
+              <p class="description">{{ ticket.description }}</p>
+              <p class="price">{{ ticket.cost | number:'1.2-2' }} {{ ticket.currency }}</p>
+            </div>
+            <div class="quantity-controls">
+              <button
+                class="qty-btn minus"
+                (click)="removeFromCart(ticket)"
+                [disabled]="getQuantity(ticket.typeName) === 0">
+                −
+              </button>
+              <span class="qty-value">{{ getQuantity(ticket.typeName) }}</span>
+              <button
+                class="qty-btn plus"
+                (click)="addToCart(ticket)"
+                [disabled]="ticket.available === 0 || getQuantity(ticket.typeName) >= ticket.available">
+                +
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="summary-section">
+    <div class="date-picker">
+      <h3>{{ 'CHECKOUT.STEP1.VISIT_DATE' | translate }}</h3>
+
+      <div class="calendar">
+        <div class="calendar-header">
+          <button
+            class="calendar-nav"
+            (click)="previousMonth()"
+            [disabled]="!canGoPrevious()">
+            ‹
+          </button>
+          <span class="calendar-month">{{ getMonthName() }}</span>
+          <button class="calendar-nav" (click)="nextMonth()">›</button>
+        </div>
+
+        <div class="calendar-weekdays">
+          @for (day of weekDays; track day) {
+            <span class="weekday">{{ day }}</span>
+          }
+        </div>
+
+        <div class="calendar-days">
+          @for (day of calendarDays; track $index) {
+            <button
+              class="calendar-day"
+              [class.empty]="day === null"
+              [class.disabled]="!isDaySelectable(day)"
+              [class.selected]="isDaySelected(day)"
+              [disabled]="!isDaySelectable(day)"
+              (click)="selectDay(day)">
+              {{ day }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-summary">
+      <h3>{{ 'CHECKOUT.STEP1.ORDER_SUMMARY' | translate }}</h3>
+
+      @if (cart.size === 0) {
+        <div class="cart-empty">
+          {{ 'CHECKOUT.STEP1.CART_EMPTY' | translate }}
+        </div>
+      }
+
+      @if (cart.size > 0) {
+        <div class="cart-items">
+          @for (item of cartItems; track item.ticketTypeName) {
+            <div class="cart-item">
+              <span class="item-name">{{ item.ticketTypeName }}</span>
+              <span class="item-qty">x{{ item.quantity }}</span>
+              <span class="item-price">{{ item.totalPrice | number:'1.2-2' }} €</span>
+            </div>
+          }
+        </div>
+
+        <div class="cart-total">
+          <span>{{ 'CHECKOUT.STEP1.SUBTOTAL' | translate }}</span>
+          <span class="total-amount">{{ getSubtotal() | number:'1.2-2' }} €</span>
+        </div>
+      }
+    </div>
+
+    <button
+      class="proceed-btn"
+      [disabled]="!canProceed()"
+      (click)="goToStep2()">
+      {{ 'CHECKOUT.STEP1.PROCEED' | translate }}
+    </button>
+  </div>
+</div>
+

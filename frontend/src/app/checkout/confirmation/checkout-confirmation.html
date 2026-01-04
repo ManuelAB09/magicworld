@@ -1,0 +1,56 @@
+@if (showModal) {
+  <div class="confirmation-overlay">
+    <div class="confirmation-modal" [class.success]="result?.success" [class.error]="!result?.success">
+      @if (result?.success) {
+        <div class="modal-content">
+          <div class="success-icon">✓</div>
+          <h2>{{ 'CHECKOUT.CONFIRMATION.SUCCESS_TITLE' | translate }}</h2>
+          <p class="message">{{ 'CHECKOUT.CONFIRMATION.SUCCESS_MESSAGE' | translate }}</p>
+
+          <div class="details">
+            <div class="detail-row">
+              <span class="label">{{ 'CHECKOUT.CONFIRMATION.PURCHASE_ID' | translate }}:</span>
+              <span class="value">#{{ result?.purchaseId }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">{{ 'CHECKOUT.CONFIRMATION.VISIT_DATE' | translate }}:</span>
+              <span class="value">{{ result?.visitDate }}</span>
+            </div>
+            @if ((result?.discountAmount ?? 0) > 0) {
+              <div class="detail-row">
+                <span class="label">{{ 'CHECKOUT.STEP2.DISCOUNT' | translate }}:</span>
+                <span class="value discount">-{{ result?.discountAmount | number:'1.2-2' }} €</span>
+              </div>
+            }
+            <div class="detail-row total">
+              <span class="label">{{ 'CHECKOUT.STEP2.TOTAL' | translate }}:</span>
+              <span class="value">{{ result?.totalAmount | number:'1.2-2' }} €</span>
+            </div>
+          </div>
+
+          <p class="email-notice">
+            📧 {{ 'CHECKOUT.CONFIRMATION.EMAIL_SENT' | translate }}
+          </p>
+
+          <button class="btn-primary" (click)="goHome()">
+            {{ 'CHECKOUT.CONFIRMATION.GO_HOME' | translate }}
+          </button>
+        </div>
+      } @else {
+        <div class="modal-content">
+          <div class="error-icon">✗</div>
+          <h2>{{ 'CHECKOUT.CONFIRMATION.ERROR_TITLE' | translate }}</h2>
+          <p class="message">{{ 'CHECKOUT.CONFIRMATION.ERROR_MESSAGE' | translate }}</p>
+          @if (result?.errorMessage) {
+            <p class="error-detail">{{ result?.errorMessage }}</p>
+          }
+
+          <button class="btn-secondary" (click)="goBack()">
+            {{ 'CHECKOUT.CONFIRMATION.TRY_AGAIN' | translate }}
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}
+
