@@ -246,7 +246,6 @@ public class DiscountControllerTests {
 
         TicketType tt = TicketType.builder()
                 .cost(COST_50)
-                .currency(CURRENCY_EUR)
                 .typeName(TYPE_NAME_ADULT)
                 .description(ADULT_TICKET_DESC)
                 .maxPerDay(10)

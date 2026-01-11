@@ -38,8 +38,6 @@ public class TicketTypeServiceTests {
     private static final String TYPE_NAME_PREMIUM = "PREMIUM";
     private static final String STANDARD_TICKET_DESC = "Standard ticket";
     private static final String PREMIUM_TICKET_DESC = "Premium ticket";
-    private static final String CURRENCY_EUR = "EUR";
-    private static final String CURRENCY_USD = "USD";
     private static final String PHOTO_URL = "http://example.com/photo.jpg";
     private static final String PHOTO_URL_UPDATED = "http://example.com/updated.jpg";
     private static final BigDecimal COST_50 = new BigDecimal("50.00");
@@ -66,7 +64,6 @@ public class TicketTypeServiceTests {
         ticketTypeRepository.deleteAll();
         sample = TicketType.builder()
                 .cost(COST_50)
-                .currency(CURRENCY_EUR)
                 .typeName(TYPE_NAME_STANDARD)
                 .description(STANDARD_TICKET_DESC)
                 .maxPerDay(10)
@@ -165,7 +162,6 @@ public class TicketTypeServiceTests {
     private TicketType buildUpdateTicketType() {
         return TicketType.builder()
                 .cost(COST_75_50)
-                .currency(CURRENCY_USD)
                 .typeName(TYPE_NAME_PREMIUM)
                 .description(PREMIUM_TICKET_DESC)
                 .maxPerDay(20)
@@ -185,17 +181,6 @@ public class TicketTypeServiceTests {
         assertEquals(COST_75_50, updated.getCost());
     }
 
-    @Test
-    @Story("Actualizar Tipo de Entrada")
-    @Description("Verifica que update actualiza la moneda")
-    @Severity(SeverityLevel.NORMAL)
-    @DisplayName("update actualiza la moneda correctamente")
-    void testUpdateTicketTypeUpdatesCurrency() {
-        TicketType saved = ticketTypeService.save(sample);
-        TicketType update = buildUpdateTicketType();
-        TicketType updated = ticketTypeService.update(saved.getId(), update);
-        assertEquals(CURRENCY_USD, updated.getCurrency());
-    }
 
     @Test
     @Story("Actualizar Tipo de Entrada")
@@ -242,7 +227,6 @@ public class TicketTypeServiceTests {
         TicketType saved = ticketTypeService.save(sample);
         TicketType update = TicketType.builder()
                 .cost(COST_75_50)
-                .currency(CURRENCY_USD)
                 .typeName(TYPE_NAME_PREMIUM)
                 .description(PREMIUM_TICKET_DESC)
                 .maxPerDay(20)

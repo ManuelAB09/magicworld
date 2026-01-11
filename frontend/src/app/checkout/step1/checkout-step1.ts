@@ -7,6 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { CheckoutService, TicketAvailability, CartItem } from '../services/checkout.service';
 import { AvailabilityWebSocketService } from '../services/availability-websocket.service';
 import { ErrorService } from '../../error/error-service';
+import { CurrencyService } from '../../shared/currency.service';
 
 @Component({
   selector: 'app-checkout-step1',
@@ -35,7 +36,8 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
     private wsService: AvailabilityWebSocketService,
     private router: Router,
     private translate: TranslateService,
-    private errorService: ErrorService
+    private errorService: ErrorService,
+    public currency: CurrencyService
   ) {}
 
   ngOnInit(): void {
@@ -98,6 +100,12 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
         this.tickets = availability;
         this.updateCartAvailability();
       });
+
+    this.wsService.getTicketTypesChanges()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.loadAvailability();
+      });
   }
 
   private updateCartAvailability(): void {
@@ -151,6 +159,7 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
     this.cart.forEach(item => subtotal += item.totalPrice);
     return subtotal;
   }
+
 
   canProceed(): boolean {
     return this.cart.size > 0 && this.selectedDate !== '';

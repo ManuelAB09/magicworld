@@ -45,8 +45,6 @@ public class TicketTypeE2ETests {
     private static final String VIP_TICKET_DESC = "VIP ticket";
     private static final String PREMIUM_TICKET_DESC = "Premium ticket";
     private static final String ULTRA_TICKET_DESC = "Ultra ticket";
-    private static final String CURRENCY_EUR = "EUR";
-    private static final String CURRENCY_USD = "USD";
     private static final String PHOTO_URL_ADULT = "https://example.com/adult.jpg";
     private static final String TEST_IMAGE_CONTENT = "test image content";
     private static final String NEW_IMAGE_CONTENT = "new image content";
@@ -72,7 +70,6 @@ public class TicketTypeE2ETests {
         sample = TicketType.builder()
                 .typeName(TYPE_NAME_ADULT)
                 .cost(COST_50)
-                .currency(CURRENCY_EUR)
                 .description(ADULT_TICKET_DESC)
                 .maxPerDay(100)
                 .photoUrl(PHOTO_URL_ADULT)
@@ -357,7 +354,6 @@ public class TicketTypeE2ETests {
     void testCreateTicketTypeMultipartReturnsCreated() throws Exception {
         TicketTypeRequest request = new TicketTypeRequest();
         request.setCost(COST_75);
-        request.setCurrency(CURRENCY_USD);
         request.setTypeName(TYPE_NAME_VIP);
         request.setDescription(VIP_TICKET_DESC);
         request.setMaxPerDay(50);
@@ -383,7 +379,6 @@ public class TicketTypeE2ETests {
     void testCreateTicketTypeMultipartReturnsId() throws Exception {
         TicketTypeRequest request = new TicketTypeRequest();
         request.setCost(COST_75);
-        request.setCurrency(CURRENCY_USD);
         request.setTypeName(TYPE_NAME_VIP);
         request.setDescription(VIP_TICKET_DESC);
         request.setMaxPerDay(50);
@@ -411,7 +406,6 @@ public class TicketTypeE2ETests {
 
         TicketTypeRequest request = new TicketTypeRequest();
         request.setCost(COST_100);
-        request.setCurrency(CURRENCY_EUR);
         request.setTypeName(TYPE_NAME_PREMIUM);
         request.setDescription(PREMIUM_TICKET_DESC);
         request.setMaxPerDay(200);
@@ -438,7 +432,6 @@ public class TicketTypeE2ETests {
 
         TicketTypeRequest request = new TicketTypeRequest();
         request.setCost(COST_150);
-        request.setCurrency(CURRENCY_USD);
         request.setTypeName(TYPE_NAME_ULTRA);
         request.setDescription(ULTRA_TICKET_DESC);
         request.setMaxPerDay(25);

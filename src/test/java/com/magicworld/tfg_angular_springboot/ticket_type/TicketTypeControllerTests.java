@@ -22,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -60,8 +61,6 @@ public class TicketTypeControllerTests {
     private static final String TYPE_NAME_PREMIUM = "PREMIUM";
     private static final String STANDARD_TICKET_DESC = "Standard ticket";
     private static final String PREMIUM_TICKET_DESC = "Premium ticket";
-    private static final String CURRENCY_EUR = "EUR";
-    private static final String CURRENCY_USD = "USD";
     private static final String PHOTO_URL_STANDARD = "http://example.com/standard.jpg";
     private static final String PHOTO_URL_PREMIUM = "http://example.com/premium.jpg";
     private static final String PHOTO_URL_INVALID = "http://example.com/invalid.jpg";
@@ -81,7 +80,6 @@ public class TicketTypeControllerTests {
     private TicketType sample() {
         return TicketType.builder()
                 .cost(COST_50)
-                .currency(CURRENCY_EUR)
                 .typeName(TYPE_NAME_STANDARD)
                 .description(STANDARD_TICKET_DESC)
                 .maxPerDay(10)
@@ -187,7 +185,6 @@ public class TicketTypeControllerTests {
     public void testUpdateTicketTypeReturnsOk() throws Exception {
         TicketType update = TicketType.builder()
                 .cost(COST_75_50)
-                .currency(CURRENCY_USD)
                 .typeName(TYPE_NAME_PREMIUM)
                 .description(PREMIUM_TICKET_DESC)
                 .maxPerDay(20)
@@ -196,7 +193,6 @@ public class TicketTypeControllerTests {
 
         TicketType returned = TicketType.builder()
                 .cost(COST_75_50)
-                .currency(CURRENCY_USD)
                 .typeName(TYPE_NAME_PREMIUM)
                 .description(PREMIUM_TICKET_DESC)
                 .maxPerDay(20)
@@ -237,7 +233,6 @@ public class TicketTypeControllerTests {
     public void testCreateTicketTypeBadRequestWhenInvalid() throws Exception {
         TicketType invalid = TicketType.builder()
                 .cost(null)
-                .currency("")
                 .typeName("")
                 .description("")
                 .maxPerDay(null)
@@ -282,6 +277,11 @@ public class TicketTypeControllerTests {
         @Bean
         public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
             return Mockito.mock(OAuth2AuthenticationFailureHandler.class);
+        }
+
+        @Bean
+        public SimpMessagingTemplate simpMessagingTemplate() {
+            return Mockito.mock(SimpMessagingTemplate.class);
         }
     }
 }

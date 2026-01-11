@@ -60,7 +60,7 @@
                       (change)="toggleTypeName(tt.typeName, ($any($event.target)?.checked ?? false))"
                     />
                     <span class="check-item__box"></span>
-                    <span class="check-item__text">{{ tt.typeName }} ({{ tt.currency }} {{ tt.cost }})</span>
+                    <span class="check-item__text">{{ tt.typeName }} ({{ currency.convertFromEur(tt.cost) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }})</span>
                   </label>
                 }
               </div>

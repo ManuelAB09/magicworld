@@ -7,6 +7,7 @@ import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { CheckoutService, CartItem, PriceCalculationResponse, PaymentRequest } from '../services/checkout.service';
 import { AuthService, UserProfile } from '../../auth/auth.service';
 import { ErrorService } from '../../error/error-service';
+import { CurrencyService } from '../../shared/currency.service';
 
 declare const Stripe: any;
 
@@ -57,7 +58,8 @@ export class CheckoutStep2Component implements OnInit, OnDestroy, AfterViewInit 
     private authService: AuthService,
     private router: Router,
     private translate: TranslateService,
-    private errorService: ErrorService
+    private errorService: ErrorService,
+    public currency: CurrencyService
   ) {}
 
   ngOnInit(): void {
@@ -223,6 +225,7 @@ export class CheckoutStep2Component implements OnInit, OnDestroy, AfterViewInit 
       this.cart !== null
     );
   }
+
 
   private isValidEmail(emailValue: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

@@ -28,7 +28,7 @@
 
           <div class="ticket-content">
             <h3>{{ tt.typeName }}</h3>
-            <p class="ticket-cost">{{ 'Cost:' | translate }} {{ tt.cost }} {{ tt.currency }}</p>
+            <p class="ticket-cost">{{ 'Cost:' | translate }} {{ currency.convertFromEur(tt.cost) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</p>
             <p class="ticket-desc" title="{{ tt.description }}">{{ tt.description }}</p>
 
             @if (isAdmin) {

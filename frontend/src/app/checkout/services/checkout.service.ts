@@ -8,7 +8,6 @@ export interface TicketAvailability {
   typeName: string;
   description: string;
   cost: number;
-  currency: string;
   photoUrl: string;
   maxPerDay: number;
   available: number;

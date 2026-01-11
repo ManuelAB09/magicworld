@@ -27,7 +27,7 @@
             <div class="ticket-info">
               <h3>{{ ticket.typeName }}</h3>
               <p class="description">{{ ticket.description }}</p>
-              <p class="price">{{ ticket.cost | number:'1.2-2' }} {{ ticket.currency }}</p>
+              <p class="price">{{ currency.convertFromEur(ticket.cost) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</p>
             </div>
             <div class="quantity-controls">
               <button
@@ -103,14 +103,14 @@
             <div class="cart-item">
               <span class="item-name">{{ item.ticketTypeName }}</span>
               <span class="item-qty">x{{ item.quantity }}</span>
-              <span class="item-price">{{ item.totalPrice | number:'1.2-2' }} €</span>
+              <span class="item-price">{{ currency.convertFromEur(item.totalPrice) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</span>
             </div>
           }
         </div>
 
         <div class="cart-total">
           <span>{{ 'CHECKOUT.STEP1.SUBTOTAL' | translate }}</span>
-          <span class="total-amount">{{ getSubtotal() | number:'1.2-2' }} €</span>
+          <span class="total-amount">{{ currency.convertFromEur(getSubtotal()) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</span>
         </div>
       }
     </div>

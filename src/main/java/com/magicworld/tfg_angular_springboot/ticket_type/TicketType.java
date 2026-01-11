@@ -26,9 +26,6 @@ public class TicketType extends BaseEntity {
     @Column(name = "cost", nullable = false, precision = 10, scale = 2)
     private BigDecimal cost;
 
-    @NotBlank
-    @Column(name = "currency")
-    private String currency;
 
     @NotBlank
     @Size(max = 50)

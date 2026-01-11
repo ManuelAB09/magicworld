@@ -40,11 +40,9 @@ public class TicketTypeFunctionExecutorTests {
     private static final String STORY_ELIMINAR_TIPO = "Eliminar Tipo de Entrada";
 
     private static final String TYPE_NAME_ADULT = "ADULT";
-    private static final String CURRENCY_EUR = "EUR";
     private static final String DESCRIPTION_ADULT_TICKET = "Adult ticket";
     private static final String FIELD_COST = "cost";
     private static final String FIELD_TYPE_NAME = "typeName";
-    private static final String FIELD_CURRENCY = "currency";
     private static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_MAX_PER_DAY = "maxPerDay";
     private static final String FIELD_PHOTO_URL = "photoUrl";
@@ -63,7 +61,6 @@ public class TicketTypeFunctionExecutorTests {
         sample = TicketType.builder()
                 .typeName(TYPE_NAME_ADULT)
                 .cost(new BigDecimal("50.00"))
-                .currency(CURRENCY_EUR)
                 .description(DESCRIPTION_ADULT_TICKET)
                 .maxPerDay(100)
                 .photoUrl("https://example.com/adult.jpg")
@@ -242,7 +239,6 @@ public class TicketTypeFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
         args.put(FIELD_COST, 50.0);
-        args.put(FIELD_CURRENCY, CURRENCY_EUR);
         args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
         args.put(FIELD_MAX_PER_DAY, 100);
         ChatResponse response = executor.createTicketType(args, "en");
@@ -259,7 +255,6 @@ public class TicketTypeFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
         args.put(FIELD_COST, 50.0);
-        args.put(FIELD_CURRENCY, CURRENCY_EUR);
         args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
         args.put(FIELD_MAX_PER_DAY, 100);
         ChatResponse response = executor.createTicketType(args, "en");
@@ -276,7 +271,6 @@ public class TicketTypeFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
         args.put(FIELD_COST, 50.0);
-        args.put(FIELD_CURRENCY, CURRENCY_EUR);
         args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
         args.put(FIELD_MAX_PER_DAY, 100);
         ChatResponse response = executor.createTicketType(args, "es");
@@ -293,7 +287,6 @@ public class TicketTypeFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
         args.put(FIELD_COST, 50.0);
-        args.put(FIELD_CURRENCY, CURRENCY_EUR);
         args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
         args.put(FIELD_MAX_PER_DAY, 100);
         args.put(FIELD_PHOTO_URL, PHOTO_URL_EXAMPLE);
@@ -421,7 +414,6 @@ public class TicketTypeFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
         args.put(FIELD_COST, 50.0);
-        args.put(FIELD_CURRENCY, CURRENCY_EUR);
         args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
         args.put(FIELD_MAX_PER_DAY, 100);
         args.put(FIELD_PHOTO_URL, "   ");
@@ -439,7 +431,6 @@ public class TicketTypeFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
         args.put(FIELD_COST, 50.0);
-        args.put(FIELD_CURRENCY, CURRENCY_EUR);
         args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
         args.put(FIELD_MAX_PER_DAY, 100);
         args.put(FIELD_PHOTO_URL, null);
@@ -457,7 +448,6 @@ public class TicketTypeFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
         args.put(FIELD_COST, 50.0);
-        args.put(FIELD_CURRENCY, CURRENCY_EUR);
         args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
         args.put(FIELD_MAX_PER_DAY, 100);
         args.put(FIELD_PHOTO_URL, "not-a-url");
@@ -475,7 +465,6 @@ public class TicketTypeFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put(FIELD_TYPE_NAME, TYPE_NAME_ADULT);
         args.put(FIELD_COST, 50.0);
-        args.put(FIELD_CURRENCY, CURRENCY_EUR);
         args.put(FIELD_DESCRIPTION, DESCRIPTION_ADULT_TICKET);
         args.put(FIELD_MAX_PER_DAY, 100);
         args.put(FIELD_PHOTO_URL, "http://example.com/photo.jpg");

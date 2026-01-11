@@ -51,8 +51,23 @@
         .order-line {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            align-items: center;
+            padding: 10px 0;
             border-bottom: 1px solid #e0d8c8;
+            gap: 20px;
+        }
+        .order-line .ticket-info {
+            flex: 1;
+        }
+        .order-line .ticket-qty {
+            color: #666;
+            margin-left: 8px;
+        }
+        .order-line .ticket-price {
+            font-weight: 500;
+            white-space: nowrap;
+            min-width: 80px;
+            text-align: right;
         }
         .order-line:last-child {
             border-bottom: none;
@@ -130,18 +145,21 @@
             <h3 th:text="${orderSummaryTitle}">Order Summary</h3>
 
             <div th:each="line : ${orderLines}" class="order-line">
-                <span th:text="${line.ticketTypeName} + ' x ' + ${line.quantity}"></span>
-                <span th:text="${line.totalCost} + ' €'"></span>
+                <span class="ticket-info">
+                    <span th:text="${line.ticketTypeName}"></span>
+                    <span class="ticket-qty" th:text="'× ' + ${line.quantity}"></span>
+                </span>
+                <span class="ticket-price" th:text="${line.totalCost} + ' ' + ${currencySymbol}"></span>
             </div>
 
             <div th:if="${discountApplied}" class="order-line discount-row">
                 <span th:text="${discountLabel}">Discount</span>
-                <span th:text="'-' + ${discountAmount} + ' €'"></span>
+                <span th:text="'-' + ${discountAmount} + ' ' + ${currencySymbol}"></span>
             </div>
 
             <div class="order-line total-row">
                 <span th:text="${totalLabel}">Total</span>
-                <span th:text="${totalAmount} + ' €'"></span>
+                <span th:text="${totalAmount} + ' ' + ${currencySymbol}"></span>
             </div>
         </div>
 

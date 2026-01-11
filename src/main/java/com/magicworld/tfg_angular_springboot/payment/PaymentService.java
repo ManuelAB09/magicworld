@@ -55,7 +55,6 @@ public class PaymentService {
                             .typeName(tt.getTypeName())
                             .description(tt.getDescription())
                             .cost(tt.getCost())
-                            .currency(tt.getCurrency())
                             .photoUrl(tt.getPhotoUrl())
                             .maxPerDay(tt.getMaxPerDay())
                             .available(available)
@@ -284,16 +283,23 @@ public class PaymentService {
         byte[] qrCode = qrCodeService.generateQrCodeBytes(qrContent);
 
         boolean isSpanish = "es".equalsIgnoreCase(lang);
+        String currencySymbol = isSpanish ? "€" : "$";
+        BigDecimal exchangeRate = isSpanish ? BigDecimal.ONE : new BigDecimal("1.08");
 
         List<Map<String, Object>> orderLines = new ArrayList<>();
         for (PaymentRequest.PaymentLineItem item : request.getItems()) {
             TicketType tt = ticketTypeService.findByTypeName(item.getTicketTypeName());
+            BigDecimal lineTotalEur = tt.getCost().multiply(BigDecimal.valueOf(item.getQuantity()));
+            BigDecimal lineTotalConverted = lineTotalEur.multiply(exchangeRate).setScale(2, RoundingMode.HALF_UP);
             Map<String, Object> lineMap = new HashMap<>();
             lineMap.put("ticketTypeName", item.getTicketTypeName());
             lineMap.put("quantity", item.getQuantity());
-            lineMap.put("totalCost", tt.getCost().multiply(BigDecimal.valueOf(item.getQuantity())).setScale(2, RoundingMode.HALF_UP));
+            lineMap.put("totalCost", lineTotalConverted);
             orderLines.add(lineMap);
         }
+
+        BigDecimal discountConverted = priceCalc.getDiscountAmount().multiply(exchangeRate).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal totalConverted = priceCalc.getTotal().multiply(exchangeRate).setScale(2, RoundingMode.HALF_UP);
 
         Map<String, Object> vars = new HashMap<>();
         vars.put("subject", isSpanish ? "Confirmación de compra - MagicWorld" : "Purchase Confirmation - MagicWorld");
@@ -304,11 +310,12 @@ public class PaymentService {
         vars.put("visitDate", request.getVisitDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         vars.put("orderSummaryTitle", isSpanish ? "Resumen del Pedido" : "Order Summary");
         vars.put("orderLines", orderLines);
+        vars.put("currencySymbol", currencySymbol);
         vars.put("discountApplied", priceCalc.getDiscountAmount().compareTo(BigDecimal.ZERO) > 0);
         vars.put("discountLabel", isSpanish ? "Descuento" : "Discount");
-        vars.put("discountAmount", priceCalc.getDiscountAmount().setScale(2, RoundingMode.HALF_UP));
-        vars.put("totalLabel", isSpanish ? "Total" : "Total");
-        vars.put("totalAmount", priceCalc.getTotal().setScale(2, RoundingMode.HALF_UP));
+        vars.put("discountAmount", discountConverted);
+        vars.put("totalLabel", "Total");
+        vars.put("totalAmount", totalConverted);
         vars.put("qrTitle", isSpanish ? "Tu Código QR de Entrada" : "Your Entry QR Code");
         vars.put("qrInstructions", isSpanish ? "Muestra este código QR en la entrada del parque" : "Show this QR code at the park entrance");
         vars.put("purchaseId", purchase.getId());

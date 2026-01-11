@@ -7,6 +7,7 @@ import { AuthService, Role } from '../auth/auth.service';
 import { ErrorService } from '../error/error-service';
 import { catchError, map, of } from 'rxjs';
 import { getBackendBaseUrl } from '../config/backend';
+import { CurrencyService } from '../shared/currency.service';
 
 @Component({
   selector: 'app-ticket-type-list',
@@ -30,7 +31,8 @@ export class TicketTypeList implements OnInit {
     private auth: AuthService,
     private error: ErrorService,
     private router: Router,
-    private translate: TranslateService
+    private translate: TranslateService,
+    public currency: CurrencyService
   ) {}
 
   ngOnInit(): void {
@@ -69,6 +71,7 @@ export class TicketTypeList implements OnInit {
     if (url.startsWith('http')) return url;
     return this.apiBase + url;
   }
+
 
   delete(id: number) {
     const ok = confirm(this.translate.instant('TICKET_TYPE_FORM.CONFIRM_DELETE'));

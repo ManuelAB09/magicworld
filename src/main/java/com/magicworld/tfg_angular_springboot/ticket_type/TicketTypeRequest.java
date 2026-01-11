@@ -14,8 +14,6 @@ public class TicketTypeRequest {
     @Positive
     private BigDecimal cost;
 
-    @NotBlank
-    private String currency;
 
     @NotBlank
     @Size(max = 50)

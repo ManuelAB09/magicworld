@@ -40,7 +40,6 @@ public class TicketTypeService {
     public TicketType update(Long id, TicketType updatedTicketType) {
         TicketType existingTicketType = findById(id);
         existingTicketType.setCost(updatedTicketType.getCost());
-        existingTicketType.setCurrency(updatedTicketType.getCurrency());
         existingTicketType.setTypeName(updatedTicketType.getTypeName());
         existingTicketType.setDescription(updatedTicketType.getDescription());
         existingTicketType.setMaxPerDay(updatedTicketType.getMaxPerDay());

@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @Feature("Servicio de Pago")
 public class PaymentServiceTests {
 
-    private static final String CURRENCY_EUR = "EUR";
     private static final String TYPE_NAME_ADULT = "ADULT";
     private static final String TYPE_NAME_CHILD = "CHILD";
     private static final BigDecimal COST_50 = new BigDecimal("50.00");
@@ -74,7 +73,6 @@ public class PaymentServiceTests {
 
         adultTicket = ticketTypeRepository.save(TicketType.builder()
                 .cost(COST_50)
-                .currency(CURRENCY_EUR)
                 .typeName(TYPE_NAME_ADULT)
                 .description("Adult ticket")
                 .maxPerDay(100)
@@ -83,7 +81,6 @@ public class PaymentServiceTests {
 
         childTicket = ticketTypeRepository.save(TicketType.builder()
                 .cost(COST_25)
-                .currency(CURRENCY_EUR)
                 .typeName(TYPE_NAME_CHILD)
                 .description("Child ticket")
                 .maxPerDay(100)
@@ -99,7 +96,7 @@ public class PaymentServiceTests {
     @Story("Consulta de disponibilidad")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifica que se obtiene correctamente la disponibilidad de entradas para una fecha dada")
-    void getAvailability_shouldReturnAllTicketTypes() {
+    void getAvailabilityShouldReturnAllTicketTypes() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
 
         List<TicketAvailabilityDTO> availability = paymentService.getAvailability(tomorrow);
@@ -122,7 +119,7 @@ public class PaymentServiceTests {
     @Story("Cálculo de precios")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifica que el cálculo del precio sin descuentos es correcto")
-    void calculatePrice_withoutDiscounts_shouldReturnCorrectTotal() {
+    void calculatePriceWithoutDiscountsShouldReturnCorrectTotal() {
         List<PaymentRequest.PaymentLineItem> items = List.of(
                 PaymentRequest.PaymentLineItem.builder()
                         .ticketTypeName(TYPE_NAME_ADULT)
@@ -147,7 +144,7 @@ public class PaymentServiceTests {
     @Story("Cálculo de precios")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifica que el cálculo del precio con descuento válido aplica correctamente")
-    void calculatePrice_withValidDiscount_shouldApplyDiscount() {
+    void calculatePriceWithValidDiscountShouldApplyDiscount() {
         TicketType adult = ticketTypeRepository.findByTypeName(TYPE_NAME_ADULT).orElseThrow();
 
         Discount discount = discountRepository.save(Discount.builder()
@@ -185,7 +182,7 @@ public class PaymentServiceTests {
     @Story("Cálculo de precios")
     @Severity(SeverityLevel.NORMAL)
     @Description("Verifica que los códigos de descuento inválidos no se aplican")
-    void calculatePrice_withInvalidDiscount_shouldNotApplyDiscount() {
+    void calculatePriceWithInvalidDiscountShouldNotApplyDiscount() {
         List<PaymentRequest.PaymentLineItem> items = List.of(
                 PaymentRequest.PaymentLineItem.builder()
                         .ticketTypeName(TYPE_NAME_ADULT)
@@ -207,7 +204,7 @@ public class PaymentServiceTests {
     @Story("Cálculo de precios")
     @Severity(SeverityLevel.NORMAL)
     @Description("Verifica que se pueden aplicar múltiples códigos de descuento separados")
-    void calculatePrice_withMultipleDiscounts_shouldApplyBest() {
+    void calculatePriceWithMultipleDiscountsShouldApplyBest() {
         TicketType adult = ticketTypeRepository.findByTypeName(TYPE_NAME_ADULT).orElseThrow();
 
         Discount discount1 = discountRepository.save(Discount.builder()
@@ -255,7 +252,7 @@ public class PaymentServiceTests {
     @Story("Validación de compra")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifica que no se puede procesar un pago para una fecha pasada")
-    void processPayment_withPastDate_shouldThrowException() {
+    void processPaymentWithPastDateShouldThrowException() {
         PaymentRequest request = PaymentRequest.builder()
                 .visitDate(LocalDate.now().minusDays(1))
                 .items(List.of(PaymentRequest.PaymentLineItem.builder()

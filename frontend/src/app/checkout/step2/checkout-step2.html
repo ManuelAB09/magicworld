@@ -22,16 +22,14 @@
               <h4>{{ item.ticketTypeName }}</h4>
               <p class="item-desc">{{ item.description }}</p>
               <div class="item-pricing">
-                <span class="unit-price">{{ item.unitPrice | number:'1.2-2' }} € x {{ item.quantity }}</span>
-                <span class="line-total">{{ item.totalPrice | number:'1.2-2' }} €</span>
+                <span class="unit-price">{{ currency.convertFromEur(item.unitPrice) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }} x {{ item.quantity }}</span>
+                <span class="line-total">{{ currency.convertFromEur(item.totalPrice) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</span>
               </div>
             </div>
           </div>
         }
       </div>
     }
-
-    <!-- Código de descuento -->
     <div class="discount-section">
       <h3>{{ 'CHECKOUT.STEP2.DISCOUNT_CODE' | translate }}</h3>
       <p class="discount-hint">{{ 'CHECKOUT.STEP2.DISCOUNT_HINT' | translate }}</p>
@@ -83,22 +81,21 @@
       }
     </div>
 
-    <!-- Totales -->
     @if (priceCalc) {
       <div class="price-summary">
         <div class="price-row">
           <span>{{ 'CHECKOUT.STEP2.SUBTOTAL' | translate }}</span>
-          <span>{{ priceCalc.subtotal | number:'1.2-2' }} €</span>
+          <span>{{ currency.convertFromEur(priceCalc.subtotal) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</span>
         </div>
         @if (priceCalc.discountAmount > 0) {
           <div class="price-row discount">
             <span>{{ 'CHECKOUT.STEP2.DISCOUNT' | translate }}</span>
-            <span>-{{ priceCalc.discountAmount | number:'1.2-2' }} €</span>
+            <span>-{{ currency.convertFromEur(priceCalc.discountAmount) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</span>
           </div>
         }
         <div class="price-row total">
           <span>{{ 'CHECKOUT.STEP2.TOTAL' | translate }}</span>
-          <span>{{ priceCalc.total | number:'1.2-2' }} €</span>
+          <span>{{ currency.convertFromEur(priceCalc.total) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</span>
         </div>
       </div>
     }
@@ -160,7 +157,7 @@
         <span>
           {{ 'CHECKOUT.STEP2.PAY_NOW' | translate }}
           @if (priceCalc) {
-            <span> - {{ priceCalc.total | number:'1.2-2' }} €</span>
+            <span> - {{ currency.convertFromEur(priceCalc.total) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</span>
           }
         </span>
       } @else {

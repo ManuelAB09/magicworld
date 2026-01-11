@@ -22,7 +22,6 @@ describe('TicketTypeForm', () => {
     typeName: 'Adult',
     description: 'Adult ticket',
     cost: 50,
-    currency: 'EUR',
     maxPerDay: 100,
     photoUrl: '/images/adult.jpg'
   };
@@ -68,7 +67,6 @@ describe('TicketTypeForm', () => {
     fixture.detectChanges();
     expect(component.form.get('typeName')?.hasError('required')).toBeTrue();
     expect(component.form.get('description')?.hasError('required')).toBeTrue();
-    expect(component.form.get('currency')?.hasError('required')).toBeTrue();
     expect(component.form.get('cost')?.hasError('required')).toBeTrue();
     expect(component.form.get('maxPerDay')?.hasError('required')).toBeTrue();
   });

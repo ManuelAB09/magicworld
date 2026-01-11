@@ -74,7 +74,6 @@ public class DiscountE2ETests {
         TicketType ticketType = ticketTypeRepository.save(TicketType.builder()
                 .typeName(TYPE_NAME_ADULT)
                 .cost(COST_50)
-                .currency(CURRENCY_EUR)
                 .description(ADULT_TICKET_DESC)
                 .maxPerDay(100)
                 .photoUrl(PHOTO_URL_ADULT)

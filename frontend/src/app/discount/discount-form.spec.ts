@@ -27,8 +27,8 @@ describe('DiscountForm', () => {
   };
 
   const mockTicketTypes: TicketType[] = [
-    { id: 1, typeName: 'Adult', description: 'Adult ticket', cost: 50, currency: 'EUR', maxPerDay: 100, photoUrl: '/img.jpg' },
-    { id: 2, typeName: 'Child', description: 'Child ticket', cost: 25, currency: 'EUR', maxPerDay: 50, photoUrl: '/img2.jpg' }
+    { id: 1, typeName: 'Adult', description: 'Adult ticket', cost: 50, maxPerDay: 100, photoUrl: '/img.jpg' },
+    { id: 2, typeName: 'Child', description: 'Child ticket', cost: 25, maxPerDay: 50, photoUrl: '/img2.jpg' }
   ];
 
   beforeEach(async () => {

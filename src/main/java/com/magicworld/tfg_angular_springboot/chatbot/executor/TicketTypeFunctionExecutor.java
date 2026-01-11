@@ -43,8 +43,8 @@ public class TicketTypeFunctionExecutor {
                 "🎫 **Tipos de entrada disponibles:**\n\n");
 
         for (TicketType t : ticketTypes) {
-            sb.append(String.format("• **ID %d** - %s | %.2f %s | Max/%s: %d\n",
-                    t.getId(), t.getTypeName(), t.getCost(), t.getCurrency(),
+            sb.append(String.format("• **ID %d** - %s | %.2f € | Max/%s: %d\n",
+                    t.getId(), t.getTypeName(), t.getCost(),
                     lang.equals("en") ? "day" : "día", t.getMaxPerDay()));
         }
 
@@ -63,18 +63,18 @@ public class TicketTypeFunctionExecutor {
                         "🎫 **Ticket Type Details:**\n\n" +
                         "• **ID:** %d\n" +
                         "• **Name:** %s\n" +
-                        "• **Price:** %.2f %s\n" +
+                        "• **Price:** %.2f €\n" +
                         "• **Description:** %s\n" +
                         "• **Max per day:** %d\n" +
                         "• **Photo URL:** %s" :
                         "🎫 **Detalles del Tipo de Entrada:**\n\n" +
                         "• **ID:** %d\n" +
                         "• **Nombre:** %s\n" +
-                        "• **Precio:** %.2f %s\n" +
+                        "• **Precio:** %.2f €\n" +
                         "• **Descripción:** %s\n" +
                         "• **Máximo por día:** %d\n" +
                         "• **URL de foto:** %s",
-                t.getId(), t.getTypeName(), t.getCost(), t.getCurrency(),
+                t.getId(), t.getTypeName(), t.getCost(),
                 t.getDescription(), t.getMaxPerDay(),
                 t.getPhotoUrl() != null ? t.getPhotoUrl() : (lang.equals("en") ? "None" : "Ninguna"));
 
@@ -103,9 +103,9 @@ public class TicketTypeFunctionExecutor {
         return ChatResponse.builder()
                 .success(true)
                 .message(String.format(lang.equals("en") ?
-                                "🎫 **Found ticket type:**\n\n• **ID:** %d\n• **Name:** %s\n• **Price:** %.2f %s\n• **Max/day:** %d\n• **Description:** %s" :
-                                "🎫 **Tipo de entrada encontrado:**\n\n• **ID:** %d\n• **Nombre:** %s\n• **Precio:** %.2f %s\n• **Máx/día:** %d\n• **Descripción:** %s",
-                        t.getId(), t.getTypeName(), t.getCost(), t.getCurrency(),
+                                "🎫 **Found ticket type:**\n\n• **ID:** %d\n• **Name:** %s\n• **Price:** %.2f €\n• **Max/day:** %d\n• **Description:** %s" :
+                                "🎫 **Tipo de entrada encontrado:**\n\n• **ID:** %d\n• **Nombre:** %s\n• **Precio:** %.2f €\n• **Máx/día:** %d\n• **Descripción:** %s",
+                        t.getId(), t.getTypeName(), t.getCost(),
                         t.getMaxPerDay(), t.getDescription()))
                 .data(t)
                 .build();
@@ -114,7 +114,6 @@ public class TicketTypeFunctionExecutor {
     public ChatResponse createTicketType(Map<String, Object> args, String lang) {
         String typeName = (String) args.get("typeName");
         BigDecimal cost = BigDecimal.valueOf(((Number) args.get("cost")).doubleValue());
-        String currency = (String) args.get("currency");
         String description = (String) args.get("description");
         int maxPerDay = ((Number) args.get("maxPerDay")).intValue();
 
@@ -124,7 +123,6 @@ public class TicketTypeFunctionExecutor {
         TicketType ticketType = TicketType.builder()
                 .typeName(typeName)
                 .cost(cost)
-                .currency(currency)
                 .description(description)
                 .maxPerDay(maxPerDay)
                 .photoUrl(photoUrl)
@@ -135,10 +133,10 @@ public class TicketTypeFunctionExecutor {
         return ChatResponse.builder()
                 .success(true)
                 .message(String.format(lang.equals("en") ?
-                                "✅ Ticket type created!\n\n• **ID:** %d\n• **Name:** %s\n• **Price:** %.2f %s\n• **Max/day:** %d\n• **Photo:** %s" :
-                                "✅ ¡Tipo de entrada creado!\n\n• **ID:** %d\n• **Nombre:** %s\n• **Precio:** %.2f %s\n• **Máx/día:** %d\n• **Foto:** %s",
+                                "✅ Ticket type created!\n\n• **ID:** %d\n• **Name:** %s\n• **Price:** %.2f €\n• **Max/day:** %d\n• **Photo:** %s" :
+                                "✅ ¡Tipo de entrada creado!\n\n• **ID:** %d\n• **Nombre:** %s\n• **Precio:** %.2f €\n• **Máx/día:** %d\n• **Foto:** %s",
                         saved.getId(), saved.getTypeName(), saved.getCost(),
-                        saved.getCurrency(), saved.getMaxPerDay(), saved.getPhotoUrl()))
+                        saved.getMaxPerDay(), saved.getPhotoUrl()))
                 .data(saved)
                 .build();
     }
@@ -149,7 +147,6 @@ public class TicketTypeFunctionExecutor {
 
         String typeName = getOrDefault(args, "typeName", existing.getTypeName());
         BigDecimal cost = getOrDefaultBigDecimal(args, "cost", existing.getCost());
-        String currency = getOrDefault(args, "currency", existing.getCurrency());
         String description = getOrDefault(args, "description", existing.getDescription());
         int maxPerDay = getOrDefaultInt(args, "maxPerDay", existing.getMaxPerDay());
         String photoUrl = extractPhotoUrlForUpdate(args);
@@ -157,7 +154,6 @@ public class TicketTypeFunctionExecutor {
         TicketType ticketType = TicketType.builder()
                 .typeName(typeName)
                 .cost(cost)
-                .currency(currency)
                 .description(description)
                 .maxPerDay(maxPerDay)
                 .photoUrl(photoUrl)
@@ -168,9 +164,9 @@ public class TicketTypeFunctionExecutor {
         return ChatResponse.builder()
                 .success(true)
                 .message(String.format(lang.equals("en") ?
-                                "✅ Ticket type updated!\n\n• **ID:** %d\n• **Name:** %s\n• **Price:** %.2f %s" :
-                                "✅ ¡Tipo de entrada actualizado!\n\n• **ID:** %d\n• **Nombre:** %s\n• **Precio:** %.2f %s",
-                        updated.getId(), updated.getTypeName(), updated.getCost(), updated.getCurrency()))
+                                "✅ Ticket type updated!\n\n• **ID:** %d\n• **Name:** %s\n• **Price:** %.2f €" :
+                                "✅ ¡Tipo de entrada actualizado!\n\n• **ID:** %d\n• **Nombre:** %s\n• **Precio:** %.2f €",
+                        updated.getId(), updated.getTypeName(), updated.getCost()))
                 .data(updated)
                 .build();
     }
@@ -222,9 +218,9 @@ public class TicketTypeFunctionExecutor {
         return ChatResponse.builder()
                 .success(true)
                 .message(String.format(lang.equals("en") ?
-                                "⚠️ **Confirmation required**\n\nYou are about to delete the ticket type:\n• **Name:** %s\n• **Price:** %.2f %s\n\nDo you confirm this action?" :
-                                "⚠️ **Confirmación requerida**\n\nVas a eliminar el tipo de entrada:\n• **Nombre:** %s\n• **Precio:** %.2f %s\n\n¿Confirmas esta acción?",
-                        ticketType.getTypeName(), ticketType.getCost(), ticketType.getCurrency()))
+                                "⚠️ **Confirmation required**\n\nYou are about to delete the ticket type:\n• **Name:** %s\n• **Price:** %.2f €\n\nDo you confirm this action?" :
+                                "⚠️ **Confirmación requerida**\n\nVas a eliminar el tipo de entrada:\n• **Nombre:** %s\n• **Precio:** %.2f €\n\n¿Confirmas esta acción?",
+                        ticketType.getTypeName(), ticketType.getCost()))
                 .pendingAction(pending)
                 .build();
     }

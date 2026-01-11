@@ -7,6 +7,7 @@ import { TicketType, TicketTypeApiService } from '../ticket-type/ticket-type.ser
 import { catchError, of, switchMap } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ErrorService } from '../error/error-service';
+import { CurrencyService } from '../shared/currency.service';
 
 @Component({
   selector: 'app-discount-form',
@@ -33,7 +34,8 @@ export class DiscountForm implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private translate: TranslateService,
-    private error: ErrorService
+    private error: ErrorService,
+    public currency: CurrencyService
   ) {}
 
   ngOnInit(): void {

@@ -16,7 +16,6 @@ describe('TicketTypeApiService', () => {
     typeName: 'Adult',
     description: 'Adult ticket',
     cost: 50,
-    currency: 'EUR',
     maxPerDay: 100,
     photoUrl: '/images/adult.jpg'
   };
@@ -101,7 +100,6 @@ describe('TicketTypeApiService', () => {
       typeName: 'New',
       description: 'New ticket',
       cost: 30,
-      currency: 'EUR',
       maxPerDay: 50
     };
     const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
@@ -121,7 +119,6 @@ describe('TicketTypeApiService', () => {
       typeName: 'Updated',
       description: 'Updated ticket',
       cost: 55,
-      currency: 'EUR',
       maxPerDay: 120
     };
 

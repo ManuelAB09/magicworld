@@ -45,7 +45,6 @@ public class PaymentControllerTests {
 
         ticketTypeRepository.save(TicketType.builder()
                 .cost(new BigDecimal("50.00"))
-                .currency("EUR")
                 .typeName("ADULT")
                 .description("Adult ticket")
                 .maxPerDay(100)
@@ -54,7 +53,6 @@ public class PaymentControllerTests {
 
         ticketTypeRepository.save(TicketType.builder()
                 .cost(new BigDecimal("25.00"))
-                .currency("EUR")
                 .typeName("CHILD")
                 .description("Child ticket")
                 .maxPerDay(100)
@@ -67,7 +65,7 @@ public class PaymentControllerTests {
     @Story("Configuración de Stripe")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifica que se obtiene la clave pública de Stripe")
-    void getStripePublicKey_shouldReturnKey() throws Exception {
+    void getStripePublicKeyShouldReturnKey() throws Exception {
         mockMvc.perform(get("/api/v1/payment/stripe-key"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.publicKey").exists());
@@ -78,7 +76,7 @@ public class PaymentControllerTests {
     @Story("Consulta de disponibilidad")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifica que se obtiene la disponibilidad de entradas para una fecha")
-    void getAvailability_shouldReturnTicketTypes() throws Exception {
+    void getAvailabilityShouldReturnTicketTypes() throws Exception {
         String tomorrow = LocalDate.now().plusDays(1).toString();
 
         mockMvc.perform(get("/api/v1/payment/availability")
@@ -93,7 +91,7 @@ public class PaymentControllerTests {
     @Story("Cálculo de precios")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifica que se calcula correctamente el precio de las entradas")
-    void calculatePrice_shouldReturnCorrectTotal() throws Exception {
+    void calculatePriceShouldReturnCorrectTotal() throws Exception {
         PaymentController.PriceCalculationRequest request = new PaymentController.PriceCalculationRequest();
         request.setItems(List.of(
                 PaymentRequest.PaymentLineItem.builder()
@@ -116,7 +114,7 @@ public class PaymentControllerTests {
     @Story("Procesamiento de pago")
     @Severity(SeverityLevel.NORMAL)
     @Description("Verifica que se validan los datos requeridos para el pago")
-    void processPayment_withMissingData_shouldReturnBadRequest() throws Exception {
+    void processPaymentWithMissingDataShouldReturnBadRequest() throws Exception {
         PaymentRequest request = PaymentRequest.builder()
                 .visitDate(LocalDate.now().plusDays(1))
                 .items(List.of())

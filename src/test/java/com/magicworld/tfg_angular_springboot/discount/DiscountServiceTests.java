@@ -73,7 +73,6 @@ public class DiscountServiceTests {
 
         TicketType adult = ticketTypeRepository.save(TicketType.builder()
                 .cost(COST_50)
-                .currency(CURRENCY_EUR)
                 .typeName(TYPE_NAME_ADULT)
                 .description(ADULT_TICKET_DESC)
                 .maxPerDay(10)
@@ -82,7 +81,6 @@ public class DiscountServiceTests {
 
         TicketType child = ticketTypeRepository.save(TicketType.builder()
                 .cost(COST_25)
-                .currency(CURRENCY_EUR)
                 .typeName(TYPE_NAME_CHILD)
                 .description(CHILD_TICKET_DESC)
                 .maxPerDay(10)
@@ -91,7 +89,6 @@ public class DiscountServiceTests {
 
         TicketType vip = ticketTypeRepository.save(TicketType.builder()
                 .cost(COST_120)
-                .currency(CURRENCY_EUR)
                 .typeName(TYPE_NAME_VIP)
                 .description(VIP_TICKET_DESC)
                 .maxPerDay(5)

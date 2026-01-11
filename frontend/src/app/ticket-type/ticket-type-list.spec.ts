@@ -15,8 +15,8 @@ describe('TicketTypeList', () => {
   let mockErrorService: jasmine.SpyObj<ErrorService>;
 
   const mockTicketTypes: TicketType[] = [
-    { id: 1, typeName: 'Adult', description: 'Adult ticket', cost: 50, currency: 'EUR', maxPerDay: 100, photoUrl: '/images/adult.jpg' },
-    { id: 2, typeName: 'Child', description: 'Child ticket', cost: 25, currency: 'EUR', maxPerDay: 50, photoUrl: '/images/child.jpg' }
+    { id: 1, typeName: 'Adult', description: 'Adult ticket', cost: 50, maxPerDay: 100, photoUrl: '/images/adult.jpg' },
+    { id: 2, typeName: 'Child', description: 'Child ticket', cost: 25, maxPerDay: 50, photoUrl: '/images/child.jpg' }
   ];
 
   beforeEach(async () => {

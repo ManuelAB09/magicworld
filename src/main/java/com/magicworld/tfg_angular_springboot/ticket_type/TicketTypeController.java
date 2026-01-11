@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,7 @@ import java.util.List;
 public class TicketTypeController {
     private final TicketTypeService ticketTypeService;
     private final ImageStorageService imageStorageService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Operation(summary = "Get all ticket types", description = "Retrieve a list of all ticket types", tags = {"TicketTypes"})
     @ApiResponses({
@@ -55,6 +57,7 @@ public class TicketTypeController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TicketType> createTicketType(@RequestBody @Valid TicketType ticketType) {
         TicketType saved = ticketTypeService.save(ticketType);
+        notifyTicketTypesChanged();
         return ResponseEntity.created(URI.create("/api/v1/ticket-types/" + saved.getId())).body(saved);
     }
 
@@ -71,13 +74,13 @@ public class TicketTypeController {
         String url = imageStorageService.store(photo, "ticket-types");
         TicketType toSave = TicketType.builder()
                 .cost(request.getCost())
-                .currency(request.getCurrency())
                 .typeName(request.getTypeName())
                 .description(request.getDescription())
                 .maxPerDay(request.getMaxPerDay())
                 .photoUrl(url)
                 .build();
         TicketType saved = ticketTypeService.save(toSave);
+        notifyTicketTypesChanged();
         return ResponseEntity.created(URI.create("/api/v1/ticket-types/" + saved.getId())).body(saved);
     }
 
@@ -92,10 +95,10 @@ public class TicketTypeController {
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TicketType> updateTicketType(@PathVariable Long id, @RequestBody @Valid TicketType updatedTicketType) {
         TicketType saved = ticketTypeService.update(id, updatedTicketType);
+        notifyTicketTypesChanged();
         return ResponseEntity.ok(saved);
     }
 
-    // MULTIPART update con opción de nueva imagen
     @Operation(summary = "Update ticket type (multipart)", description = "Update an existing ticket type with optional image upload", tags = {"TicketTypes"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ticket type updated", content = @Content(mediaType = "application/json")),
@@ -113,13 +116,13 @@ public class TicketTypeController {
         }
         TicketType update = TicketType.builder()
                 .cost(request.getCost())
-                .currency(request.getCurrency())
                 .typeName(request.getTypeName())
                 .description(request.getDescription())
                 .maxPerDay(request.getMaxPerDay())
                 .photoUrl(url)
                 .build();
         TicketType saved = ticketTypeService.update(id, update);
+        notifyTicketTypesChanged();
         return ResponseEntity.ok(saved);
     }
 
@@ -133,6 +136,12 @@ public class TicketTypeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTicketType(@PathVariable Long id) {
         ticketTypeService.delete(id);
+        notifyTicketTypesChanged();
         return ResponseEntity.noContent().build();
+    }
+
+    private void notifyTicketTypesChanged() {
+        List<TicketType> ticketTypes = ticketTypeService.findAll();
+        messagingTemplate.convertAndSend("/topic/ticket-types", ticketTypes);
     }
 }

@@ -137,12 +137,11 @@ public class ChatbotToolsBuilder {
                         .properties(Map.of(
                                 "typeName", Schema.builder().type("STRING").description("Unique name / Nombre único").build(),
                                 "cost", Schema.builder().type("NUMBER").description("Price / Precio").build(),
-                                "currency", Schema.builder().type("STRING").description("Currency (EUR, USD) / Moneda").build(),
                                 "description", Schema.builder().type("STRING").description("Description / Descripción").build(),
                                 "maxPerDay", Schema.builder().type("INTEGER").description("Max per day / Máximo por día").build(),
                                 "photoUrl", Schema.builder().type("STRING").description("Photo URL (optional) / URL foto").build()
                         ))
-                        .required(List.of("typeName", "cost", "currency", "description", "maxPerDay"))
+                        .required(List.of("typeName", "cost", "description", "maxPerDay"))
                         .build())
                 .build());
 
@@ -155,7 +154,6 @@ public class ChatbotToolsBuilder {
                                 "id", Schema.builder().type("INTEGER").description("ID of the ticket type (required) / ID del tipo (requerido)").build(),
                                 "typeName", Schema.builder().type("STRING").description("Name (optional) / Nombre (opcional)").build(),
                                 "cost", Schema.builder().type("NUMBER").description("Price (optional) / Precio (opcional)").build(),
-                                "currency", Schema.builder().type("STRING").description("Currency (optional) / Moneda (opcional)").build(),
                                 "description", Schema.builder().type("STRING").description("Description (optional) / Descripción (opcional)").build(),
                                 "maxPerDay", Schema.builder().type("INTEGER").description("Max per day (optional) / Máximo por día (opcional)").build(),
                                 "photoUrl", Schema.builder().type("STRING").description("Photo URL (optional) / URL foto (opcional)").build()

@@ -14,7 +14,6 @@ public class TicketAvailabilityDTO {
     private String typeName;
     private String description;
     private BigDecimal cost;
-    private String currency;
     private String photoUrl;
     private Integer maxPerDay;
     private Integer available;

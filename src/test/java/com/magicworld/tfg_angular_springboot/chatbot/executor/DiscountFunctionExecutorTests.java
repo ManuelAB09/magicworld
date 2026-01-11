@@ -62,7 +62,6 @@ public class DiscountFunctionExecutorTests {
         ticketType = TicketType.builder()
                 .typeName("ADULT")
                 .cost(new BigDecimal("50.00"))
-                .currency("EUR")
                 .description("Adult ticket")
                 .maxPerDay(100)
                 .build();

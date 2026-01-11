@@ -7,6 +7,7 @@ import { ErrorService } from '../error/error-service';
 import { TicketTypeApiService, TicketTypeData } from './ticket-type.service';
 import { catchError, of } from 'rxjs';
 import { getBackendBaseUrl } from '../config/backend';
+import { CurrencyService } from '../shared/currency.service';
 
 @Component({
   selector: 'app-ticket-type-form',
@@ -38,14 +39,14 @@ export class TicketTypeForm implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private translate: TranslateService,
-    private error: ErrorService
+    private error: ErrorService,
+    private currencyService: CurrencyService
   ) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
       typeName: ['', [Validators.required, Validators.maxLength(50)]],
       description: ['', [Validators.required, Validators.maxLength(255)]],
-      currency: ['', [Validators.required]],
       cost: [null, [Validators.required, Validators.min(0.01)]],
       maxPerDay: [null, [Validators.required, Validators.min(1)]]
     });
@@ -72,8 +73,7 @@ export class TicketTypeForm implements OnInit {
           this.form.patchValue({
             typeName: tt.typeName,
             description: tt.description,
-            currency: tt.currency,
-            cost: tt.cost,
+            cost: this.currencyService.convertFromEur(tt.cost),
             maxPerDay: tt.maxPerDay
           });
           this.existingPhotoUrl = tt.photoUrl;
@@ -122,10 +122,13 @@ export class TicketTypeForm implements OnInit {
     return {
       typeName: this.form.value.typeName,
       description: this.form.value.description,
-      currency: this.form.value.currency,
-      cost: Number(this.form.value.cost),
+      cost: this.currencyService.convertToEur(Number(this.form.value.cost)),
       maxPerDay: Number(this.form.value.maxPerDay)
     };
+  }
+
+  getCurrencySymbol(): string {
+    return this.currencyService.getCurrencySymbol();
   }
 
   getImageUrl(url: string | null): string | null {

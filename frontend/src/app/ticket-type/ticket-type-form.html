@@ -41,19 +41,10 @@
           </div>
 
           <div class="field">
-            <label class="field__label">{{ 'TICKET_TYPE_FORM.FIELDS.COST' | translate }}</label>
+            <label class="field__label">{{ 'TICKET_TYPE_FORM.FIELDS.COST' | translate }} ({{ getCurrencySymbol() }})</label>
             <input type="number" step="0.01" min="0.01" class="field__input" formControlName="cost" />
             @if (form.get('cost')?.touched && form.get('cost')?.invalid) {
               <div class="field__error">{{ 'TICKET_TYPE_FORM.VALIDATION.COST' | translate }}</div>
-            }
-          </div>
-
-
-          <div class="field">
-            <label class="field__label">{{ 'TICKET_TYPE_FORM.FIELDS.CURRENCY' | translate }}</label>
-            <input class="field__input" formControlName="currency" />
-            @if (form.get('currency')?.touched && form.get('currency')?.invalid) {
-              <div class="field__error">{{ 'TICKET_TYPE_FORM.VALIDATION.CURRENCY' | translate }}</div>
             }
           </div>
 

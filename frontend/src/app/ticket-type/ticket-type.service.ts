@@ -7,7 +7,6 @@ import { getBackendBaseUrl } from '../config/backend';
 export interface TicketType {
   id?: number;
   cost: number;
-  currency: string;
   typeName: string;
   description: string;
   maxPerDay: number;
