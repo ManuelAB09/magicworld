@@ -29,12 +29,24 @@
         </button>
       </li>
       <li class="nav-list__item">
+        <a class="nav-btn" routerLink="/profile">
+          <i class="fa-solid fa-user"></i>
+          {{ 'NAV.PROFILE' | translate }}
+        </a>
+      </li>
+      <li class="nav-list__item">
         <a class="nav-btn" routerLink="/discounts">
           <i class="fa-solid fa-percent"></i>
           {{ 'NAV.DISCOUNT' | translate }}
         </a>
       </li>
     }
+    <li class="nav-list__item">
+      <a class="nav-btn" routerLink="/reviews">
+        <i class="fa-solid fa-star-half-stroke"></i>
+        {{ 'NAV.REVIEWS' | translate }}
+      </a>
+    </li>
     <li class="nav-list__item">
       <a class="nav-btn" routerLink="/attractions">
         <i class="fa-solid fa-star"></i>

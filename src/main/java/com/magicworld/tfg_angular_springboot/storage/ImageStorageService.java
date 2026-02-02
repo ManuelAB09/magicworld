@@ -22,6 +22,10 @@ import java.util.UUID;
 @Slf4j
 public class ImageStorageService {
 
+    private static final java.util.Set<String> ALLOWED_EXTENSIONS = java.util.Set.of(
+            "jpg", "jpeg", "png", "gif", "bmp", "webp", "svg", "ico", "tiff", "tif"
+    );
+
     private final Path baseDir;
     private final long maxBytes;
 
@@ -48,17 +52,23 @@ public class ImageStorageService {
         String ext = extractExtension(file.getOriginalFilename());
 
         try {
-            Path targetDir = baseDir.resolve(subfolder).normalize();
+            String sanitizedSubfolder = sanitizeSubfolder(subfolder);
+            Path targetDir = baseDir.resolve(sanitizedSubfolder).normalize();
+            if (!targetDir.startsWith(baseDir)) {
+                throw new FileStorageException("error.file.invalid_path");
+            }
+
             Files.createDirectories(targetDir);
 
             String incomingHash = computeHash(file.getInputStream());
             String existingFile = findDuplicateByHash(targetDir, incomingHash);
 
             if (existingFile != null) {
-                return buildImagePath(subfolder, existingFile);
+                return buildImagePath(sanitizedSubfolder, existingFile);
             }
 
-            return saveNewFile(targetDir, file, ext, subfolder);
+            return saveNewFile(targetDir, file, ext, sanitizedSubfolder);
+
         } catch (IOException e) {
             log.error("Failed to store file", e);
             throw new FileStorageException("error.file.save_failed");
@@ -66,6 +76,22 @@ public class ImageStorageService {
             log.error("Hash algorithm not found", e);
             throw new FileStorageException("error.file.save_failed");
         }
+    }
+
+    private String sanitizeSubfolder(String subfolder) {
+        if (subfolder == null || subfolder.isBlank()) {
+            return "default";
+        }
+        String sanitized = subfolder.replaceAll("[\\\\./]+", "_")
+                                    .replaceAll("^_+|_+$", "")
+                                    .replaceAll("_+", "_");
+        if (sanitized.isEmpty()) {
+            return "default";
+        }
+        if (!sanitized.matches("^[a-zA-Z0-9_-]+$")) {
+            throw new FileStorageException("error.file.invalid_path");
+        }
+        return sanitized;
     }
 
     private void validateFile(MultipartFile file) {
@@ -81,12 +107,16 @@ public class ImageStorageService {
         }
     }
 
+
     private String extractExtension(String originalFilename) {
-        String original = StringUtils.cleanPath(originalFilename == null ? "" : originalFilename);
+        if (originalFilename == null || originalFilename.isBlank()) {
+            return "";
+        }
+        String original = StringUtils.cleanPath(originalFilename);
         int dot = original.lastIndexOf('.');
         if (dot > 0 && dot < original.length() - 1) {
-            String rawExt = original.substring(dot + 1);
-            if (rawExt.matches("^[a-zA-Z0-9]+$")) {
+            String rawExt = original.substring(dot + 1).toLowerCase();
+            if (ALLOWED_EXTENSIONS.contains(rawExt)) {
                 return "." + rawExt;
             }
         }
@@ -113,8 +143,12 @@ public class ImageStorageService {
     }
 
     private String saveNewFile(Path targetDir, MultipartFile file, String ext, String subfolder) throws IOException {
-        String filename = UUID.randomUUID() + ext.toLowerCase();
-        Path target = targetDir.resolve(filename);
+        String filename = UUID.randomUUID() + ext;
+        Path target = targetDir.resolve(filename).normalize();
+        if (!target.startsWith(baseDir)) {
+            throw new FileStorageException("error.file.invalid_path");
+        }
+
         file.transferTo(target);
         return buildImagePath(subfolder, filename);
     }

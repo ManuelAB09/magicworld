@@ -27,7 +27,9 @@
     "TICKET_TYPE": "Ticket Types",
     "ATTRACTIONS": "Attractions",
     "CHATBOT": "AI Assistant",
-    "PARK_MAP": "Park Map"
+    "PARK_MAP": "Park Map",
+    "REVIEWS": "Reviews",
+    "PROFILE": "My Profile"
   },
   "HOME": {
     "TITLE": "Welcome to MagicWorld",
@@ -325,5 +327,58 @@
   "MAP_PICKER": {
     "WEBGL_ERROR": "WebGL is not available in your browser.",
     "MANUAL_COORDS": "Enter coordinates manually"
-  }
+  },
+  "REVIEWS": {
+    "TITLE": "Reviews",
+    "LOADING": "Loading reviews...",
+    "EMPTY": "No reviews yet.",
+    "WRITE_REVIEW": "Write a review",
+    "NO_PURCHASES_TO_REVIEW": "You have no purchases pending review.",
+    "CREATE_TITLE": "New review",
+    "SELECT_PURCHASE": "Select the purchase to review",
+    "SELECT_PURCHASE_PLACEHOLDER": "-- Select a purchase --",
+    "RATING": "Rating",
+    "DESCRIPTION": "Description",
+    "DESCRIPTION_PLACEHOLDER": "Tell us about your experience at the park...",
+    "CANCEL": "Cancel",
+    "SUBMIT": "Submit",
+    "PREV": "Previous",
+    "NEXT": "Next",
+    "VISIT_DATE": "Visit date",
+    "PER_PAGE": "Per page"
+  },
+  "PROFILE": {
+    "TITLE": "My Profile",
+    "LOADING": "Loading profile...",
+    "LOADING_PURCHASES": "Loading purchases...",
+    "TAB_PROFILE": "Personal data",
+    "TAB_PURCHASES": "My purchases",
+    "USERNAME": "Username",
+    "FIRSTNAME": "First name",
+    "LASTNAME": "Last name",
+    "EMAIL": "Email",
+    "EDIT": "Edit profile",
+    "DELETE_ACCOUNT": "Delete account",
+    "EDIT_TITLE": "Edit profile",
+    "CANCEL": "Cancel",
+    "SAVE": "Save",
+    "UPDATE_SUCCESS": "Profile updated successfully",
+    "PURCHASE_ID": "Order #",
+    "VISIT_DATE": "Visit date",
+    "TOTAL": "Total",
+    "NO_PURCHASES": "You have no registered purchases.",
+    "NEW_PASSWORD": "New password",
+    "PASSWORD_PLACEHOLDER": "Leave empty to keep current",
+    "PASSWORD_HINT": "Minimum 8 characters, one uppercase, one lowercase, one number and one special character."
+  },
+  "error.review.not.owner": "You cannot review a purchase that is not yours.",
+  "error.review.already.exists": "This purchase already has a review.",
+  "error.review.not_found": "Review not found.",
+  "validation.review.purchase.required": "You must select a purchase.",
+  "validation.review.visitDate.required": "Visit date is required.",
+  "validation.review.stars.required": "Rating is required.",
+  "validation.review.stars.min": "Minimum rating is 1 star.",
+  "validation.review.stars.max": "Maximum rating is 5 stars.",
+  "validation.review.description.required": "Description is required.",
+  "validation.review.description.size": "Description cannot exceed 255 characters."
 }

@@ -1,0 +1,158 @@
+<div class="profile-page">
+  <div class="page-header">
+    <h2>{{ 'PROFILE.TITLE' | translate }}</h2>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage | translate }}</div>
+  }
+
+  @if (errorKey) {
+    <div class="alert alert-danger">{{ errorKey | translate:errorArgs }}</div>
+    @if (validationMessages.length) {
+      <ul class="mt-2 mb-0">
+        @for (m of validationMessages; track m) {
+          <li>{{ m }}</li>
+        }
+      </ul>
+    }
+  }
+
+  @if (loading) {
+    <div class="alert alert-info">{{ 'PROFILE.LOADING' | translate }}</div>
+  } @else if (profile) {
+    <div class="tabs">
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'profile'"
+        (click)="switchTab('profile')">
+        {{ 'PROFILE.TAB_PROFILE' | translate }}
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'purchases'"
+        (click)="switchTab('purchases')">
+        {{ 'PROFILE.TAB_PURCHASES' | translate }}
+      </button>
+    </div>
+
+    <!-- Profile Tab -->
+    @if (activeTab === 'profile') {
+      <div class="profile-card">
+        <div class="profile-info">
+          <div class="info-row">
+            <span class="label">{{ 'PROFILE.USERNAME' | translate }}:</span>
+            <span class="value">{{ profile.username }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">{{ 'PROFILE.FIRSTNAME' | translate }}:</span>
+            <span class="value">{{ profile.firstname }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">{{ 'PROFILE.LASTNAME' | translate }}:</span>
+            <span class="value">{{ profile.lastname }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">{{ 'PROFILE.EMAIL' | translate }}:</span>
+            <span class="value">{{ profile.email }}</span>
+          </div>
+        </div>
+
+        <div class="profile-actions">
+          <button class="btn-edit" (click)="openEditForm()">
+            {{ 'PROFILE.EDIT' | translate }}
+          </button>
+          <button class="btn-delete" (click)="confirmDelete()" [disabled]="deleting">
+            @if (deleting) {
+              <span class="loader"></span>
+            } @else {
+              {{ 'PROFILE.DELETE_ACCOUNT' | translate }}
+            }
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Purchases Tab -->
+    @if (activeTab === 'purchases') {
+      @if (loadingPurchases) {
+        <div class="alert alert-info">{{ 'PROFILE.LOADING_PURCHASES' | translate }}</div>
+      } @else if (purchases.length) {
+        <div class="purchases-container">
+          @for (purchase of purchases; track purchase.id) {
+            <div class="purchase-card">
+              <div class="purchase-header">
+                <span class="purchase-id">{{ 'PROFILE.PURCHASE_ID' | translate }}: #{{ purchase.id }}</span>
+                <span class="purchase-date">{{ purchase.purchaseDate }}</span>
+              </div>
+              <div class="purchase-lines">
+                @for (line of purchase.lines; track line.id) {
+                  <div class="line-row">
+                    <span class="line-name">{{ line.ticketTypeName }}</span>
+                    <span class="line-details">
+                      x{{ line.quantity }} - {{ 'PROFILE.VISIT_DATE' | translate }}: {{ line.validDate }}
+                    </span>
+                    <span class="line-cost">{{ line.totalCost | number:'1.2-2' }} €</span>
+                  </div>
+                }
+              </div>
+              <div class="purchase-total">
+                <span>{{ 'PROFILE.TOTAL' | translate }}:</span>
+                <span class="total-amount">{{ getTotalCost(purchase) | number:'1.2-2' }} €</span>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-message">{{ 'PROFILE.NO_PURCHASES' | translate }}</div>
+      }
+    }
+  }
+
+  <!-- Edit Profile Modal -->
+  @if (showEditForm) {
+    <div class="modal-overlay" (click)="closeEditForm()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3>{{ 'PROFILE.EDIT_TITLE' | translate }}</h3>
+
+        <div class="form-group">
+          <label>{{ 'PROFILE.FIRSTNAME' | translate }}</label>
+          <input type="text" [(ngModel)]="editFirstname" maxlength="50" />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'PROFILE.LASTNAME' | translate }}</label>
+          <input type="text" [(ngModel)]="editLastname" maxlength="50" />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'PROFILE.EMAIL' | translate }}</label>
+          <input type="email" [(ngModel)]="editEmail" />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
+          <input type="password" [(ngModel)]="editPassword" maxlength="100"
+                 [placeholder]="'PROFILE.PASSWORD_PLACEHOLDER' | translate" />
+          <small class="password-hint">{{ 'PROFILE.PASSWORD_HINT' | translate }}</small>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-cancel" (click)="closeEditForm()">
+            {{ 'PROFILE.CANCEL' | translate }}
+          </button>
+          <button
+            class="btn-submit"
+            (click)="saveProfile()"
+            [disabled]="saving || !editFirstname.trim() || !editLastname.trim() || !editEmail.trim()">
+            @if (saving) {
+              <span class="loader"></span>
+            } @else {
+              {{ 'PROFILE.SAVE' | translate }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

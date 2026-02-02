@@ -74,7 +74,61 @@ JOIN ticket_type t ON t.type_name = 'Adult'
 WHERE u.username = 'user1';
 
 
-INSERT  INTO review (stars, publication_date, description, user_id)
-SELECT 4.5, CURDATE(), 'Muy divertida y emocionante', u.id
-FROM users u
+INSERT  INTO review (stars, publication_date, visit_date, description, purchase_id)
+SELECT 4.5, CURDATE(), CURDATE() + INTERVAL 1 DAY, 'Muy divertida y emocionante', p.id
+FROM purchase p
+JOIN users u ON p.buyer_id = u.id
 WHERE u.username = 'user1';
+
+INSERT INTO purchase (purchase_date, buyer_id)
+VALUES
+    (CURDATE() - INTERVAL 12 DAY, (SELECT id FROM users WHERE username = 'user1')),
+    (CURDATE() - INTERVAL 11 DAY, (SELECT id FROM users WHERE username = 'user1')),
+    (CURDATE() - INTERVAL 10 DAY, (SELECT id FROM users WHERE username = 'user1')),
+    (CURDATE() - INTERVAL 9 DAY, (SELECT id FROM users WHERE username = 'user1')),
+    (CURDATE() - INTERVAL 8 DAY, (SELECT id FROM users WHERE username = 'user1')),
+    (CURDATE() - INTERVAL 7 DAY, (SELECT id FROM users WHERE username = 'user1')),
+    (CURDATE() - INTERVAL 6 DAY, (SELECT id FROM users WHERE username = 'user1')),
+    (CURDATE() - INTERVAL 5 DAY, (SELECT id FROM users WHERE username = 'user1')),
+    (CURDATE() - INTERVAL 4 DAY, (SELECT id FROM users WHERE username = 'user1')),
+    (CURDATE() - INTERVAL 3 DAY, (SELECT id FROM users WHERE username = 'user1')),
+    (CURDATE() - INTERVAL 2 DAY, (SELECT id FROM users WHERE username = 'user1'));
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date + INTERVAL 1 DAY, 1, p.id, t.cost, t.type_name
+FROM purchase p
+JOIN users u ON p.buyer_id = u.id
+JOIN ticket_type t ON t.type_name = 'Adult'
+WHERE u.username = 'user1'
+  AND p.purchase_date IN (
+      CURDATE() - INTERVAL 12 DAY,
+      CURDATE() - INTERVAL 11 DAY,
+      CURDATE() - INTERVAL 10 DAY,
+      CURDATE() - INTERVAL 9 DAY,
+      CURDATE() - INTERVAL 8 DAY,
+      CURDATE() - INTERVAL 7 DAY,
+      CURDATE() - INTERVAL 6 DAY,
+      CURDATE() - INTERVAL 5 DAY,
+      CURDATE() - INTERVAL 4 DAY,
+      CURDATE() - INTERVAL 3 DAY,
+      CURDATE() - INTERVAL 2 DAY
+  );
+
+INSERT INTO review (stars, publication_date, visit_date, description, purchase_id)
+SELECT 5, CURDATE(), p.purchase_date + INTERVAL 1 DAY, 'Muy divertida y emocionante', p.id
+FROM purchase p
+JOIN users u ON p.buyer_id = u.id
+WHERE u.username = 'user1'
+  AND p.purchase_date IN (
+      CURDATE() - INTERVAL 12 DAY,
+      CURDATE() - INTERVAL 11 DAY,
+      CURDATE() - INTERVAL 10 DAY,
+      CURDATE() - INTERVAL 9 DAY,
+      CURDATE() - INTERVAL 8 DAY,
+      CURDATE() - INTERVAL 7 DAY,
+      CURDATE() - INTERVAL 6 DAY,
+      CURDATE() - INTERVAL 5 DAY,
+      CURDATE() - INTERVAL 4 DAY,
+      CURDATE() - INTERVAL 3 DAY,
+      CURDATE() - INTERVAL 2 DAY
+  );

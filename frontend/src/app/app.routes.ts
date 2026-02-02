@@ -18,6 +18,9 @@ import { CheckoutStep1Component } from './checkout/step1/checkout-step1';
 import { CheckoutStep2Component } from './checkout/step2/checkout-step2';
 import { CheckoutConfirmationComponent } from './checkout/confirmation/checkout-confirmation';
 import { ParkMapComponent } from './park-map/park-map';
+import { ReviewListComponent } from './review/review-list';
+import { ProfileComponent } from './profile/profile';
+import { RequireAuthGuard } from './auth/RequireAuthGuard';
 
 export const routes: Routes = [
   { path: 'login',
@@ -62,5 +65,8 @@ export const routes: Routes = [
 
   { path: 'checkout', component: CheckoutStep1Component },
   { path: 'checkout/step2', component: CheckoutStep2Component },
-  { path: 'checkout/confirmation', component: CheckoutConfirmationComponent }
+  { path: 'checkout/confirmation', component: CheckoutConfirmationComponent },
+
+  { path: 'reviews', component: ReviewListComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [RequireAuthGuard] }
 ];

@@ -1,0 +1,131 @@
+<div class="reviews-page">
+  <div class="page-header">
+    <h2>{{ 'REVIEWS.TITLE' | translate }}</h2>
+  </div>
+
+  @if (errorKey) {
+    <div class="alert alert-danger">{{ errorKey | translate:errorArgs }}</div>
+    @if (validationMessages.length) {
+      <ul class="mt-2 mb-0">
+        @for (m of validationMessages; track m) {
+          <li>{{ m }}</li>
+        }
+      </ul>
+    }
+  }
+
+  @if (isAuthenticated && availablePurchases.length > 0) {
+    <div class="user-actions">
+      <button class="btn-add" (click)="openCreateForm()">
+        {{ 'REVIEWS.WRITE_REVIEW' | translate }}
+      </button>
+    </div>
+  } @else if (isAuthenticated && availablePurchases.length === 0) {
+    <div class="user-actions">
+      <p class="info-message">{{ 'REVIEWS.NO_PURCHASES_TO_REVIEW' | translate }}</p>
+    </div>
+  }
+
+  @if (showForm) {
+    <div class="modal-overlay" (click)="closeForm()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3>{{ 'REVIEWS.CREATE_TITLE' | translate }}</h3>
+
+        <div class="form-group">
+          <label>{{ 'REVIEWS.SELECT_PURCHASE' | translate }}</label>
+          <select class="form-select" (change)="onPurchaseSelect(+$any($event.target).value)">
+            <option value="">{{ 'REVIEWS.SELECT_PURCHASE_PLACEHOLDER' | translate }}</option>
+            @for (purchase of availablePurchases; track purchase.id) {
+              <option [value]="purchase.id">#{{ purchase.id }} - {{ purchase.purchaseDate }}</option>
+            }
+          </select>
+        </div>
+
+        @if (selectedPurchaseId) {
+          <div class="star-rating">
+            <label>{{ 'REVIEWS.RATING' | translate }}</label>
+            <div class="stars-input">
+              @for (i of [1,2,3,4,5]; track i) {
+                <span class="star-btn" [class.filled]="i <= formStars" (click)="setStars(i)">★</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>{{ 'REVIEWS.DESCRIPTION' | translate }}</label>
+            <textarea [(ngModel)]="formDescription" maxlength="255" rows="4"
+              [placeholder]="'REVIEWS.DESCRIPTION_PLACEHOLDER' | translate"></textarea>
+            <small class="char-count">{{ formDescription.length }}/255</small>
+          </div>
+        }
+
+        <div class="form-actions">
+          <button class="btn-cancel" (click)="closeForm()">{{ 'REVIEWS.CANCEL' | translate }}</button>
+          <button class="btn-submit" (click)="submitReview()"
+            [disabled]="submitting || !formDescription.trim() || !selectedPurchaseId">
+            @if (submitting) {
+              <span class="loader"></span>
+            } @else {
+              {{ 'REVIEWS.SUBMIT' | translate }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (loading) {
+    <div class="alert alert-info">{{ 'REVIEWS.LOADING' | translate }}</div>
+  }
+
+  @if (!loading && reviews.length) {
+    <div class="page-size-selector">
+      <label>{{ 'REVIEWS.PER_PAGE' | translate }}:</label>
+      <select (change)="onPageSizeChange(+$any($event.target).value)">
+        @for (size of pageSizeOptions; track size) {
+          <option [value]="size" [selected]="size === pageSize">{{ size }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="reviews-container">
+      @for (review of reviews; track review.id) {
+        <div class="review-card">
+          <div class="review-header">
+            <span class="review-username">{{ review.username }}</span>
+            <span class="review-date">{{ review.publicationDate }}</span>
+          </div>
+          <div class="review-visit-date">
+            <i class="fa-solid fa-calendar-check"></i>
+            {{ 'REVIEWS.VISIT_DATE' | translate }}: {{ review.visitDate }}
+          </div>
+          <div class="review-stars">
+            @for (s of getStarsArray(review.stars); track $index) {
+              <span class="star filled">★</span>
+            }
+            @for (s of getEmptyStarsArray(review.stars); track $index) {
+              <span class="star">★</span>
+            }
+          </div>
+          <p class="review-description">{{ review.description }}</p>
+        </div>
+      }
+    </div>
+
+    @if (totalPages > 1) {
+      <div class="pagination">
+        <div class="page-navigation">
+          <button class="page-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">
+            {{ 'REVIEWS.PREV' | translate }}
+          </button>
+          <span class="page-info">{{ currentPage + 1 }} / {{ totalPages }}</span>
+          <button class="page-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage >= totalPages - 1">
+            {{ 'REVIEWS.NEXT' | translate }}
+          </button>
+        </div>
+      </div>
+    }
+  } @else if (!loading) {
+    <div class="empty-message">{{ 'REVIEWS.EMPTY' | translate }}</div>
+  }
+</div>

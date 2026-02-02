@@ -27,7 +27,9 @@
     "TICKET_TYPE": "Tipos de entradas",
     "ATTRACTIONS": "Atracciones",
     "CHATBOT": "Asistente IA",
-    "PARK_MAP": "Mapa del Parque"
+    "PARK_MAP": "Mapa del Parque",
+    "REVIEWS": "Valoraciones",
+    "PROFILE": "Mi Perfil"
   },
   "HOME": {
     "TITLE": "Bienvenido a MagicWorld",
@@ -325,6 +327,59 @@
   "MAP_PICKER": {
     "WEBGL_ERROR": "WebGL no está disponible en tu navegador.",
     "MANUAL_COORDS": "Ingresa las coordenadas manualmente"
-  }
+  },
+  "REVIEWS": {
+    "TITLE": "Valoraciones",
+    "LOADING": "Cargando valoraciones...",
+    "EMPTY": "No hay valoraciones todavía.",
+    "WRITE_REVIEW": "Escribir valoración",
+    "NO_PURCHASES_TO_REVIEW": "No tienes compras pendientes de valorar.",
+    "CREATE_TITLE": "Nueva valoración",
+    "SELECT_PURCHASE": "Selecciona la compra a valorar",
+    "SELECT_PURCHASE_PLACEHOLDER": "-- Selecciona una compra --",
+    "RATING": "Puntuación",
+    "DESCRIPTION": "Descripción",
+    "DESCRIPTION_PLACEHOLDER": "Cuéntanos tu experiencia en el parque...",
+    "CANCEL": "Cancelar",
+    "SUBMIT": "Enviar",
+    "PREV": "Anterior",
+    "NEXT": "Siguiente",
+    "VISIT_DATE": "Fecha de visita",
+    "PER_PAGE": "Por página"
+  },
+  "PROFILE": {
+    "TITLE": "Mi Perfil",
+    "LOADING": "Cargando perfil...",
+    "LOADING_PURCHASES": "Cargando compras...",
+    "TAB_PROFILE": "Datos personales",
+    "TAB_PURCHASES": "Mis compras",
+    "USERNAME": "Usuario",
+    "FIRSTNAME": "Nombre",
+    "LASTNAME": "Apellido",
+    "EMAIL": "Correo electrónico",
+    "EDIT": "Editar perfil",
+    "DELETE_ACCOUNT": "Eliminar cuenta",
+    "EDIT_TITLE": "Editar perfil",
+    "CANCEL": "Cancelar",
+    "SAVE": "Guardar",
+    "UPDATE_SUCCESS": "Perfil actualizado correctamente",
+    "PURCHASE_ID": "Nº pedido",
+    "VISIT_DATE": "Fecha de visita",
+    "TOTAL": "Total",
+    "NO_PURCHASES": "No tienes compras registradas.",
+    "NEW_PASSWORD": "Nueva contraseña",
+    "PASSWORD_PLACEHOLDER": "Dejar vacío para no cambiar",
+    "PASSWORD_HINT": "Mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."
+  },
+  "error.review.not.owner": "No puedes valorar una compra que no es tuya.",
+  "error.review.already.exists": "Esta compra ya tiene una valoración.",
+  "error.review.not_found": "Valoración no encontrada.",
+  "validation.review.purchase.required": "Debes seleccionar una compra.",
+  "validation.review.visitDate.required": "La fecha de visita es obligatoria.",
+  "validation.review.stars.required": "La puntuación es obligatoria.",
+  "validation.review.stars.min": "La puntuación mínima es 1 estrella.",
+  "validation.review.stars.max": "La puntuación máxima es 5 estrellas.",
+  "validation.review.description.required": "La descripción es obligatoria.",
+  "validation.review.description.size": "La descripción no puede superar 255 caracteres."
 }
 

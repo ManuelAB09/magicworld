@@ -1,6 +1,6 @@
 package com.magicworld.tfg_angular_springboot.review;
 
-import com.magicworld.tfg_angular_springboot.user.User;
+import com.magicworld.tfg_angular_springboot.purchase.Purchase;
 import com.magicworld.tfg_angular_springboot.util.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,7 +26,7 @@ import java.time.LocalDate;
 public class Review extends BaseEntity {
 
     @NotNull
-    @DecimalMin("0.0")
+    @DecimalMin("1.0")
     @DecimalMax("5.0")
     @Column(name = "stars", nullable = false)
     private Double stars;
@@ -36,12 +36,16 @@ public class Review extends BaseEntity {
     private LocalDate publicationDate;
 
     @NotNull
+    @Column(name = "visit_date", nullable = false)
+    private LocalDate visitDate;
+
+    @NotNull
     @Size(max = 255)
     @Column(name = "description", nullable = false, length = 255)
     private String description;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "purchase_id", nullable = false)
+    private Purchase purchase;
 }
