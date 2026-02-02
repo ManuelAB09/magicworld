@@ -105,12 +105,15 @@ public class AttractionControllerTests {
         return Attraction.builder()
                 .name(NEW_RIDE_NAME)
                 .intensity(Intensity.LOW)
+                .category(AttractionCategory.ROLLER_COASTER)
                 .minimumHeight(MIN_HEIGHT_90)
                 .minimumAge(MIN_AGE_6)
                 .minimumWeight(MIN_WEIGHT_20)
                 .description(NICE_RIDE_DESC)
                 .photoUrl(PHOTO_URL)
                 .isActive(true)
+                .mapPositionX(50.0)
+                .mapPositionY(50.0)
                 .build();
     }
 
@@ -118,12 +121,15 @@ public class AttractionControllerTests {
         Attraction saved = Attraction.builder()
                 .name(request.getName())
                 .intensity(request.getIntensity())
+                .category(request.getCategory())
                 .minimumHeight(request.getMinimumHeight())
                 .minimumAge(request.getMinimumAge())
                 .minimumWeight(request.getMinimumWeight())
                 .description(request.getDescription())
                 .photoUrl(request.getPhotoUrl())
                 .isActive(request.getIsActive())
+                .mapPositionX(request.getMapPositionX())
+                .mapPositionY(request.getMapPositionY())
                 .build();
         saved.setId(1L);
         return saved;
@@ -178,12 +184,15 @@ public class AttractionControllerTests {
         Attraction one = Attraction.builder()
                 .name("A")
                 .intensity(Intensity.LOW)
+                .category(AttractionCategory.CAROUSEL)
                 .minimumHeight(MIN_HEIGHT_80)
                 .minimumAge(MIN_AGE_5)
                 .minimumWeight(MIN_WEIGHT_20)
                 .description("d")
                 .photoUrl("u")
                 .isActive(true)
+                .mapPositionX(30.0)
+                .mapPositionY(30.0)
                 .build();
         one.setId(1L);
 
@@ -202,7 +211,7 @@ public class AttractionControllerTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Obtener atracción por ID retorna 200 OK")
     public void testGetAttractionByIdFoundReturnsOk() throws Exception {
-        Attraction one = Attraction.builder().name("B").intensity(Intensity.MEDIUM).minimumHeight(MIN_HEIGHT_100).minimumAge(MIN_AGE_8).minimumWeight(MIN_WEIGHT_30).description("desc").photoUrl("u").isActive(true).build();
+        Attraction one = Attraction.builder().name("B").intensity(Intensity.MEDIUM).category(AttractionCategory.FERRIS_WHEEL).minimumHeight(MIN_HEIGHT_100).minimumAge(MIN_AGE_8).minimumWeight(MIN_WEIGHT_30).description("desc").photoUrl("u").isActive(true).mapPositionX(40.0).mapPositionY(40.0).build();
         one.setId(2L);
         when(attractionService.getAttractionById(2L)).thenReturn(one);
 
@@ -233,8 +242,8 @@ public class AttractionControllerTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar atracción retorna 200 OK")
     public void testUpdateAttractionReturnsOk() throws Exception {
-        Attraction update = Attraction.builder().name(UPDATED_NAME).intensity(Intensity.HIGH).minimumHeight(MIN_HEIGHT_120).minimumAge(MIN_AGE_12).minimumWeight(MIN_WEIGHT_40).description(UPDATED_DESC).photoUrl("u").isActive(false).build();
-        Attraction returned = Attraction.builder().name(UPDATED_NAME).intensity(Intensity.HIGH).minimumHeight(MIN_HEIGHT_120).minimumAge(MIN_AGE_12).minimumWeight(MIN_WEIGHT_40).description(UPDATED_DESC).photoUrl("u").isActive(false).build();
+        Attraction update = Attraction.builder().name(UPDATED_NAME).intensity(Intensity.HIGH).category(AttractionCategory.DROP_TOWER).minimumHeight(MIN_HEIGHT_120).minimumAge(MIN_AGE_12).minimumWeight(MIN_WEIGHT_40).description(UPDATED_DESC).photoUrl("u").isActive(false).mapPositionX(60.0).mapPositionY(60.0).build();
+        Attraction returned = Attraction.builder().name(UPDATED_NAME).intensity(Intensity.HIGH).category(AttractionCategory.DROP_TOWER).minimumHeight(MIN_HEIGHT_120).minimumAge(MIN_AGE_12).minimumWeight(MIN_WEIGHT_40).description(UPDATED_DESC).photoUrl("u").isActive(false).mapPositionX(60.0).mapPositionY(60.0).build();
         returned.setId(3L);
 
         when(attractionService.updateAttraction(eq(3L), any(Attraction.class))).thenReturn(returned);

@@ -53,12 +53,15 @@ public class AttractionController {
         Attraction toSave = Attraction.builder()
                 .name(request.getName())
                 .intensity(request.getIntensity())
+                .category(request.getCategory())
                 .minimumHeight(request.getMinimumHeight())
                 .minimumAge(request.getMinimumAge())
                 .minimumWeight(request.getMinimumWeight())
                 .description(request.getDescription())
                 .photoUrl(url)
                 .isActive(request.getIsActive())
+                .mapPositionX(request.getMapPositionX())
+                .mapPositionY(request.getMapPositionY())
                 .build();
         Attraction saved = attractionService.saveAttraction(toSave);
         return ResponseEntity.created(URI.create("/api/v1/attractions/" + saved.getId())).body(saved);
@@ -123,12 +126,15 @@ public class AttractionController {
         Attraction update = Attraction.builder()
                 .name(request.getName())
                 .intensity(request.getIntensity())
+                .category(request.getCategory())
                 .minimumHeight(request.getMinimumHeight())
                 .minimumAge(request.getMinimumAge())
                 .minimumWeight(request.getMinimumWeight())
                 .description(request.getDescription())
                 .photoUrl(url)
                 .isActive(request.getIsActive())
+                .mapPositionX(request.getMapPositionX())
+                .mapPositionY(request.getMapPositionY())
                 .build();
         Attraction saved = attractionService.updateAttraction(id, update);
         return ResponseEntity.ok(saved);

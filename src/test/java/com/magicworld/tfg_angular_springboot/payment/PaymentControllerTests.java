@@ -128,5 +128,64 @@ public class PaymentControllerTests {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("GET /api/v1/payment/availability - Retorna array de tipos")
+    @Story("Consulta de disponibilidad")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verifica que la disponibilidad retorna un array")
+    void getAvailabilityShouldReturnArray() throws Exception {
+        String tomorrow = LocalDate.now().plusDays(1).toString();
+
+        mockMvc.perform(get("/api/v1/payment/availability")
+                        .param("date", tomorrow))
+                .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/payment/calculate - Retorna respuesta de cálculo")
+    @Story("Cálculo de precios")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verifica que el cálculo retorna todos los campos necesarios")
+    void calculatePriceShouldReturnAllFields() throws Exception {
+        PaymentController.PriceCalculationRequest request = new PaymentController.PriceCalculationRequest();
+        request.setItems(List.of(
+                PaymentRequest.PaymentLineItem.builder()
+                        .ticketTypeName("ADULT")
+                        .quantity(1)
+                        .build()
+        ));
+        request.setDiscountCodes(List.of());
+
+        mockMvc.perform(post("/api/v1/payment/calculate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(jsonPath("$.subtotal").exists())
+                .andExpect(jsonPath("$.discountAmount").exists());
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/payment/stripe-key - Retorna clave no vacía")
+    @Story("Configuración de Stripe")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verifica que la clave de Stripe no está vacía")
+    void getStripePublicKeyShouldReturnNonEmptyKey() throws Exception {
+        mockMvc.perform(get("/api/v1/payment/stripe-key"))
+                .andExpect(jsonPath("$.publicKey").isNotEmpty());
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/payment/availability - Incluye campos de tipo")
+    @Story("Consulta de disponibilidad")
+    @Severity(SeverityLevel.MINOR)
+    @Description("Verifica que cada tipo incluye sus campos")
+    void getAvailabilityShouldIncludeTypeFields() throws Exception {
+        String tomorrow = LocalDate.now().plusDays(1).toString();
+
+        mockMvc.perform(get("/api/v1/payment/availability")
+                        .param("date", tomorrow))
+                .andExpect(jsonPath("$[0].typeName").exists())
+                .andExpect(jsonPath("$[0].cost").exists());
+    }
 }
 

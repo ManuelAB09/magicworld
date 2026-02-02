@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DiscountApiService, Discount } from './discount.service';
-import { AuthService, Role } from '../auth/auth.service';
-import { catchError, map, of } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
+import { catchError, of } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ErrorService } from '../error/error-service';
+import { checkAdminRole, handleApiError } from '../shared/utils';
 
 @Component({
   selector: 'app-discount-list',
@@ -23,36 +24,24 @@ export class DiscountList implements OnInit {
   validationMessages: string[] = [];
   appliedTypesMap: Record<number, string[]> = {};
   loadingTypes: Record<number, boolean> = {};
-  deleting: Record<number, boolean> = {}; // estado de eliminación por id
+  deleting: Record<number, boolean> = {};
 
   constructor(private api: DiscountApiService, private auth: AuthService, private error: ErrorService) {}
 
   ngOnInit(): void {
-    this.checkAdmin();
+    checkAdminRole(this.auth).subscribe(v => this.isAdmin = v);
     this.load();
-  }
-
-  private checkAdmin() {
-    this.auth.checkRoleSecure().pipe(
-      map(role => role === Role.ADMIN),
-      catchError(() => of(false))
-    ).subscribe(v => this.isAdmin = v);
   }
 
   load() {
     this.loading = true;
-    this.errorKey = null;
-    this.errorArgs = null;
-    this.validationMessages = [];
+    this.clearError();
     this.discounts = [];
     this.appliedTypesMap = {};
     this.loadingTypes = {};
     this.api.findAll().pipe(
       catchError((err) => {
-        const mapped = this.error.handleError(err);
-        this.errorKey = mapped.code;
-        this.errorArgs = mapped.args;
-        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+        this.setError(err);
         return of([]);
       })
     ).subscribe(list => {
@@ -73,15 +62,11 @@ export class DiscountList implements OnInit {
     });
   }
 
-  // eliminar un descuento desde la lista
   onDelete(d: Discount) {
     if (!d.id) return;
-    const confirmed = window.confirm(`¿Eliminar el descuento "${d.discountCode}"?`);
-    if (!confirmed) return;
+    if (!window.confirm(`¿Eliminar el descuento "${d.discountCode}"?`)) return;
 
-    this.errorKey = null;
-    this.errorArgs = null;
-    this.validationMessages = [];
+    this.clearError();
     this.deleting[d.id] = true;
 
     this.api.delete(d.id).subscribe({
@@ -90,12 +75,22 @@ export class DiscountList implements OnInit {
         delete this.deleting[d.id!];
       },
       error: (err) => {
-        const mapped = this.error.handleError(err);
-        this.errorKey = mapped.code;
-        this.errorArgs = mapped.args;
-        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+        this.setError(err);
         this.deleting[d.id!] = false;
       }
     });
+  }
+
+  private clearError(): void {
+    this.errorKey = null;
+    this.errorArgs = null;
+    this.validationMessages = [];
+  }
+
+  private setError(err: any): void {
+    const state = handleApiError(err, this.error);
+    this.errorKey = state.errorKey;
+    this.errorArgs = state.errorArgs;
+    this.validationMessages = state.validationMessages;
   }
 }

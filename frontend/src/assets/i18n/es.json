@@ -26,7 +26,8 @@
     "DISCOUNT": "Descuentos",
     "TICKET_TYPE": "Tipos de entradas",
     "ATTRACTIONS": "Atracciones",
-    "CHATBOT": "Asistente IA"
+    "CHATBOT": "Asistente IA",
+    "PARK_MAP": "Mapa del Parque"
   },
   "HOME": {
     "TITLE": "Bienvenido a MagicWorld",
@@ -58,7 +59,7 @@
   "validation.password.mismatch": "Las contraseñas deben coincidir",
   "error.password.pattern": "La contraseña debe contener al menos una mayúscula, una minúscula, un número, un carácter especial y tener al menos 8 caracteres.",
   "error.invalid.token": "El token es inválido o ha expirado",
-  "error.too.many.requests": "Lo ha intentando varias veces seguidas, por favor pruebe luego.",
+  "error.too.many.requests": "Lo has intentado varias veces seguidas, por favor prueba luego.",
   "error.at.least.one.ticket.type.must.be.provided": "Debe proporcionarse al menos un tipo de entrada.",
   "error.ticket_type.discounts.assigned": "No se puede eliminar un tipo de entrada con descuentos asignados.",
   "error.discount.expiryDate.past": "Un descuento no puede tener una fecha de expiración en el pasado o en el día de hoy.",
@@ -68,9 +69,8 @@
   "error.file.size_exceeded": "Fichero demasiado grande (máx. {{0}} bytes)",
   "error.file.invalid_type": "Solo se permiten imágenes",
   "error.file.save_failed": "No se pudo guardar el fichero subido",
-
   "passwordReset": {
-    "title": "¿Has olvidado tu contraseña?",
+    "title": "Has olvidado tu contraseña?",
     "emailLabel": "Correo electrónico",
     "emailRequired": "El correo electrónico es obligatorio.",
     "emailInvalid": "Introduce un correo electrónico válido.",
@@ -195,13 +195,15 @@
     "FIELDS": {
       "NAME": "Nombre",
       "INTENSITY": "Intensidad",
+      "CATEGORY": "Categoría",
       "MIN_HEIGHT": "Altura mínima (cm)",
       "MIN_AGE": "Edad mínima (años)",
       "MIN_WEIGHT": "Peso mínimo (kg)",
       "DESCRIPTION": "Descripción",
       "IS_ACTIVE": "Activa",
       "PHOTO_URL": "Imagen",
-      "UPLOAD_IMAGE": "Subir imagen"
+      "UPLOAD_IMAGE": "Subir imagen",
+      "MAP_POSITION": "Posición en el mapa (haz clic para posicionar)"
     },
     "VALIDATION": {
       "NAME": "Nombre requerido (máx. 50)",
@@ -209,11 +211,51 @@
       "MIN_AGE": "La edad mínima debe ser 0 o mayor",
       "MIN_WEIGHT": "El peso mínimo debe ser 0 o mayor",
       "DESCRIPTION": "Descripción requerida (máx. 255)",
-      "PHOTO_URL": "Debes proporcionar una imagen"
+      "PHOTO_URL": "Debes proporcionar una imagen",
+      "MAP_POSITION": "Debes indicar la posición en el mapa"
     },
     "BUTTON_SAVE": "Guardar",
     "BUTTON_DELETE": "Eliminar",
     "CONFIRM_DELETE": "¿Seguro que deseas eliminar esta atracción?"
+  },
+  "ATTRACTION_CATEGORY": {
+    "ROLLER_COASTER": "Montaña rusa",
+    "FERRIS_WHEEL": "Noria",
+    "CAROUSEL": "Carrusel",
+    "WATER_RIDE": "Atracción acuática",
+    "HAUNTED_HOUSE": "Casa del terror",
+    "DROP_TOWER": "Torre de caída",
+    "BUMPER_CARS": "Coches de choque",
+    "TRAIN_RIDE": "Tren",
+    "SWING_RIDE": "Sillas voladoras",
+    "OTHER": "Otra"
+  },
+  "ATTRACTION_DETAIL": {
+    "LOADING": "Cargando atracción...",
+    "ERROR": "No se pudo cargar la atracción",
+    "GO_TO_ATTRACTIONS": "Ver todas las atracciones",
+    "BACK_TO_MAP": "Volver al mapa",
+    "REQUIREMENTS": "Requisitos de acceso",
+    "MIN_HEIGHT": "Altura mínima",
+    "MIN_AGE": "Edad mínima",
+    "MIN_WEIGHT": "Peso mínimo",
+    "YEARS": "años",
+    "VIEW_ALL": "Ver todas las atracciones"
+  },
+  "PARK_MAP": {
+    "TITLE": "Mapa del Parque",
+    "LOADING": "Cargando mapa...",
+    "ERROR": "Error al cargar el mapa",
+    "WEBGL_ERROR": "WebGL no está disponible en tu navegador. Por favor, actualiza tu navegador o habilita la aceleración por hardware.",
+    "TOOLTIP": {
+      "VIEW_DETAILS": "Ver detalles",
+      "CLOSED": "Cerrada"
+    },
+    "CONTROLS": {
+      "ZOOM_IN": "Acercar",
+      "ZOOM_OUT": "Alejar",
+      "RESET": "Restablecer vista"
+    }
   },
   "CHATBOT": {
     "TITLE": "Asistente de Administración",
@@ -244,7 +286,7 @@
       "DISCOUNT_CODE": "Código de descuento",
       "DISCOUNT_HINT": "Puedes introducir varios códigos separados por comas",
       "DISCOUNT_PLACEHOLDER": "Ej: VERANO2024, FAMILIA10",
-      "DISCOUNT_APPLIED": "¡Descuento aplicado correctamente!",
+      "DISCOUNT_APPLIED": "Descuento aplicado correctamente!",
       "DISCOUNT_INVALID": "Código no válido o expirado",
       "DISCOUNT_NOT_APPLICABLE": "Código válido pero no aplicable a las entradas seleccionadas",
       "APPLIES_TO": "Aplica a",
@@ -264,7 +306,7 @@
     "CONFIRMATION": {
       "SUCCESS_TITLE": "¡Compra realizada con éxito!",
       "SUCCESS_MESSAGE": "Tu pedido ha sido procesado correctamente. Recibirás un correo de confirmación con tu código QR de entrada.",
-      "PURCHASE_ID": "Nº de pedido",
+      "PURCHASE_ID": "No de pedido",
       "VISIT_DATE": "Fecha de visita",
       "EMAIL_SENT": "Hemos enviado un correo de confirmación con tu entrada QR",
       "GO_HOME": "Volver al inicio",
@@ -279,5 +321,10 @@
   "error.payment.failed": "El pago ha fallado. Por favor, revisa los datos de tu tarjeta",
   "error.payment.stripe.failed": "Error al procesar el pago con Stripe",
   "error.payment.discount.changed": "Los siguientes códigos de descuento ya no son válidos o han cambiado: {{0}}. Por favor, revisa tu pedido.",
-  "success.payment.completed": "Pago completado correctamente"
+  "success.payment.completed": "Pago completado correctamente",
+  "MAP_PICKER": {
+    "WEBGL_ERROR": "WebGL no está disponible en tu navegador.",
+    "MANUAL_COORDS": "Ingresa las coordenadas manualmente"
+  }
 }
+

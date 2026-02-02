@@ -6,8 +6,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ErrorService } from '../error/error-service';
 import { TicketTypeApiService, TicketTypeData } from './ticket-type.service';
 import { catchError, of } from 'rxjs';
-import { getBackendBaseUrl } from '../config/backend';
 import { CurrencyService } from '../shared/currency.service';
+import { getImageUrl, handleApiError, validateImageFile, readFileAsDataUrl, DEFAULT_MAX_FILE_BYTES } from '../shared/utils';
 
 @Component({
   selector: 'app-ticket-type-form',
@@ -30,9 +30,6 @@ export class TicketTypeForm implements OnInit {
   existingPhotoUrl: string | null = null;
   photoRequiredError = false;
 
-  private apiBase = getBackendBaseUrl();
-  private readonly maxFileBytes = 50 * 1024 * 1024;
-
   constructor(
     private fb: FormBuilder,
     private api: TicketTypeApiService,
@@ -44,17 +41,22 @@ export class TicketTypeForm implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initForm();
+    this.loadData();
+  }
+
+  private initForm(): void {
     this.form = this.fb.group({
       typeName: ['', [Validators.required, Validators.maxLength(50)]],
       description: ['', [Validators.required, Validators.maxLength(255)]],
       cost: [null, [Validators.required, Validators.min(0.01)]],
       maxPerDay: [null, [Validators.required, Validators.min(1)]]
     });
+  }
 
+  private loadData(): void {
     this.loading = true;
-    this.errorKey = null;
-    this.errorArgs = null;
-    this.validationMessages = [];
+    this.clearError();
 
     const idParam = this.route.snapshot.paramMap.get('id');
     this.isEdit = !!idParam;
@@ -62,10 +64,7 @@ export class TicketTypeForm implements OnInit {
       this.id = Number(idParam);
       this.api.findById(this.id).pipe(
         catchError(err => {
-          const mapped = this.error.handleError(err);
-          this.errorKey = mapped.code;
-          this.errorArgs = mapped.args;
-          this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+          this.setError(err);
           return of(null);
         })
       ).subscribe(tt => {
@@ -93,29 +92,25 @@ export class TicketTypeForm implements OnInit {
       return;
     }
     const file = input.files[0];
-    if (!file.type.startsWith('image/')) {
+    const validation = validateImageFile(file, DEFAULT_MAX_FILE_BYTES);
 
+    if (!validation.valid) {
       this.selectedFile = null;
       this.previewUrl = null;
-      this.photoRequiredError = true;
+      if (validation.error === 'invalid_type') {
+        this.photoRequiredError = true;
+      } else if (validation.error === 'size_exceeded') {
+        this.photoRequiredError = false;
+        this.errorKey = 'error.file.size_exceeded';
+        this.errorArgs = { 0: DEFAULT_MAX_FILE_BYTES };
+        this.validationMessages = [];
+      }
       return;
     }
 
-    if (file.size > this.maxFileBytes) {
-      this.selectedFile = null;
-      this.previewUrl = null;
-      this.photoRequiredError = false;
-      this.errorKey = 'error.file.size_exceeded';
-
-      this.errorArgs = { 0: this.maxFileBytes };
-      this.validationMessages = [];
-      return;
-    }
     this.selectedFile = file;
     this.photoRequiredError = false;
-    const reader = new FileReader();
-    reader.onload = () => this.previewUrl = reader.result as string;
-    reader.readAsDataURL(file);
+    readFileAsDataUrl(file).then(url => this.previewUrl = url);
   }
 
   private getDataFromForm(): TicketTypeData {
@@ -132,9 +127,7 @@ export class TicketTypeForm implements OnInit {
   }
 
   getImageUrl(url: string | null): string | null {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    return this.apiBase + url;
+    return getImageUrl(url);
   }
 
   submit() {
@@ -149,22 +142,16 @@ export class TicketTypeForm implements OnInit {
     }
 
     this.loading = true;
-    this.errorKey = null;
-    this.errorArgs = null;
-    this.validationMessages = [];
+    this.clearError();
 
     const data = this.getDataFromForm();
-
     const obs = this.isEdit && this.id
       ? this.api.updateMultipart(this.id, data, this.selectedFile || undefined)
       : this.api.createMultipart(data, this.selectedFile!);
 
     obs.pipe(
       catchError(err => {
-        const mapped = this.error.handleError(err);
-        this.errorKey = mapped.code;
-        this.errorArgs = mapped.args;
-        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+        this.setError(err);
         return of(null);
       })
     ).subscribe(res => {
@@ -175,8 +162,8 @@ export class TicketTypeForm implements OnInit {
 
   delete() {
     if (!this.isEdit || !this.id) return;
-    const ok = confirm(this.translate.instant('TICKET_TYPE_FORM.CONFIRM_DELETE'));
-    if (!ok) return;
+    if (!confirm(this.translate.instant('TICKET_TYPE_FORM.CONFIRM_DELETE'))) return;
+
     this.loading = true;
     this.api.delete(this.id).subscribe({
       next: () => {
@@ -185,11 +172,21 @@ export class TicketTypeForm implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        const mapped = this.error.handleError(err);
-        this.errorKey = mapped.code;
-        this.errorArgs = mapped.args;
-        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+        this.setError(err);
       }
     });
+  }
+
+  private clearError(): void {
+    this.errorKey = null;
+    this.errorArgs = null;
+    this.validationMessages = [];
+  }
+
+  private setError(err: any): void {
+    const state = handleApiError(err, this.error);
+    this.errorKey = state.errorKey;
+    this.errorArgs = state.errorArgs;
+    this.validationMessages = state.validationMessages;
   }
 }

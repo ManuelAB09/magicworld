@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { TicketType, TicketTypeApiService } from './ticket-type.service';
-import { AuthService, Role } from '../auth/auth.service';
+import { AuthService } from '../auth/auth.service';
 import { ErrorService } from '../error/error-service';
-import { catchError, map, of } from 'rxjs';
-import { getBackendBaseUrl } from '../config/backend';
+import { catchError, of } from 'rxjs';
+import { getImageUrl, checkAdminRole, handleApiError } from '../shared/utils';
 import { CurrencyService } from '../shared/currency.service';
 
 @Component({
@@ -24,8 +24,6 @@ export class TicketTypeList implements OnInit {
   errorArgs: any = null;
   validationMessages: string[] = [];
 
-  private apiBase = getBackendBaseUrl();
-
   constructor(
     private api: TicketTypeApiService,
     private auth: AuthService,
@@ -36,28 +34,16 @@ export class TicketTypeList implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.checkAdmin();
+    checkAdminRole(this.auth).subscribe(v => this.isAdmin = v);
     this.load();
-  }
-
-  private checkAdmin() {
-    this.auth.checkRoleSecure().pipe(
-      map(role => role === Role.ADMIN),
-      catchError(() => of(false))
-    ).subscribe(v => this.isAdmin = v);
   }
 
   load() {
     this.loading = true;
-    this.errorKey = null;
-    this.errorArgs = null;
-    this.validationMessages = [];
+    this.clearError();
     this.api.findAll().pipe(
       catchError(err => {
-        const mapped = this.error.handleError(err);
-        this.errorKey = mapped.code;
-        this.errorArgs = mapped.args;
-        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+        this.setError(err);
         return of([]);
       })
     ).subscribe(list => {
@@ -67,15 +53,11 @@ export class TicketTypeList implements OnInit {
   }
 
   getImageUrl(url: string | null | undefined): string | null {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    return this.apiBase + url;
+    return getImageUrl(url);
   }
 
-
   delete(id: number) {
-    const ok = confirm(this.translate.instant('TICKET_TYPE_FORM.CONFIRM_DELETE'));
-    if (!ok) return;
+    if (!confirm(this.translate.instant('TICKET_TYPE_FORM.CONFIRM_DELETE'))) return;
 
     this.loading = true;
     this.api.delete(id).subscribe({
@@ -85,11 +67,21 @@ export class TicketTypeList implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        const mapped = this.error.handleError(err);
-        this.errorKey = mapped.code;
-        this.errorArgs = mapped.args;
-        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+        this.setError(err);
       }
     });
+  }
+
+  private clearError(): void {
+    this.errorKey = null;
+    this.errorArgs = null;
+    this.validationMessages = [];
+  }
+
+  private setError(err: any): void {
+    const state = handleApiError(err, this.error);
+    this.errorKey = state.errorKey;
+    this.errorArgs = state.errorArgs;
+    this.validationMessages = state.validationMessages;
   }
 }

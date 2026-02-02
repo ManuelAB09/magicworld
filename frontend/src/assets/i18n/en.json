@@ -26,7 +26,8 @@
     "DISCOUNT": "Discounts",
     "TICKET_TYPE": "Ticket Types",
     "ATTRACTIONS": "Attractions",
-    "CHATBOT": "AI Assistant"
+    "CHATBOT": "AI Assistant",
+    "PARK_MAP": "Park Map"
   },
   "HOME": {
     "TITLE": "Welcome to MagicWorld",
@@ -58,7 +59,7 @@
   "validation.password.mismatch": "Passwords must match",
   "error.password.pattern": "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character.",
   "error.invalid.token": "Token is invalid or has expired",
-  "error.too.many.requests": "You have tried to much times. Please try again later.",
+  "error.too.many.requests": "You have tried too many times. Please try again later.",
   "error.at.least.one.ticket.type.must.be.provided": "At least one ticket type must be provided",
   "error.ticket_type.discounts.assigned": "A ticket type with assigned discounts cannot be deleted",
   "error.discount.expiryDate.past": "A discount cannot have an expiry date in the past or today",
@@ -68,7 +69,6 @@
   "error.file.size_exceeded": "File too large (max {{0}} bytes)",
   "error.file.invalid_type": "Only image uploads are allowed",
   "error.file.save_failed": "Failed to save the uploaded file",
-
   "passwordReset": {
     "title": "Forgot your password?",
     "emailLabel": "Email address",
@@ -195,13 +195,15 @@
     "FIELDS": {
       "NAME": "Name",
       "INTENSITY": "Intensity",
+      "CATEGORY": "Category",
       "MIN_HEIGHT": "Min height (cm)",
       "MIN_AGE": "Min age (years)",
       "MIN_WEIGHT": "Min weight (kg)",
       "DESCRIPTION": "Description",
       "IS_ACTIVE": "Active",
       "PHOTO_URL": "Image",
-      "UPLOAD_IMAGE": "Upload image"
+      "UPLOAD_IMAGE": "Upload image",
+      "MAP_POSITION": "Map position (click to place)"
     },
     "VALIDATION": {
       "NAME": "Name is required (max 50)",
@@ -209,11 +211,51 @@
       "MIN_AGE": "Minimum age must be 0 or greater",
       "MIN_WEIGHT": "Minimum weight must be 0 or greater",
       "DESCRIPTION": "Description is required (max 255)",
-      "PHOTO_URL": "You must provide an image"
+      "PHOTO_URL": "You must provide an image",
+      "MAP_POSITION": "You must set the map position"
     },
     "BUTTON_SAVE": "Save",
     "BUTTON_DELETE": "Delete",
     "CONFIRM_DELETE": "Are you sure you want to delete this attraction?"
+  },
+  "ATTRACTION_CATEGORY": {
+    "ROLLER_COASTER": "Roller Coaster",
+    "FERRIS_WHEEL": "Ferris Wheel",
+    "CAROUSEL": "Carousel",
+    "WATER_RIDE": "Water Ride",
+    "HAUNTED_HOUSE": "Haunted House",
+    "DROP_TOWER": "Drop Tower",
+    "BUMPER_CARS": "Bumper Cars",
+    "TRAIN_RIDE": "Train Ride",
+    "SWING_RIDE": "Swing Ride",
+    "OTHER": "Other"
+  },
+  "ATTRACTION_DETAIL": {
+    "LOADING": "Loading attraction...",
+    "ERROR": "Could not load the attraction",
+    "GO_TO_ATTRACTIONS": "View all attractions",
+    "BACK_TO_MAP": "Back to map",
+    "REQUIREMENTS": "Access requirements",
+    "MIN_HEIGHT": "Minimum height",
+    "MIN_AGE": "Minimum age",
+    "MIN_WEIGHT": "Minimum weight",
+    "YEARS": "years",
+    "VIEW_ALL": "View all attractions"
+  },
+  "PARK_MAP": {
+    "TITLE": "Park Map",
+    "LOADING": "Loading map...",
+    "ERROR": "Error loading map",
+    "WEBGL_ERROR": "WebGL is not available in your browser. Please update your browser or enable hardware acceleration.",
+    "TOOLTIP": {
+      "VIEW_DETAILS": "View details",
+      "CLOSED": "Closed"
+    },
+    "CONTROLS": {
+      "ZOOM_IN": "Zoom in",
+      "ZOOM_OUT": "Zoom out",
+      "RESET": "Reset view"
+    }
   },
   "CHATBOT": {
     "TITLE": "Admin Assistant",
@@ -257,27 +299,31 @@
       "LAST_NAME": "Last Name",
       "EMAIL": "Email",
       "CARD_DETAILS": "Card Details",
-      "PAY_NOW": "Pay Now",
+      "PAY_NOW": "Pay now",
       "PROCESSING": "Processing payment...",
       "SECURE_PAYMENT": "Secure payment with Stripe"
     },
     "CONFIRMATION": {
-      "SUCCESS_TITLE": "Purchase Successful!",
-      "SUCCESS_MESSAGE": "Your order has been processed successfully. You will receive a confirmation email with your QR entry code.",
-      "PURCHASE_ID": "Order #",
-      "VISIT_DATE": "Visit Date",
+      "SUCCESS_TITLE": "Purchase successful!",
+      "SUCCESS_MESSAGE": "Your order has been processed successfully. You will receive a confirmation email with your QR code ticket.",
+      "PURCHASE_ID": "Order number",
+      "VISIT_DATE": "Visit date",
       "EMAIL_SENT": "We have sent a confirmation email with your QR ticket",
-      "GO_HOME": "Go Home",
-      "ERROR_TITLE": "Payment Error",
+      "GO_HOME": "Back to home",
+      "ERROR_TITLE": "Payment error",
       "ERROR_MESSAGE": "There was a problem processing your payment. Please try again.",
-      "TRY_AGAIN": "Try Again"
+      "TRY_AGAIN": "Try again"
     }
   },
-  "error.payment.date.past": "You cannot purchase tickets for past dates",
+  "error.payment.date.past": "You cannot buy tickets for past dates",
   "error.payment.insufficient.availability": "Not enough availability for the selected quantity",
   "error.payment.invalid.total": "The payment total is not valid",
   "error.payment.failed": "Payment failed. Please check your card details",
   "error.payment.stripe.failed": "Error processing payment with Stripe",
   "error.payment.discount.changed": "The following discount codes are no longer valid or have changed: {{0}}. Please review your order.",
-  "success.payment.completed": "Payment completed successfully"
+  "success.payment.completed": "Payment completed successfully",
+  "MAP_PICKER": {
+    "WEBGL_ERROR": "WebGL is not available in your browser.",
+    "MANUAL_COORDS": "Enter coordinates manually"
+  }
 }

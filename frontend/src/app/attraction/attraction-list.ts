@@ -4,10 +4,10 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Attraction, AttractionApiService } from './attraction.service';
-import { AuthService, Role } from '../auth/auth.service';
+import { AuthService } from '../auth/auth.service';
 import { ErrorService } from '../error/error-service';
-import { catchError, map, of } from 'rxjs';
-import { getBackendBaseUrl } from '../config/backend';
+import { catchError, of } from 'rxjs';
+import { getImageUrl, checkAdminRole, handleApiError } from '../shared/utils';
 
 @Component({
   selector: 'app-attraction-list',
@@ -23,9 +23,7 @@ export class AttractionList implements OnInit {
   errorKey: string | null = null;
   errorArgs: any = null;
   validationMessages: string[] = [];
-  filters: { minHeight?: number | null; minWeight?: number | null; minAge?: number | null } = { minHeight: 0, minWeight: 0, minAge: 0 };
-
-  private apiBase = getBackendBaseUrl();
+  filters = { minHeight: 0, minWeight: 0, minAge: 0 };
 
   constructor(
     private api: AttractionApiService,
@@ -36,35 +34,18 @@ export class AttractionList implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.checkAdmin();
+    checkAdminRole(this.auth).subscribe(v => this.isAdmin = v);
     this.load();
-  }
-
-  private checkAdmin() {
-    this.auth.checkRoleSecure().pipe(
-      map(role => role === Role.ADMIN),
-      catchError(() => of(false))
-    ).subscribe(v => this.isAdmin = v);
   }
 
   load(filters?: { minHeight?: number | null; minWeight?: number | null; minAge?: number | null }) {
     this.loading = true;
-    this.errorKey = null;
-    this.errorArgs = null;
-    this.validationMessages = [];
-    const apiFilters: any = {};
-    if (filters) {
-      if (filters.minHeight != null) apiFilters.minHeight = filters.minHeight;
-      if (filters.minWeight != null) apiFilters.minWeight = filters.minWeight;
-      if (filters.minAge != null) apiFilters.minAge = filters.minAge;
-    }
+    this.clearError();
+    const apiFilters = this.buildApiFilters(filters);
 
     this.api.findAll(Object.keys(apiFilters).length ? apiFilters : undefined).pipe(
       catchError(err => {
-        const mapped = this.error.handleError(err);
-        this.errorKey = mapped.code;
-        this.errorArgs = mapped.args;
-        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+        this.setError(err);
         return of([]);
       })
     ).subscribe(list => {
@@ -73,20 +54,29 @@ export class AttractionList implements OnInit {
     });
   }
 
-  applyFilters() {
-    this.validationMessages = [];
-    this.validateFilters();
-    if (this.validationMessages.length) return;
-
-    const f = this.buildFilterParams();
-    this.load(f);
+  private buildApiFilters(filters?: { minHeight?: number | null; minWeight?: number | null; minAge?: number | null }): any {
+    const apiFilters: any = {};
+    if (filters) {
+      if (filters.minHeight != null) apiFilters.minHeight = filters.minHeight;
+      if (filters.minWeight != null) apiFilters.minWeight = filters.minWeight;
+      if (filters.minAge != null) apiFilters.minAge = filters.minAge;
+    }
+    return apiFilters;
   }
 
-  private validateFilters(): void {
+  applyFilters() {
+    this.validationMessages = [];
+    if (!this.validateFilters()) return;
+    this.load(this.buildFilterParams());
+  }
+
+  private validateFilters(): boolean {
     const fields = [this.filters.minHeight, this.filters.minWeight, this.filters.minAge];
     if (fields.some(v => v != null && v < 0)) {
       this.validationMessages.push(this.translate.instant('ATTRACTIONS.FILTER.INVALID_NEGATIVE'));
+      return false;
     }
+    return true;
   }
 
   private buildFilterParams(): any {
@@ -98,20 +88,16 @@ export class AttractionList implements OnInit {
   }
 
   clearFilters() {
-
     this.filters = { minHeight: 0, minWeight: 0, minAge: 0 };
     this.load();
   }
 
   getImageUrl(url: string | null | undefined): string | null {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    return this.apiBase + url;
+    return getImageUrl(url);
   }
 
   delete(id: number) {
-    const ok = confirm(this.translate.instant('ATTRACTION_FORM.CONFIRM_DELETE'));
-    if (!ok) return;
+    if (!confirm(this.translate.instant('ATTRACTION_FORM.CONFIRM_DELETE'))) return;
 
     this.loading = true;
     this.api.delete(id).subscribe({
@@ -121,11 +107,21 @@ export class AttractionList implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        const mapped = this.error.handleError(err);
-        this.errorKey = mapped.code;
-        this.errorArgs = mapped.args;
-        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+        this.setError(err);
       }
     });
+  }
+
+  private clearError(): void {
+    this.errorKey = null;
+    this.errorArgs = null;
+    this.validationMessages = [];
+  }
+
+  private setError(err: any): void {
+    const state = handleApiError(err, this.error);
+    this.errorKey = state.errorKey;
+    this.errorArgs = state.errorArgs;
+    this.validationMessages = state.validationMessages;
   }
 }

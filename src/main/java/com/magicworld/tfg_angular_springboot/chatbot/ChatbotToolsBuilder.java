@@ -199,38 +199,44 @@ public class ChatbotToolsBuilder {
 
         functions.add(FunctionDeclaration.builder()
                 .name("createAttraction")
-                .description("Creates a new attraction / Crea una nueva atracción")
+                .description("Creates a new attraction. Map coordinates are optional (defaults to center 50,50). Use the web form with 3D preview for precise positioning. / Crea una nueva atracción. Las coordenadas del mapa son opcionales (por defecto centro 50,50). Usa el formulario web con preview 3D para posicionamiento preciso.")
                 .parameters(Schema.builder()
                         .type("OBJECT")
-                        .properties(Map.of(
-                                "name", Schema.builder().type("STRING").description("Name / Nombre").build(),
-                                "intensity", Schema.builder().type("STRING").description("Intensity: LOW, MEDIUM or HIGH / Intensidad").build(),
-                                "minimumHeight", Schema.builder().type("INTEGER").description("Minimum height in cm / Altura mínima").build(),
-                                "minimumAge", Schema.builder().type("INTEGER").description("Minimum age / Edad mínima").build(),
-                                "minimumWeight", Schema.builder().type("INTEGER").description("Minimum weight in kg / Peso mínimo").build(),
-                                "description", Schema.builder().type("STRING").description("Description / Descripción").build(),
-                                "photoUrl", Schema.builder().type("STRING").description("Photo URL (optional) / URL foto").build(),
-                                "isActive", Schema.builder().type("BOOLEAN").description("Is active / Está activa").build()
+                        .properties(Map.ofEntries(
+                                Map.entry("name", Schema.builder().type("STRING").description("Name / Nombre").build()),
+                                Map.entry("intensity", Schema.builder().type("STRING").description("Intensity: LOW, MEDIUM or HIGH / Intensidad").build()),
+                                Map.entry("category", Schema.builder().type("STRING").description("Category: ROLLER_COASTER, FERRIS_WHEEL, CAROUSEL, WATER_RIDE, HAUNTED_HOUSE, DROP_TOWER, BUMPER_CARS, TRAIN_RIDE, SWING_RIDE, OTHER / Categoría").build()),
+                                Map.entry("minimumHeight", Schema.builder().type("INTEGER").description("Minimum height in cm / Altura mínima").build()),
+                                Map.entry("minimumAge", Schema.builder().type("INTEGER").description("Minimum age / Edad mínima").build()),
+                                Map.entry("minimumWeight", Schema.builder().type("INTEGER").description("Minimum weight in kg / Peso mínimo").build()),
+                                Map.entry("description", Schema.builder().type("STRING").description("Description / Descripción").build()),
+                                Map.entry("photoUrl", Schema.builder().type("STRING").description("Photo URL (optional) / URL foto").build()),
+                                Map.entry("isActive", Schema.builder().type("BOOLEAN").description("Is active / Está activa").build()),
+                                Map.entry("mapPositionX", Schema.builder().type("NUMBER").description("Map X position 0-100 (optional, default 50) / Posición X en mapa 0-100 (opcional, por defecto 50)").build()),
+                                Map.entry("mapPositionY", Schema.builder().type("NUMBER").description("Map Y position 0-100 (optional, default 50) / Posición Y en mapa 0-100 (opcional, por defecto 50)").build())
                         ))
-                        .required(List.of("name", "intensity", "minimumHeight", "minimumAge", "minimumWeight", "description", "isActive"))
+                        .required(List.of("name", "intensity", "category", "minimumHeight", "minimumAge", "minimumWeight", "description", "isActive"))
                         .build())
                 .build());
 
         functions.add(FunctionDeclaration.builder()
                 .name("updateAttraction")
-                .description("Updates an existing attraction. Only provide the fields you want to change / Actualiza una atracción. Solo proporciona los campos que deseas cambiar")
+                .description("Updates an existing attraction. Only provide the fields you want to change. For precise map positioning, use the web form with 3D preview. / Actualiza una atracción. Solo proporciona los campos que deseas cambiar. Para posicionamiento preciso en el mapa, usa el formulario web con preview 3D.")
                 .parameters(Schema.builder()
                         .type("OBJECT")
-                        .properties(Map.of(
-                                "id", Schema.builder().type("INTEGER").description("ID of the attraction (required) / ID de la atracción (requerido)").build(),
-                                "name", Schema.builder().type("STRING").description("Name (optional) / Nombre (opcional)").build(),
-                                "intensity", Schema.builder().type("STRING").description("Intensity: LOW, MEDIUM or HIGH (optional) / Intensidad (opcional)").build(),
-                                "minimumHeight", Schema.builder().type("INTEGER").description("Minimum height in cm (optional) / Altura mínima (opcional)").build(),
-                                "minimumAge", Schema.builder().type("INTEGER").description("Minimum age (optional) / Edad mínima (opcional)").build(),
-                                "minimumWeight", Schema.builder().type("INTEGER").description("Minimum weight in kg (optional) / Peso mínimo (opcional)").build(),
-                                "description", Schema.builder().type("STRING").description("Description (optional) / Descripción (opcional)").build(),
-                                "photoUrl", Schema.builder().type("STRING").description("Photo URL (optional) / URL foto (opcional)").build(),
-                                "isActive", Schema.builder().type("BOOLEAN").description("Is active (optional) / Está activa (opcional)").build()
+                        .properties(Map.ofEntries(
+                                Map.entry("id", Schema.builder().type("INTEGER").description("ID of the attraction (required) / ID de la atracción (requerido)").build()),
+                                Map.entry("name", Schema.builder().type("STRING").description("Name (optional) / Nombre (opcional)").build()),
+                                Map.entry("intensity", Schema.builder().type("STRING").description("Intensity: LOW, MEDIUM or HIGH (optional) / Intensidad (opcional)").build()),
+                                Map.entry("category", Schema.builder().type("STRING").description("Category: ROLLER_COASTER, FERRIS_WHEEL, CAROUSEL, WATER_RIDE, HAUNTED_HOUSE, DROP_TOWER, BUMPER_CARS, TRAIN_RIDE, SWING_RIDE, OTHER (optional) / Categoría (opcional)").build()),
+                                Map.entry("minimumHeight", Schema.builder().type("INTEGER").description("Minimum height in cm (optional) / Altura mínima (opcional)").build()),
+                                Map.entry("minimumAge", Schema.builder().type("INTEGER").description("Minimum age (optional) / Edad mínima (opcional)").build()),
+                                Map.entry("minimumWeight", Schema.builder().type("INTEGER").description("Minimum weight in kg (optional) / Peso mínimo (opcional)").build()),
+                                Map.entry("description", Schema.builder().type("STRING").description("Description (optional) / Descripción (opcional)").build()),
+                                Map.entry("photoUrl", Schema.builder().type("STRING").description("Photo URL (optional) / URL foto (opcional)").build()),
+                                Map.entry("isActive", Schema.builder().type("BOOLEAN").description("Is active (optional) / Está activa (opcional)").build()),
+                                Map.entry("mapPositionX", Schema.builder().type("NUMBER").description("Map X position 0-100 (optional) / Posición X en mapa 0-100 (opcional)").build()),
+                                Map.entry("mapPositionY", Schema.builder().type("NUMBER").description("Map Y position 0-100 (optional) / Posición Y en mapa 0-100 (opcional)").build())
                         ))
                         .required(List.of("id"))
                         .build())

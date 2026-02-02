@@ -16,8 +16,8 @@ describe('AttractionList', () => {
   let translateService: TranslateService;
 
   const mockAttractions: Attraction[] = [
-    { id: 1, name: 'Roller Coaster', intensity: 'HIGH', minimumHeight: 120, minimumAge: 10, minimumWeight: 30, description: 'Exciting ride', photoUrl: '/images/roller.jpg', isActive: true },
-    { id: 2, name: 'Carousel', intensity: 'LOW', minimumHeight: 80, minimumAge: 3, minimumWeight: 15, description: 'Fun for kids', photoUrl: '/images/carousel.jpg', isActive: true }
+    { id: 1, name: 'Roller Coaster', intensity: 'HIGH', category: 'ROLLER_COASTER', minimumHeight: 120, minimumAge: 10, minimumWeight: 30, description: 'Exciting ride', photoUrl: '/images/roller.jpg', isActive: true, mapPositionX: 30, mapPositionY: 40 },
+    { id: 2, name: 'Carousel', intensity: 'LOW', category: 'CAROUSEL', minimumHeight: 80, minimumAge: 3, minimumWeight: 15, description: 'Fun for kids', photoUrl: '/images/carousel.jpg', isActive: true, mapPositionX: 60, mapPositionY: 70 }
   ];
 
   beforeEach(async () => {

@@ -1,6 +1,7 @@
 package com.magicworld.tfg_angular_springboot.chatbot.executor;
 
 import com.magicworld.tfg_angular_springboot.attraction.Attraction;
+import com.magicworld.tfg_angular_springboot.attraction.AttractionCategory;
 import com.magicworld.tfg_angular_springboot.attraction.AttractionService;
 import com.magicworld.tfg_angular_springboot.attraction.Intensity;
 import com.magicworld.tfg_angular_springboot.chatbot.dto.ChatResponse;
@@ -21,6 +22,8 @@ public class AttractionFunctionExecutor {
     private final AttractionService attractionService;
 
     private static final String DEFAULT_PHOTO_URL = "https://placeholder.com/default.jpg";
+    private static final Double DEFAULT_MAP_POSITION_X = 50.0;
+    private static final Double DEFAULT_MAP_POSITION_Y = 50.0;
 
     public ChatResponse listAttractions(String lang) {
         List<Attraction> attractions = attractionService.getAllAttractions();
@@ -52,8 +55,10 @@ public class AttractionFunctionExecutor {
             String status = a.getIsActive() ?
                     (lang.equals("en") ? "✅ Active" : "✅ Activa") :
                     (lang.equals("en") ? "❌ Inactive" : "❌ Inactiva");
-            sb.append(String.format("• **ID %d** - %s | %s: %s | %s\n",
+            sb.append(String.format("• **ID %d** - %s | %s: %s | %s: %s | %s\n",
                     a.getId(), a.getName(),
+                    lang.equals("en") ? "Category" : "Categoría",
+                    a.getCategory(),
                     lang.equals("en") ? "Intensity" : "Intensidad",
                     a.getIntensity(), status));
         }
@@ -72,26 +77,31 @@ public class AttractionFunctionExecutor {
                         "🎢 **Attraction Details:**\n\n" +
                         "• **ID:** %d\n" +
                         "• **Name:** %s\n" +
+                        "• **Category:** %s\n" +
                         "• **Intensity:** %s\n" +
                         "• **Description:** %s\n" +
                         "• **Minimum height:** %d cm\n" +
                         "• **Minimum age:** %d years\n" +
                         "• **Minimum weight:** %d kg\n" +
                         "• **Status:** %s\n" +
+                        "• **Map Position:** (%.1f, %.1f)\n" +
                         "• **Photo URL:** %s" :
                         "🎢 **Detalles de la Atracción:**\n\n" +
                         "• **ID:** %d\n" +
                         "• **Nombre:** %s\n" +
+                        "• **Categoría:** %s\n" +
                         "• **Intensidad:** %s\n" +
                         "• **Descripción:** %s\n" +
                         "• **Altura mínima:** %d cm\n" +
                         "• **Edad mínima:** %d años\n" +
                         "• **Peso mínimo:** %d kg\n" +
                         "• **Estado:** %s\n" +
+                        "• **Posición en mapa:** (%.1f, %.1f)\n" +
                         "• **URL de foto:** %s",
-                a.getId(), a.getName(), a.getIntensity(), a.getDescription(),
+                a.getId(), a.getName(), a.getCategory(), a.getIntensity(), a.getDescription(),
                 a.getMinimumHeight(), a.getMinimumAge(), a.getMinimumWeight(),
-                status, a.getPhotoUrl() != null ? a.getPhotoUrl() : (lang.equals("en") ? "None" : "Ninguna"));
+                status, a.getMapPositionX(), a.getMapPositionY(),
+                a.getPhotoUrl() != null ? a.getPhotoUrl() : (lang.equals("en") ? "None" : "Ninguna"));
 
         return ChatResponse.builder()
                 .success(true)
@@ -103,39 +113,50 @@ public class AttractionFunctionExecutor {
     public ChatResponse createAttraction(Map<String, Object> args, String lang) {
         String name = (String) args.get("name");
         Intensity intensity = Intensity.valueOf(((String) args.get("intensity")).toUpperCase());
+        AttractionCategory category = AttractionCategory.valueOf(((String) args.get("category")).toUpperCase());
         int minHeight = ((Number) args.get("minimumHeight")).intValue();
         int minAge = ((Number) args.get("minimumAge")).intValue();
         int minWeight = ((Number) args.get("minimumWeight")).intValue();
         String description = (String) args.get("description");
 
-        // Get photoUrl - handle both direct URLs and when not provided
         String photoUrl = extractPhotoUrl(args);
 
         boolean isActive = args.containsKey("isActive") && args.get("isActive") != null ?
                 (Boolean) args.get("isActive") : true;
 
+        Double mapPositionX = getOrDefaultDouble(args, "mapPositionX", DEFAULT_MAP_POSITION_X);
+        Double mapPositionY = getOrDefaultDouble(args, "mapPositionY", DEFAULT_MAP_POSITION_Y);
+
         Attraction attraction = Attraction.builder()
                 .name(name)
                 .intensity(intensity)
+                .category(category)
                 .minimumHeight(minHeight)
                 .minimumAge(minAge)
                 .minimumWeight(minWeight)
                 .description(description)
                 .photoUrl(photoUrl)
                 .isActive(isActive)
+                .mapPositionX(mapPositionX)
+                .mapPositionY(mapPositionY)
                 .build();
 
         Attraction saved = attractionService.saveAttraction(attraction);
 
+        String positionNote = (args.containsKey("mapPositionX") || args.containsKey("mapPositionY")) ? "" :
+                (lang.equals("en") ?
+                        "\n\n💡 **Tip:** The attraction was placed at the default position (center of map). Use the web form with 3D preview to adjust its exact location." :
+                        "\n\n💡 **Consejo:** La atracción se colocó en la posición por defecto (centro del mapa). Usa el formulario web con preview 3D para ajustar su ubicación exacta.");
+
         return ChatResponse.builder()
                 .success(true)
                 .message(String.format(lang.equals("en") ?
-                                "✅ Attraction created!\n\n• **ID:** %d\n• **Name:** %s\n• **Intensity:** %s\n• **Status:** %s\n• **Photo:** %s" :
-                                "✅ ¡Atracción creada!\n\n• **ID:** %d\n• **Nombre:** %s\n• **Intensidad:** %s\n• **Estado:** %s\n• **Foto:** %s",
-                        saved.getId(), saved.getName(), saved.getIntensity(),
+                                "✅ Attraction created!\n\n• **ID:** %d\n• **Name:** %s\n• **Category:** %s\n• **Intensity:** %s\n• **Status:** %s\n• **Map Position:** (%.1f, %.1f)%s" :
+                                "✅ ¡Atracción creada!\n\n• **ID:** %d\n• **Nombre:** %s\n• **Categoría:** %s\n• **Intensidad:** %s\n• **Estado:** %s\n• **Posición en mapa:** (%.1f, %.1f)%s",
+                        saved.getId(), saved.getName(), saved.getCategory(), saved.getIntensity(),
                         saved.getIsActive() ? (lang.equals("en") ? "Active" : "Activa") :
                                 (lang.equals("en") ? "Inactive" : "Inactiva"),
-                        saved.getPhotoUrl()))
+                        saved.getMapPositionX(), saved.getMapPositionY(), positionNote))
                 .data(saved)
                 .build();
     }
@@ -146,22 +167,28 @@ public class AttractionFunctionExecutor {
 
         String name = getOrDefault(args, "name", existing.getName());
         Intensity intensity = getIntensityOrDefault(args, existing.getIntensity());
+        AttractionCategory category = getCategoryOrDefault(args, existing.getCategory());
         int minHeight = getOrDefaultInt(args, "minimumHeight", existing.getMinimumHeight());
         int minAge = getOrDefaultInt(args, "minimumAge", existing.getMinimumAge());
         int minWeight = getOrDefaultInt(args, "minimumWeight", existing.getMinimumWeight());
         String description = getOrDefault(args, "description", existing.getDescription());
         boolean isActive = getOrDefaultBool(args, "isActive", existing.getIsActive());
         String photoUrl = extractPhotoUrlForUpdate(args);
+        Double mapPositionX = getOrDefaultDouble(args, "mapPositionX", existing.getMapPositionX());
+        Double mapPositionY = getOrDefaultDouble(args, "mapPositionY", existing.getMapPositionY());
 
         Attraction attraction = Attraction.builder()
                 .name(name)
                 .intensity(intensity)
+                .category(category)
                 .minimumHeight(minHeight)
                 .minimumAge(minAge)
                 .minimumWeight(minWeight)
                 .description(description)
                 .photoUrl(photoUrl)
                 .isActive(isActive)
+                .mapPositionX(mapPositionX)
+                .mapPositionY(mapPositionY)
                 .build();
 
         Attraction updated = attractionService.updateAttraction(id, attraction);
@@ -169,9 +196,10 @@ public class AttractionFunctionExecutor {
         return ChatResponse.builder()
                 .success(true)
                 .message(String.format(lang.equals("en") ?
-                                "✅ Attraction updated!\n\n• **ID:** %d\n• **Name:** %s\n• **Intensity:** %s" :
-                                "✅ ¡Atracción actualizada!\n\n• **ID:** %d\n• **Nombre:** %s\n• **Intensidad:** %s",
-                        updated.getId(), updated.getName(), updated.getIntensity()))
+                                "✅ Attraction updated!\n\n• **ID:** %d\n• **Name:** %s\n• **Category:** %s\n• **Intensity:** %s\n• **Map Position:** (%.1f, %.1f)" :
+                                "✅ ¡Atracción actualizada!\n\n• **ID:** %d\n• **Nombre:** %s\n• **Categoría:** %s\n• **Intensidad:** %s\n• **Posición en mapa:** (%.1f, %.1f)",
+                        updated.getId(), updated.getName(), updated.getCategory(), updated.getIntensity(),
+                        updated.getMapPositionX(), updated.getMapPositionY()))
                 .data(updated)
                 .build();
     }
@@ -196,6 +224,20 @@ public class AttractionFunctionExecutor {
     private Intensity getIntensityOrDefault(Map<String, Object> args, Intensity defaultValue) {
         if (args.containsKey("intensity") && args.get("intensity") != null) {
             return Intensity.valueOf(((String) args.get("intensity")).toUpperCase());
+        }
+        return defaultValue;
+    }
+
+    private AttractionCategory getCategoryOrDefault(Map<String, Object> args, AttractionCategory defaultValue) {
+        if (args.containsKey("category") && args.get("category") != null) {
+            return AttractionCategory.valueOf(((String) args.get("category")).toUpperCase());
+        }
+        return defaultValue;
+    }
+
+    private Double getOrDefaultDouble(Map<String, Object> args, String key, Double defaultValue) {
+        if (args.containsKey(key) && args.get(key) != null) {
+            return ((Number) args.get(key)).doubleValue();
         }
         return defaultValue;
     }

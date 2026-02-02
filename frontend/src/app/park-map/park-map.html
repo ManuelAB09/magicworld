@@ -1,0 +1,49 @@
+<div class="park-map-wrapper">
+  <h2 class="park-map__title">{{ 'PARK_MAP.TITLE' | translate }}</h2>
+
+  @if (loading) {
+    <div class="park-map__loading">{{ 'PARK_MAP.LOADING' | translate }}</div>
+  }
+
+  @if (error) {
+    <div class="park-map__error">{{ 'PARK_MAP.ERROR' | translate }}</div>
+  }
+
+  @if (webglError) {
+    <div class="park-map__error">
+      {{ 'PARK_MAP.WEBGL_ERROR' | translate }}
+    </div>
+  }
+
+  <div class="park-map__container"
+       #mapContainer
+       (mousemove)="onMouseMove($event)"
+       (click)="onClick()">
+  </div>
+
+  @if (hoveredAttraction) {
+    <div class="park-map__tooltip"
+         #tooltipEl
+         [style.left.px]="tooltipX + 15"
+         [style.top.px]="tooltipY - 10">
+      <div class="tooltip__header">
+        <img [src]="getImageUrl(hoveredAttraction.photoUrl)"
+             [alt]="hoveredAttraction.name"
+             class="tooltip__image" />
+        <div class="tooltip__info">
+          <h4 class="tooltip__name">{{ hoveredAttraction.name }}</h4>
+          <span class="tooltip__category">{{ ('ATTRACTION_CATEGORY.' + hoveredAttraction.category) | translate }}</span>
+        </div>
+      </div>
+      <p class="tooltip__description">{{ hoveredAttraction.description | slice:0:80 }}...</p>
+      <span class="tooltip__cta">{{ 'PARK_MAP.TOOLTIP.VIEW_DETAILS' | translate }} →</span>
+    </div>
+  }
+
+  <div class="park-map__controls">
+    <button type="button" class="control-btn" (click)="zoomIn()" [title]="'PARK_MAP.CONTROLS.ZOOM_IN' | translate">+</button>
+    <button type="button" class="control-btn" (click)="zoomOut()" [title]="'PARK_MAP.CONTROLS.ZOOM_OUT' | translate">−</button>
+    <button type="button" class="control-btn control-btn--reset" (click)="resetView()" [title]="'PARK_MAP.CONTROLS.RESET' | translate">⟲</button>
+  </div>
+</div>
+

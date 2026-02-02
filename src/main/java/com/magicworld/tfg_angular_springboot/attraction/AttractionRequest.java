@@ -13,6 +13,9 @@ public class AttractionRequest {
     private Intensity intensity;
 
     @NotNull
+    private AttractionCategory category;
+
+    @NotNull
     @Min(0)
     private Integer minimumHeight;
 
@@ -30,5 +33,11 @@ public class AttractionRequest {
 
     @NotNull
     private Boolean isActive;
+
+    @NotNull
+    private Double mapPositionX;
+
+    @NotNull
+    private Double mapPositionY;
 }
 

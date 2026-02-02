@@ -4,14 +4,15 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ErrorService } from '../error/error-service';
-import { AttractionApiService, AttractionData, Attraction } from './attraction.service';
+import { AttractionApiService, AttractionData, AttractionCategory } from './attraction.service';
 import { catchError, of } from 'rxjs';
-import { getBackendBaseUrl } from '../config/backend';
+import { MapPicker3DComponent } from './map-picker-3d';
+import { getImageUrl, handleApiError, validateImageFile, readFileAsDataUrl, DEFAULT_MAX_FILE_BYTES } from '../shared/utils';
 
 @Component({
   selector: 'app-attraction-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslatePipe, MapPicker3DComponent],
   templateUrl: './attraction-form.html',
   styleUrls: ['./attraction-form.css']
 })
@@ -29,10 +30,12 @@ export class AttractionForm implements OnInit {
   existingPhotoUrl: string | null = null;
   photoRequiredError = false;
 
-  private apiBase = getBackendBaseUrl();
-  private readonly maxFileBytes = 50 * 1024 * 1024;
 
   intensities: Array<'LOW'|'MEDIUM'|'HIGH'> = ['LOW','MEDIUM','HIGH'];
+  categories: AttractionCategory[] = [
+    'ROLLER_COASTER', 'FERRIS_WHEEL', 'CAROUSEL', 'WATER_RIDE',
+    'HAUNTED_HOUSE', 'DROP_TOWER', 'BUMPER_CARS', 'TRAIN_RIDE', 'SWING_RIDE', 'OTHER'
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -44,20 +47,28 @@ export class AttractionForm implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initForm();
+    this.loadData();
+  }
+
+  private initForm(): void {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(50)]],
       intensity: ['LOW', [Validators.required]],
+      category: ['OTHER', [Validators.required]],
       minimumHeight: [0, [Validators.required, Validators.min(0)]],
       minimumAge: [0, [Validators.required, Validators.min(0)]],
       minimumWeight: [0, [Validators.required, Validators.min(0)]],
       description: ['', [Validators.required, Validators.maxLength(255)]],
-      isActive: [true, [Validators.required]]
+      isActive: [true, [Validators.required]],
+      mapPositionX: [50, [Validators.required, Validators.min(0), Validators.max(100)]],
+      mapPositionY: [50, [Validators.required, Validators.min(0), Validators.max(100)]]
     });
+  }
 
+  private loadData(): void {
     this.loading = true;
-    this.errorKey = null;
-    this.errorArgs = null;
-    this.validationMessages = [];
+    this.clearError();
 
     const idParam = this.route.snapshot.paramMap.get('id');
     this.isEdit = !!idParam;
@@ -65,10 +76,7 @@ export class AttractionForm implements OnInit {
       this.id = Number(idParam);
       this.api.findById(this.id).pipe(
         catchError(err => {
-          const mapped = this.error.handleError(err);
-          this.errorKey = mapped.code;
-          this.errorArgs = mapped.args;
-          this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+          this.setError(err);
           return of(null);
         })
       ).subscribe(a => {
@@ -76,11 +84,14 @@ export class AttractionForm implements OnInit {
           this.form.patchValue({
             name: a.name,
             intensity: a.intensity,
+            category: a.category,
             minimumHeight: a.minimumHeight,
             minimumAge: a.minimumAge,
             minimumWeight: a.minimumWeight,
             description: a.description,
-            isActive: a.isActive
+            isActive: a.isActive,
+            mapPositionX: a.mapPositionX,
+            mapPositionY: a.mapPositionY
           });
           this.existingPhotoUrl = a.photoUrl;
         }
@@ -99,45 +110,73 @@ export class AttractionForm implements OnInit {
       return;
     }
     const file = input.files[0];
-    if (!file.type.startsWith('image/')) {
+    const validation = validateImageFile(file, DEFAULT_MAX_FILE_BYTES);
+
+    if (!validation.valid) {
       this.selectedFile = null;
       this.previewUrl = null;
-      this.photoRequiredError = true;
+      if (validation.error === 'invalid_type') {
+        this.photoRequiredError = true;
+      } else if (validation.error === 'size_exceeded') {
+        this.photoRequiredError = false;
+        this.errorKey = 'error.file.size_exceeded';
+        this.errorArgs = { 0: DEFAULT_MAX_FILE_BYTES };
+        this.validationMessages = [];
+      }
       return;
     }
 
-    if (file.size > this.maxFileBytes) {
-      this.selectedFile = null;
-      this.previewUrl = null;
-      this.photoRequiredError = false;
-      this.errorKey = 'error.file.size_exceeded';
-      this.errorArgs = { 0: this.maxFileBytes };
-      this.validationMessages = [];
-      return;
-    }
     this.selectedFile = file;
     this.photoRequiredError = false;
-    const reader = new FileReader();
-    reader.onload = () => this.previewUrl = reader.result as string;
-    reader.readAsDataURL(file);
+    readFileAsDataUrl(file).then(url => this.previewUrl = url);
   }
 
   private getDataFromForm(): AttractionData {
     return {
       name: this.form.value.name,
       intensity: this.form.value.intensity,
+      category: this.form.value.category,
       minimumHeight: Number(this.form.value.minimumHeight),
       minimumAge: Number(this.form.value.minimumAge),
       minimumWeight: Number(this.form.value.minimumWeight),
       description: this.form.value.description,
-      isActive: !!this.form.value.isActive
+      isActive: !!this.form.value.isActive,
+      mapPositionX: Number(this.form.value.mapPositionX),
+      mapPositionY: Number(this.form.value.mapPositionY)
+    };
+  }
+
+  onMapPreviewClick(event: MouseEvent): void {
+    const target = event.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    this.form.patchValue({
+      mapPositionX: Math.round(x * 10) / 10,
+      mapPositionY: Math.round(y * 10) / 10
+    });
+  }
+
+  onMapPositionChange(event: { x: number; y: number }): void {
+    this.form.patchValue({
+      mapPositionX: event.x,
+      mapPositionY: event.y
+    });
+    this.form.get('mapPositionX')?.markAsTouched();
+    this.form.get('mapPositionY')?.markAsTouched();
+  }
+
+  getMarkerStyle(): { [key: string]: string } {
+    const x = this.form.value.mapPositionX ?? 50;
+    const y = this.form.value.mapPositionY ?? 50;
+    return {
+      left: `${x}%`,
+      top: `${y}%`
     };
   }
 
   getImageUrl(url: string | null): string | null {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    return this.apiBase + url;
+    return getImageUrl(url);
   }
 
   submit() {
@@ -152,22 +191,16 @@ export class AttractionForm implements OnInit {
     }
 
     this.loading = true;
-    this.errorKey = null;
-    this.errorArgs = null;
-    this.validationMessages = [];
+    this.clearError();
 
     const data = this.getDataFromForm();
-
     const obs = this.isEdit && this.id
       ? this.api.updateMultipart(this.id, data, this.selectedFile || undefined)
       : this.api.createMultipart(data, this.selectedFile!);
 
     obs.pipe(
       catchError(err => {
-        const mapped = this.error.handleError(err);
-        this.errorKey = mapped.code;
-        this.errorArgs = mapped.args;
-        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+        this.setError(err);
         return of(null);
       })
     ).subscribe(res => {
@@ -178,8 +211,8 @@ export class AttractionForm implements OnInit {
 
   delete() {
     if (!this.isEdit || !this.id) return;
-    const ok = confirm(this.translate.instant('ATTRACTION_FORM.CONFIRM_DELETE'));
-    if (!ok) return;
+    if (!confirm(this.translate.instant('ATTRACTION_FORM.CONFIRM_DELETE'))) return;
+
     this.loading = true;
     this.api.delete(this.id).subscribe({
       next: () => {
@@ -188,11 +221,21 @@ export class AttractionForm implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        const mapped = this.error.handleError(err);
-        this.errorKey = mapped.code;
-        this.errorArgs = mapped.args;
-        this.validationMessages = this.error.getValidationMessages(mapped.code, mapped.args);
+        this.setError(err);
       }
     });
+  }
+
+  private clearError(): void {
+    this.errorKey = null;
+    this.errorArgs = null;
+    this.validationMessages = [];
+  }
+
+  private setError(err: any): void {
+    const state = handleApiError(err, this.error);
+    this.errorKey = state.errorKey;
+    this.errorArgs = state.errorArgs;
+    this.validationMessages = state.validationMessages;
   }
 }

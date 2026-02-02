@@ -19,7 +19,7 @@
         }
       }
 
-      <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="attr-form">
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="attr-form">
         <div class="attr-form__grid">
           <div class="field">
             <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.NAME' | translate }}</label>
@@ -33,6 +33,13 @@
             <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.INTENSITY' | translate }}</label>
             <select class="field__input" formControlName="intensity">
               @for (i of intensities; track i) { <option [value]="i">{{ ('ATTRACTIONS.FILTER.INTENSITY_' + i) | translate }}</option> }
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.CATEGORY' | translate }}</label>
+            <select class="field__input" formControlName="category">
+              @for (c of categories; track c) { <option [value]="c">{{ ('ATTRACTION_CATEGORY.' + c) | translate }}</option> }
             </select>
           </div>
 
@@ -94,6 +101,20 @@
               <div class="image-preview"><img [src]="previewUrl" alt="preview" /></div>
             } @else if (getImageUrl(existingPhotoUrl)) {
               <div class="image-preview"><img [src]="getImageUrl(existingPhotoUrl)" alt="current" /></div>
+            }
+          </div>
+
+          <div class="field field--full">
+            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.MAP_POSITION' | translate }}</label>
+            <app-map-picker-3d
+              [positionX]="form.value.mapPositionX"
+              [positionY]="form.value.mapPositionY"
+              [category]="form.value.category"
+              (positionChange)="onMapPositionChange($event)">
+            </app-map-picker-3d>
+            @if ((form.get('mapPositionX')?.touched && form.get('mapPositionX')?.invalid) ||
+                 (form.get('mapPositionY')?.touched && form.get('mapPositionY')?.invalid)) {
+              <div class="field__error">{{ 'ATTRACTION_FORM.VALIDATION.MAP_POSITION' | translate }}</div>
             }
           </div>
         </div>

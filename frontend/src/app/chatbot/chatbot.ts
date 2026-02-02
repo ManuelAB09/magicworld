@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ChatbotService, ChatHistoryEntry, PendingAction, ChatResponse } from './chatbot.service';
 import { FormatMarkdownPipe } from './format-markdown.pipe';
+import { extractActionFromMessage, interpretError, WELCOME_MESSAGE, RESET_MESSAGE } from './chatbot-utils';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -30,17 +31,16 @@ export class ChatbotComponent implements AfterViewChecked {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
   messages: ChatMessage[] = [];
-  inputMessage: string = '';
-  isLoading: boolean = false;
+  inputMessage = '';
+  isLoading = false;
   pendingAction: PendingAction | null = null;
   activityLog: ActivityLogEntry[] = [];
 
+  private readonly MAX_ACTIVITY_LOG = 20;
+  private readonly HISTORY_SIZE = 10;
+
   constructor(private chatbotService: ChatbotService) {
-    this.messages.push({
-      role: 'assistant',
-      content: '¡Hola! 👋 Soy tu asistente de administración de MagicWorld. Puedo ayudarte a gestionar:\n\n• **Descuentos**: crear, editar, eliminar y listar\n• **Tipos de entrada**: crear, editar, eliminar y listar\n• **Atracciones**: crear, editar, eliminar y listar\n\n¿En qué puedo ayudarte hoy?\n\n---\n\nHi! 👋 I\'m your MagicWorld administration assistant. I can help you manage:\n\n• **Discounts**: create, edit, delete and list\n• **Ticket Types**: create, edit, delete and list\n• **Attractions**: create, edit, delete and list\n\nHow can I help you today?',
-      timestamp: new Date()
-    });
+    this.messages.push({ role: 'assistant', content: WELCOME_MESSAGE, timestamp: new Date() });
   }
 
   ngAfterViewChecked() {
@@ -49,67 +49,8 @@ export class ChatbotComponent implements AfterViewChecked {
 
   private scrollToBottom(): void {
     try {
-      this.messagesContainer.nativeElement.scrollTop =
-        this.messagesContainer.nativeElement.scrollHeight;
-    } catch (err) {}
-  }
-
-  private extractActionFromMessage(response: ChatResponse): string {
-    const responseMsg = response.message.toLowerCase();
-
-    if (responseMsg.includes('✅') && (responseMsg.includes('created') || responseMsg.includes('creado'))) {
-      if (responseMsg.includes('discount') || responseMsg.includes('descuento')) {
-        return '✨ Discount created';
-      } else if (responseMsg.includes('ticket') || responseMsg.includes('entrada')) {
-        return '✨ Ticket type created';
-      } else if (responseMsg.includes('attraction') || responseMsg.includes('atracción')) {
-        return '✨ Attraction created';
-      }
-    }
-
-    if (responseMsg.includes('✅') && (responseMsg.includes('updated') || responseMsg.includes('actualizado'))) {
-      if (responseMsg.includes('discount') || responseMsg.includes('descuento')) {
-        return '✏️ Discount updated';
-      } else if (responseMsg.includes('ticket') || responseMsg.includes('entrada')) {
-        return '✏️ Ticket type updated';
-      } else if (responseMsg.includes('attraction') || responseMsg.includes('atracción')) {
-        return '✏️ Attraction updated';
-      }
-    }
-
-    if (responseMsg.includes('✅') && (responseMsg.includes('deleted') || responseMsg.includes('eliminado'))) {
-      if (responseMsg.includes('discount') || responseMsg.includes('descuento')) {
-        return '🗑️ Discount deleted';
-      } else if (responseMsg.includes('ticket') || responseMsg.includes('entrada')) {
-        return '🗑️ Ticket type deleted';
-      } else if (responseMsg.includes('attraction') || responseMsg.includes('atracción')) {
-        return '🗑️ Attraction deleted';
-      }
-    }
-
-    if (responseMsg.includes('📋') || responseMsg.includes('🎫') || responseMsg.includes('🎢')) {
-      if (responseMsg.includes('discount') || responseMsg.includes('descuento')) {
-        return '📋 Listed discounts';
-      } else if (responseMsg.includes('ticket') || responseMsg.includes('entrada')) {
-        return '📋 Listed ticket types';
-      } else if (responseMsg.includes('attraction') || responseMsg.includes('atracción')) {
-        return '📋 Listed attractions';
-      }
-    }
-
-    if (responseMsg.includes('⚠️') && (responseMsg.includes('confirmation') || responseMsg.includes('confirmación'))) {
-      return '⚠️ Confirmation requested';
-    }
-
-    if (responseMsg.includes('❌') && (responseMsg.includes('cancelled') || responseMsg.includes('cancelada'))) {
-      return '❌ Operation cancelled';
-    }
-
-    if (responseMsg.includes('❌')) {
-      return '❌ Error occurred';
-    }
-
-    return '💬 Response received';
+      this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
+    } catch {}
   }
 
   sendMessage(): void {
@@ -118,116 +59,53 @@ export class ChatbotComponent implements AfterViewChecked {
     const userMessage = this.inputMessage.trim();
     this.inputMessage = '';
 
-
-    this.messages.push({
-      role: 'user',
-      content: userMessage,
-      timestamp: new Date()
-    });
-
-
-    this.messages.push({
-      role: 'assistant',
-      content: '',
-      timestamp: new Date(),
-      isLoading: true
-    });
-
+    this.messages.push({ role: 'user', content: userMessage, timestamp: new Date() });
+    this.messages.push({ role: 'assistant', content: '', timestamp: new Date(), isLoading: true });
     this.isLoading = true;
 
-    // Build history for context
     const history: ChatHistoryEntry[] = this.messages
       .filter(m => !m.isLoading)
-      .slice(-10)
-      .map(m => ({
-        role: m.role,
-        content: m.content
-      }));
+      .slice(-this.HISTORY_SIZE)
+      .map(m => ({ role: m.role, content: m.content }));
 
-    // Send to backend
     this.chatbotService.sendMessage({
       message: userMessage,
       history: history.slice(0, -1),
       pendingAction: this.pendingAction || undefined
     }).subscribe({
-      next: (response: ChatResponse) => {
-        // Remove loading message
-        this.messages = this.messages.filter(m => !m.isLoading);
-
-        // Add assistant response
-        this.messages.push({
-          role: 'assistant',
-          content: response.message,
-          timestamp: new Date(),
-          pendingAction: response.pendingAction
-        });
-
-
-        const actionDescription = this.extractActionFromMessage(response);
-        this.activityLog.unshift({
-          action: actionDescription,
-          success: response.success,
-          timestamp: new Date()
-        });
-
-
-        if (this.activityLog.length > 20) {
-          this.activityLog = this.activityLog.slice(0, 20);
-        }
-
-
-        this.pendingAction = response.pendingAction || null;
-        this.isLoading = false;
-      },
-      error: (error) => {
-
-        this.messages = this.messages.filter(m => !m.isLoading);
-
-        const errorMessage = this.interpretError(error);
-        this.messages.push({
-          role: 'assistant',
-          content: errorMessage,
-          timestamp: new Date()
-        });
-
-
-        this.activityLog.unshift({
-          action: '❌ Request failed',
-          success: false,
-          timestamp: new Date()
-        });
-
-        this.pendingAction = null;
-        this.isLoading = false;
-        console.error('Error:', error);
-      }
+      next: (response) => this.handleResponse(response),
+      error: (error) => this.handleError(error)
     });
   }
 
-  private interpretError(error: any): string {
-    let errorMsg = error?.error?.message || error?.message || '';
+  private handleResponse(response: ChatResponse): void {
+    this.messages = this.messages.filter(m => !m.isLoading);
+    this.messages.push({
+      role: 'assistant',
+      content: response.message,
+      timestamp: new Date(),
+      pendingAction: response.pendingAction
+    });
 
-    if (errorMsg.includes('date') || errorMsg.includes('fecha')) {
-      return '❌ The date format is invalid. Please use YYYY-MM-DD format (e.g., 2025-12-31).\n\n❌ El formato de fecha no es válido. Por favor, usa el formato AAAA-MM-DD (ej: 2025-12-31).';
+    this.addToActivityLog(extractActionFromMessage(response), response.success);
+    this.pendingAction = response.pendingAction || null;
+    this.isLoading = false;
+  }
+
+  private handleError(error: any): void {
+    this.messages = this.messages.filter(m => !m.isLoading);
+    this.messages.push({ role: 'assistant', content: interpretError(error), timestamp: new Date() });
+    this.addToActivityLog('❌ Request failed', false);
+    this.pendingAction = null;
+    this.isLoading = false;
+    console.error('Error:', error);
+  }
+
+  private addToActivityLog(action: string, success: boolean): void {
+    this.activityLog.unshift({ action, success, timestamp: new Date() });
+    if (this.activityLog.length > this.MAX_ACTIVITY_LOG) {
+      this.activityLog = this.activityLog.slice(0, this.MAX_ACTIVITY_LOG);
     }
-
-    if (errorMsg.includes('duplicate') || errorMsg.includes('already exists')) {
-      return '❌ This item already exists. Please use a different name or code.\n\n❌ Este elemento ya existe. Por favor, usa un nombre o código diferente.';
-    }
-
-    if (errorMsg.includes('not found') || errorMsg.includes('no encontr')) {
-      return '❌ The requested item was not found. Please verify the ID or name.\n\n❌ El elemento solicitado no fue encontrado. Por favor, verifica el ID o nombre.';
-    }
-
-    if (error.status === 401 || error.status === 403) {
-      return '❌ You don\'t have permission to perform this action.\n\n❌ No tienes permiso para realizar esta acción.';
-    }
-
-    if (error.status === 500) {
-      return '❌ A server error occurred. Please try again later.\n\n❌ Ha ocurrido un error en el servidor. Por favor, inténtalo más tarde.';
-    }
-
-    return '❌ An error occurred while processing your request. Please try again.\n\n❌ Ha ocurrido un error al procesar tu solicitud. Por favor, inténtalo de nuevo.';
   }
 
   confirmAction(): void {
@@ -250,11 +128,7 @@ export class ChatbotComponent implements AfterViewChecked {
   }
 
   clearChat(): void {
-    this.messages = [{
-      role: 'assistant',
-      content: '¡Chat reiniciado! 🔄 ¿En qué puedo ayudarte?\n\nChat restarted! 🔄 How can I help you?',
-      timestamp: new Date()
-    }];
+    this.messages = [{ role: 'assistant', content: RESET_MESSAGE, timestamp: new Date() }];
     this.pendingAction = null;
   }
 

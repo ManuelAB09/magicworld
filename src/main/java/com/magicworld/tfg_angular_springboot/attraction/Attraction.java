@@ -31,6 +31,11 @@ public class Attraction extends BaseEntity {
     private Intensity intensity;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false)
+    private AttractionCategory category;
+
+    @NotNull
     @Min(0)
     @Column(name = "minimum_height", nullable = false)
     private Integer minimumHeight;
@@ -58,5 +63,13 @@ public class Attraction extends BaseEntity {
     @NotNull
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
+
+    @NotNull
+    @Column(name = "map_position_x", nullable = false)
+    private Double mapPositionX;
+
+    @NotNull
+    @Column(name = "map_position_y", nullable = false)
+    private Double mapPositionY;
 
 }

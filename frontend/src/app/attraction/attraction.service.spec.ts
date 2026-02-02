@@ -15,12 +15,15 @@ describe('AttractionApiService', () => {
     id: 1,
     name: 'Test',
     intensity: 'LOW',
+    category: 'OTHER',
     minimumHeight: 100,
     minimumAge: 10,
     minimumWeight: 30,
     description: 'Test desc',
     photoUrl: '/images/test.jpg',
-    isActive: true
+    isActive: true,
+    mapPositionX: 50,
+    mapPositionY: 50
   };
 
   beforeEach(() => {
@@ -96,11 +99,14 @@ describe('AttractionApiService', () => {
     const data: AttractionData = {
       name: 'New',
       intensity: 'LOW',
+      category: 'OTHER',
       minimumHeight: 100,
       minimumAge: 10,
       minimumWeight: 30,
       description: 'Desc',
-      isActive: true
+      isActive: true,
+      mapPositionX: 50,
+      mapPositionY: 50
     };
     const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
 
@@ -118,11 +124,14 @@ describe('AttractionApiService', () => {
     const data: AttractionData = {
       name: 'Updated',
       intensity: 'MEDIUM',
+      category: 'ROLLER_COASTER',
       minimumHeight: 120,
       minimumAge: 12,
       minimumWeight: 40,
       description: 'Updated desc',
-      isActive: true
+      isActive: true,
+      mapPositionX: 60,
+      mapPositionY: 70
     };
 
     service.updateMultipart(1, data).subscribe(attraction => {

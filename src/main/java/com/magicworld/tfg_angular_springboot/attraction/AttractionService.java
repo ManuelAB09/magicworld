@@ -49,6 +49,7 @@ public class AttractionService {
 
         existingAttraction.setName(updatedAttraction.getName());
         existingAttraction.setIntensity(updatedAttraction.getIntensity());
+        existingAttraction.setCategory(updatedAttraction.getCategory());
         existingAttraction.setMinimumHeight(updatedAttraction.getMinimumHeight());
         existingAttraction.setMinimumAge(updatedAttraction.getMinimumAge());
         existingAttraction.setMinimumWeight(updatedAttraction.getMinimumWeight());
@@ -57,6 +58,8 @@ public class AttractionService {
             existingAttraction.setPhotoUrl(updatedAttraction.getPhotoUrl());
         }
         existingAttraction.setIsActive(updatedAttraction.getIsActive());
+        existingAttraction.setMapPositionX(updatedAttraction.getMapPositionX());
+        existingAttraction.setMapPositionY(updatedAttraction.getMapPositionY());
         return attractionRepository.save(existingAttraction);
     }
 }

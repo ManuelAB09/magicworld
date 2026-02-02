@@ -1,0 +1,96 @@
+<div class="attraction-detail-container">
+  @if (loading) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>{{ 'ATTRACTION_DETAIL.LOADING' | translate }}</p>
+    </div>
+  } @else if (error) {
+    <div class="error-container">
+      <i class="bi bi-exclamation-triangle"></i>
+      <h2>{{ 'ATTRACTION_DETAIL.ERROR' | translate }}</h2>
+      <button class="btn btn-primary" (click)="goToAttractions()">
+        {{ 'ATTRACTION_DETAIL.GO_TO_ATTRACTIONS' | translate }}
+      </button>
+    </div>
+  } @else if (attraction) {
+    <div class="detail-content">
+      <div class="detail-header">
+        <button class="btn-back" (click)="goBack()">
+          <i class="bi bi-arrow-left"></i>
+          {{ 'ATTRACTION_DETAIL.BACK_TO_MAP' | translate }}
+        </button>
+      </div>
+
+      <div class="detail-main">
+        <div class="detail-image">
+          <img [src]="getImageUrl(attraction.photoUrl)" [alt]="attraction.name">
+          <div class="status-badge" [class.active]="attraction.isActive" [class.inactive]="!attraction.isActive">
+            @if (attraction.isActive) {
+              <i class="bi bi-check-circle"></i>
+              {{ 'ATTRACTIONS.STATUS_ACTIVE' | translate }}
+            } @else {
+              <i class="bi bi-x-circle"></i>
+              {{ 'ATTRACTIONS.STATUS_INACTIVE' | translate }}
+            }
+          </div>
+        </div>
+
+        <div class="detail-info">
+          <h1 class="attraction-name">{{ attraction.name }}</h1>
+
+          <div class="tags">
+            <span class="tag category-tag">
+              <i class="bi bi-tag"></i>
+              {{ getCategoryLabel() }}
+            </span>
+            <span class="tag intensity-tag" [ngClass]="getIntensityClass()">
+              <i class="bi bi-lightning"></i>
+              {{ getIntensityLabel() }}
+            </span>
+          </div>
+
+          <p class="description">{{ attraction.description }}</p>
+
+          <div class="requirements">
+            <h3>{{ 'ATTRACTION_DETAIL.REQUIREMENTS' | translate }}</h3>
+            <div class="requirements-grid">
+              <div class="requirement-item">
+                <i class="bi bi-rulers"></i>
+                <div class="requirement-content">
+                  <span class="requirement-label">{{ 'ATTRACTION_DETAIL.MIN_HEIGHT' | translate }}</span>
+                  <span class="requirement-value">{{ attraction.minimumHeight }} cm</span>
+                </div>
+              </div>
+              <div class="requirement-item">
+                <i class="bi bi-person"></i>
+                <div class="requirement-content">
+                  <span class="requirement-label">{{ 'ATTRACTION_DETAIL.MIN_AGE' | translate }}</span>
+                  <span class="requirement-value">{{ attraction.minimumAge }} {{ 'ATTRACTION_DETAIL.YEARS' | translate }}</span>
+                </div>
+              </div>
+              <div class="requirement-item">
+                <i class="bi bi-speedometer2"></i>
+                <div class="requirement-content">
+                  <span class="requirement-label">{{ 'ATTRACTION_DETAIL.MIN_WEIGHT' | translate }}</span>
+                  <span class="requirement-value">{{ attraction.minimumWeight }} kg</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-outline" (click)="goToAttractions()">
+              <i class="bi bi-grid"></i>
+              {{ 'ATTRACTION_DETAIL.VIEW_ALL' | translate }}
+            </button>
+            <button class="btn btn-primary" (click)="goBack()">
+              <i class="bi bi-map"></i>
+              {{ 'ATTRACTION_DETAIL.BACK_TO_MAP' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

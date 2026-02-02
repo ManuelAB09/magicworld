@@ -202,7 +202,7 @@
 					<driver>com.mysql.cj.jdbc.Driver</driver>
 					<url>jdbc:mysql://localhost:3306/magicworld</url>
 					<username>root</username>
-					<password>tfg$root</password>
+					<password>RootPass123!</password>
 					<srcFiles>
 						<srcFile>src/main/resources/db/migration/data.sql</srcFile>
 					</srcFiles>

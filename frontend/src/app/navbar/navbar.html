@@ -41,6 +41,12 @@
         {{ 'NAV.ATTRACTIONS' | translate }}
       </a>
     </li>
+    <li class="nav-list__item">
+      <a class="nav-btn" routerLink="/park-map">
+        <i class="fa-solid fa-map"></i>
+        {{ 'NAV.PARK_MAP' | translate }}
+      </a>
+    </li>
     @if (role === 'ADMIN') {
       <li class="nav-list__item">
         <a class="nav-btn" routerLink="/chatbot">

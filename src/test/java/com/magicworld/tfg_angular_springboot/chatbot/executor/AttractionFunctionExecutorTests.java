@@ -1,6 +1,7 @@
 package com.magicworld.tfg_angular_springboot.chatbot.executor;
 
 import com.magicworld.tfg_angular_springboot.attraction.Attraction;
+import com.magicworld.tfg_angular_springboot.attraction.AttractionCategory;
 import com.magicworld.tfg_angular_springboot.attraction.AttractionService;
 import com.magicworld.tfg_angular_springboot.attraction.Intensity;
 import com.magicworld.tfg_angular_springboot.chatbot.dto.ChatResponse;
@@ -44,12 +45,15 @@ public class AttractionFunctionExecutorTests {
         sample = Attraction.builder()
                 .name("Roller Coaster")
                 .intensity(Intensity.HIGH)
+                .category(AttractionCategory.ROLLER_COASTER)
                 .minimumHeight(140)
                 .minimumAge(12)
                 .minimumWeight(30)
                 .description("Extreme roller coaster")
                 .photoUrl("https://example.com/coaster.jpg")
                 .isActive(true)
+                .mapPositionX(50.0)
+                .mapPositionY(50.0)
                 .build();
         sample.setId(1L);
     }
@@ -212,6 +216,7 @@ public class AttractionFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put("name", "Roller Coaster");
         args.put("intensity", "HIGH");
+        args.put("category", "ROLLER_COASTER");
         args.put("minimumHeight", 140);
         args.put("minimumAge", 12);
         args.put("minimumWeight", 30);
@@ -230,6 +235,7 @@ public class AttractionFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put("name", "Roller Coaster");
         args.put("intensity", "HIGH");
+        args.put("category", "ROLLER_COASTER");
         args.put("minimumHeight", 140);
         args.put("minimumAge", 12);
         args.put("minimumWeight", 30);
@@ -248,6 +254,7 @@ public class AttractionFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put("name", "Roller Coaster");
         args.put("intensity", "HIGH");
+        args.put("category", "ROLLER_COASTER");
         args.put("minimumHeight", 140);
         args.put("minimumAge", 12);
         args.put("minimumWeight", 30);
@@ -266,6 +273,7 @@ public class AttractionFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put("name", "Roller Coaster");
         args.put("intensity", "HIGH");
+        args.put("category", "ROLLER_COASTER");
         args.put("minimumHeight", 140);
         args.put("minimumAge", 12);
         args.put("minimumWeight", 30);
@@ -285,6 +293,7 @@ public class AttractionFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put("name", "Roller Coaster");
         args.put("intensity", "HIGH");
+        args.put("category", "ROLLER_COASTER");
         args.put("minimumHeight", 140);
         args.put("minimumAge", 12);
         args.put("minimumWeight", 30);
@@ -429,6 +438,7 @@ public class AttractionFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put("name", "Roller Coaster");
         args.put("intensity", "HIGH");
+        args.put("category", "ROLLER_COASTER");
         args.put("minimumHeight", 140);
         args.put("minimumAge", 12);
         args.put("minimumWeight", 30);
@@ -448,6 +458,7 @@ public class AttractionFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put("name", "Roller Coaster");
         args.put("intensity", "HIGH");
+        args.put("category", "ROLLER_COASTER");
         args.put("minimumHeight", 140);
         args.put("minimumAge", 12);
         args.put("minimumWeight", 30);
@@ -467,6 +478,7 @@ public class AttractionFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put("name", "Roller Coaster");
         args.put("intensity", "HIGH");
+        args.put("category", "ROLLER_COASTER");
         args.put("minimumHeight", 140);
         args.put("minimumAge", 12);
         args.put("minimumWeight", 30);
@@ -588,6 +600,7 @@ public class AttractionFunctionExecutorTests {
         Map<String, Object> args = new HashMap<>();
         args.put("name", "Roller Coaster");
         args.put("intensity", "HIGH");
+        args.put("category", "ROLLER_COASTER");
         args.put("minimumHeight", 140);
         args.put("minimumAge", 12);
         args.put("minimumWeight", 30);

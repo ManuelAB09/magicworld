@@ -7,6 +7,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -77,12 +78,15 @@ public class AttractionE2ETests {
         sample = Attraction.builder()
                 .name(ROLLER_COASTER_NAME)
                 .intensity(Intensity.HIGH)
+                .category(AttractionCategory.ROLLER_COASTER)
                 .minimumHeight(MIN_HEIGHT_140)
                 .minimumAge(MIN_AGE_12)
                 .minimumWeight(MIN_WEIGHT_30)
                 .description(EXTREME_COASTER_DESC)
                 .photoUrl(PHOTO_URL)
                 .isActive(true)
+                .mapPositionX(50.0)
+                .mapPositionY(50.0)
                 .build();
     }
 
@@ -388,14 +392,7 @@ public class AttractionE2ETests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Crear atracción multipart retorna 201")
     void testCreateAttractionMultipartReturnsCreated() throws Exception {
-        AttractionRequest request = new AttractionRequest();
-        request.setName(WATER_SLIDE_NAME);
-        request.setIntensity(Intensity.MEDIUM);
-        request.setMinimumHeight(MIN_HEIGHT_120);
-        request.setMinimumAge(MIN_AGE_8);
-        request.setMinimumWeight(MIN_WEIGHT_25);
-        request.setDescription(FUN_WATER_SLIDE_DESC);
-        request.setIsActive(true);
+        AttractionRequest request = getAttractionRequest();
 
         MockMultipartFile photo = new MockMultipartFile("photo", "test.jpg", "image/jpeg", TEST_IMAGE_CONTENT.getBytes());
         MockMultipartFile data = new MockMultipartFile("data", "", "application/json", objectMapper.writeValueAsBytes(request));
@@ -416,14 +413,7 @@ public class AttractionE2ETests {
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Crear atracción multipart retorna ID")
     void testCreateAttractionMultipartReturnsId() throws Exception {
-        AttractionRequest request = new AttractionRequest();
-        request.setName(WATER_SLIDE_NAME);
-        request.setIntensity(Intensity.MEDIUM);
-        request.setMinimumHeight(MIN_HEIGHT_120);
-        request.setMinimumAge(MIN_AGE_8);
-        request.setMinimumWeight(MIN_WEIGHT_25);
-        request.setDescription(FUN_WATER_SLIDE_DESC);
-        request.setIsActive(true);
+        AttractionRequest request = getAttractionRequest();
 
         MockMultipartFile photo = new MockMultipartFile("photo", "test.jpg", "image/jpeg", TEST_IMAGE_CONTENT.getBytes());
         MockMultipartFile data = new MockMultipartFile("data", "", "application/json", objectMapper.writeValueAsBytes(request));
@@ -435,6 +425,21 @@ public class AttractionE2ETests {
                 .andExpect(jsonPath("$.id").exists())
                 .andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("id"));
+    }
+
+    private static @NonNull AttractionRequest getAttractionRequest() {
+        AttractionRequest request = new AttractionRequest();
+        request.setName(WATER_SLIDE_NAME);
+        request.setIntensity(Intensity.MEDIUM);
+        request.setCategory(AttractionCategory.WATER_RIDE);
+        request.setMinimumHeight(MIN_HEIGHT_120);
+        request.setMinimumAge(MIN_AGE_8);
+        request.setMinimumWeight(MIN_WEIGHT_25);
+        request.setDescription(FUN_WATER_SLIDE_DESC);
+        request.setIsActive(true);
+        request.setMapPositionX(30.0);
+        request.setMapPositionY(30.0);
+        return request;
     }
 
     @Test
@@ -449,11 +454,14 @@ public class AttractionE2ETests {
         AttractionRequest request = new AttractionRequest();
         request.setName(UPDATED_COASTER_NAME);
         request.setIntensity(Intensity.LOW);
+        request.setCategory(AttractionCategory.CAROUSEL);
         request.setMinimumHeight(MIN_HEIGHT_100);
         request.setMinimumAge(MIN_AGE_6);
         request.setMinimumWeight(MIN_WEIGHT_20);
         request.setDescription(UPDATED_DESC);
         request.setIsActive(false);
+        request.setMapPositionX(40.0);
+        request.setMapPositionY(40.0);
 
         MockMultipartFile data = new MockMultipartFile("data", "", "application/json", objectMapper.writeValueAsBytes(request));
 
@@ -478,11 +486,14 @@ public class AttractionE2ETests {
         AttractionRequest request = new AttractionRequest();
         request.setName(PHOTO_UPDATED_COASTER_NAME);
         request.setIntensity(Intensity.HIGH);
+        request.setCategory(AttractionCategory.DROP_TOWER);
         request.setMinimumHeight(MIN_HEIGHT_150);
         request.setMinimumAge(MIN_AGE_14);
         request.setMinimumWeight(MIN_WEIGHT_40);
         request.setDescription(PHOTO_UPDATED_DESC);
         request.setIsActive(true);
+        request.setMapPositionX(70.0);
+        request.setMapPositionY(70.0);
 
         MockMultipartFile photo = new MockMultipartFile("photo", "new.jpg", "image/jpeg", NEW_IMAGE_CONTENT.getBytes());
         MockMultipartFile data = new MockMultipartFile("data", "", "application/json", objectMapper.writeValueAsBytes(request));

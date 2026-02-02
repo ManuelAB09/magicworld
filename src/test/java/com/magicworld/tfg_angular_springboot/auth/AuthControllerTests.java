@@ -256,6 +256,45 @@ public class AuthControllerTests {
         assertEquals(200, result.getResponse().getStatus());
     }
 
+    @Test
+    @Story("CSRF Token")
+    @Description("Verifica que CSRF token establece header X-XSRF-TOKEN")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("CSRF token establece header")
+    public void testCsrfTokenSetsHeader() throws Exception {
+        var result = mockMvc.perform(get("/api/v1/auth/csrf-token"))
+                .andReturn();
+        assertNotNull(result.getResponse().getHeader("X-XSRF-TOKEN"));
+    }
+
+    @Test
+    @Story("Recuperar Contraseña")
+    @Description("Verifica que forgot-password retorna 200 OK")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("Forgot password retorna 200 OK")
+    public void testForgotPasswordReturnsOk() throws Exception {
+        var result = mockMvc.perform(post("/api/v1/auth/forgot-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("\"test@example.com\""))
+                .andExpect(status().isOk())
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
+    }
+
+    @Test
+    @Story("Restablecer Contraseña")
+    @Description("Verifica que reset-password retorna 200 OK")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("Reset password retorna 200 OK")
+    public void testResetPasswordReturnsOk() throws Exception {
+        var result = mockMvc.perform(post("/api/v1/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"valid-token\",\"newPassword\":\"NewPassword1@\"}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
+    }
+
     @TestConfiguration
     static class AuthControllerTestConfig {
         @Bean

@@ -1,0 +1,220 @@
+.park-map-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(180deg, #faebd7 0%, #f5e6d3 100%);
+  min-height: calc(100vh - 80px);
+  font-family: 'Georgia', serif;
+}
+
+.park-map__title {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2c0d0d;
+  margin-bottom: 24px;
+  border-bottom: 4px solid #a11d1d;
+  display: inline-block;
+  padding-bottom: 0.3rem;
+  width: 100%;
+}
+
+.park-map__loading,
+.park-map__error {
+  text-align: center;
+  padding: 60px 40px;
+  font-size: 1.2rem;
+  color: #2c0d0d;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 2px solid #d4a76a;
+}
+
+.park-map__error {
+  color: #a11d1d;
+  border-left: 4px solid #a11d1d;
+}
+
+.park-map__container {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(44, 13, 13, 0.2);
+  cursor: grab;
+  border: 3px solid #2c0d0d;
+}
+
+.park-map__container:active {
+  cursor: grabbing;
+}
+
+.park-map__tooltip {
+  position: absolute;
+  background: linear-gradient(135deg, #ffffff 0%, #fff8f0 100%);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 12px 32px rgba(44, 13, 13, 0.25);
+  pointer-events: none;
+  z-index: 100;
+  max-width: 300px;
+  animation: tooltipFadeIn 0.2s ease-out;
+  border: 3px solid #2c0d0d;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tooltip__header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.tooltip__image {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 2px solid #d4a76a;
+}
+
+.tooltip__info {
+  flex: 1;
+}
+
+.tooltip__name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2c0d0d;
+}
+
+.tooltip__category {
+  font-size: 0.85rem;
+  color: #856404;
+  font-weight: 500;
+  display: inline-block;
+  padding: 2px 8px;
+  background: #fff3cd;
+  border-radius: 12px;
+  margin-top: 4px;
+  border: 1px solid #856404;
+}
+
+.tooltip__description {
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+.tooltip__cta {
+  font-size: 0.9rem;
+  color: #a11d1d;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.park-map__controls {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+}
+
+.control-btn {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #2c0d0d;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffb700 0%, #ff9500 100%);
+  color: #2c0d0d;
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(44, 13, 13, 0.3);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 183, 0, 0.5);
+}
+
+.control-btn:active {
+  transform: scale(0.95);
+}
+
+.control-btn--reset {
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .park-map__container {
+    height: 450px;
+    border-radius: 12px;
+  }
+
+  .park-map__controls {
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .control-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .park-map__tooltip {
+    max-width: 240px;
+    padding: 12px;
+  }
+
+  .park-map__title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .park-map__container {
+    height: 350px;
+  }
+
+  .park-map__title {
+    font-size: 1.5rem;
+  }
+
+  .tooltip__image {
+    width: 50px;
+    height: 50px;
+  }
+
+  .tooltip__name {
+    font-size: 1rem;
+  }
+}
+

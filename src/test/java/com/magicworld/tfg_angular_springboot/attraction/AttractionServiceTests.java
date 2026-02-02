@@ -55,12 +55,15 @@ public class AttractionServiceTests {
         sample = Attraction.builder()
                 .name(TEST_RIDE_NAME)
                 .intensity(Intensity.MEDIUM)
+                .category(AttractionCategory.ROLLER_COASTER)
                 .minimumHeight(TEST_MIN_HEIGHT)
                 .minimumAge(TEST_MIN_AGE)
                 .minimumWeight(TEST_MIN_WEIGHT)
                 .description(TEST_DESCRIPTION)
                 .photoUrl(TEST_PHOTO_URL)
                 .isActive(true)
+                .mapPositionX(50.0)
+                .mapPositionY(50.0)
                 .build();
     }
 
@@ -116,12 +119,15 @@ public class AttractionServiceTests {
         return Attraction.builder()
                 .name(UPDATED_RIDE_NAME)
                 .intensity(Intensity.HIGH)
+                .category(AttractionCategory.FERRIS_WHEEL)
                 .minimumHeight(UPDATED_MIN_HEIGHT)
                 .minimumAge(UPDATED_MIN_AGE)
                 .minimumWeight(UPDATED_MIN_WEIGHT)
                 .description(UPDATED_DESCRIPTION)
                 .photoUrl(UPDATED_PHOTO_URL)
                 .isActive(false)
+                .mapPositionX(60.0)
+                .mapPositionY(60.0)
                 .build();
     }
 
@@ -233,12 +239,15 @@ public class AttractionServiceTests {
         Attraction update = Attraction.builder()
                 .name(UPDATED_RIDE_NAME)
                 .intensity(Intensity.HIGH)
+                .category(AttractionCategory.FERRIS_WHEEL)
                 .minimumHeight(UPDATED_MIN_HEIGHT)
                 .minimumAge(UPDATED_MIN_AGE)
                 .minimumWeight(UPDATED_MIN_WEIGHT)
                 .description(UPDATED_DESCRIPTION)
                 .photoUrl(null)
                 .isActive(false)
+                .mapPositionX(60.0)
+                .mapPositionY(60.0)
                 .build();
         Attraction updated = attractionService.updateAttraction(saved.getId(), update);
         assertEquals(TEST_PHOTO_URL, updated.getPhotoUrl());

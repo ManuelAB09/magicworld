@@ -21,12 +21,15 @@ describe('AttractionForm', () => {
     id: 1,
     name: 'Test Attraction',
     intensity: 'MEDIUM',
+    category: 'ROLLER_COASTER',
     minimumHeight: 120,
     minimumAge: 10,
     minimumWeight: 30,
     description: 'Test description',
     photoUrl: '/images/test.jpg',
-    isActive: true
+    isActive: true,
+    mapPositionX: 50,
+    mapPositionY: 50
   };
 
   beforeEach(async () => {

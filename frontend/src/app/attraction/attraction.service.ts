@@ -4,16 +4,31 @@ import { Observable, switchMap } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { getBackendBaseUrl } from '../config/backend';
 
+export type AttractionCategory =
+  | 'ROLLER_COASTER'
+  | 'FERRIS_WHEEL'
+  | 'CAROUSEL'
+  | 'WATER_RIDE'
+  | 'HAUNTED_HOUSE'
+  | 'DROP_TOWER'
+  | 'BUMPER_CARS'
+  | 'TRAIN_RIDE'
+  | 'SWING_RIDE'
+  | 'OTHER';
+
 export interface Attraction {
   id?: number;
   name: string;
   intensity: 'LOW' | 'MEDIUM' | 'HIGH';
+  category: AttractionCategory;
   minimumHeight: number;
   minimumAge: number;
   minimumWeight: number;
   description: string;
   photoUrl: string;
   isActive: boolean;
+  mapPositionX: number;
+  mapPositionY: number;
 }
 
 export type AttractionData = Omit<Attraction, 'id' | 'photoUrl'>;
@@ -41,7 +56,7 @@ export class AttractionApiService {
   }
 
   findById(id: number): Observable<Attraction> {
-    return this.withCsrf((h) => this.http.get<Attraction>(`${this.baseUrl}/${id}`, { withCredentials: true, headers: h }));
+    return this.http.get<Attraction>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 
   delete(id: number): Observable<void> {

@@ -14,6 +14,8 @@ export class App {
   protected title = 'frontend';
 
   constructor(private translate: TranslateService) {
-    this.translate.setDefaultLang('en');
+    this.translate.addLangs(['es', 'en']);
+    this.translate.setDefaultLang('es');
+    this.translate.use('es');
   }
 }
