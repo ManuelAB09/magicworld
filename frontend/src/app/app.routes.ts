@@ -14,6 +14,7 @@ import { AttractionList } from './attraction/attraction-list';
 import { AttractionForm } from './attraction/attraction-form';
 import { AttractionDetailComponent } from './attraction/attraction-detail/attraction-detail';
 import { ChatbotComponent } from './chatbot/chatbot';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard';
 import { CheckoutStep1Component } from './checkout/step1/checkout-step1';
 import { CheckoutStep2Component } from './checkout/step2/checkout-step2';
 import { CheckoutConfirmationComponent } from './checkout/confirmation/checkout-confirmation';
@@ -62,6 +63,7 @@ export const routes: Routes = [
 
 
   { path: 'chatbot', component: ChatbotComponent, canActivate: [AdminGuard] },
+  { path: 'admin/dashboard', component: AdminDashboardComponent, canActivate: [AdminGuard] },
 
   { path: 'checkout', component: CheckoutStep1Component },
   { path: 'checkout/step2', component: CheckoutStep2Component },

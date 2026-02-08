@@ -1,5 +1,8 @@
 package com.magicworld.tfg_angular_springboot.attraction;
 
+import com.magicworld.tfg_angular_springboot.monitoring.event.ParkEventType;
+import com.magicworld.tfg_angular_springboot.monitoring.service.DashboardService;
+import com.magicworld.tfg_angular_springboot.monitoring.service.MonitoringWebSocketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +30,8 @@ public class AttractionController {
 
     private final AttractionService attractionService;
     private final ImageStorageService imageStorageService;
+    private final DashboardService dashboardService;
+    private final MonitoringWebSocketService webSocketService;
 
     @Operation(summary = "Create attraction", description = "Create a new attraction", tags = {"Attractions"})
     @ApiResponses({
@@ -105,6 +110,7 @@ public class AttractionController {
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Attraction> updateAttraction(@PathVariable Long id, @RequestBody @Valid Attraction updatedAttraction) {
         Attraction saved = attractionService.updateAttraction(id, updatedAttraction);
+        notifyAttractionStateChange(saved);
         return ResponseEntity.ok(saved);
     }
 
@@ -137,6 +143,7 @@ public class AttractionController {
                 .mapPositionY(request.getMapPositionY())
                 .build();
         Attraction saved = attractionService.updateAttraction(id, update);
+        notifyAttractionStateChange(saved);
         return ResponseEntity.ok(saved);
     }
 
@@ -149,7 +156,16 @@ public class AttractionController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAttraction(@PathVariable Long id) {
         attractionService.deleteAttraction(id);
+        webSocketService.broadcastDashboard(dashboardService.getSnapshot());
         return ResponseEntity.noContent().build();
+    }
+
+    private void notifyAttractionStateChange(Attraction attraction) {
+        ParkEventType eventType = attraction.getIsActive()
+            ? ParkEventType.ATTRACTION_OPEN
+            : ParkEventType.ATTRACTION_CLOSE;
+        dashboardService.updateAttractionState(attraction.getId(), eventType, null);
+        webSocketService.broadcastDashboard(dashboardService.getSnapshot());
     }
 
 }

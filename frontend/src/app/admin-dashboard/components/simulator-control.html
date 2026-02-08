@@ -1,0 +1,44 @@
+<div class="simulator-control" [class.running]="status?.running">
+  <div class="status-section">
+    <span class="status-indicator" [class.active]="status?.running"></span>
+    <div class="status-info">
+      <span class="status-label">{{ 'dashboard.simulator' | translate }}</span>
+      <span class="status-text">
+        {{ status?.running ? ('dashboard.simulatorActive' | translate) : ('dashboard.simulatorStopped' | translate) }}
+      </span>
+    </div>
+  </div>
+
+  @if (status?.running) {
+    <div class="stats-section">
+      <div class="stat">
+        <span class="stat-value">{{ status!.simulatedVisitors }}</span>
+        <span class="stat-label">{{ 'dashboard.visitors' | translate }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">{{ status!.totalInQueues || 0 }}</span>
+        <span class="stat-label">{{ 'dashboard.inQueues' | translate }}</span>
+      </div>
+    </div>
+  }
+
+  <div class="actions-section">
+    @if (status?.running) {
+      <button class="btn-sim btn-stop" (click)="stop()" [disabled]="loading">
+        @if (loading) {
+          <span class="spinner"></span>
+        } @else {
+          {{ 'dashboard.stopSimulator' | translate }}
+        }
+      </button>
+    } @else {
+      <button class="btn-sim btn-start" (click)="start()" [disabled]="loading">
+        @if (loading) {
+          <span class="spinner"></span>
+        } @else {
+          {{ 'dashboard.startSimulator' | translate }}
+        }
+      </button>
+    }
+  </div>
+</div>

@@ -61,6 +61,12 @@
     </li>
     @if (role === 'ADMIN') {
       <li class="nav-list__item">
+        <a class="nav-btn" routerLink="/admin/dashboard">
+          <i class="fa-solid fa-chart-line"></i>
+          {{ 'NAV.MONITORING' | translate }}
+        </a>
+      </li>
+      <li class="nav-list__item">
         <a class="nav-btn" routerLink="/chatbot">
           <i class="fa-solid fa-robot"></i>
           {{ 'NAV.CHATBOT' | translate }}

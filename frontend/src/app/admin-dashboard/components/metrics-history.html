@@ -1,0 +1,117 @@
+<div class="metrics-history">
+  <div class="controls">
+    <div class="time-buttons">
+      <button [class.active]="selectedRange === '1h'" (click)="setRange('1h')">1h</button>
+      <button [class.active]="selectedRange === '3h'" (click)="setRange('3h')">3h</button>
+      <button [class.active]="selectedRange === '6h'" (click)="setRange('6h')">6h</button>
+      <button [class.active]="selectedRange === '24h'" (click)="setRange('24h')">24h</button>
+    </div>
+    <div class="actions">
+      <label class="auto-refresh">
+        <input type="checkbox" [(ngModel)]="autoRefresh" (change)="toggleAutoRefresh()" />
+        {{ 'dashboard.autoRefresh' | translate }}
+      </label>
+      <button class="btn btn-secondary" (click)="exportCsv()" [disabled]="!metrics?.dataPoints?.length">
+        CSV
+      </button>
+    </div>
+  </div>
+
+  @if (loading && !metrics) {
+    <div class="loading">
+      <div class="spinner"></div>
+      {{ 'dashboard.loadingMetrics' | translate }}
+    </div>
+  } @else if (metrics?.dataPoints?.length) {
+    <div class="chart-section">
+      <div class="chart-header">
+        <span class="chart-title">{{ 'dashboard.parkActivity' | translate }}</span>
+        <span class="data-info">{{ metrics!.dataPoints.length }} {{ 'dashboard.records' | translate }}</span>
+      </div>
+
+      <div class="chart-container">
+        <div class="chart-y-axis">
+          <span>{{ maxVisitors }}</span>
+          <span>{{ Math.round(maxVisitors / 2) }}</span>
+          <span>0</span>
+        </div>
+        <div class="chart-area">
+          <svg viewBox="0 0 100 50" preserveAspectRatio="none" class="chart-svg">
+            <defs>
+              <linearGradient id="visitorsGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#6366f1" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#6366f1" stop-opacity="0.05"/>
+              </linearGradient>
+              <linearGradient id="queueGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.05"/>
+              </linearGradient>
+            </defs>
+
+            <path [attr.d]="visitorsAreaPath" fill="url(#visitorsGradient)" />
+            <path [attr.d]="visitorsLinePath" fill="none" stroke="#6366f1" stroke-width="0.5" />
+
+            <path [attr.d]="queueAreaPath" fill="url(#queueGradient)" />
+            <path [attr.d]="queueLinePath" fill="none" stroke="#f59e0b" stroke-width="0.5" />
+          </svg>
+
+          <div class="chart-x-axis">
+            @for (label of timeLabels; track label) {
+              <span>{{ label }}</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-legend">
+        <span class="legend-item"><span class="dot visitors"></span> {{ 'dashboard.visitors' | translate }}</span>
+        <span class="legend-item"><span class="dot queue"></span> {{ 'dashboard.inQueues' | translate }}</span>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <span class="stat-label">{{ 'dashboard.maxVisitors' | translate }}</span>
+        <span class="stat-value">{{ maxVisitors }}</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">{{ 'dashboard.avgQueues' | translate }}</span>
+        <span class="stat-value">{{ avgQueue }}</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">{{ 'dashboard.avgWaitTimeLabel' | translate }}</span>
+        <span class="stat-value">{{ avgWaitTime }} {{ 'dashboard.min' | translate }}</span>
+      </div>
+    </div>
+
+    <details class="data-details">
+      <summary>{{ 'dashboard.viewDetails' | translate }}</summary>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{{ 'dashboard.hour' | translate }}</th>
+            <th>{{ 'dashboard.visitors' | translate }}</th>
+            <th>{{ 'dashboard.inQueues' | translate }}</th>
+            <th>{{ 'dashboard.wait' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (point of recentPoints; track point.timestamp) {
+            <tr>
+              <td>{{ formatTime(point.timestamp) }}</td>
+              <td>{{ point.visitors }}</td>
+              <td>{{ point.queueSize }}</td>
+              <td>{{ point.waitTimeMinutes }} {{ 'dashboard.min' | translate }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </details>
+  } @else {
+    <div class="no-data">
+      <span class="no-data-icon"></span>
+      <p>{{ 'dashboard.noData' | translate }}</p>
+      <p class="hint">{{ 'dashboard.noDataHint' | translate }}</p>
+    </div>
+  }
+</div>

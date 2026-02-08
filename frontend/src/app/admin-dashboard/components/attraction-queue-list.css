@@ -1,0 +1,80 @@
+.queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.queue-item {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.queue-item.closed {
+  opacity: 0.6;
+}
+
+.attraction-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.attraction-name {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.attraction-status {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.attraction-status.open {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.queue-metrics {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-value {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.metric-label {
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+.metric.predicted .metric-value {
+  color: #8b5cf6;
+}
+
+.queue-bar-container {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.queue-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444);
+  border-radius: 3px;
+  transition: width 0.3s;
+}

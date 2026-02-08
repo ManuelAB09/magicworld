@@ -132,3 +132,88 @@ WHERE u.username = 'user1'
       CURDATE() - INTERVAL 3 DAY,
       CURDATE() - INTERVAL 2 DAY
   );
+
+
+INSERT INTO park_event (event_type, timestamp, visitor_count, queue_size, metadata)
+VALUES
+    ('PARK_ENTRY', NOW() - INTERVAL 3 HOUR, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 2 HOUR - INTERVAL 45 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 2 HOUR - INTERVAL 30 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 2 HOUR - INTERVAL 15 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 2 HOUR, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 1 HOUR - INTERVAL 45 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 1 HOUR - INTERVAL 30 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 1 HOUR - INTERVAL 15 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 1 HOUR, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 45 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 30 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 15 MINUTE, 1, NULL, NULL);
+
+-- Some exits
+INSERT INTO park_event (event_type, timestamp, visitor_count, queue_size, metadata)
+VALUES
+    ('PARK_EXIT', NOW() - INTERVAL 30 MINUTE, 1, NULL, NULL),
+    ('PARK_EXIT', NOW() - INTERVAL 20 MINUTE, 1, NULL, NULL);
+
+-- Queue events for Dragon Fury (attraction id 1)
+INSERT INTO park_event (event_type, timestamp, attraction_id, queue_size, metadata)
+VALUES
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 2 HOUR, (SELECT id FROM attraction WHERE name = 'Dragon Fury'), 15, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 1 HOUR - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Dragon Fury'), 25, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 1 HOUR, (SELECT id FROM attraction WHERE name = 'Dragon Fury'), 35, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Dragon Fury'), 42, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 15 MINUTE, (SELECT id FROM attraction WHERE name = 'Dragon Fury'), 48, NULL);
+
+-- Queue events for Thunder Tower
+INSERT INTO park_event (event_type, timestamp, attraction_id, queue_size, metadata)
+VALUES
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 2 HOUR, (SELECT id FROM attraction WHERE name = 'Thunder Tower'), 10, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 1 HOUR, (SELECT id FROM attraction WHERE name = 'Thunder Tower'), 18, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Thunder Tower'), 22, NULL);
+
+-- Queue events for Splash Mountain
+INSERT INTO park_event (event_type, timestamp, attraction_id, queue_size, metadata)
+VALUES
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 1 HOUR - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Splash Mountain'), 30, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 45 MINUTE, (SELECT id FROM attraction WHERE name = 'Splash Mountain'), 55, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 20 MINUTE, (SELECT id FROM attraction WHERE name = 'Splash Mountain'), 65, NULL);
+
+-- Queue events for Giant Wheel
+INSERT INTO park_event (event_type, timestamp, attraction_id, queue_size, metadata)
+VALUES
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 1 HOUR, (SELECT id FROM attraction WHERE name = 'Giant Wheel'), 8, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Giant Wheel'), 12, NULL);
+
+-- Metrics snapshots
+INSERT INTO park_metrics (timestamp, attraction_id, current_visitors, queue_size, avg_wait_time_minutes, rides_completed, total_entries_today, total_sales_today)
+VALUES
+    (NOW() - INTERVAL 2 HOUR, (SELECT id FROM attraction WHERE name = 'Dragon Fury'), NULL, 15, 38, 45, NULL, NULL),
+    (NOW() - INTERVAL 1 HOUR - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Dragon Fury'), NULL, 25, 63, 52, NULL, NULL),
+    (NOW() - INTERVAL 1 HOUR, (SELECT id FROM attraction WHERE name = 'Dragon Fury'), NULL, 35, 88, 58, NULL, NULL),
+    (NOW() - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Dragon Fury'), NULL, 42, 105, 62, NULL, NULL),
+    (NOW() - INTERVAL 2 HOUR, (SELECT id FROM attraction WHERE name = 'Splash Mountain'), NULL, 20, 35, 60, NULL, NULL),
+    (NOW() - INTERVAL 1 HOUR, (SELECT id FROM attraction WHERE name = 'Splash Mountain'), NULL, 45, 75, 72, NULL, NULL),
+    (NOW() - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Splash Mountain'), NULL, 65, 110, 78, NULL, NULL);
+
+-- Global park metrics
+INSERT INTO park_metrics (timestamp, attraction_id, current_visitors, queue_size, avg_wait_time_minutes, rides_completed, total_entries_today, total_sales_today)
+VALUES
+    (NOW() - INTERVAL 2 HOUR, NULL, 85, NULL, 25, NULL, 95, 2850),
+    (NOW() - INTERVAL 1 HOUR, NULL, 142, NULL, 42, NULL, 165, 4950),
+    (NOW() - INTERVAL 30 MINUTE, NULL, 198, NULL, 55, NULL, 215, 6450);
+
+-- Active alerts
+INSERT INTO park_alert (alert_type, severity, message, suggestion, attraction_id, timestamp, is_active, resolved_at)
+VALUES
+    ('HIGH_QUEUE', 'WARNING', 'Cola alta: más de 50 personas esperando', 'Considerar abrir más puertas o redirigir personal',
+     (SELECT id FROM attraction WHERE name = 'Splash Mountain'), NOW() - INTERVAL 25 MINUTE, TRUE, NULL),
+    ('HIGH_QUEUE', 'WARNING', 'Cola alta: más de 50 personas esperando', 'Considerar abrir más puertas o redirigir personal',
+     (SELECT id FROM attraction WHERE name = 'Dragon Fury'), NOW() - INTERVAL 40 MINUTE, TRUE, NULL);
+
+-- Resolved alerts (historical)
+INSERT INTO park_alert (alert_type, severity, message, suggestion, attraction_id, timestamp, is_active, resolved_at)
+VALUES
+    ('ATTRACTION_DOWN', 'CRITICAL', 'Atracción cerrada por mantenimiento', 'Equipo técnico notificado',
+     (SELECT id FROM attraction WHERE name = 'Velocity Coaster'), NOW() - INTERVAL 4 HOUR, FALSE, NOW() - INTERVAL 2 HOUR),
+    ('HIGH_QUEUE', 'WARNING', 'Cola alta detectada', 'Se redirigió personal adicional',
+     (SELECT id FROM attraction WHERE name = 'Thunder Tower'), NOW() - INTERVAL 3 HOUR, FALSE, NOW() - INTERVAL 2 HOUR - INTERVAL 30 MINUTE);

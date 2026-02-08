@@ -1,0 +1,31 @@
+<div class="queue-list">
+  @for (attraction of sortedAttractions; track attraction.attractionId) {
+    <div class="queue-item" [class.closed]="!attraction.isOpen">
+      <div class="attraction-info">
+        <span class="attraction-name">{{ attraction.name }}</span>
+        <span class="attraction-status" [class.open]="attraction.isOpen">
+          {{ attraction.isOpen ? ('dashboard.open' | translate) : ('dashboard.closed' | translate) }}
+        </span>
+      </div>
+      <div class="queue-metrics">
+        <div class="metric">
+          <span class="metric-value">{{ attraction.queueSize }}</span>
+          <span class="metric-label">{{ 'dashboard.inQueue' | translate }}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value">{{ attraction.estimatedWaitMinutes }} {{ 'dashboard.min' | translate }}</span>
+          <span class="metric-label">{{ 'dashboard.waitTime' | translate }}</span>
+        </div>
+        @if (attraction.predictedWaitMinutes !== attraction.estimatedWaitMinutes) {
+          <div class="metric predicted">
+            <span class="metric-value">{{ attraction.predictedWaitMinutes }} {{ 'dashboard.min' | translate }}</span>
+            <span class="metric-label">{{ 'dashboard.predicted' | translate }}</span>
+          </div>
+        }
+      </div>
+      <div class="queue-bar-container">
+        <div class="queue-bar" [style.width.%]="getQueuePercentage(attraction)"></div>
+      </div>
+    </div>
+  }
+</div>

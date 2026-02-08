@@ -1,0 +1,51 @@
+<div class="dashboard-container">
+  @if (loading) {
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>{{ 'dashboard.loading' | translate }}</p>
+    </div>
+  } @else if (error) {
+    <div class="error-message">
+      <p>{{ 'dashboard.error' | translate }}</p>
+      <button class="btn btn-primary" (click)="refreshDashboard()">
+        {{ 'dashboard.retry' | translate }}
+      </button>
+    </div>
+  } @else if (snapshot) {
+    <div class="dashboard-header">
+      <h1>{{ 'dashboard.title' | translate }}</h1>
+      <div class="header-actions">
+        <app-simulator-control />
+        <button class="btn btn-outline" (click)="refreshDashboard()">
+          <span class="refresh-icon">↻</span>
+        </button>
+      </div>
+    </div>
+
+    <app-dashboard-stats [snapshot]="snapshot" />
+
+    <div class="dashboard-grid">
+      <div class="grid-item attractions-panel">
+        <h2>{{ 'dashboard.attractions' | translate }}</h2>
+        <app-attraction-queue-list [attractions]="snapshot.attractionStatuses" />
+      </div>
+
+      <div class="grid-item alerts-panel">
+        <h2>{{ 'dashboard.alerts' | translate }}</h2>
+        <app-alert-list
+          [alerts]="snapshot.activeAlerts"
+          (resolveAlert)="onAlertResolved($event)" />
+      </div>
+
+      <div class="grid-item heatmap-panel">
+        <h2>{{ 'dashboard.heatmap' | translate }}</h2>
+        <app-heatmap-overlay [attractions]="snapshot.attractionStatuses" />
+      </div>
+    </div>
+
+    <div class="history-section">
+      <h2>{{ 'dashboard.history' | translate }}</h2>
+      <app-metrics-history />
+    </div>
+  }
+</div>

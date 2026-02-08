@@ -1,0 +1,41 @@
+<div class="stats-grid">
+  <div class="stat-card visitors">
+    <div class="stat-icon"></div>
+    <div class="stat-content">
+      <span class="stat-value">{{ snapshot.currentVisitors }}</span>
+      <span class="stat-label">{{ 'dashboard.currentVisitors' | translate }}</span>
+    </div>
+  </div>
+
+  <div class="stat-card entries">
+    <div class="stat-icon"></div>
+    <div class="stat-content">
+      <span class="stat-value">{{ snapshot.totalEntriesToday }}</span>
+      <span class="stat-label">{{ 'dashboard.entriesToday' | translate }}</span>
+    </div>
+  </div>
+
+  <div class="stat-card attractions">
+    <div class="stat-icon"></div>
+    <div class="stat-content">
+      <span class="stat-value">{{ snapshot.activeAttractions }}/{{ snapshot.totalAttractions }}</span>
+      <span class="stat-label">{{ 'dashboard.activeAttractions' | translate }}</span>
+    </div>
+  </div>
+
+  <div class="stat-card wait-time">
+    <div class="stat-icon"></div>
+    <div class="stat-content">
+      <span class="stat-value">{{ snapshot.avgParkWaitTime | number:'1.0-0' }} min</span>
+      <span class="stat-label">{{ 'dashboard.avgWaitTime' | translate }}</span>
+    </div>
+  </div>
+
+  <div class="stat-card alerts" [class.has-alerts]="snapshot.activeAlerts.length > 0">
+    <div class="stat-icon"></div>
+    <div class="stat-content">
+      <span class="stat-value">{{ snapshot.activeAlerts.length }}</span>
+      <span class="stat-label">{{ 'dashboard.activeAlerts' | translate }}</span>
+    </div>
+  </div>
+</div>
