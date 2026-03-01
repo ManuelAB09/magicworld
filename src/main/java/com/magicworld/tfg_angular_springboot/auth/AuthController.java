@@ -1,5 +1,6 @@
 package com.magicworld.tfg_angular_springboot.auth;
 
+import com.magicworld.tfg_angular_springboot.configuration.CookieUtils;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtAuthenticationFilter;
 import com.magicworld.tfg_angular_springboot.reset_token.PasswordResetService;
 import com.magicworld.tfg_angular_springboot.reset_token.ResetPasswordRequest;
@@ -9,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -41,13 +41,9 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
     })
     @PostMapping(value = "/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
         AuthResponse authResponse = authService.login(request);
-        Cookie cookie = new Cookie("token", authResponse.getToken());
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(2 * 60 * 60);
-        response.addCookie(cookie);
+        addTokenCookie(response, httpRequest, authResponse.getToken(), 2 * 60 * 60);
         return ResponseEntity.ok(new AuthResponse(null));
     }
     @Operation(summary = "User registration", description = "Register a new user", tags = {"Authentication"})
@@ -59,13 +55,9 @@ public class AuthController {
     })
 
     @PostMapping(value = "/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request, HttpServletResponse response) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
         AuthResponse authResponse = authService.register(request);
-        Cookie cookie = new Cookie("token", authResponse.getToken());
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(2 * 60 * 60);
-        response.addCookie(cookie);
+        addTokenCookie(response, httpRequest, authResponse.getToken(), 2 * 60 * 60);
         return ResponseEntity.status(201).body(new AuthResponse(null));
     }
     @Operation(summary = "User logout", description = "Logout user and clear JWT token", tags = {"Authentication"})
@@ -74,12 +66,8 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
     })
     @PostMapping(value = "/logout")
-    public ResponseEntity<Void> logout(HttpServletResponse response) {
-        Cookie cookie = new Cookie("token", null);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // Expire the cookie
-        response.addCookie(cookie);
+    public ResponseEntity<Void> logout(HttpServletRequest httpRequest, HttpServletResponse response) {
+        addTokenCookie(response, httpRequest, "", 0);
         return ResponseEntity.ok().build();
     }
     @Operation(summary = "Get current user", description = "Returns information about the currently authenticated user", tags = {"Authentication"})
@@ -95,6 +83,10 @@ public class AuthController {
         return ResponseEntity.ok(userInfo);
     }
 
+    private void addTokenCookie(HttpServletResponse response, HttpServletRequest request, String tokenValue, int maxAge) {
+        CookieUtils.addCookie(response, request, "token", tokenValue, true, maxAge);
+    }
+
     @Operation(
             summary = "Get CSRF token",
             description = "Generates and returns a CSRF token in a cookie to protect against CSRF attacks.",
@@ -108,12 +100,7 @@ public class AuthController {
     public ResponseEntity<Void> csrf(HttpServletRequest request, HttpServletResponse response) {
         CsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
         CsrfToken token = repo.generateToken(request);
-        boolean secure = false;
-        String forwardedProto = request.getHeader("X-Forwarded-Proto");
-        if (request.isSecure() || "https".equalsIgnoreCase(request.getScheme()) ||
-                (forwardedProto != null && forwardedProto.toLowerCase().contains("https"))) {
-            secure = true;
-        }
+        boolean secure = CookieUtils.isSecureRequest(request);
 
         String sameSite = secure ? "None" : "Lax";
 
@@ -154,23 +141,14 @@ public class AuthController {
     public ResponseEntity<AuthResponse> completeOAuth2Registration(
             @Valid @RequestBody OAuth2CompleteRegistrationRequest request,
             @CookieValue(name = "oauth2_pending", required = false) String pendingToken,
+            HttpServletRequest httpRequest,
             HttpServletResponse response) {
         if (pendingToken == null || pendingToken.isBlank()) {
             return ResponseEntity.status(401).build();
         }
         AuthResponse authResponse = authService.completeOAuth2Registration(pendingToken, request);
-        Cookie authCookie = new Cookie("token", authResponse.getToken());
-        authCookie.setHttpOnly(true);
-        authCookie.setPath("/");
-        authCookie.setMaxAge(2 * 60 * 60);
-        response.addCookie(authCookie);
-
-        // Clear the pending token cookie
-        Cookie clearPending = new Cookie("oauth2_pending", null);
-        clearPending.setHttpOnly(true);
-        clearPending.setPath("/");
-        clearPending.setMaxAge(0);
-        response.addCookie(clearPending);
+        CookieUtils.addCookie(response, httpRequest, "token", authResponse.getToken(), true, 2 * 60 * 60);
+        CookieUtils.addCookie(response, httpRequest, "oauth2_pending", "", true, 0);
 
         return ResponseEntity.status(201).body(new AuthResponse(null));
     }

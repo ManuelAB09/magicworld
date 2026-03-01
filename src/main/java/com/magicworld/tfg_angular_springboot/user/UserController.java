@@ -1,11 +1,12 @@
 package com.magicworld.tfg_angular_springboot.user;
 
+import com.magicworld.tfg_angular_springboot.configuration.CookieUtils;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidTokenException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,15 +47,12 @@ public class UserController {
     })
     @DeleteMapping("/profile")
     public ResponseEntity<Void> deleteProfile(
+            HttpServletRequest httpRequest,
             HttpServletResponse response) {
         User user = getUserFromContext();
         userService.deleteUserWithRelatedData(user);
 
-        Cookie cookie = new Cookie("token", null);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        CookieUtils.addCookie(response, httpRequest, "token", "", true, 0);
 
         return ResponseEntity.noContent().build();
     }

@@ -5,7 +5,6 @@ import com.magicworld.tfg_angular_springboot.user.Role;
 import com.magicworld.tfg_angular_springboot.user.User;
 import com.magicworld.tfg_angular_springboot.user.UserRepository;
 import io.qameta.allure.*;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,9 +84,9 @@ public class OAuth2AuthenticationSuccessHandlerTests {
 
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
-        ArgumentCaptor<Cookie> cookieCaptor = ArgumentCaptor.forClass(Cookie.class);
-        verify(response).addCookie(cookieCaptor.capture());
-        assertEquals("token", cookieCaptor.getValue().getName());
+        ArgumentCaptor<String> headerCaptor = ArgumentCaptor.forClass(String.class);
+        verify(response).addHeader(eq("Set-Cookie"), headerCaptor.capture());
+        assertTrue(headerCaptor.getValue().startsWith("token=test-jwt-token;"));
     }
 
     @Test
@@ -158,9 +157,9 @@ public class OAuth2AuthenticationSuccessHandlerTests {
 
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
-        ArgumentCaptor<Cookie> cookieCaptor = ArgumentCaptor.forClass(Cookie.class);
-        verify(response).addCookie(cookieCaptor.capture());
-        assertTrue(cookieCaptor.getValue().isHttpOnly());
+        ArgumentCaptor<String> headerCaptor = ArgumentCaptor.forClass(String.class);
+        verify(response).addHeader(eq("Set-Cookie"), headerCaptor.capture());
+        assertTrue(headerCaptor.getValue().contains("HttpOnly"));
     }
 
     @Test
@@ -177,9 +176,9 @@ public class OAuth2AuthenticationSuccessHandlerTests {
 
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
-        ArgumentCaptor<Cookie> cookieCaptor = ArgumentCaptor.forClass(Cookie.class);
-        verify(response).addCookie(cookieCaptor.capture());
-        assertEquals(7200, cookieCaptor.getValue().getMaxAge());
+        ArgumentCaptor<String> headerCaptor = ArgumentCaptor.forClass(String.class);
+        verify(response).addHeader(eq("Set-Cookie"), headerCaptor.capture());
+        assertTrue(headerCaptor.getValue().contains("Max-Age=7200"));
     }
 
     @Test
@@ -197,13 +196,12 @@ public class OAuth2AuthenticationSuccessHandlerTests {
 
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
-        ArgumentCaptor<Cookie> cookieCaptor = ArgumentCaptor.forClass(Cookie.class);
-        verify(response).addCookie(cookieCaptor.capture());
-        Cookie pendingCookie = cookieCaptor.getValue();
-        assertEquals("oauth2_pending", pendingCookie.getName());
-        assertEquals("pending-token", pendingCookie.getValue());
-        assertTrue(pendingCookie.isHttpOnly());
-        assertEquals(600, pendingCookie.getMaxAge());
+        ArgumentCaptor<String> headerCaptor = ArgumentCaptor.forClass(String.class);
+        verify(response).addHeader(eq("Set-Cookie"), headerCaptor.capture());
+        String cookieHeader = headerCaptor.getValue();
+        assertTrue(cookieHeader.startsWith("oauth2_pending=pending-token;"));
+        assertTrue(cookieHeader.contains("HttpOnly"));
+        assertTrue(cookieHeader.contains("Max-Age=600"));
     }
 
     private User createTestUser() {

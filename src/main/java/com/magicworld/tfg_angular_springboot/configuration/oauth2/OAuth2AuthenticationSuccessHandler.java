@@ -1,9 +1,9 @@
 package com.magicworld.tfg_angular_springboot.configuration.oauth2;
 
+import com.magicworld.tfg_angular_springboot.configuration.CookieUtils;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtService;
 import com.magicworld.tfg_angular_springboot.user.User;
 import com.magicworld.tfg_angular_springboot.user.UserRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -38,31 +38,15 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         if (existingUser.isPresent()) {
             String token = jwtService.getToken(existingUser.get());
-            addTokenCookie(response, token);
+            CookieUtils.addCookie(response, request, "token", token, true, TOKEN_MAX_AGE);
             getRedirectStrategy().sendRedirect(request, response, frontendUrl);
         } else {
             String firstname = oAuth2User.getAttribute("given_name");
             String lastname = oAuth2User.getAttribute("family_name");
             String pendingToken = jwtService.generateOAuth2PendingToken(email, firstname, lastname);
-            addPendingTokenCookie(response, pendingToken);
+            CookieUtils.addCookie(response, request, "oauth2_pending", pendingToken, true, PENDING_TOKEN_MAX_AGE);
             getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/oauth2-set-password");
         }
-    }
-
-    private void addTokenCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie("token", token);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(TOKEN_MAX_AGE);
-        response.addCookie(cookie);
-    }
-
-    private void addPendingTokenCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie("oauth2_pending", token);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(PENDING_TOKEN_MAX_AGE);
-        response.addCookie(cookie);
     }
 }
 
