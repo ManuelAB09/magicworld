@@ -31,6 +31,14 @@
     </div>
   </div>
 
+  <div class="stat-card tickets" [class.near-capacity]="snapshot.ticketsSoldToday > snapshot.parkMaxCapacity * 0.8">
+    <div class="stat-icon"></div>
+    <div class="stat-content">
+      <span class="stat-value">{{ snapshot.ticketsSoldToday }}/{{ snapshot.parkMaxCapacity }}</span>
+      <span class="stat-label">{{ 'dashboard.ticketsSold' | translate }}</span>
+    </div>
+  </div>
+
   <div class="stat-card alerts" [class.has-alerts]="snapshot.activeAlerts.length > 0">
     <div class="stat-icon"></div>
     <div class="stat-content">

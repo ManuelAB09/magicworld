@@ -1,0 +1,113 @@
+<div class="employee-management">
+  <header class="page-header">
+    <h1>{{ 'employees.title' | translate }}</h1>
+    <button class="btn-primary" (click)="openNewForm()">
+      + {{ 'employees.addNew' | translate }}
+    </button>
+  </header>
+
+  @if (errorKey && errorKey !== 'error.validation') {
+  <div class="error-banner">
+    <span class="error-banner-icon">⚠️</span>
+    <span>{{ errorKey | translate: errorArgs }}</span>
+    <button class="error-dismiss" (click)="clearError()">✕</button>
+  </div>
+  }
+
+  <div class="filters">
+    <select [(ngModel)]="roleFilter" (change)="applyFilters()">
+      <option value="">{{ 'employees.allRoles' | translate }}</option>
+      @for (role of roles; track role) {
+      <option [value]="role">{{ getRoleLabel(role) }}</option>
+      }
+    </select>
+    <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+      <option value="">{{ 'employees.allStatuses' | translate }}</option>
+      @for (status of statuses; track status) {
+      <option [value]="status">{{ getStatusLabel(status) }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loading) {
+  <div class="loading">{{ 'employees.loading' | translate }}...</div>
+  } @else {
+  <div class="employee-grid">
+    @for (emp of filteredEmployees; track emp.id) {
+    <div class="employee-card" [class.terminated]="emp.status === 'TERMINATED'">
+      <div class="card-header">
+        <span class="role-badge" [class]="getRoleBadgeClass(emp.role)">{{ getRoleLabel(emp.role) }}</span>
+        <span class="status-badge" [class]="getStatusBadgeClass(emp.status)">{{ getStatusLabel(emp.status) }}</span>
+      </div>
+      <div class="card-body">
+        <h3>{{ emp.fullName }}</h3>
+        <p class="email">{{ emp.email }}</p>
+        @if (emp.phone) {
+        <p class="phone">📞 {{ emp.phone }}</p>
+        }
+        <p class="hire-date">{{ 'employees.hiredOn' | translate }}: {{ emp.hireDate }}</p>
+      </div>
+      <div class="card-actions">
+        <button class="btn-edit" (click)="openEditForm(emp)">{{ 'employees.edit' | translate }}</button>
+        <button class="btn-terminate" (click)="terminateEmployee(emp.id)">{{ 'employees.delete' | translate }}</button>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  @if (showForm) {
+  <div class="modal-overlay" (click)="closeForm()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>{{ editingEmployee ? ('employees.editEmployee' | translate) : ('employees.newEmployee' | translate) }}</h2>
+
+      @if (validationMessages.length > 0) {
+      <div class="validation-errors">
+        <ul>
+          @for (msg of validationMessages; track msg) {
+          <li>{{ msg }}</li>
+          }
+        </ul>
+      </div>
+      }
+
+      @if (errorKey && errorKey !== 'error.validation') {
+      <div class="form-error">
+        <span>⚠️ {{ errorKey | translate: errorArgs }}</span>
+      </div>
+      }
+
+      <form (submit)="saveEmployee(); $event.preventDefault()">
+        <div class="form-group">
+          <label>{{ 'employees.firstName' | translate }}</label>
+          <input type="text" [(ngModel)]="formData.firstName" name="firstName" required>
+        </div>
+        <div class="form-group">
+          <label>{{ 'employees.lastName' | translate }}</label>
+          <input type="text" [(ngModel)]="formData.lastName" name="lastName" required>
+        </div>
+        <div class="form-group">
+          <label>{{ 'employees.email' | translate }}</label>
+          <input type="email" [(ngModel)]="formData.email" name="email" required [disabled]="!!editingEmployee">
+        </div>
+        <div class="form-group">
+          <label>{{ 'employees.phone' | translate }}</label>
+          <input type="tel" [(ngModel)]="formData.phone" name="phone">
+        </div>
+        <div class="form-group">
+          <label>{{ 'employees.role' | translate }}</label>
+          <select [(ngModel)]="formData.role" name="role" required>
+            @for (role of roles; track role) {
+            <option [value]="role">{{ getRoleLabel(role) }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="closeForm()">{{ 'employees.cancel' | translate }}</button>
+          <button type="submit" class="btn-save">{{ 'employees.save' | translate }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+</div>

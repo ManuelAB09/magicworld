@@ -8,7 +8,6 @@ import { AttractionQueueListComponent } from './components/attraction-queue-list
 import { AlertListComponent } from './components/alert-list';
 import { SimulatorControlComponent } from './components/simulator-control';
 import { HeatmapOverlayComponent } from './components/heatmap-overlay';
-import { MetricsHistoryComponent } from './components/metrics-history';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -20,8 +19,7 @@ import { MetricsHistoryComponent } from './components/metrics-history';
     AttractionQueueListComponent,
     AlertListComponent,
     SimulatorControlComponent,
-    HeatmapOverlayComponent,
-    MetricsHistoryComponent
+    HeatmapOverlayComponent
   ],
   templateUrl: './admin-dashboard.html',
   styleUrls: ['./admin-dashboard.css']

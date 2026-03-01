@@ -1,16 +1,10 @@
 package com.magicworld.tfg_angular_springboot.monitoring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magicworld.tfg_angular_springboot.attraction.Attraction;
 import com.magicworld.tfg_angular_springboot.attraction.AttractionCategory;
 import com.magicworld.tfg_angular_springboot.attraction.AttractionRepository;
 import com.magicworld.tfg_angular_springboot.attraction.Intensity;
-import com.magicworld.tfg_angular_springboot.monitoring.dto.EventRequest;
 import com.magicworld.tfg_angular_springboot.monitoring.event.ParkEventRepository;
-import com.magicworld.tfg_angular_springboot.monitoring.event.ParkEventType;
-import com.magicworld.tfg_angular_springboot.user.Role;
-import com.magicworld.tfg_angular_springboot.user.User;
-import com.magicworld.tfg_angular_springboot.user.UserRepository;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,25 +32,17 @@ public class MonitoringControllerTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     private AttractionRepository attractionRepository;
 
     @Autowired
     private ParkEventRepository eventRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    private Attraction testAttraction;
 
     @BeforeEach
     void setUp() {
         eventRepository.deleteAll();
         attractionRepository.deleteAll();
 
-        testAttraction = attractionRepository.save(Attraction.builder()
+        attractionRepository.save(Attraction.builder()
                 .name("Test Ride")
                 .intensity(Intensity.MEDIUM)
                 .category(AttractionCategory.ROLLER_COASTER)
@@ -105,7 +89,7 @@ public class MonitoringControllerTests {
     @WithMockUser(roles = "ADMIN")
     void testGetRecentEvents() throws Exception {
         mockMvc.perform(get("/api/v1/monitoring/events")
-                        .param("minutes", "30"))
+                .param("minutes", "30"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }

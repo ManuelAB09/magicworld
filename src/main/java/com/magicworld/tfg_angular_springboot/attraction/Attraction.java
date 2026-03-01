@@ -1,11 +1,8 @@
 package com.magicworld.tfg_angular_springboot.attraction;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.magicworld.tfg_angular_springboot.util.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -71,5 +68,16 @@ public class Attraction extends BaseEntity {
     @NotNull
     @Column(name = "map_position_y", nullable = false)
     private Double mapPositionY;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "zone_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private ParkZone zone;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "maintenance_status", nullable = false)
+    @Builder.Default
+    private MaintenanceStatus maintenanceStatus = MaintenanceStatus.OPERATIONAL;
 
 }

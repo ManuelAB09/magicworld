@@ -19,6 +19,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
+
+    @Value("${park.max-capacity:500}")
+    private int parkMaxCapacity;
 
     private final TicketTypeService ticketTypeService;
     private final PurchaseLineService purchaseLineService;
@@ -65,7 +69,7 @@ public class PaymentService {
 
     @Transactional(readOnly = true)
     public PriceCalculationResponse calculatePrice(List<PaymentRequest.PaymentLineItem> items,
-                                                    List<String> discountCodes) {
+            List<String> discountCodes) {
         BigDecimal subtotal = BigDecimal.ZERO;
         Map<String, BigDecimal> itemSubtotals = new HashMap<>();
         Set<String> itemTicketTypes = new HashSet<>();
@@ -88,7 +92,8 @@ public class PaymentService {
         if (discountCodes != null) {
             for (String code : discountCodes) {
                 String trimmedCode = code.trim();
-                if (trimmedCode.isEmpty()) continue;
+                if (trimmedCode.isEmpty())
+                    continue;
 
                 Discount discount = discountService.findByCode(trimmedCode);
                 if (discount != null && !discount.getExpiryDate().isBefore(LocalDate.now())) {
@@ -132,8 +137,8 @@ public class PaymentService {
     }
 
     private BigDecimal calculateDiscountAmount(List<PaymentRequest.PaymentLineItem> items,
-                                                Map<String, Discount> validDiscountsMap,
-                                                Map<String, BigDecimal> itemSubtotals) {
+            Map<String, Discount> validDiscountsMap,
+            Map<String, BigDecimal> itemSubtotals) {
         BigDecimal totalDiscount = BigDecimal.ZERO;
         Map<String, Integer> bestDiscountPerItem = new HashMap<>();
 
@@ -169,14 +174,16 @@ public class PaymentService {
         // Recalculate price at payment time to handle concurrent changes
         PriceCalculationResponse priceCalc = calculatePrice(request.getItems(), request.getDiscountCodes());
 
-        // Check if any discount codes the user thought were valid are now invalid or not applicable
+        // Check if any discount codes the user thought were valid are now invalid or
+        // not applicable
         if (request.getDiscountCodes() != null && !request.getDiscountCodes().isEmpty()) {
             List<String> problematicCodes = new ArrayList<>();
             problematicCodes.addAll(priceCalc.getInvalidDiscountCodes());
             problematicCodes.addAll(priceCalc.getValidButNotApplicableCodes());
 
             if (!problematicCodes.isEmpty()) {
-                throw new InvalidOperationException("error.payment.discount.changed", String.join(", ", problematicCodes));
+                throw new InvalidOperationException("error.payment.discount.changed",
+                        String.join(", ", problematicCodes));
             }
         }
 
@@ -194,9 +201,9 @@ public class PaymentService {
                 .setAutomaticPaymentMethods(
                         PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
                                 .setEnabled(true)
-                                .setAllowRedirects(PaymentIntentCreateParams.AutomaticPaymentMethods.AllowRedirects.NEVER)
-                                .build()
-                )
+                                .setAllowRedirects(
+                                        PaymentIntentCreateParams.AutomaticPaymentMethods.AllowRedirects.NEVER)
+                                .build())
                 .build();
 
         PaymentIntent paymentIntent = PaymentIntent.create(params);
@@ -231,11 +238,20 @@ public class PaymentService {
             throw new InvalidOperationException("error.payment.date.past");
         }
 
+        // Per-ticket-type availability check
         for (PaymentRequest.PaymentLineItem item : request.getItems()) {
             int available = purchaseLineService.getAvailableQuantity(item.getTicketTypeName(), request.getVisitDate());
             if (item.getQuantity() > available) {
                 throw new InvalidOperationException("error.payment.insufficient.availability");
             }
+        }
+
+        // Global park capacity check
+        int totalRequestedQuantity = request.getItems().stream()
+                .mapToInt(PaymentRequest.PaymentLineItem::getQuantity).sum();
+        int totalSoldForDay = purchaseLineService.getTotalSoldForDate(request.getVisitDate());
+        if (totalSoldForDay + totalRequestedQuantity > parkMaxCapacity) {
+            throw new InvalidOperationException("error.payment.park.capacity.exceeded");
         }
     }
 
@@ -278,7 +294,7 @@ public class PaymentService {
     }
 
     private void sendConfirmationEmail(Purchase purchase, PaymentRequest request,
-                                        PriceCalculationResponse priceCalc, String lang) {
+            PriceCalculationResponse priceCalc, String lang) {
         String qrContent = "MAGICWORLD-TICKET-" + purchase.getId() + "-" + request.getVisitDate();
         byte[] qrCode = qrCodeService.generateQrCodeBytes(qrContent);
 
@@ -298,14 +314,17 @@ public class PaymentService {
             orderLines.add(lineMap);
         }
 
-        BigDecimal discountConverted = priceCalc.getDiscountAmount().multiply(exchangeRate).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal discountConverted = priceCalc.getDiscountAmount().multiply(exchangeRate).setScale(2,
+                RoundingMode.HALF_UP);
         BigDecimal totalConverted = priceCalc.getTotal().multiply(exchangeRate).setScale(2, RoundingMode.HALF_UP);
 
         Map<String, Object> vars = new HashMap<>();
         vars.put("subject", isSpanish ? "Confirmación de compra - MagicWorld" : "Purchase Confirmation - MagicWorld");
         vars.put("headerText", isSpanish ? "Confirmación de Compra" : "Purchase Confirmation");
-        vars.put("greeting", isSpanish ? "¡Hola " + request.getFirstName() + "!" : "Hello " + request.getFirstName() + "!");
-        vars.put("thankYouMessage", isSpanish ? "¡Gracias por tu compra! Aquí tienes los detalles de tu pedido." : "Thank you for your purchase! Here are your order details.");
+        vars.put("greeting",
+                isSpanish ? "¡Hola " + request.getFirstName() + "!" : "Hello " + request.getFirstName() + "!");
+        vars.put("thankYouMessage", isSpanish ? "¡Gracias por tu compra! Aquí tienes los detalles de tu pedido."
+                : "Thank you for your purchase! Here are your order details.");
         vars.put("visitDateLabel", isSpanish ? "Fecha de visita" : "Visit Date");
         vars.put("visitDate", request.getVisitDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         vars.put("orderSummaryTitle", isSpanish ? "Resumen del Pedido" : "Order Summary");
@@ -317,9 +336,11 @@ public class PaymentService {
         vars.put("totalLabel", "Total");
         vars.put("totalAmount", totalConverted);
         vars.put("qrTitle", isSpanish ? "Tu Código QR de Entrada" : "Your Entry QR Code");
-        vars.put("qrInstructions", isSpanish ? "Muestra este código QR en la entrada del parque" : "Show this QR code at the park entrance");
+        vars.put("qrInstructions", isSpanish ? "Muestra este código QR en la entrada del parque"
+                : "Show this QR code at the park entrance");
         vars.put("purchaseId", purchase.getId());
-        vars.put("footerMessage", isSpanish ? "¡Te esperamos en MagicWorld!" : "We look forward to seeing you at MagicWorld!");
+        vars.put("footerMessage",
+                isSpanish ? "¡Te esperamos en MagicWorld!" : "We look forward to seeing you at MagicWorld!");
         vars.put("footerRights", isSpanish ? "Todos los derechos reservados" : "All rights reserved");
         vars.put("contactInfo", isSpanish ? "Contáctanos en info@magicworld.com" : "Contact us at info@magicworld.com");
 
@@ -333,4 +354,3 @@ public class PaymentService {
         messagingTemplate.convertAndSend("/topic/availability/" + date, availability);
     }
 }
-

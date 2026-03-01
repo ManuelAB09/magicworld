@@ -1,0 +1,208 @@
+<div class="schedule-management">
+  <header class="page-header">
+    <div class="header-left">
+      <h1>{{ 'schedule.title' | translate }}</h1>
+      <span class="employee-count">{{ getAssignedCount() }} {{ 'schedule.employeesAssigned' | translate }}</span>
+    </div>
+    <div class="week-nav">
+      <button class="nav-btn" (click)="previousWeek()">‹</button>
+      <div class="week-label">
+        <span class="week-range">{{ currentWeekStart }} - {{ getWeekEndDate() }}</span>
+      </div>
+      <button class="nav-btn" (click)="nextWeek()">›</button>
+    </div>
+  </header>
+
+  @if (errorKey) {
+  <div class="error-banner">
+    <span class="error-banner-icon">⚠️</span>
+    <span>{{ errorKey | translate: errorArgs }}</span>
+    <button class="error-dismiss" (click)="clearError()">✕</button>
+  </div>
+  }
+
+  @if (validation && !validation.valid) {
+  <div class="validation-warning" [class.collapsed]="!showValidationDetails">
+    <div class="validation-header" (click)="showValidationDetails = !showValidationDetails">
+      <div class="validation-header-left">
+        <span class="validation-icon">⚠️</span>
+        <strong>{{ 'schedule.coverageIssues' | translate }}</strong>
+        <span class="issue-count-badge">{{ getTotalIssueCount() }}</span>
+      </div>
+      <span class="toggle-icon">{{ showValidationDetails ? '▼' : '▶' }}</span>
+    </div>
+    @if (showValidationDetails) {
+    <div class="validation-body">
+      @for (dateGroup of groupedIssues; track dateGroup.date) {
+      <div class="date-group">
+        <div class="date-group-header">
+          <span class="date-label">📅 {{ getDateDayLabel(dateGroup.date) }}</span>
+          <span class="date-full">{{ dateGroup.date }}</span>
+        </div>
+        <div class="date-group-content">
+          @for (typeGroup of dateGroup.groups; track typeGroup.issueType) {
+          <div class="type-group">
+            <div class="type-group-header">
+              <span class="type-icon">{{ getIssueIcon(typeGroup.issueType) }}</span>
+              <span class="type-label">{{ getIssueGroupLabel(typeGroup.issueType) }}</span>
+              <span class="type-count">({{ typeGroup.issues.length }})</span>
+            </div>
+            <ul class="issue-list">
+              @for (issue of typeGroup.issues; track issue.date + issue.issueType + (issue.attractionName ||
+              issue.zoneName || '')) {
+              <li class="issue-item">
+                {{ getIssueDescription(issue) }}
+              </li>
+              }
+            </ul>
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </div>
+  }
+
+  <div class="toolbar">
+    <div class="filters">
+      <select [(ngModel)]="selectedRole" (change)="filterByRole()">
+        <option value="">{{ 'schedule.allRoles' | translate }}</option>
+        @for (role of roles; track role) {
+        <option [value]="role">{{ 'schedule.roles.' + role.toLowerCase() | translate }}</option>
+        }
+      </select>
+    </div>
+    <div class="actions">
+      <button class="action-btn secondary" (click)="copyFromPreviousWeek()">
+        {{ 'schedule.copyPrevious' | translate }}
+      </button>
+      <button class="action-btn primary" (click)="autoAssignWeek()">
+        {{ 'schedule.autoAssign' | translate }}
+      </button>
+    </div>
+  </div>
+
+  @if (loading) {
+  <div class="loading">
+    <div class="spinner"></div>
+    <span>{{ 'schedule.loading' | translate }}...</span>
+  </div>
+  } @else {
+  <div class="schedule-table-wrapper">
+    <table class="schedule-table">
+      <thead>
+        <tr>
+          <th class="employee-col">{{ 'schedule.employee' | translate }}</th>
+          @for (day of days; track day; let i = $index) {
+          <th class="day-col">
+            <div class="day-header">
+              <span class="day-name">{{ getDayLabel(day) }}</span>
+              <span class="day-date">{{ getDayDate(i) }}</span>
+            </div>
+          </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of employeeRows; track row.id) {
+        <tr>
+          <td class="employee-cell">
+            <div class="employee-info">
+              <span class="employee-name">{{ row.name }}</span>
+              <span class="role-badge" [class]="getRoleBadgeClass(row.role)">
+                {{ 'schedule.roles.' + row.role.toLowerCase() | translate }}
+              </span>
+            </div>
+          </td>
+          @for (cell of row.days; track $index; let dayIdx = $index) {
+          <td class="day-cell" [class.assigned]="cell.assigned && !cell.isOvertime"
+            [class.overtime]="cell.assigned && cell.isOvertime" [class.not-assigned]="!cell.assigned"
+            [class.clickable]="!cell.assigned" (click)="!cell.assigned && openAssignModal(row, dayIdx)">
+            @if (cell.assigned) {
+            <div class="cell-content">
+              <div class="shift-badge">{{ getShiftLabel(cell.shift!) }}</div>
+              @if (cell.isOvertime) {
+              <div class="overtime-badge">⏰ {{ 'schedule.overtime' | translate }}</div>
+              }
+              @if (cell.attractionName) {
+              <div class="location">🎢 {{ cell.attractionName }}</div>
+              }
+              @if (cell.zoneName) {
+              <div class="location">📍 {{ getTranslatedZoneName(cell.zoneName) }}</div>
+              }
+              <div class="break-info">
+                <span class="break-badge">{{ cell.breakGroup }}</span>
+                <span class="break-time">{{ cell.breakTime }}</span>
+              </div>
+              <button class="remove-btn" (click)="removeAssignment(row, dayIdx); $event.stopPropagation()">✕</button>
+            </div>
+            } @else {
+            <div class="not-working" title="{{ 'schedule.clickToAssign' | translate }}">
+              <span class="off-icon">+</span>
+            </div>
+            }
+          </td>
+          }
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (employeeRows.length === 0) {
+  <div class="empty-state">
+    <p>{{ 'schedule.noEmployees' | translate }}</p>
+  </div>
+  }
+  }
+
+  @if (showAssignModal) {
+  <div class="modal-overlay" (click)="closeAssignModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>{{ 'schedule.assignEmployee' | translate }}</h3>
+      <p class="modal-subtitle">{{ selectedEmployeeForAssign?.name }} - {{ getDayLabel(days[selectedDayIndex]) }}</p>
+
+      @if (selectedEmployeeForAssign?.role === 'OPERATOR') {
+      <div class="form-group">
+        <label>{{ 'schedule.selectAttraction' | translate }}</label>
+        <select [(ngModel)]="selectedAttractionId">
+          <option [ngValue]="null">-- {{ 'schedule.selectOne' | translate }} --</option>
+          @for (attr of attractions; track attr.id) {
+          <option [ngValue]="attr.id">{{ attr.name }}</option>
+          }
+        </select>
+      </div>
+      } @else if (selectedEmployeeForAssign?.role === 'SECURITY') {
+      <div class="form-group">
+        <label>{{ 'schedule.selectZone' | translate }}</label>
+        <select [(ngModel)]="selectedZoneId">
+          <option [ngValue]="null">-- {{ 'schedule.selectOne' | translate }} --</option>
+          @for (zone of zones; track zone.id) {
+          <option [ngValue]="zone.id">{{ getTranslatedZoneName(zone.zoneName) }}</option>
+          }
+        </select>
+      </div>
+      }
+
+      <div class="form-group">
+        <label>{{ 'schedule.breakGroup' | translate }}</label>
+        <select [(ngModel)]="selectedBreakGroup">
+          <option value="A">{{ 'schedule.breakGroups.A' | translate }}</option>
+          <option value="B">{{ 'schedule.breakGroups.B' | translate }}</option>
+          <option value="C">{{ 'schedule.breakGroups.C' | translate }}</option>
+          <option value="D">{{ 'schedule.breakGroups.D' | translate }}</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeAssignModal()">{{ 'schedule.cancel' | translate }}</button>
+        <button class="btn-confirm" (click)="confirmAssignment()" [disabled]="!canConfirmAssignment()">
+          {{ 'schedule.confirm' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

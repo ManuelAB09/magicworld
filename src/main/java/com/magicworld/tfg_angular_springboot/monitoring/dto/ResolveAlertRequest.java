@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ResolveAlertRequest {
     private String resolutionOptionId;
+    private Long employeeId;
     private String notes;
 }

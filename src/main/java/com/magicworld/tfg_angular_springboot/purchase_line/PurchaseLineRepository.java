@@ -15,5 +15,7 @@ public interface PurchaseLineRepository extends JpaRepository<PurchaseLine, Long
 
     @Query("SELECT COALESCE(SUM(pl.quantity), 0) FROM PurchaseLine pl WHERE pl.ticketTypeName = :typeName AND pl.validDate = :date")
     Integer sumQuantityByTicketTypeNameAndValidDate(@Param("typeName") String typeName, @Param("date") LocalDate date);
-}
 
+    @Query("SELECT COALESCE(SUM(pl.quantity), 0) FROM PurchaseLine pl WHERE pl.validDate = :date")
+    Integer sumTotalQuantityByValidDate(@Param("date") LocalDate date);
+}

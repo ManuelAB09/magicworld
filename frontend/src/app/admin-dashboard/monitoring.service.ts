@@ -12,7 +12,6 @@ export interface AttractionStatus {
   isOpen: boolean;
   queueSize: number;
   estimatedWaitMinutes: number;
-  predictedWaitMinutes: number;
   mapPositionX: number;
   mapPositionY: number;
   intensity: string;
@@ -22,10 +21,7 @@ export interface ResolutionOption {
   id: string;
   label: string;
   description: string;
-  impact: 'positive' | 'neutral' | 'negative';
-  effectivenessScore: number;
-  costScore: number;
-  timeToResolveMinutes: number;
+  enabled: boolean;
 }
 
 export interface AlertDTO {
@@ -44,10 +40,11 @@ export interface AlertDTO {
 export interface ResolutionResult {
   success: boolean;
   message: string;
-  impact: 'positive' | 'neutral' | 'negative';
-  satisfactionChange: number;
-  waitTimeChange: number;
-  costIncurred: number;
+  code?: string;
+  args?: any[];
+  actionTaken: string;
+  resourcesUsed: Record<string, any>;
+  failureReason?: string;
 }
 
 export interface DashboardSnapshot {
@@ -57,6 +54,8 @@ export interface DashboardSnapshot {
   activeAttractions: number;
   totalAttractions: number;
   avgParkWaitTime: number;
+  ticketsSoldToday: number;
+  parkMaxCapacity: number;
   attractionStatuses: AttractionStatus[];
   activeAlerts: AlertDTO[];
 }
@@ -79,7 +78,7 @@ export class MonitoringService {
   dashboard$ = this.dashboardSubject.asObservable();
   alerts$ = this.alertSubject.asObservable();
 
-  constructor(private http: HttpClient, private auth: AuthService) {}
+  constructor(private http: HttpClient, private auth: AuthService) { }
 
   private withCsrf<T>(op: (h: HttpHeaders) => Observable<T>): Observable<T> {
     return this.auth.ensureCsrfToken(new HttpHeaders()).pipe(switchMap(op));
@@ -93,11 +92,11 @@ export class MonitoringService {
     return this.http.get<AlertDTO[]>(`${this.baseUrl}/alerts`, { withCredentials: true });
   }
 
-  resolveAlert(id: number, resolutionOptionId: string): Observable<ResolutionResult> {
+  resolveAlert(id: number, resolutionOptionId: string, employeeId?: number): Observable<ResolutionResult> {
     return this.withCsrf(h =>
       this.http.post<ResolutionResult>(
         `${this.baseUrl}/alerts/${id}/resolve`,
-        { resolutionOptionId },
+        { resolutionOptionId, employeeId },
         { withCredentials: true, headers: h }
       )
     );

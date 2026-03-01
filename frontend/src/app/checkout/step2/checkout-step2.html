@@ -16,7 +16,7 @@
         @for (item of cart.items; track item.ticketTypeName) {
           <div class="order-item">
             <div class="item-image">
-              <img [src]="item.photoUrl" [alt]="item.ticketTypeName">
+              <img [src]="getImageUrl(item.photoUrl)" [alt]="item.ticketTypeName">
             </div>
             <div class="item-details">
               <h4>{{ item.ticketTypeName }}</h4>

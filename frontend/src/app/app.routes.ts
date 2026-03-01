@@ -15,6 +15,8 @@ import { AttractionForm } from './attraction/attraction-form';
 import { AttractionDetailComponent } from './attraction/attraction-detail/attraction-detail';
 import { ChatbotComponent } from './chatbot/chatbot';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard';
+import { EmployeeManagementComponent } from './employee-management/employee-management';
+import { ScheduleManagementComponent } from './schedule-management/schedule-management';
 import { CheckoutStep1Component } from './checkout/step1/checkout-step1';
 import { CheckoutStep2Component } from './checkout/step2/checkout-step2';
 import { CheckoutConfirmationComponent } from './checkout/confirmation/checkout-confirmation';
@@ -22,6 +24,7 @@ import { ParkMapComponent } from './park-map/park-map';
 import { ReviewListComponent } from './review/review-list';
 import { ProfileComponent } from './profile/profile';
 import { RequireAuthGuard } from './auth/RequireAuthGuard';
+import { OAuth2SetPassword } from './auth/oauth2-set-password/oauth2-set-password';
 
 export const routes: Routes = [
   { path: 'login',
@@ -39,6 +42,10 @@ export const routes: Routes = [
     path: 'reset-password',
     component: ResetPasswordForm,
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'oauth2-set-password',
+    component: OAuth2SetPassword
   },
   { path:'',
     component: HomeComponent
@@ -64,6 +71,8 @@ export const routes: Routes = [
 
   { path: 'chatbot', component: ChatbotComponent, canActivate: [AdminGuard] },
   { path: 'admin/dashboard', component: AdminDashboardComponent, canActivate: [AdminGuard] },
+  { path: 'admin/employees', component: EmployeeManagementComponent, canActivate: [AdminGuard] },
+  { path: 'admin/schedule', component: ScheduleManagementComponent, canActivate: [AdminGuard] },
 
   { path: 'checkout', component: CheckoutStep1Component },
   { path: 'checkout/step2', component: CheckoutStep2Component },

@@ -51,8 +51,6 @@ public class UserServiceTests {
     @Autowired
     private EntityManager entityManager;
 
-    private User testUser;
-
     @BeforeEach
     void setUp() {
         SecurityContextHolder.clearContext();
@@ -63,7 +61,7 @@ public class UserServiceTests {
         entityManager.flush();
         entityManager.clear();
 
-        testUser = userRepository.save(User.builder()
+        userRepository.save(User.builder()
                 .username("testuser")
                 .firstname("John")
                 .lastname("Doe")
@@ -146,9 +144,7 @@ public class UserServiceTests {
                 .password("weak")
                 .build();
 
-        assertThrows(InvalidOperationException.class, () ->
-            userService.updateProfile(user, request)
-        );
+        assertThrows(InvalidOperationException.class, () -> userService.updateProfile(user, request));
     }
 
     @Test
@@ -173,9 +169,7 @@ public class UserServiceTests {
                 .email("other@example.com")
                 .build();
 
-        assertThrows(EmailAlreadyExistsException.class, () ->
-            userService.updateProfile(user, request)
-        );
+        assertThrows(EmailAlreadyExistsException.class, () -> userService.updateProfile(user, request));
     }
 
     @Test

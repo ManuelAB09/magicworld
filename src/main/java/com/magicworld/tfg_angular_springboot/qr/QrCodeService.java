@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
 
 @Service
 public class QrCodeService {
@@ -31,4 +30,3 @@ public class QrCodeService {
         }
     }
 }
-

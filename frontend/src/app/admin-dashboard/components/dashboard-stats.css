@@ -39,5 +39,8 @@
 .entries { border-left: 4px solid #3b82f6; }
 .attractions { border-left: 4px solid #8b5cf6; }
 .wait-time { border-left: 4px solid #f59e0b; }
+.tickets { border-left: 4px solid #06b6d4; }
+.tickets.near-capacity { border-left-color: #ef4444; background: #fef2f2; }
+.tickets.near-capacity .stat-value { color: #dc2626; }
 .alerts { border-left: 4px solid #6b7280; }
 .alerts.has-alerts { border-left-color: #ef4444; }

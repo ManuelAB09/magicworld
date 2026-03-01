@@ -48,9 +48,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = DiscountController.class, excludeAutoConfiguration = {
-    org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
-    org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class,
-    org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration.class
+        org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration.class
 })
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
@@ -66,7 +66,6 @@ public class DiscountControllerTests {
     private static final String TYPE_NAME_ADULT = "ADULT";
     private static final String TYPE_NAME_CHILD = "CHILD";
     private static final String TYPE_NAME_VIP = "VIP";
-    private static final String CURRENCY_EUR = "EUR";
     private static final String ADULT_TICKET_DESC = "Adult ticket";
     private static final BigDecimal COST_50 = new BigDecimal("50.00");
 
@@ -81,7 +80,6 @@ public class DiscountControllerTests {
 
     @Autowired
     private DiscountTicketTypeService discountTicketTypeService;
-
 
     private Discount sampleDiscount() {
         return Discount.builder()
@@ -113,8 +111,8 @@ public class DiscountControllerTests {
         DiscountRequest request = requestWith(toSave, List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
 
         var result = mockMvc.perform(post(API_DISCOUNTS)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", API_DISCOUNTS_ID + "1"))
                 .andReturn();
@@ -136,8 +134,8 @@ public class DiscountControllerTests {
         DiscountRequest request = requestWith(toSave, List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
 
         var result = mockMvc.perform(post(API_DISCOUNTS)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.discountCode").value(DISCOUNT_CODE_WELCOME10))
                 .andReturn();
@@ -212,8 +210,8 @@ public class DiscountControllerTests {
         DiscountRequest request = requestWith(in, List.of(TYPE_NAME_VIP));
 
         var result = mockMvc.perform(put(API_DISCOUNTS_ID + "3")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(3))
                 .andReturn();
@@ -285,8 +283,8 @@ public class DiscountControllerTests {
         DiscountRequest request = requestWith(invalid, List.of());
 
         var result = mockMvc.perform(post(API_DISCOUNTS)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andReturn();
         assertEquals(400, result.getResponse().getStatus());
@@ -306,8 +304,8 @@ public class DiscountControllerTests {
         DiscountRequest request = requestWith(invalid, List.of(TYPE_NAME_ADULT));
 
         var result = mockMvc.perform(post(API_DISCOUNTS)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andReturn();
         assertEquals(400, result.getResponse().getStatus());

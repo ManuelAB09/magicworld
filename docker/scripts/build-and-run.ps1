@@ -38,3 +38,7 @@ docker compose -f $ComposeFile --env-file $EnvFile up -d --remove-orphans
 Write-Host "Showing service status..."
 docker compose -f $ComposeFile --env-file $EnvFile ps
 
+Write-Host ""
+Write-Host "El seed se ejecuta automaticamente via el contenedor db-seed." -ForegroundColor Cyan
+Write-Host "Usa 'docker compose -f $ComposeFile logs db-seed' para ver su estado." -ForegroundColor Cyan
+

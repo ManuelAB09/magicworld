@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -12,8 +14,9 @@ import lombok.NoArgsConstructor;
 public class ResolutionResult {
     private boolean success;
     private String message;
-    private String impact;
-    private int satisfactionChange;
-    private int waitTimeChange;
-    private int costIncurred;
+    private String code;
+    private Object[] args;
+    private String actionTaken;
+    private Map<String, Object> resourcesUsed;
+    private String failureReason;
 }

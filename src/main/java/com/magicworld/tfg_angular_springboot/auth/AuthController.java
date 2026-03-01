@@ -143,4 +143,36 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Complete OAuth2 registration", description = "Set password for a new user coming from OAuth2 (Google)", tags = {"Authentication"})
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Registration completed successfully", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Invalid data or token", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Invalid or expired pending token", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Email already exists", content = @Content)
+    })
+    @PostMapping("/oauth2/complete-registration")
+    public ResponseEntity<AuthResponse> completeOAuth2Registration(
+            @Valid @RequestBody OAuth2CompleteRegistrationRequest request,
+            @CookieValue(name = "oauth2_pending", required = false) String pendingToken,
+            HttpServletResponse response) {
+        if (pendingToken == null || pendingToken.isBlank()) {
+            return ResponseEntity.status(401).build();
+        }
+        AuthResponse authResponse = authService.completeOAuth2Registration(pendingToken, request);
+        Cookie authCookie = new Cookie("token", authResponse.getToken());
+        authCookie.setHttpOnly(true);
+        authCookie.setPath("/");
+        authCookie.setMaxAge(2 * 60 * 60);
+        response.addCookie(authCookie);
+
+        // Clear the pending token cookie
+        Cookie clearPending = new Cookie("oauth2_pending", null);
+        clearPending.setHttpOnly(true);
+        clearPending.setPath("/");
+        clearPending.setMaxAge(0);
+        response.addCookie(clearPending);
+
+        return ResponseEntity.status(201).body(new AuthResponse(null));
+    }
+
 }

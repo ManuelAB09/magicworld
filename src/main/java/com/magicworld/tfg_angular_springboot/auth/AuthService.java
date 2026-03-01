@@ -6,6 +6,7 @@ import com.magicworld.tfg_angular_springboot.user.Role;
 import com.magicworld.tfg_angular_springboot.user.User;
 import com.magicworld.tfg_angular_springboot.user.UserDTO;
 import com.magicworld.tfg_angular_springboot.user.UserRepository;
+import io.jsonwebtoken.Claims;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -79,5 +80,48 @@ public class AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(username));
         return new UserDTO(user.getUsername(), user.getFirstname(), user.getLastname(), user.getEmail(), user.getUserRole());
+    }
+
+    @Transactional
+    public AuthResponse completeOAuth2Registration(String pendingToken, OAuth2CompleteRegistrationRequest request) {
+        Claims claims;
+        try {
+            claims = jwtService.parseOAuth2PendingToken(pendingToken);
+        } catch (Exception e) {
+            throw new InvalidTokenException();
+        }
+
+        String email = claims.get("email", String.class);
+        String firstname = claims.get("firstname", String.class);
+        String lastname = claims.get("lastname", String.class);
+
+        if (userRepository.existsByEmail(email)) {
+            throw new EmailAlreadyExistsException(email);
+        }
+
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new PasswordsDoNoMatchException();
+        }
+
+        User user = User.builder()
+                .email(email)
+                .username(email)
+                .firstname(firstname)
+                .lastname(lastname)
+                .password(request.getPassword())
+                .userRole(Role.USER)
+                .build();
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+
+        return AuthResponse.builder()
+                .token(jwtService.getToken(user))
+                .build();
     }
 }

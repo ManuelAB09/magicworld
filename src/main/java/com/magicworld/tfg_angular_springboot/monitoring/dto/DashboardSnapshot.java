@@ -14,6 +14,8 @@ public class DashboardSnapshot {
     private int activeAttractions;
     private int totalAttractions;
     private double avgParkWaitTime;
+    private int ticketsSoldToday;
+    private int parkMaxCapacity;
     private List<AttractionStatus> attractionStatuses;
     private List<AlertDTO> activeAlerts;
 }

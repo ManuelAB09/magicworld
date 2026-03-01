@@ -5,6 +5,8 @@ import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtService;
 import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationFailureHandler;
 import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
+import com.magicworld.tfg_angular_springboot.monitoring.service.DashboardService;
+import com.magicworld.tfg_angular_springboot.monitoring.service.MonitoringWebSocketService;
 import com.magicworld.tfg_angular_springboot.storage.ImageStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.qameta.allure.Description;
@@ -89,6 +91,12 @@ public class AttractionControllerTests {
 
     @MockitoBean
     private ImageStorageService imageStorageService;
+
+    @MockitoBean
+    private DashboardService dashboardService;
+
+    @MockitoBean
+    private MonitoringWebSocketService monitoringWebSocketService;
 
     @MockitoBean
     private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;

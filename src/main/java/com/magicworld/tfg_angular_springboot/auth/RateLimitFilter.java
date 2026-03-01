@@ -2,7 +2,6 @@ package com.magicworld.tfg_angular_springboot.auth;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Bucket4j;
 import io.github.bucket4j.Refill;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -25,7 +24,7 @@ public class RateLimitFilter implements Filter {
     private static final Duration DURATION = Duration.ofMinutes(1);
 
     private Bucket resolveBucket(String ip) {
-        return buckets.computeIfAbsent(ip, k -> Bucket4j.builder()
+        return buckets.computeIfAbsent(ip, k -> Bucket.builder()
                 .addLimit(Bandwidth.classic(LIMIT, Refill.intervally(LIMIT, DURATION)))
                 .build());
     }

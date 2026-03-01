@@ -69,4 +69,27 @@ public class JwtService {
     public boolean isTokenExpired(String token) {
         return getExpirationDateFromToken(token).before(new Date());
     }
+
+    public String generateOAuth2PendingToken(String email, String firstname, String lastname) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", email);
+        claims.put("firstname", firstname != null ? firstname : "");
+        claims.put("lastname", lastname != null ? lastname : "");
+        claims.put("type", "oauth2_pending");
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(email)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10)) // 10 minutos
+                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public Claims parseOAuth2PendingToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        if (!"oauth2_pending".equals(claims.get("type", String.class))) {
+            throw new RuntimeException("Invalid token type");
+        }
+        return claims;
+    }
 }

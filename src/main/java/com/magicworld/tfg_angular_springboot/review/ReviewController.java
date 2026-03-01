@@ -1,6 +1,5 @@
 package com.magicworld.tfg_angular_springboot.review;
 
-import com.magicworld.tfg_angular_springboot.exceptions.InvalidTokenException;
 import com.magicworld.tfg_angular_springboot.user.User;
 import com.magicworld.tfg_angular_springboot.user.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,8 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -71,7 +68,6 @@ public class ReviewController {
         return ResponseEntity.created(URI.create("/api/v1/reviews/" + created.getId()))
                 .body(created);
     }
-
 
     private User getUserFromContext() {
         return getUser(userRepository);

@@ -19,7 +19,7 @@
         @for (ticket of tickets; track ticket.id) {
           <div class="ticket-card">
             <div class="ticket-image">
-              <img [src]="ticket.photoUrl" [alt]="ticket.typeName">
+              <img [src]="getImageUrl(ticket.photoUrl)" [alt]="ticket.typeName">
               <span class="availability-badge" [class.low]="ticket.available <= 10" [class.sold-out]="ticket.available === 0">
                 {{ ticket.available }} {{ 'CHECKOUT.STEP1.AVAILABLE' | translate }}
               </span>

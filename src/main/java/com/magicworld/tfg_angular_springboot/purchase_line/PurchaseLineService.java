@@ -33,6 +33,11 @@ public class PurchaseLineService {
         return Math.max(0, ticketType.getMaxPerDay() - sold);
     }
 
+    @Transactional(readOnly = true)
+    public int getTotalSoldForDate(LocalDate date) {
+        return purchaseLineRepository.sumTotalQuantityByValidDate(date);
+    }
+
     @Transactional
     public PurchaseLine save(PurchaseLine purchaseLine) {
         return purchaseLineRepository.save(purchaseLine);
@@ -43,4 +48,3 @@ public class PurchaseLineService {
         return purchaseLineRepository.saveAll(lines);
     }
 }
-

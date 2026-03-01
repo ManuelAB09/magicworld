@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @Feature("Servicio de Descuentos")
 public class DiscountServiceTests {
 
-    private static final String CURRENCY_EUR = "EUR";
     private static final String TYPE_NAME_ADULT = "ADULT";
     private static final String TYPE_NAME_CHILD = "CHILD";
     private static final String TYPE_NAME_VIP = "VIP";
@@ -71,7 +70,7 @@ public class DiscountServiceTests {
         entityManager.flush();
         entityManager.clear();
 
-        TicketType adult = ticketTypeRepository.save(TicketType.builder()
+        ticketTypeRepository.save(TicketType.builder()
                 .cost(COST_50)
                 .typeName(TYPE_NAME_ADULT)
                 .description(ADULT_TICKET_DESC)
@@ -79,7 +78,7 @@ public class DiscountServiceTests {
                 .photoUrl(PHOTO_URL_ADULT)
                 .build());
 
-        TicketType child = ticketTypeRepository.save(TicketType.builder()
+        ticketTypeRepository.save(TicketType.builder()
                 .cost(COST_25)
                 .typeName(TYPE_NAME_CHILD)
                 .description(CHILD_TICKET_DESC)
@@ -87,7 +86,7 @@ public class DiscountServiceTests {
                 .photoUrl(PHOTO_URL_CHILD)
                 .build());
 
-        TicketType vip = ticketTypeRepository.save(TicketType.builder()
+        ticketTypeRepository.save(TicketType.builder()
                 .cost(COST_120)
                 .typeName(TYPE_NAME_VIP)
                 .description(VIP_TICKET_DESC)
@@ -177,7 +176,8 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Buscar descuento existente lo encuentra")
     void testFindByIdExists() {
-        Discount saved = discountService.save(newDiscount("FINDME", 12, LocalDate.now().plusDays(15)), List.of(TYPE_NAME_ADULT));
+        Discount saved = discountService.save(newDiscount("FINDME", 12, LocalDate.now().plusDays(15)),
+                List.of(TYPE_NAME_ADULT));
         Discount found = discountService.findById(saved.getId());
         assertEquals(saved.getId(), found.getId());
         assertEquals("FINDME", found.getDiscountCode());
@@ -198,7 +198,8 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar descuento cambia el código")
     void testUpdateDiscountFieldsUpdatesCode() {
-        Discount saved = discountService.save(newDiscount("UPD10", 10, LocalDate.now().plusDays(30)), List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
+        Discount saved = discountService.save(newDiscount("UPD10", 10, LocalDate.now().plusDays(30)),
+                List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
         Long id = saved.getId();
         Discount updatedData = newDiscount("UPD20", 20, LocalDate.now().plusDays(60));
         updatedData.setId(id);
@@ -212,7 +213,8 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar descuento cambia el porcentaje")
     void testUpdateDiscountFieldsUpdatesPercentage() {
-        Discount saved = discountService.save(newDiscount("UPD11", 10, LocalDate.now().plusDays(30)), List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
+        Discount saved = discountService.save(newDiscount("UPD11", 10, LocalDate.now().plusDays(30)),
+                List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
         Long id = saved.getId();
         Discount updatedData = newDiscount("UPD21", 20, LocalDate.now().plusDays(60));
         updatedData.setId(id);
@@ -226,7 +228,8 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Actualizar descuento reemplaza asociaciones")
     void testUpdateDiscountReplacesAssociations() {
-        Discount saved = discountService.save(newDiscount("UPD12", 10, LocalDate.now().plusDays(30)), List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
+        Discount saved = discountService.save(newDiscount("UPD12", 10, LocalDate.now().plusDays(30)),
+                List.of(TYPE_NAME_ADULT, TYPE_NAME_CHILD));
         Long id = saved.getId();
         Discount updatedData = newDiscount("UPD22", 20, LocalDate.now().plusDays(60));
         updatedData.setId(id);
@@ -242,7 +245,8 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar con tipos vacíos lanza excepción")
     void testUpdateWithEmptyTicketTypesThrows() {
-        Discount saved = discountService.save(newDiscount("UPD_EMPTY", 5, LocalDate.now().plusDays(5)), List.of(TYPE_NAME_ADULT));
+        Discount saved = discountService.save(newDiscount("UPD_EMPTY", 5, LocalDate.now().plusDays(5)),
+                List.of(TYPE_NAME_ADULT));
         Discount updatedData = newDiscount("UPD_EMPTY", 7, LocalDate.now().plusDays(8));
         updatedData.setId(saved.getId());
         assertThrows(AtLeastOneTicketTypeMustBeProvidedException.class,
@@ -255,7 +259,8 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Actualizar con tipo desconocido lanza excepción")
     void testUpdateWithUnknownTicketTypeThrows() {
-        Discount saved = discountService.save(newDiscount("UPD_UNK", 5, LocalDate.now().plusDays(5)), List.of(TYPE_NAME_ADULT));
+        Discount saved = discountService.save(newDiscount("UPD_UNK", 5, LocalDate.now().plusDays(5)),
+                List.of(TYPE_NAME_ADULT));
         Discount updatedData = newDiscount("UPD_UNK", 9, LocalDate.now().plusDays(9));
         updatedData.setId(saved.getId());
         assertThrows(ResourceNotFoundException.class,
@@ -268,7 +273,8 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Eliminar descuento lo remueve")
     void testDeleteByIdRemovesDiscount() {
-        Discount saved = discountService.save(newDiscount("DEL", 18, LocalDate.now().plusDays(20)), List.of(TYPE_NAME_ADULT, TYPE_NAME_VIP));
+        Discount saved = discountService.save(newDiscount("DEL", 18, LocalDate.now().plusDays(20)),
+                List.of(TYPE_NAME_ADULT, TYPE_NAME_VIP));
         Long id = saved.getId();
         discountService.deleteById(id);
         entityManager.flush();
@@ -282,7 +288,8 @@ public class DiscountServiceTests {
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("Eliminar descuento remueve asociaciones")
     void testDeleteByIdRemovesAssociations() {
-        Discount saved = discountService.save(newDiscount("DEL2", 18, LocalDate.now().plusDays(20)), List.of(TYPE_NAME_ADULT, TYPE_NAME_VIP));
+        Discount saved = discountService.save(newDiscount("DEL2", 18, LocalDate.now().plusDays(20)),
+                List.of(TYPE_NAME_ADULT, TYPE_NAME_VIP));
         Long id = saved.getId();
         discountService.deleteById(id);
         entityManager.flush();

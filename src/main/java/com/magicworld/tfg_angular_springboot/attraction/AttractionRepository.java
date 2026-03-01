@@ -9,6 +9,11 @@ import java.util.List;
 
 @Repository
 public interface AttractionRepository extends JpaRepository<Attraction, Long> {
+
+    List<Attraction> findByIsActiveTrue();
+
+    List<Attraction> findByZoneId(Long zoneId);
+
     @Query("""
         SELECT a FROM Attraction a
         WHERE (:minHeight IS NULL OR a.minimumHeight <= :minHeight)

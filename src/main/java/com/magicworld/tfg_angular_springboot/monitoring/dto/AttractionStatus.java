@@ -13,7 +13,6 @@ public class AttractionStatus {
     private boolean open;
     private int queueSize;
     private int estimatedWaitMinutes;
-    private int predictedWaitMinutes;
     private double mapPositionX;
     private double mapPositionY;
     private String intensity;

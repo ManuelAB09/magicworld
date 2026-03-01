@@ -43,7 +43,6 @@ public class DiscountE2ETests {
     private static final String API_DISCOUNTS = "/api/v1/discounts";
     private static final String DISCOUNT_CODE_SAVE20 = "SAVE20";
     private static final String TYPE_NAME_ADULT = "ADULT";
-    private static final String CURRENCY_EUR = "EUR";
     private static final String ADULT_TICKET_DESC = "Adult ticket";
     private static final String PHOTO_URL_ADULT = "https://example.com/adult.jpg";
     private static final BigDecimal COST_50 = new BigDecimal("50.00");
@@ -71,7 +70,7 @@ public class DiscountE2ETests {
         discountRepository.deleteAll();
         ticketTypeRepository.deleteAll();
 
-        TicketType ticketType = ticketTypeRepository.save(TicketType.builder()
+        ticketTypeRepository.save(TicketType.builder()
                 .typeName(TYPE_NAME_ADULT)
                 .cost(COST_50)
                 .description(ADULT_TICKET_DESC)
@@ -103,9 +102,9 @@ public class DiscountE2ETests {
     @DisplayName("Crear descuento retorna 201 Created")
     void testCreateDiscountReturnsCreated() throws Exception {
         var result = mockMvc.perform(post(API_DISCOUNTS)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(discountRequest)))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(discountRequest)))
                 .andExpect(status().isCreated())
                 .andReturn();
         assertEquals(201, result.getResponse().getStatus());
@@ -119,9 +118,9 @@ public class DiscountE2ETests {
     @DisplayName("Crear descuento retorna header Location")
     void testCreateDiscountReturnsLocationHeader() throws Exception {
         var result = mockMvc.perform(post(API_DISCOUNTS)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(discountRequest)))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(discountRequest)))
                 .andExpect(header().exists("Location"))
                 .andReturn();
         assertNotNull(result.getResponse().getHeader("Location"));
@@ -135,9 +134,9 @@ public class DiscountE2ETests {
     @DisplayName("Crear descuento retorna descuento con ID")
     void testCreateDiscountReturnsDiscountWithId() throws Exception {
         var result = mockMvc.perform(post(API_DISCOUNTS)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(discountRequest)))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(discountRequest)))
                 .andExpect(jsonPath("$.id").exists())
                 .andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("id"));
@@ -151,9 +150,9 @@ public class DiscountE2ETests {
     @DisplayName("Crear descuento retorna código correcto")
     void testCreateDiscountReturnsCorrectCode() throws Exception {
         var result = mockMvc.perform(post(API_DISCOUNTS)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(discountRequest)))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(discountRequest)))
                 .andExpect(jsonPath("$.discountCode").value(DISCOUNT_CODE_SAVE20))
                 .andReturn();
         assertTrue(result.getResponse().getContentAsString().contains(DISCOUNT_CODE_SAVE20));
@@ -213,7 +212,6 @@ public class DiscountE2ETests {
         assertTrue(result.getResponse().getContentAsString().contains(DISCOUNT_CODE_SAVE20));
     }
 
-
     @Test
     @WithMockUser(roles = "USER")
     @Story("Buscar Descuento por ID")
@@ -264,7 +262,7 @@ public class DiscountE2ETests {
     void testDeleteDiscountExistsReturns204() throws Exception {
         Discount saved = discountRepository.save(discountRequest.getDiscount());
         var result = mockMvc.perform(delete(API_DISCOUNTS + "/" + saved.getId())
-                        .with(csrf()))
+                .with(csrf()))
                 .andExpect(status().isNoContent())
                 .andReturn();
         assertEquals(204, result.getResponse().getStatus());
@@ -278,7 +276,7 @@ public class DiscountE2ETests {
     @DisplayName("Eliminar descuento inexistente retorna 404")
     void testDeleteDiscountNotExistsReturns404() throws Exception {
         var result = mockMvc.perform(delete(API_DISCOUNTS + "/999999")
-                        .with(csrf()))
+                .with(csrf()))
                 .andExpect(status().isNotFound())
                 .andReturn();
         assertEquals(404, result.getResponse().getStatus());
@@ -303,9 +301,9 @@ public class DiscountE2ETests {
     @DisplayName("Sin autenticación crear descuento retorna 401")
     void testCreateDiscountUnauthorizedReturns401() throws Exception {
         var result = mockMvc.perform(post(API_DISCOUNTS)
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(discountRequest)))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(discountRequest)))
                 .andExpect(status().isUnauthorized())
                 .andReturn();
         assertEquals(401, result.getResponse().getStatus());

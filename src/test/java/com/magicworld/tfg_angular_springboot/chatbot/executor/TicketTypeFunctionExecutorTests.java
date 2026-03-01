@@ -1,7 +1,6 @@
 package com.magicworld.tfg_angular_springboot.chatbot.executor;
 
 import com.magicworld.tfg_angular_springboot.chatbot.dto.ChatResponse;
-import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import com.magicworld.tfg_angular_springboot.ticket_type.TicketType;
 import com.magicworld.tfg_angular_springboot.ticket_type.TicketTypeService;
 import io.qameta.allure.Description;
@@ -563,4 +562,3 @@ public class TicketTypeFunctionExecutorTests {
         assertTrue(response.getMessage().contains("Confirmación requerida"));
     }
 }
-

@@ -108,22 +108,23 @@ public class OAuth2AuthenticationSuccessHandlerTests {
     }
 
     @Test
-    @DisplayName("onAuthenticationSuccess crea usuario nuevo si no existe")
+    @DisplayName("onAuthenticationSuccess redirige a set-password si usuario no existe")
     @Story("Registro OAuth2")
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Verifica que se crea un usuario nuevo si no existe en la base de datos")
+    @Description("Verifica que se redirige a la página de crear contraseña si el usuario no existe en la base de datos")
     void onAuthenticationSuccessCreatesNewUserIfNotExists() throws Exception {
         when(authentication.getPrincipal()).thenReturn(oAuth2User);
         when(oAuth2User.getAttribute("email")).thenReturn("newuser@example.com");
         when(oAuth2User.getAttribute("given_name")).thenReturn("John");
         when(oAuth2User.getAttribute("family_name")).thenReturn("Doe");
         when(userRepository.findByEmail("newuser@example.com")).thenReturn(Optional.empty());
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(jwtService.getToken(any(User.class))).thenReturn("new-user-token");
+        when(jwtService.generateOAuth2PendingToken("newuser@example.com", "John", "Doe")).thenReturn("pending-token");
 
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
-        verify(userRepository).save(any(User.class));
+        verify(userRepository, never()).save(any(User.class));
+        verify(jwtService).generateOAuth2PendingToken("newuser@example.com", "John", "Doe");
+        verify(redirectStrategy).sendRedirect(request, response, "http://localhost:4200/oauth2-set-password");
     }
 
     @Test
@@ -182,24 +183,27 @@ public class OAuth2AuthenticationSuccessHandlerTests {
     }
 
     @Test
-    @DisplayName("Usuario nuevo tiene rol USER")
+    @DisplayName("Usuario nuevo recibe cookie de token pendiente OAuth2")
     @Story("Registro OAuth2")
     @Severity(SeverityLevel.NORMAL)
-    @Description("Verifica que el usuario nuevo creado tiene rol USER")
-    void newUserHasUserRole() throws Exception {
+    @Description("Verifica que el usuario nuevo recibe una cookie oauth2_pending con el token temporal")
+    void newUserGetsPendingTokenCookie() throws Exception {
         when(authentication.getPrincipal()).thenReturn(oAuth2User);
         when(oAuth2User.getAttribute("email")).thenReturn("newuser@example.com");
         when(oAuth2User.getAttribute("given_name")).thenReturn("John");
         when(oAuth2User.getAttribute("family_name")).thenReturn("Doe");
         when(userRepository.findByEmail("newuser@example.com")).thenReturn(Optional.empty());
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(jwtService.getToken(any(User.class))).thenReturn("new-user-token");
+        when(jwtService.generateOAuth2PendingToken("newuser@example.com", "John", "Doe")).thenReturn("pending-token");
 
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(userCaptor.capture());
-        assertEquals(Role.USER, userCaptor.getValue().getUserRole());
+        ArgumentCaptor<Cookie> cookieCaptor = ArgumentCaptor.forClass(Cookie.class);
+        verify(response).addCookie(cookieCaptor.capture());
+        Cookie pendingCookie = cookieCaptor.getValue();
+        assertEquals("oauth2_pending", pendingCookie.getName());
+        assertEquals("pending-token", pendingCookie.getValue());
+        assertTrue(pendingCookie.isHttpOnly());
+        assertEquals(600, pendingCookie.getMaxAge());
     }
 
     private User createTestUser() {

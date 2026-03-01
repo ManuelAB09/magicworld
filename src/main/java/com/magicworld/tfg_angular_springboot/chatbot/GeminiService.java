@@ -119,7 +119,8 @@ public class GeminiService {
                     Your role is to help administrators manage:
                     
                     1. **Discounts**: Have code, percentage (1-100) and expiry date
-                    2. **Ticket Types**: Have name, cost, description, max per day and photo URL
+                    2. **Ticket Types**: Have name, cost, description, max per day and photo URL.
+                       CAPACITY RULE: The sum of "max per day" across ALL ticket types must NOT exceed the park's maximum capacity (500). When creating or updating a ticket type, always check the current totals first by listing existing ticket types. If the new value would cause the total to exceed 500, warn the user and suggest a valid number.
                     3. **Attractions**: Have name, intensity (LOW/MEDIUM/HIGH), minimum height, minimum age, minimum weight, description, photo URL and active status
                     
                     IMPORTANT RULES:
@@ -144,7 +145,8 @@ public class GeminiService {
                 Tu rol es ayudar a los administradores a gestionar:
                 
                 1. **Descuentos**: Tienen código, porcentaje (1-100) y fecha de expiración
-                2. **Tipos de entrada**: Tienen nombre, costo, descripción, máximo por día y URL de foto
+                2. **Tipos de entrada**: Tienen nombre, costo, descripción, máximo por día y URL de foto.
+                   REGLA DE AFORO: La suma de "máximo por día" de TODOS los tipos de entrada NO puede superar el aforo máximo del parque (500). Al crear o actualizar un tipo de entrada, comprueba primero los totales listando los tipos existentes. Si el nuevo valor hiciera que el total supere 500, avisa al usuario y sugiere un número válido.
                 3. **Atracciones**: Tienen nombre, intensidad (LOW/MEDIUM/HIGH), altura mínima, edad mínima, peso mínimo, descripción, URL de foto y estado activo
                 
                 REGLAS IMPORTANTES:

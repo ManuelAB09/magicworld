@@ -8,6 +8,7 @@ import { CheckoutService, CartItem, PriceCalculationResponse, PaymentRequest } f
 import { AuthService, UserProfile } from '../../auth/auth.service';
 import { ErrorService } from '../../error/error-service';
 import { CurrencyService } from '../../shared/currency.service';
+import { getImageUrl } from '../../shared/utils';
 
 declare const Stripe: any;
 
@@ -25,6 +26,8 @@ interface CheckoutCart {
 })
 export class CheckoutStep2Component implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('cardElement') cardElement!: ElementRef;
+
+  getImageUrl = getImageUrl;
 
   cart: CheckoutCart | null = null;
   priceCalc: PriceCalculationResponse | null = null;

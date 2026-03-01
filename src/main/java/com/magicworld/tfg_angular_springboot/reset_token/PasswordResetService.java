@@ -1,7 +1,6 @@
 package com.magicworld.tfg_angular_springboot.reset_token;
 
 import com.magicworld.tfg_angular_springboot.email.EmailService;
-import com.magicworld.tfg_angular_springboot.exceptions.BadRequestException;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidPasswordPattern;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidTokenException;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;

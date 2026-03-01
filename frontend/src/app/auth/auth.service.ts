@@ -158,4 +158,13 @@ export class AuthService {
     );
   }
 
+  completeOAuth2Registration(data: { password: string; confirmPassword: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/oauth2/complete-registration`, data, { withCredentials: true }).pipe(
+      map(response => {
+        this.router.navigate(['/']);
+        return response;
+      })
+    );
+  }
+
 }

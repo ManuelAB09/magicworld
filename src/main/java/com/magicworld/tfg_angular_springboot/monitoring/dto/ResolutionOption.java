@@ -13,8 +13,5 @@ public class ResolutionOption {
     private String id;
     private String label;
     private String description;
-    private String impact;
-    private int effectivenessScore;
-    private int costScore;
-    private int timeToResolveMinutes;
+    private boolean enabled;
 }

@@ -1,81 +1,135 @@
 @if (resolutionFeedback) {
-  <div class="feedback-toast" [class]="'feedback-' + resolutionFeedback.impact">
-    <span class="feedback-icon" [class]="resolutionFeedback.impact"></span>
-    <div class="feedback-content">
-      <strong>{{ resolutionFeedback.message }}</strong>
-      <div class="feedback-stats">
-        @if (resolutionFeedback.satisfactionChange !== 0) {
-          <span [class.positive]="resolutionFeedback.satisfactionChange > 0">
-            {{ resolutionFeedback.satisfactionChange > 0 ? '+' : '' }}{{ resolutionFeedback.satisfactionChange }}% {{ 'dashboard.satisfaction' | translate }}
-          </span>
-        }
-        @if (resolutionFeedback.costIncurred > 0) {
-          <span class="cost">-{{ resolutionFeedback.costIncurred }}€</span>
-        }
-      </div>
+<div class="feedback-toast" [class.success]="resolutionFeedback.success" [class.error]="!resolutionFeedback.success">
+  <div class="feedback-content">
+    <strong>{{ translateFeedback(resolutionFeedback) }}</strong>
+    @if (resolutionFeedback.resourcesUsed) {
+    <div class="feedback-details">
+      @if (resolutionFeedback.resourcesUsed['employeeName']) {
+      <span>{{ 'dashboard.assignedEmployee' | translate }}: {{ resolutionFeedback.resourcesUsed['employeeName']
+        }}</span>
+      }
+      @if (resolutionFeedback.resourcesUsed['closedCount']) {
+      <span>{{ 'dashboard.attractionsClosed' | translate }}: {{ resolutionFeedback.resourcesUsed['closedCount']
+        }}</span>
+      }
     </div>
+    }
+    @if (resolutionFeedback.failureReason) {
+    <p class="failure-reason">{{ translateFailureReason(resolutionFeedback) }}</p>
+    }
   </div>
+</div>
 }
 
 @if (alerts.length === 0) {
-  <div class="no-alerts">
-    <span class="no-alerts-icon"></span>
-    <p>{{ 'dashboard.noAlerts' | translate }}</p>
-  </div>
+<div class="no-alerts">
+  <span class="no-alerts-icon"></span>
+  <p>{{ 'dashboard.noAlerts' | translate }}</p>
+</div>
 } @else {
-  <div class="alert-list">
-    @for (alert of alerts; track alert.id) {
-      <div class="alert-card" [class]="'severity-' + alert.severity.toLowerCase()">
-        <div class="alert-header">
-          <div class="alert-type-badge" [class]="'badge-' + alert.severity.toLowerCase()">
-            {{ getAlertTypeLabel(alert.alertType) }}
-          </div>
-          <span class="alert-time">{{ formatTime(alert.timestamp) }}</span>
+<div class="alert-list">
+  @for (alert of alerts; track alert.id) {
+  <div class="alert-card" [class]="'severity-' + alert.severity.toLowerCase()">
+    <div class="alert-header">
+      <div class="alert-type-badge" [class]="'badge-' + alert.severity.toLowerCase()">
+        {{ getAlertTypeLabel(alert.alertType) }}
+      </div>
+      <span class="alert-time">{{ formatTime(alert.timestamp) }}</span>
+    </div>
+
+    <p class="alert-message">{{ translateMessage(alert.message) }}</p>
+
+    @if (alert.attractionName) {
+    <p class="alert-location">📍 {{ alert.attractionName }}</p>
+    }
+
+    @if (expandedAlertId === alert.id) {
+    <div class="resolution-panel">
+      <p class="resolution-title">{{ 'dashboard.chooseAction' | translate }}</p>
+
+      @if (needsEmployeeSelection(selectedOption)) {
+      <div class="employee-selection">
+        <p class="selection-label">{{ 'dashboard.selectEmployee' | translate }}</p>
+        @if (loadingEmployees) {
+        <div class="loading-spinner">{{ 'dashboard.loading' | translate }}...</div>
+        } @else if (availableEmployees.length > 0) {
+        <div class="employee-list">
+          @for (emp of availableEmployees; track emp.id) {
+          <button class="employee-option" [class.selected]="selectedEmployeeId === emp.id"
+            (click)="selectEmployee(emp.id)">
+            <span class="emp-name">{{ emp.name }}</span>
+            <span class="emp-role-tag">{{ emp.role }}</span>
+          </button>
+          }
         </div>
-
-        <p class="alert-message">{{ alert.message }}</p>
-
-        @if (alert.attractionName) {
-          <p class="alert-location">{{ alert.attractionName }}</p>
+        <div class="selection-actions">
+          <button class="confirm-btn" [disabled]="!selectedEmployeeId || resolvingId === alert.id"
+            (click)="confirmResolution(alert)">
+            {{ 'dashboard.confirm' | translate }}
+          </button>
+          <button class="back-btn" (click)="cancelEmployeeSelection()">
+            {{ 'dashboard.back' | translate }}
+          </button>
+        </div>
+        } @else if (reinforcements.length === 0) {
+        <div class="no-employees">
+          <p>{{ 'dashboard.noAvailableEmployees' | translate }}</p>
+        </div>
+        <button class="back-btn" (click)="cancelEmployeeSelection()">
+          {{ 'dashboard.back' | translate }}
+        </button>
         }
 
-        @if (expandedAlertId === alert.id) {
-          <div class="resolution-panel">
-            <p class="resolution-title">{{ 'dashboard.chooseAction' | translate }}</p>
-            <div class="resolution-options">
-              @for (option of alert.resolutionOptions; track option.id) {
-                <button
-                  class="resolution-option"
-                  [class]="'impact-' + option.impact"
-                  [disabled]="resolvingId === alert.id"
-                  (click)="resolveWithOption(alert, option)">
-                  <div class="option-header">
-                    <span class="option-label">{{ option.label }}</span>
-                    <span class="option-impact-indicator" [class]="option.impact"></span>
-                  </div>
-                  <p class="option-desc">{{ option.description }}</p>
-                  <div class="option-stats">
-                    <span class="stat-item effectiveness">{{ option.effectivenessScore }}%</span>
-                    @if (option.costScore > 0) {
-                      <span class="stat-item cost">{{ option.costScore }}%</span>
-                    }
-                    @if (option.timeToResolveMinutes > 0) {
-                      <span class="stat-item time">{{ option.timeToResolveMinutes }}min</span>
-                    }
-                  </div>
-                </button>
-              }
+        @if (reinforcements.length > 0) {
+        <div class="reinforcement-section">
+          <p class="reinforcement-title">📞 {{ 'dashboard.reinforcementCandidates' | translate }}</p>
+          <p class="reinforcement-subtitle">{{ 'dashboard.reinforcementHint' | translate }}</p>
+          <div class="reinforcement-list">
+            @for (r of reinforcements; track r.id) {
+            <div class="reinforcement-card" [class.calling]="callingReinforcementId === r.id">
+              <div class="reinforcement-info">
+                <span class="reinforcement-name">{{ r.name }}</span>
+                <span class="reinforcement-phone">📱 {{ r.phone }}</span>
+              </div>
+              <button class="call-btn" (click)="callReinforcement(r.id)" [disabled]="callingReinforcementId !== null">
+                @if (callingReinforcementId === r.id) {
+                {{ 'dashboard.calling' | translate }}...
+                } @else {
+                {{ 'dashboard.callEmployee' | translate }}
+                }
+              </button>
             </div>
-            <button class="cancel-btn" (click)="expandedAlertId = null">
-              {{ 'dashboard.cancel' | translate }}
-            </button>
+            }
           </div>
-        } @else {
-          <button class="expand-btn" (click)="expandedAlertId = alert.id">
-            {{ 'dashboard.resolveAlert' | translate }}
-          </button>
+        </div>
         }
       </div>
+      } @else {
+      <div class="resolution-options">
+        @for (option of alert.resolutionOptions; track option.id) {
+        <button class="resolution-option" [class.disabled]="!option.enabled"
+          [disabled]="!option.enabled || resolvingId === alert.id" (click)="selectOption(alert, option)">
+          <div class="option-header">
+            <span class="option-label">{{ getOptionLabel(option.id) }}</span>
+            @if (!option.enabled) {
+            <span class="option-disabled-badge">{{ 'dashboard.unavailable' | translate }}</span>
+            }
+          </div>
+          <p class="option-desc">{{ getOptionDesc(option.id) }}</p>
+        </button>
+        }
+      </div>
+      <button class="cancel-btn" (click)="expandedAlertId = null">
+        {{ 'dashboard.cancel' | translate }}
+      </button>
+      }
+    </div>
+    } @else {
+    <button class="expand-btn" (click)="expandedAlertId = alert.id">
+      {{ 'dashboard.resolveAlert' | translate }}
+    </button>
     }
   </div>
+  }
+</div>
 }

@@ -1,5 +1,6 @@
 package com.magicworld.tfg_angular_springboot.monitoring.controller;
 
+import com.magicworld.tfg_angular_springboot.employee.service.DailyOperationsService;
 import com.magicworld.tfg_angular_springboot.monitoring.dto.DashboardSnapshot;
 import com.magicworld.tfg_angular_springboot.monitoring.dto.EventRequest;
 import com.magicworld.tfg_angular_springboot.monitoring.event.ParkEvent;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,10 +26,12 @@ public class MonitoringController {
     private final DashboardService dashboardService;
     private final EventIngestionService eventService;
     private final MonitoringWebSocketService webSocketService;
+    private final DailyOperationsService dailyOperationsService;
 
     @Operation(summary = "Get dashboard snapshot")
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardSnapshot> getDashboard() {
+        dailyOperationsService.initializeDay(LocalDate.now());
         DashboardSnapshot snapshot = dashboardService.getSnapshot();
         return ResponseEntity.ok(snapshot);
     }

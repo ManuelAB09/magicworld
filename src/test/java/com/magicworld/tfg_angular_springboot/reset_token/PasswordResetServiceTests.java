@@ -1,7 +1,6 @@
 package com.magicworld.tfg_angular_springboot.reset_token;
 
 import com.magicworld.tfg_angular_springboot.email.EmailService;
-import com.magicworld.tfg_angular_springboot.exceptions.BadRequestException;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidPasswordPattern;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidTokenException;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
@@ -139,7 +138,7 @@ public class PasswordResetServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("Restablecer contraseña exitoso")
     void testResetPasswordSuccess() {
-        PasswordResetToken token = tokenRepository.save(PasswordResetToken.builder()
+        tokenRepository.save(PasswordResetToken.builder()
                 .token(VALID_TOKEN)
                 .user(testUser)
                 .expiryDate(LocalDateTime.now().plusMinutes(15))

@@ -4,15 +4,15 @@ import com.magicworld.tfg_angular_springboot.attraction.Attraction;
 import com.magicworld.tfg_angular_springboot.attraction.AttractionRepository;
 import com.magicworld.tfg_angular_springboot.monitoring.dto.EventRequest;
 import com.magicworld.tfg_angular_springboot.monitoring.event.ParkEventType;
-import com.magicworld.tfg_angular_springboot.monitoring.metrics.ParkMetrics;
-import com.magicworld.tfg_angular_springboot.monitoring.metrics.ParkMetricsRepository;
 import com.magicworld.tfg_angular_springboot.monitoring.service.AlertService;
 import com.magicworld.tfg_angular_springboot.monitoring.service.DashboardService;
 import com.magicworld.tfg_angular_springboot.monitoring.service.EventIngestionService;
 import com.magicworld.tfg_angular_springboot.monitoring.service.MonitoringWebSocketService;
+import com.magicworld.tfg_angular_springboot.purchase_line.PurchaseLineService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +33,11 @@ public class ParkSimulatorService {
     private final DashboardService dashboardService;
     private final AttractionRepository attractionRepository;
     private final MonitoringWebSocketService webSocketService;
-    private final ParkMetricsRepository metricsRepository;
     private final AlertService alertService;
+    private final PurchaseLineService purchaseLineService;
+
+    @Value("${park.max-capacity:500}")
+    private int parkMaxCapacity;
 
     private final Random random = new Random();
     private final AtomicBoolean running = new AtomicBoolean(false);
@@ -49,9 +52,11 @@ public class ParkSimulatorService {
 
     public void start() {
         running.set(true);
-        simulatedVisitors.set(50 + random.nextInt(100));
+        int ticketsSold = purchaseLineService.getTotalSoldForDate(java.time.LocalDate.now());
+        int initialVisitors = ticketsSold > 0 ? Math.min(ticketsSold, parkMaxCapacity) : 50 + random.nextInt(100);
+        simulatedVisitors.set(initialVisitors);
         initializeQueues();
-        log.info("Simulador iniciado con {} visitantes", simulatedVisitors.get());
+        log.info("Simulador iniciado con {} visitantes (tickets vendidos: {})", simulatedVisitors.get(), ticketsSold);
     }
 
     public void stop() {
@@ -80,15 +85,12 @@ public class ParkSimulatorService {
 
     @Scheduled(fixedRate = 2000)
     public void simulateParkActivity() {
-        if (!running.get()) return;
+        if (!running.get())
+            return;
 
         tickCount++;
         simulateVisitorFlow();
         simulateAllQueues();
-
-        if (tickCount % 3 == 0) {
-            saveMetricsSnapshot();
-        }
 
         if (tickCount % 5 == 0 && random.nextInt(100) < 50) {
             generateRandomAlert();
@@ -99,7 +101,8 @@ public class ParkSimulatorService {
 
     private void generateRandomAlert() {
         List<Attraction> attractions = attractionRepository.findAll();
-        if (attractions.isEmpty()) return;
+        if (attractions.isEmpty())
+            return;
         Attraction target = attractions.get(random.nextInt(attractions.size()));
         alertService.generateRandomAlert(target.getId());
     }
@@ -125,14 +128,18 @@ public class ParkSimulatorService {
     }
 
     private int calculateEntryRate(int hour) {
-        if (hour >= 10 && hour <= 14) return 8;
-        if (hour >= 15 && hour <= 18) return 5;
+        if (hour >= 10 && hour <= 14)
+            return 8;
+        if (hour >= 15 && hour <= 18)
+            return 5;
         return 3;
     }
 
     private int calculateExitRate(int hour) {
-        if (hour >= 18) return 6;
-        if (hour >= 15) return 4;
+        if (hour >= 18)
+            return 6;
+        if (hour >= 15)
+            return 4;
         return 2;
     }
 
@@ -140,10 +147,11 @@ public class ParkSimulatorService {
         List<Attraction> attractions = attractionRepository.findAll();
 
         for (Attraction attraction : attractions) {
-            if (!attraction.getIsActive()) continue;
+            if (!attraction.getIsActive())
+                continue;
 
             AtomicInteger queueCounter = simulatedQueues.computeIfAbsent(
-                attraction.getId(), k -> new AtomicInteger(10));
+                    attraction.getId(), k -> new AtomicInteger(10));
 
             int currentQueue = queueCounter.get();
             int change = calculateQueueChange(attraction, currentQueue);
@@ -152,8 +160,8 @@ public class ParkSimulatorService {
             queueCounter.set(newQueue);
 
             ParkEventType eventType = change > 0
-                ? ParkEventType.ATTRACTION_QUEUE_JOIN
-                : ParkEventType.ATTRACTION_QUEUE_LEAVE;
+                    ? ParkEventType.ATTRACTION_QUEUE_JOIN
+                    : ParkEventType.ATTRACTION_QUEUE_LEAVE;
 
             recordEvent(eventType, attraction.getId(), newQueue);
             dashboardService.updateAttractionState(attraction.getId(), eventType, newQueue);
@@ -186,42 +194,55 @@ public class ParkSimulatorService {
         eventService.recordEvent(req);
     }
 
-    private void saveMetricsSnapshot() {
-        int totalQueue = simulatedQueues.values().stream()
-            .mapToInt(AtomicInteger::get).sum();
-        int avgWait = simulatedQueues.isEmpty() ? 0 : (totalQueue / simulatedQueues.size()) * 2;
-
-        ParkMetrics global = ParkMetrics.builder()
-            .timestamp(LocalDateTime.now())
-            .attractionId(null)
-            .currentVisitors(simulatedVisitors.get())
-            .queueSize(totalQueue)
-            .avgWaitTimeMinutes(avgWait)
-            .totalEntriesToday(simulatedVisitors.get())
-            .build();
-        metricsRepository.save(global);
-
-        simulatedQueues.forEach((attractionId, queue) -> {
-            ParkMetrics attractionMetrics = ParkMetrics.builder()
-                .timestamp(LocalDateTime.now())
-                .attractionId(attractionId)
-                .queueSize(queue.get())
-                .avgWaitTimeMinutes((int)(queue.get() * 2.5))
-                .build();
-            metricsRepository.save(attractionMetrics);
-        });
-    }
-
     private void broadcastUpdate() {
         webSocketService.broadcastDashboard(dashboardService.getSnapshot());
     }
 
     public Map<String, Object> getSimulatorStatus() {
         return Map.of(
-            "running", running.get(),
-            "simulatedVisitors", simulatedVisitors.get(),
-            "activeQueues", simulatedQueues.size(),
-            "totalInQueues", simulatedQueues.values().stream().mapToInt(AtomicInteger::get).sum()
-        );
+                "running", running.get(),
+                "simulatedVisitors", simulatedVisitors.get(),
+                "activeQueues", simulatedQueues.size(),
+                "totalInQueues", simulatedQueues.values().stream().mapToInt(AtomicInteger::get).sum());
+    }
+
+    public void closeAttraction(Long attractionId) {
+        AtomicInteger closedQueue = simulatedQueues.get(attractionId);
+        int redistributeCount = closedQueue != null ? closedQueue.getAndSet(0) : 0;
+
+        if (redistributeCount > 0) {
+            List<Long> openIds = attractionRepository.findByIsActiveTrue().stream()
+                    .map(Attraction::getId)
+                    .filter(id -> !id.equals(attractionId))
+                    .toList();
+
+            if (!openIds.isEmpty()) {
+                int perAttraction = redistributeCount / openIds.size();
+                int remainder = redistributeCount % openIds.size();
+
+                for (int i = 0; i < openIds.size(); i++) {
+                    int extra = i < remainder ? 1 : 0;
+                    AtomicInteger q = simulatedQueues.computeIfAbsent(openIds.get(i),
+                            k -> new AtomicInteger(0));
+                    q.addAndGet(perAttraction + extra);
+                    dashboardService.updateAttractionState(openIds.get(i),
+                            ParkEventType.ATTRACTION_QUEUE_JOIN, q.get());
+                }
+            }
+        }
+
+        if (running.get()) {
+            broadcastUpdate();
+        }
+    }
+
+    public void reopenAttraction(Long attractionId) {
+        int initialQueue = 5 + random.nextInt(15);
+        simulatedQueues.computeIfAbsent(attractionId, k -> new AtomicInteger(0)).set(initialQueue);
+        dashboardService.updateAttractionState(attractionId, ParkEventType.ATTRACTION_QUEUE_JOIN, initialQueue);
+
+        if (running.get()) {
+            broadcastUpdate();
+        }
     }
 }

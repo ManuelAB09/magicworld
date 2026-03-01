@@ -67,7 +67,7 @@ services:
     env_file: ../.env
     depends_on:
       - backend
-    entrypoint: ["sh","/seed/run-seed.sh"]
+    entrypoint: ["sh", "-c", "sed 's/\\r$//' /seed/run-seed.sh | sh"]
     volumes:
       - ../src/main/resources/db/migration/data.sql:/seed/data.sql:ro
       - ./scripts/db-seed.sh:/seed/run-seed.sh:ro

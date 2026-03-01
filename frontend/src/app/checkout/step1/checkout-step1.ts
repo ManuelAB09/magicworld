@@ -8,6 +8,7 @@ import { CheckoutService, TicketAvailability, CartItem } from '../services/check
 import { AvailabilityWebSocketService } from '../services/availability-websocket.service';
 import { ErrorService } from '../../error/error-service';
 import { CurrencyService } from '../../shared/currency.service';
+import { getImageUrl } from '../../shared/utils';
 
 @Component({
   selector: 'app-checkout-step1',
@@ -18,6 +19,8 @@ import { CurrencyService } from '../../shared/currency.service';
 })
 export class CheckoutStep1Component implements OnInit, OnDestroy {
   tickets: TicketAvailability[] = [];
+
+  getImageUrl = getImageUrl;
   cart: Map<string, CartItem> = new Map();
   selectedDate = '';
   minDate = '';

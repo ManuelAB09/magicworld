@@ -4,10 +4,13 @@ import com.magicworld.tfg_angular_springboot.attraction.Attraction;
 import com.magicworld.tfg_angular_springboot.attraction.AttractionRepository;
 import com.magicworld.tfg_angular_springboot.monitoring.dto.*;
 import com.magicworld.tfg_angular_springboot.monitoring.event.ParkEventType;
+import com.magicworld.tfg_angular_springboot.purchase_line.PurchaseLineService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +22,11 @@ public class DashboardService {
 
     private final EventIngestionService eventService;
     private final AlertService alertService;
-    private final PredictionService predictionService;
     private final AttractionRepository attractionRepository;
+    private final PurchaseLineService purchaseLineService;
+
+    @Value("${park.max-capacity:500}")
+    private int parkMaxCapacity;
 
     private final Map<Long, AttractionState> attractionStates = new ConcurrentHashMap<>();
 
@@ -42,6 +48,8 @@ public class DashboardService {
                 .mapToInt(AttractionStatus::getEstimatedWaitMinutes)
                 .average().orElse(0);
 
+        int ticketsSoldToday = purchaseLineService.getTotalSoldForDate(LocalDate.now());
+
         return DashboardSnapshot.builder()
                 .currentVisitors(Math.max(0, currentVisitors))
                 .totalEntriesToday((int) entries)
@@ -49,6 +57,8 @@ public class DashboardService {
                 .activeAttractions((int) activeCount)
                 .totalAttractions(allAttractions.size())
                 .avgParkWaitTime(avgWait)
+                .ticketsSoldToday(ticketsSoldToday)
+                .parkMaxCapacity(parkMaxCapacity)
                 .attractionStatuses(statuses)
                 .activeAlerts(alertService.getActiveAlerts())
                 .build();
@@ -59,16 +69,17 @@ public class DashboardService {
                 attraction.getId(),
                 k -> new AttractionState(attraction.getIsActive()));
 
-        int waitTime = calculateWaitTime(state.queueSize);
-        int predictedWait = predictionService.predictWaitTime(attraction.getId(), state.queueSize);
+        // Always sync open/closed state from the database
+        state.isOpen = attraction.getIsActive();
+
+        int waitTime = state.isOpen ? calculateWaitTime(state.queueSize) : 0;
 
         return AttractionStatus.builder()
                 .attractionId(attraction.getId())
                 .name(attraction.getName())
                 .open(state.isOpen)
-                .queueSize(state.queueSize)
+                .queueSize(state.isOpen ? state.queueSize : 0)
                 .estimatedWaitMinutes(waitTime)
-                .predictedWaitMinutes(predictedWait)
                 .mapPositionX(attraction.getMapPositionX())
                 .mapPositionY(attraction.getMapPositionY())
                 .intensity(attraction.getIntensity().name())
@@ -76,7 +87,8 @@ public class DashboardService {
     }
 
     private int calculateWaitTime(int queueSize) {
-        if (queueSize <= 0) return 0;
+        if (queueSize <= 0)
+            return 0;
         int cyclesNeeded = (int) Math.ceil((double) queueSize / 20);
         return cyclesNeeded * 3;
     }
@@ -92,8 +104,10 @@ public class DashboardService {
             }
             case ATTRACTION_QUEUE_JOIN -> {
                 if (state.isOpen) {
-                    if (queueSize != null) state.queueSize = queueSize;
-                    else state.queueSize++;
+                    if (queueSize != null)
+                        state.queueSize = queueSize;
+                    else
+                        state.queueSize++;
                 }
             }
             case ATTRACTION_QUEUE_LEAVE -> {
@@ -101,10 +115,10 @@ public class DashboardService {
                     state.queueSize = Math.max(0, state.queueSize - 1);
                 }
             }
-            default -> { }
+            default -> {
+            }
         }
 
-        state.waitTimeMinutes = state.isOpen ? predictionService.calculateBaseWaitTime(state.queueSize) : 0;
     }
 
     public void initializeAttractionStates() {
@@ -119,7 +133,6 @@ public class DashboardService {
     private static class AttractionState {
         boolean isOpen;
         int queueSize = 0;
-        int waitTimeMinutes = 0;
 
         AttractionState(boolean isActive) {
             this.isOpen = isActive;

@@ -29,6 +29,30 @@ public class ExceptionHandlerController {
         this.env = env;
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorMessage> handleIllegalArgument(IllegalArgumentException ex, WebRequest request) {
+        ErrorMessage body = new ErrorMessage(
+                HttpStatus.BAD_REQUEST.value(),
+                new Date(),
+                "error.invalid_argument",
+                new Object[]{ ex.getMessage() },
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorMessage> handleIllegalState(IllegalStateException ex, WebRequest request) {
+        ErrorMessage body = new ErrorMessage(
+                HttpStatus.CONFLICT.value(),
+                new Date(),
+                "error.invalid_state",
+                new Object[]{ ex.getMessage() },
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorMessage> handleApiException(ApiException ex, WebRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
