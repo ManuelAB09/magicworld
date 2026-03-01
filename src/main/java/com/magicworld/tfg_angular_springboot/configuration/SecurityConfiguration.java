@@ -3,6 +3,7 @@ package com.magicworld.tfg_angular_springboot.configuration;
 import com.magicworld.tfg_angular_springboot.auth.RateLimitFilter;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.AuthEntryPointJwt;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtAuthenticationFilter;
+import com.magicworld.tfg_angular_springboot.configuration.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationFailureHandler;
 import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.web.filter.ForwardedHeaderFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -30,6 +32,7 @@ public class SecurityConfiguration {
     private final AuthEntryPointJwt unauthorizedHandler;
     private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2FailureHandler;
+    private final HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository;
 
     private static final String ADMIN_ROLE = "ADMIN";
     @Bean
@@ -63,6 +66,9 @@ public class SecurityConfiguration {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(auth -> auth
+                                .authorizationRequestRepository(cookieAuthorizationRequestRepository)
+                        )
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler(oAuth2FailureHandler)
                 )
@@ -77,6 +83,11 @@ public class SecurityConfiguration {
         registrationBean.addUrlPatterns("/api/v1/auth/login");
         registrationBean.setOrder(1);
         return registrationBean;
+    }
+
+    @Bean
+    public ForwardedHeaderFilter forwardedHeaderFilter() {
+        return new ForwardedHeaderFilter();
     }
 
 }
