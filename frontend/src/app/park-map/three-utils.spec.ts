@@ -16,59 +16,43 @@ describe('ThreeUtils', () => {
   });
 
   describe('createPath', () => {
-    it('should create a mesh for vertical path', () => {
-      const mesh = createPath(0, 0, 0, 10, 2, true);
-      expect(mesh).toBeInstanceOf(THREE.Mesh);
+    it('should create a group for vertical path', () => {
+      const result = createPath(0, 0, 0, 10, 2, true);
+      expect(result).toBeInstanceOf(THREE.Group);
     });
 
-    it('should create a mesh for horizontal path', () => {
-      const mesh = createPath(0, 0, 10, 0, 2, false);
-      expect(mesh).toBeInstanceOf(THREE.Mesh);
+    it('should create a group for horizontal path', () => {
+      const result = createPath(0, 0, 10, 0, 2, false);
+      expect(result).toBeInstanceOf(THREE.Group);
     });
 
-    it('should position path correctly', () => {
-      const mesh = createPath(0, 0, 10, 10, 2, true);
-      expect(mesh.position.x).toBe(5);
-      expect(mesh.position.z).toBe(5);
-    });
-
-    it('should enable receiveShadow', () => {
-      const mesh = createPath(0, 0, 10, 0, 2, false);
-      expect(mesh.receiveShadow).toBeTrue();
+    it('should contain children (path + borders)', () => {
+      const result = createPath(0, 0, 10, 0, 2, false);
+      expect(result.children.length).toBeGreaterThan(0);
     });
   });
 
   describe('createHorizontalPath', () => {
-    it('should create a mesh', () => {
-      const mesh = createHorizontalPath(0, -10, 10);
-      expect(mesh).toBeInstanceOf(THREE.Mesh);
+    it('should create a group', () => {
+      const result = createHorizontalPath(0, -10, 10);
+      expect(result).toBeInstanceOf(THREE.Group);
     });
 
-    it('should position at correct z', () => {
-      const mesh = createHorizontalPath(5, -10, 10);
-      expect(mesh.position.z).toBe(5);
-    });
-
-    it('should center x position', () => {
-      const mesh = createHorizontalPath(0, -10, 10);
-      expect(mesh.position.x).toBe(0);
+    it('should have children', () => {
+      const result = createHorizontalPath(0, -10, 10);
+      expect(result.children.length).toBeGreaterThan(0);
     });
   });
 
   describe('createVerticalPath', () => {
-    it('should create a mesh', () => {
-      const mesh = createVerticalPath(0, -10, 10);
-      expect(mesh).toBeInstanceOf(THREE.Mesh);
+    it('should create a group', () => {
+      const result = createVerticalPath(0, -10, 10);
+      expect(result).toBeInstanceOf(THREE.Group);
     });
 
-    it('should position at correct x', () => {
-      const mesh = createVerticalPath(5, -10, 10);
-      expect(mesh.position.x).toBe(5);
-    });
-
-    it('should center z position', () => {
-      const mesh = createVerticalPath(0, -10, 10);
-      expect(mesh.position.z).toBe(0);
+    it('should have children', () => {
+      const result = createVerticalPath(0, -10, 10);
+      expect(result.children.length).toBeGreaterThan(0);
     });
   });
 

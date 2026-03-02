@@ -1,5 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { Attraction } from '../attraction/attraction.service';
 import { AttractionMeshFactory } from './attraction-mesh-factory';
 import { ParkBuilder } from './park-builder';
@@ -17,6 +22,7 @@ export class SceneManager {
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
   private controls!: OrbitControls;
+  private composer!: EffectComposer;
   private meshFactory = new AttractionMeshFactory();
   private parkBuilder = new ParkBuilder();
   private attractionMeshes: AttractionMesh[] = [];
@@ -42,6 +48,7 @@ export class SceneManager {
     this.initCamera(width, height);
     this.initRenderer(container, width, height);
     this.initControls();
+    this.initPostProcessing(width, height);
 
     addStandardLights(this.scene);
     this.parkBuilder.buildParkEnvironment(this.scene);
@@ -52,16 +59,76 @@ export class SceneManager {
 
   private initScene(): void {
     this.scene = new THREE.Scene();
-    const skyGeo = new THREE.SphereGeometry(400, 32, 15);
-    const skyMat = new THREE.MeshBasicMaterial({ color: 0x87ceeb, side: THREE.BackSide });
+
+    // gradient sky sphere
+    const skyGeo = new THREE.SphereGeometry(400, 32, 32);
+    const skyCanvas = document.createElement('canvas');
+    skyCanvas.width = 512;
+    skyCanvas.height = 512;
+    const skyCtx = skyCanvas.getContext('2d')!;
+
+    // sky gradient: warm horizon → deep blue zenith
+    const gradient = skyCtx.createLinearGradient(0, 0, 0, 512);
+    gradient.addColorStop(0, '#1a5fa0');   // zenith blue
+    gradient.addColorStop(0.25, '#47a0e0'); // mid blue
+    gradient.addColorStop(0.55, '#8ecbf0'); // light blue
+    gradient.addColorStop(0.75, '#c8e0f0'); // pale
+    gradient.addColorStop(0.90, '#f0dcc0'); // warm horizon
+    gradient.addColorStop(1.0, '#e8c890');  // golden horizon
+    skyCtx.fillStyle = gradient;
+    skyCtx.fillRect(0, 0, 512, 512);
+
+    const skyTex = new THREE.CanvasTexture(skyCanvas);
+    (skyTex as any).colorSpace = THREE.SRGBColorSpace;
+    const skyMat = new THREE.MeshBasicMaterial({ map: skyTex, side: THREE.BackSide });
     const sky = new THREE.Mesh(skyGeo, skyMat);
     this.scene.add(sky);
-    this.scene.fog = new THREE.Fog(0x87ceeb, 80, 180);
+
+    // procedural cloud layer
+    this.addClouds();
+
+    // warm atmospheric fog
+    this.scene.fog = new THREE.Fog(0xc8dde8, 90, 220);
+  }
+
+  private addClouds(): void {
+    const cloudMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.6,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+
+    for (let i = 0; i < 15; i++) {
+      const cloudGroup = new THREE.Group();
+      const puffCount = 3 + Math.floor(Math.random() * 4);
+      for (let p = 0; p < puffCount; p++) {
+        const puff = new THREE.Mesh(
+          new THREE.SphereGeometry(5 + Math.random() * 8, 8, 6),
+          cloudMat
+        );
+        puff.position.set(
+          (Math.random() - 0.5) * 14,
+          (Math.random() - 0.5) * 3,
+          (Math.random() - 0.5) * 6
+        );
+        puff.scale.y = 0.4 + Math.random() * 0.3;
+        cloudGroup.add(puff);
+      }
+      cloudGroup.position.set(
+        (Math.random() - 0.5) * 300,
+        60 + Math.random() * 40,
+        (Math.random() - 0.5) * 300
+      );
+      cloudGroup.name = 'cloud';
+      this.scene.add(cloudGroup);
+    }
   }
 
   private initCamera(width: number, height: number): void {
-    this.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-    this.camera.position.set(0, 60, 70);
+    this.camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 1000);
+    this.camera.position.set(0, 60, 80);
   }
 
   private initRenderer(container: HTMLDivElement, width: number, height: number): void {
@@ -72,9 +139,32 @@ export class SceneManager {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.0;
+    this.renderer.toneMappingExposure = 1.1;
     (this.renderer as any).physicallyCorrectLights = true;
     container.appendChild(this.renderer.domElement);
+  }
+
+  private initPostProcessing(width: number, height: number): void {
+    this.composer = new EffectComposer(this.renderer);
+
+    const renderPass = new RenderPass(this.scene, this.camera);
+    this.composer.addPass(renderPass);
+
+    // subtle bloom for emissive objects (lights, water glints)
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(width, height),
+      0.3,   // strength (subtle)
+      0.6,   // radius
+      0.85   // threshold
+    );
+    this.composer.addPass(bloomPass);
+
+    // high-quality anti-aliasing
+    const smaaPass = new SMAAPass();
+    this.composer.addPass(smaaPass);
+
+    const outputPass = new OutputPass();
+    this.composer.addPass(outputPass);
   }
 
   private initControls(): void {
@@ -125,6 +215,7 @@ export class SceneManager {
     this.controls.update();
     const elapsed = this.clock.getElapsedTime();
 
+    // hover bob animation
     this.attractionMeshes.forEach(mesh => {
       if (mesh.userData.attraction === this.hoveredAttraction) {
         mesh.position.y = mesh.userData.originalY + Math.sin(Date.now() * 0.003) * 0.35 + 0.5;
@@ -133,8 +224,19 @@ export class SceneManager {
       }
     });
 
+    // water shimmer effects
     this.updateWaterEffects(elapsed);
-    this.renderer.render(this.scene, this.camera);
+
+    // slow cloud drift
+    this.scene.traverse(obj => {
+      if (obj.name === 'cloud') {
+        obj.position.x += 0.02;
+        if (obj.position.x > 200) obj.position.x = -200;
+      }
+    });
+
+    // render via post-processing pipeline
+    this.composer.render();
   }
 
   private updateWaterEffects(elapsed: number): void {
@@ -144,6 +246,10 @@ export class SceneManager {
         if ((mat.color && mat.color.g > mat.color.r) && mat.transparent) {
           (mat as any).reflectivity = 0.55 + Math.sin(elapsed * 0.9) * 0.02;
         }
+      }
+      // gentle water surface oscillation
+      if (obj.name === 'lakeWater' || obj.name === 'fountainWater') {
+        obj.position.y = 0.06 + Math.sin(elapsed * 1.5) * 0.02;
       }
     });
   }
@@ -165,6 +271,7 @@ export class SceneManager {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
+    this.composer.setSize(width, height);
   }
 
   zoomIn(): void {
@@ -179,12 +286,13 @@ export class SceneManager {
 
   resetView(): void {
     if (!this.initialized) return;
-    this.camera.position.set(0, 50, 50);
+    this.camera.position.set(0, 60, 80);
     this.controls.reset();
   }
 
   dispose(): void {
     if (this.animationId) cancelAnimationFrame(this.animationId);
+    this.composer?.dispose();
     this.renderer?.dispose();
     this.controls?.dispose();
   }

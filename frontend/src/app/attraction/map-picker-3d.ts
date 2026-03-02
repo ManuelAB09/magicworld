@@ -123,7 +123,7 @@ export class MapPicker3DComponent implements AfterViewInit, OnDestroy, OnChanges
 
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x87ceeb);
-    this.scene.fog = new THREE.Fog(0x87ceeb, 60, 120);
+    this.scene.fog = new THREE.Fog(0xc8dde8, 60, 140);
 
     this.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 500);
     this.camera.position.set(0, 70, 60);
@@ -132,6 +132,8 @@ export class MapPicker3DComponent implements AfterViewInit, OnDestroy, OnChanges
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.1;
     container.appendChild(this.renderer.domElement);
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -265,4 +267,3 @@ export class MapPicker3DComponent implements AfterViewInit, OnDestroy, OnChanges
     }
   }
 }
-

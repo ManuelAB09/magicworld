@@ -13,7 +13,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}" ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -41,7 +41,7 @@ services:
     depends_on:
       - db
     healthcheck:
-      test: ["CMD-SHELL", "status=$$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/actuator/health || echo 0); if [ \"$$status\" = \"200\" ] || [ \"$$status\" = \"401\" ] || [ \"$$status\" = \"403\" ]; then exit 0; else exit 1; fi"]
+      test: [ "CMD-SHELL", "status=$$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/actuator/health || echo 0); if [ \"$$status\" = \"200\" ] || [ \"$$status\" = \"401\" ] || [ \"$$status\" = \"403\" ]; then exit 0; else exit 1; fi" ]
       interval: 15s
       timeout: 5s
       retries: 10
@@ -53,11 +53,11 @@ services:
     image: magicworld-frontend:latest
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "4200:80"
     depends_on:
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "status=$$(curl -s -o /dev/null -w '%{http_code}' http://localhost/ || echo 0); if [ \"$$status\" = \"200\" ]; then exit 0; else exit 1; fi"]
+      test: [ "CMD-SHELL", "status=$$(curl -s -o /dev/null -w '%{http_code}' http://localhost/ || echo 0); if [ \"$$status\" = \"200\" ]; then exit 0; else exit 1; fi" ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -67,7 +67,7 @@ services:
     env_file: ../.env
     depends_on:
       - backend
-    entrypoint: ["sh", "-c", "sed 's/\\r$//' /seed/run-seed.sh | sh"]
+    entrypoint: [ "sh", "-c", "sed 's/\\r$//' /seed/run-seed.sh | sh" ]
     volumes:
       - ../src/main/resources/db/migration/data.sql:/seed/data.sql:ro
       - ./scripts/db-seed.sh:/seed/run-seed.sh:ro

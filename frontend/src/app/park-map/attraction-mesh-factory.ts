@@ -38,7 +38,20 @@ export class AttractionMeshFactory {
         this.createDefaultMarker(group);
     }
 
+    // add base platform
+    this.addPlatform(group);
+
     return group;
+  }
+
+  private addPlatform(group: THREE.Group): void {
+    const platform = new THREE.Mesh(
+      new THREE.CylinderGeometry(5.5, 6, 0.25, 24),
+      new THREE.MeshStandardMaterial({ color: 0xa0937e, roughness: 0.9 })
+    );
+    platform.position.y = 0.125;
+    platform.receiveShadow = true;
+    group.add(platform);
   }
 
   private makeCanvasTexture(color: string, noise = true): THREE.Texture {
@@ -62,354 +75,773 @@ export class AttractionMeshFactory {
     const tex = new THREE.CanvasTexture(canvas);
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
     tex.repeat.set(1, 1);
-    // modern Three.js: use colorSpace
     (tex as any).colorSpace = THREE.SRGBColorSpace;
     return tex;
   }
 
   private createRollerCoaster(group: THREE.Group): void {
     const trackMat = new THREE.MeshPhysicalMaterial({
-      map: this.makeCanvasTexture('#cc4444'),
-      roughness: 0.6,
-      metalness: 0.2,
-      clearcoat: 0.2
+      map: this.makeCanvasTexture('#cc2222'),
+      roughness: 0.5,
+      metalness: 0.3,
+      clearcoat: 0.3,
     });
-    const supportMat = new THREE.MeshStandardMaterial({ color: 0x666660, roughness: 0.8 });
+    const supportMat = new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.7, metalness: 0.4 });
 
+    // main track with loop
     const curve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(-6, 0.8, -3),
-      new THREE.Vector3(-3, 3.6, -1),
-      new THREE.Vector3(-1, 1.8, 2),
-      new THREE.Vector3(2, 4.5, 1),
-      new THREE.Vector3(5, 0.8, -2)
+      new THREE.Vector3(-4, 4.0, -1.5),
+      new THREE.Vector3(-2, 2.0, 1),
+      new THREE.Vector3(0, 5.5, 2),
+      new THREE.Vector3(2, 4.0, 0),
+      new THREE.Vector3(3.5, 2.5, -1.5),
+      new THREE.Vector3(5, 0.8, -2),
     ], true);
 
-    const tubeGeometry = new THREE.TubeGeometry(curve, 200, 0.18, 12, true);
+    const tubeGeometry = new THREE.TubeGeometry(curve, 250, 0.2, 12, true);
     const track = new THREE.Mesh(tubeGeometry, trackMat);
     track.castShadow = true;
     track.receiveShadow = true;
     group.add(track);
 
-    const railGeo = new THREE.TubeGeometry(curve, 200, 0.06, 8, true);
-    const leftRail = new THREE.Mesh(railGeo, supportMat);
-    leftRail.position.x = -0.25;
+    // double rails
+    const railGeo = new THREE.TubeGeometry(curve, 250, 0.07, 8, true);
+    const railMat = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.6, roughness: 0.4 });
+    const leftRail = new THREE.Mesh(railGeo, railMat);
+    leftRail.position.x = -0.3;
     leftRail.castShadow = true;
     group.add(leftRail);
     const rightRail = leftRail.clone();
-    rightRail.position.x = 0.25;
+    rightRail.position.x = 0.3;
     group.add(rightRail);
 
-    const supportCount = 18;
+    // supports with cross-bracing
+    const supportCount = 22;
     for (let i = 0; i < supportCount; i++) {
       const t = i / supportCount;
       const p = curve.getPointAt(t);
       const h = Math.max(0.6, p.y);
+
       const left = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, h, 6), supportMat);
-      left.position.set(p.x - 0.4, h / 2, p.z);
+      left.position.set(p.x - 0.5, h / 2, p.z);
       left.castShadow = true;
       group.add(left);
 
       const right = left.clone();
-      right.position.set(p.x + 0.4, h / 2, p.z);
+      right.position.set(p.x + 0.5, h / 2, p.z);
       group.add(right);
 
-      const beam = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.06, 0.06), supportMat);
-      beam.position.set(p.x, h * 0.6, p.z);
-      beam.rotation.z = Math.random() * 0.02 - 0.01;
-      group.add(beam);
+      // cross brace
+      if (h > 1.2) {
+        const brace = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.05, 0.05), supportMat);
+        brace.position.set(p.x, h * 0.5, p.z);
+        brace.rotation.z = 0.3;
+        group.add(brace);
+      }
     }
 
-    const carMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.3, metalness: 0.6 });
-    const car = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.35, 0.6), carMat);
-    car.position.copy(curve.getPointAt(0));
-    car.position.y += 0.35;
-    car.castShadow = true;
-    group.add(car);
+    // train cars
+    const carColors = [0x222222, 0xcc0000, 0x0055cc, 0xffcc00];
+    for (let c = 0; c < 4; c++) {
+      const carMat = new THREE.MeshPhysicalMaterial({
+        color: carColors[c],
+        roughness: 0.3,
+        metalness: 0.5,
+        clearcoat: 0.4,
+      });
+      const car = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.35, 0.55), carMat);
+      const pt = curve.getPointAt(c * 0.04);
+      car.position.set(pt.x + c * 0.9, pt.y + 0.35, pt.z);
+      car.castShadow = true;
+      group.add(car);
+    }
+
+    // station
+    const stationMat = new THREE.MeshStandardMaterial({ color: 0x8b4513, roughness: 0.85 });
+    const station = new THREE.Mesh(new THREE.BoxGeometry(3, 2, 2), stationMat);
+    station.position.set(-6, 1, -3);
+    station.castShadow = true;
+    group.add(station);
+
+    const stationRoof = new THREE.Mesh(
+      new THREE.ConeGeometry(2.2, 1, 4),
+      new THREE.MeshStandardMaterial({ color: 0xcc0000, roughness: 0.7 })
+    );
+    stationRoof.position.set(-6, 2.5, -3);
+    stationRoof.rotation.y = Math.PI / 4;
+    group.add(stationRoof);
   }
 
   private createFerrisWheel(group: THREE.Group): void {
     const wheelMat = new THREE.MeshPhysicalMaterial({
-      map: this.makeCanvasTexture('#4477cc'),
-      roughness: 0.5,
+      map: this.makeCanvasTexture('#3366aa'),
+      roughness: 0.4,
       metalness: 0.7,
-      clearcoat: 0.1
+      clearcoat: 0.2,
     });
-    const supportMat = new THREE.MeshStandardMaterial({ color: 0x555555 });
+    const supportMat = new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.5, roughness: 0.5 });
 
-    const rim = new THREE.Mesh(new THREE.TorusGeometry(4.2, 0.18, 8, 64), wheelMat);
+    // rim with inner ring
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(4.5, 0.2, 12, 64), wheelMat);
     rim.rotation.x = Math.PI / 2;
-    rim.position.y = 6;
+    rim.position.y = 6.5;
     rim.castShadow = true;
     group.add(rim);
 
+    const innerRim = new THREE.Mesh(new THREE.TorusGeometry(3.5, 0.08, 8, 48), supportMat);
+    innerRim.rotation.x = Math.PI / 2;
+    innerRim.position.y = 6.5;
+    group.add(innerRim);
+
+    // spokes
     const spokes = 16;
     for (let i = 0; i < spokes; i++) {
       const angle = (i / spokes) * Math.PI * 2;
-      const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 4.2), supportMat);
-      spoke.position.set(Math.cos(angle) * 2.1, 6, Math.sin(angle) * 2.1);
+      const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 4.5), supportMat);
+      spoke.position.set(Math.cos(angle) * 2.25, 6.5, Math.sin(angle) * 2.25);
       spoke.rotation.y = -angle;
       spoke.castShadow = true;
       group.add(spoke);
     }
 
-    const cabinMat = new THREE.MeshStandardMaterial({ color: 0xffcc66, roughness: 0.6 });
+    // cabins with varied colours
+    const cabinColors = [0xff6644, 0x44aa66, 0x4488cc, 0xeecc44, 0xcc44cc, 0x44cccc];
     const cabins = 12;
     for (let i = 0; i < cabins; i++) {
       const angle = (i / cabins) * Math.PI * 2;
-      const cx = Math.cos(angle) * 4.0;
-      const cz = Math.sin(angle) * 4.0;
-      const cy = 6 + Math.sin(angle) * 0.12;
-      const bar = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.6), supportMat);
-      bar.position.set(cx * 0.95, cy + 0.15, cz * 0.95);
-      bar.rotation.y = angle;
+      const cx = Math.cos(angle) * 4.3;
+      const cz = Math.sin(angle) * 4.3;
+      const cy = 6.5;
+
+      // hanging bar
+      const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.8, 6), supportMat);
+      bar.position.set(cx * 0.95, cy - 0.1, cz * 0.95);
       group.add(bar);
 
-      const cabin = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.7, 0.7), cabinMat);
-      cabin.position.set(cx, cy - 0.35, cz);
-      cabin.lookAt(0, 6, 0);
+      // cabin body
+      const cabinMat = new THREE.MeshPhysicalMaterial({
+        color: cabinColors[i % cabinColors.length],
+        roughness: 0.5,
+        metalness: 0.1,
+        clearcoat: 0.3,
+      });
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.8, 0.8), cabinMat);
+      cabin.position.set(cx, cy - 0.6, cz);
+      cabin.lookAt(0, 6.5, 0);
       cabin.castShadow = true;
       group.add(cabin);
+
+      // cabin roof
+      const roofMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.8 });
+      const cabinRoof = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.1, 0.9), roofMat);
+      cabinRoof.position.set(cx, cy - 0.15, cz);
+      cabinRoof.lookAt(0, 6.5, 0);
+      group.add(cabinRoof);
     }
 
-    const supportLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 6), supportMat);
-    supportLeft.position.set(-1.6, 3, 0);
-    supportLeft.rotation.z = 0.12;
-    supportLeft.castShadow = true;
-    group.add(supportLeft);
+    // A-frame supports
+    const leftA = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 7), supportMat);
+    leftA.position.set(-1.8, 3.5, 0);
+    leftA.rotation.z = 0.14;
+    leftA.castShadow = true;
+    group.add(leftA);
 
-    const supportRight = supportLeft.clone();
-    supportRight.position.set(1.6, 3, 0);
-    supportRight.rotation.z = -0.12;
-    group.add(supportRight);
+    const rightA = leftA.clone();
+    rightA.position.set(1.8, 3.5, 0);
+    rightA.rotation.z = -0.14;
+    group.add(rightA);
+
+    // hub
+    const hub = new THREE.Mesh(new THREE.SphereGeometry(0.4, 12, 12), wheelMat);
+    hub.position.y = 6.5;
+    group.add(hub);
+
+    // lights on rim
+    const lightMat = new THREE.MeshStandardMaterial({
+      color: 0xffee88,
+      emissive: 0xffdd44,
+      emissiveIntensity: 0.6,
+    });
+    for (let i = 0; i < 24; i++) {
+      const angle = (i / 24) * Math.PI * 2;
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6), lightMat);
+      bulb.position.set(Math.cos(angle) * 4.5, 6.5, Math.sin(angle) * 4.5);
+      group.add(bulb);
+    }
   }
 
   private createCarousel(group: THREE.Group): void {
-    const baseMat = new THREE.MeshPhysicalMaterial({ color: 0xffc0cb, roughness: 0.7, metalness: 0.1 });
-    const roofMat = new THREE.MeshPhysicalMaterial({ color: 0xffdd55, roughness: 0.5, metalness: 0.05 });
-    const poleMat = new THREE.MeshStandardMaterial({ color: 0xdddddd });
+    const baseMat = new THREE.MeshPhysicalMaterial({ color: 0xffc0cb, roughness: 0.6, metalness: 0.1, clearcoat: 0.2 });
+    const roofMat = new THREE.MeshPhysicalMaterial({ color: 0xffdd55, roughness: 0.4, metalness: 0.1, clearcoat: 0.3 });
+    const poleMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.5, roughness: 0.3 });
 
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(3.0, 3.0, 0.5, 32), baseMat);
-    base.position.y = 0.25;
+    // ornate base
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.4, 0.6, 32), baseMat);
+    base.position.y = 0.3;
     base.receiveShadow = true;
     group.add(base);
 
-    const roof = new THREE.Mesh(new THREE.ConeGeometry(3.6, 1.8, 32), roofMat);
-    roof.position.y = 3.6;
+    // base trim ring
+    const trimRing = new THREE.Mesh(
+      new THREE.TorusGeometry(3.3, 0.08, 8, 32),
+      new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.6, roughness: 0.3 })
+    );
+    trimRing.position.y = 0.6;
+    trimRing.rotation.x = Math.PI / 2;
+    group.add(trimRing);
+
+    // conical roof
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(3.8, 2.0, 32), roofMat);
+    roof.position.y = 3.8;
     roof.castShadow = true;
     group.add(roof);
 
-    const centerPole = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 3.2), poleMat);
-    centerPole.position.y = 1.6;
+    // roof finial
+    const finial = new THREE.Mesh(
+      new THREE.SphereGeometry(0.25, 12, 12),
+      new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.7, roughness: 0.2 })
+    );
+    finial.position.y = 4.9;
+    group.add(finial);
+
+    // center pole
+    const centerPole = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 3.5), poleMat);
+    centerPole.position.y = 1.75;
     group.add(centerPole);
 
-    for (let i = 0; i < 12; i++) {
-      const stripe = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 1.4), new THREE.MeshStandardMaterial({ color: i % 2 === 0 ? 0xffffff : 0xff9999 }));
-      const a = (i / 12) * Math.PI * 2;
-      stripe.position.set(Math.cos(a) * 2.6, 3.3, Math.sin(a) * 2.6);
-      stripe.lookAt(0, 3.3, 0);
+    // hanging banners
+    for (let i = 0; i < 16; i++) {
+      const color = i % 2 === 0 ? 0xffffff : 0xff8888;
+      const stripe = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.5, 1.6),
+        new THREE.MeshStandardMaterial({ color, side: THREE.DoubleSide })
+      );
+      const a = (i / 16) * Math.PI * 2;
+      stripe.position.set(Math.cos(a) * 2.8, 3.4, Math.sin(a) * 2.8);
+      stripe.lookAt(0, 3.4, 0);
       stripe.receiveShadow = true;
       group.add(stripe);
     }
 
+    // horses (varied colours)
+    const horseColors = [0xffffff, 0xeecc88, 0xaa8866, 0xcccccc, 0xffddaa, 0xddbbaa, 0xe8d8c8, 0xf0e0d0];
     for (let i = 0; i < 8; i++) {
       const angle = (i / 8) * Math.PI * 2;
-      const horse = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.25), new THREE.MeshStandardMaterial({ color: 0xffffff }));
-      horse.position.set(Math.cos(angle) * 2.0, 0.9, Math.sin(angle) * 2.0);
-      horse.castShadow = true;
-      group.add(horse);
+      const horseMat = new THREE.MeshPhysicalMaterial({
+        color: horseColors[i],
+        roughness: 0.6,
+        metalness: 0.05,
+        clearcoat: 0.2,
+      });
 
-      const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.4), poleMat);
-      rod.position.set(Math.cos(angle) * 2.0, 1.6, Math.sin(angle) * 2.0);
+      // horse body
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.25), horseMat);
+      body.position.set(Math.cos(angle) * 2.2, 1.0, Math.sin(angle) * 2.2);
+      body.castShadow = true;
+      group.add(body);
+
+      // horse head
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.25, 0.15), horseMat);
+      head.position.set(
+        Math.cos(angle) * 2.2 + Math.cos(angle) * 0.3,
+        1.2,
+        Math.sin(angle) * 2.2 + Math.sin(angle) * 0.3
+      );
+      group.add(head);
+
+      // pole through horse
+      const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.8), poleMat);
+      rod.position.set(Math.cos(angle) * 2.2, 1.7, Math.sin(angle) * 2.2);
       group.add(rod);
+    }
+
+    // light bulbs around rim
+    const bulbMat = new THREE.MeshStandardMaterial({
+      color: 0xffeeaa,
+      emissive: 0xffcc44,
+      emissiveIntensity: 0.5,
+    });
+    for (let i = 0; i < 20; i++) {
+      const angle = (i / 20) * Math.PI * 2;
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), bulbMat);
+      bulb.position.set(Math.cos(angle) * 3.5, 2.85, Math.sin(angle) * 3.5);
+      group.add(bulb);
     }
   }
 
   private createDropTower(group: THREE.Group): void {
-    const towerMat = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.9 });
-    const seatMat = new THREE.MeshPhysicalMaterial({ color: 0xff4444, roughness: 0.4, metalness: 0.1 });
+    const towerMat = new THREE.MeshStandardMaterial({ color: 0x383838, roughness: 0.8, metalness: 0.3 });
+    const seatMat = new THREE.MeshPhysicalMaterial({ color: 0xff3333, roughness: 0.4, metalness: 0.15, clearcoat: 0.3 });
+    const frameMat = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.5, roughness: 0.5 });
 
-    const tower = new THREE.Mesh(new THREE.BoxGeometry(1.5, 12, 1.5), towerMat);
-    tower.position.y = 6;
+    // lattice tower structure
+    const tower = new THREE.Mesh(new THREE.BoxGeometry(1.2, 13, 1.2), towerMat);
+    tower.position.y = 6.5;
     tower.castShadow = true;
     group.add(tower);
 
-    const seat = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.4, 1.2), seatMat);
-    seat.position.y = 8.0;
-    seat.castShadow = true;
-    group.add(seat);
+    // lattice cross pieces
+    for (let h = 1; h < 13; h += 1.5) {
+      for (let side = 0; side < 4; side++) {
+        const cross = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.06, 0.06), frameMat);
+        cross.position.y = h;
+        cross.rotation.y = (side / 4) * Math.PI * 2;
+        cross.rotation.z = 0.4;
+        group.add(cross);
+      }
+    }
 
-    const top = new THREE.Mesh(new THREE.ConeGeometry(1.2, 1.5, 6), towerMat);
-    top.position.y = 12.75;
+    // seat ring
+    const seatRing = new THREE.Mesh(new THREE.TorusGeometry(2.0, 0.25, 8, 16), seatMat);
+    seatRing.position.y = 9;
+    seatRing.rotation.x = Math.PI / 2;
+    seatRing.castShadow = true;
+    group.add(seatRing);
+
+    // individual seats
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.5, 0.3), seatMat);
+      seat.position.set(Math.cos(angle) * 2.0, 8.7, Math.sin(angle) * 2.0);
+      seat.lookAt(0, 8.7, 0);
+      seat.castShadow = true;
+      group.add(seat);
+    }
+
+    // top cap
+    const top = new THREE.Mesh(new THREE.ConeGeometry(1.5, 2, 6), towerMat);
+    top.position.y = 14;
     group.add(top);
+
+    // strobe light at top
+    const strobe = new THREE.Mesh(
+      new THREE.SphereGeometry(0.3, 8, 8),
+      new THREE.MeshStandardMaterial({
+        color: 0xff0000,
+        emissive: 0xff0000,
+        emissiveIntensity: 1.0,
+      })
+    );
+    strobe.position.y = 15;
+    group.add(strobe);
   }
 
   private createHauntedHouse(group: THREE.Group): void {
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0x48372f, roughness: 0.9 });
-    const roofMat = new THREE.MeshStandardMaterial({ color: 0x2b1a13, roughness: 1 });
+    const wallMat = new THREE.MeshStandardMaterial({
+      map: this.makeCanvasTexture('#3a2a20'),
+      roughness: 0.95,
+    });
+    const roofMat = new THREE.MeshStandardMaterial({ color: 0x1a0f0a, roughness: 1 });
 
-    const house = new THREE.Mesh(new THREE.BoxGeometry(6, 4.5, 4.2), wallMat);
-    house.position.y = 2.25;
+    // main building
+    const house = new THREE.Mesh(new THREE.BoxGeometry(6.5, 5, 4.5), wallMat);
+    house.position.y = 2.5;
     house.castShadow = true;
     group.add(house);
 
-    const roof = new THREE.Mesh(new THREE.ConeGeometry(4.5, 2, 4), roofMat);
-    roof.position.y = 5;
+    // pitched roof
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(4.8, 2.5, 4), roofMat);
+    roof.position.y = 6.25;
     roof.rotation.y = Math.PI / 4;
     roof.castShadow = true;
     group.add(roof);
 
-    const windowMat = new THREE.MeshStandardMaterial({ color: 0x111111, emissive: 0x220000, emissiveIntensity: 0.01 });
-    for (let i = -1; i <= 1; i++) {
-      const w = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.8, 0.05), windowMat);
-      w.position.set(i * 1.5, 2.6, 2.11);
+    // tower/turret
+    const turret = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.9, 7, 6), wallMat);
+    turret.position.set(2.5, 3.5, -1.5);
+    turret.castShadow = true;
+    group.add(turret);
+
+    const turretRoof = new THREE.Mesh(new THREE.ConeGeometry(1.1, 1.5, 6), roofMat);
+    turretRoof.position.set(2.5, 7.5, -1.5);
+    group.add(turretRoof);
+
+    // glowing green windows
+    const windowMat = new THREE.MeshStandardMaterial({
+      color: 0x112211,
+      emissive: 0x00ff00,
+      emissiveIntensity: 0.25,
+    });
+    const windowPositions = [
+      { x: -1.5, y: 3.0, z: 2.26 },
+      { x: 0, y: 3.0, z: 2.26 },
+      { x: 1.5, y: 3.0, z: 2.26 },
+      { x: -1.0, y: 1.5, z: 2.26 },
+      { x: 1.0, y: 1.5, z: 2.26 },
+    ];
+    windowPositions.forEach(wp => {
+      const w = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.7, 0.05), windowMat);
+      w.position.set(wp.x, wp.y, wp.z);
       group.add(w);
+    });
+
+    // graveyard fence
+    const fenceMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, metalness: 0.6, roughness: 0.6 });
+    for (let i = -4; i <= 4; i++) {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.2, 6), fenceMat);
+      post.position.set(i * 0.8, 0.6, 3.5);
+      group.add(post);
+    }
+    const fenceRail = new THREE.Mesh(new THREE.BoxGeometry(7, 0.06, 0.06), fenceMat);
+    fenceRail.position.set(0, 1.0, 3.5);
+    group.add(fenceRail);
+
+    // dead tree
+    const deadTreeMat = new THREE.MeshStandardMaterial({ color: 0x3a2a1a, roughness: 1 });
+    const deadTrunk = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.25, 3), deadTreeMat);
+    deadTrunk.position.set(-3.8, 1.5, 2);
+    deadTrunk.rotation.z = 0.1;
+    group.add(deadTrunk);
+
+    // bare branches
+    for (let b = 0; b < 4; b++) {
+      const branch = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.06, 1.2, 4), deadTreeMat);
+      branch.position.set(-3.8 + (Math.random() - 0.5) * 0.8, 2.5 + b * 0.3, 2);
+      branch.rotation.z = (Math.random() - 0.5) * 1.2;
+      group.add(branch);
     }
   }
 
   private createWaterRide(group: THREE.Group): void {
-    const stoneMat = new THREE.MeshStandardMaterial({ color: 0x777777, roughness: 0.9 });
+    const stoneMat = new THREE.MeshStandardMaterial({ color: 0x707070, roughness: 0.9 });
     const waterMat = new THREE.MeshPhysicalMaterial({
-      color: 0x2b7bd9,
-      metalness: 0.1,
-      roughness: 0.05,
-      reflectivity: 0.7,
-      clearcoat: 0.2,
+      color: 0x2080cc,
+      metalness: 0.12,
+      roughness: 0.04,
+      clearcoat: 0.5,
       transparent: true,
-      opacity: 0.9
+      opacity: 0.88,
+    });
+    const slideMat = new THREE.MeshPhysicalMaterial({
+      color: 0xeeeeee,
+      roughness: 0.4,
+      metalness: 0.2,
+      clearcoat: 0.5,
     });
 
-    const pool = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 0.6, 32), stoneMat);
-    pool.position.y = 0.3;
+    // splash pool
+    const pool = new THREE.Mesh(new THREE.CylinderGeometry(3.5, 3.5, 0.8, 32), stoneMat);
+    pool.position.y = 0.4;
     pool.receiveShadow = true;
     group.add(pool);
 
-    const waterGeo = new THREE.CircleGeometry(2.6, 64);
+    // pool lip
+    const lip = new THREE.Mesh(new THREE.TorusGeometry(3.3, 0.2, 8, 32), stoneMat);
+    lip.position.y = 0.8;
+    lip.rotation.x = Math.PI / 2;
+    group.add(lip);
+
+    // animated water
+    const waterGeo = new THREE.CircleGeometry(3.0, 64);
     const water = new THREE.Mesh(waterGeo, waterMat);
     water.rotation.x = -Math.PI / 2;
-    water.position.y = 0.55;
-    // safe attribute access
-    (water.geometry as THREE.BufferGeometry).setAttribute(
-      'uNoiseOffset',
-      new THREE.BufferAttribute(new Float32Array((waterGeo as any).attributes['position'].count), 1)
-    );
-    water.castShadow = false;
+    water.position.y = 0.75;
+    water.name = 'lakeWater';
     group.add(water);
 
+    // water slide (tube)
     const slideCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-1.5, 4.8, -2.5),
-      new THREE.Vector3(-0.4, 3, -1.2),
-      new THREE.Vector3(0.2, 2, 0),
-      new THREE.Vector3(1.4, 1.0, 1.3)
+      new THREE.Vector3(-1.5, 5.5, -2.5),
+      new THREE.Vector3(-0.8, 4.0, -1.5),
+      new THREE.Vector3(-0.2, 2.8, -0.5),
+      new THREE.Vector3(0.3, 1.8, 0.5),
+      new THREE.Vector3(1.2, 1.0, 1.5),
     ]);
-    const slideGeom = new THREE.TubeGeometry(slideCurve, 60, 0.25, 8, false);
-    const slide = new THREE.Mesh(slideGeom, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 }));
+    const slideGeom = new THREE.TubeGeometry(slideCurve, 80, 0.35, 12, false);
+    const slide = new THREE.Mesh(slideGeom, slideMat);
     slide.castShadow = true;
     group.add(slide);
 
-    const platform = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.3, 1.6), stoneMat);
-    platform.position.set(-1.5, 4.8, -2.5);
+    // launch platform
+    const platform = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.4, 2), stoneMat);
+    platform.position.set(-1.5, 5.5, -2.5);
+    platform.castShadow = true;
     group.add(platform);
+
+    // platform railing
+    const railMat = new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.5 });
+    for (let i = 0; i < 4; i++) {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1), railMat);
+      post.position.set(
+        -1.5 + (i % 2) * 2.2 - 1.1,
+        6.2,
+        -2.5 + Math.floor(i / 2) * 1.6 - 0.8
+      );
+      group.add(post);
+    }
+
+    // stairs
+    for (let s = 0; s < 6; s++) {
+      const step = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.2, 0.4), stoneMat);
+      step.position.set(-3.5, 0.5 + s * 0.85, -2.5);
+      step.castShadow = true;
+      group.add(step);
+    }
   }
 
   private createBumperCars(group: THREE.Group): void {
-    const floorMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.85 });
     const carColors = [0xff4d4d, 0x4dff88, 0x4da6ff, 0xffe34d, 0xff79ff];
 
-    const floor = new THREE.Mesh(new THREE.CylinderGeometry(4.2, 4.2, 0.2, 32), floorMat);
-    floor.position.y = 0.1;
+    // arena floor with pattern
+    const floor = new THREE.Mesh(new THREE.CylinderGeometry(4.5, 4.5, 0.25, 32), floorMat);
+    floor.position.y = 0.125;
     floor.receiveShadow = true;
     group.add(floor);
 
-    for (let i = 0; i < 5; i++) {
-      const angle = (i / 5) * Math.PI * 2;
-      const car = new THREE.Mesh(
-        new THREE.SphereGeometry(0.62, 12, 12),
-        new THREE.MeshPhysicalMaterial({ color: carColors[i], roughness: 0.3, metalness: 0.2 })
-      );
-      car.position.set(Math.cos(angle) * 2.5, 0.45, Math.sin(angle) * 2.5);
-      car.scale.set(1, 0.6, 1);
-      car.castShadow = true;
-      group.add(car);
+    // floor pattern rings
+    const ringMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.8 });
+    for (const r of [2, 3.5]) {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.08, 6, 32), ringMat);
+      ring.position.y = 0.26;
+      ring.rotation.x = Math.PI / 2;
+      group.add(ring);
     }
 
-    const fence = new THREE.Mesh(new THREE.TorusGeometry(4.4, 0.08, 8, 64), new THREE.MeshStandardMaterial({ color: 0x888888 }));
+    // bumper cars
+    for (let i = 0; i < 5; i++) {
+      const angle = (i / 5) * Math.PI * 2 + Math.random() * 0.5;
+      const dist = 1.5 + Math.random() * 1.5;
+      const carMat = new THREE.MeshPhysicalMaterial({
+        color: carColors[i],
+        roughness: 0.3,
+        metalness: 0.2,
+        clearcoat: 0.4,
+      });
+
+      // car body
+      const car = new THREE.Mesh(new THREE.SphereGeometry(0.65, 12, 12), carMat);
+      car.position.set(Math.cos(angle) * dist, 0.5, Math.sin(angle) * dist);
+      car.scale.set(1, 0.55, 1);
+      car.castShadow = true;
+      group.add(car);
+
+      // bumper ring
+      const bumper = new THREE.Mesh(
+        new THREE.TorusGeometry(0.65, 0.06, 6, 16),
+        new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 })
+      );
+      bumper.position.set(Math.cos(angle) * dist, 0.35, Math.sin(angle) * dist);
+      bumper.rotation.x = Math.PI / 2;
+      group.add(bumper);
+
+      // antenna pole
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.5, 4), new THREE.MeshStandardMaterial({ color: 0x888888 }));
+      pole.position.set(Math.cos(angle) * dist, 1.2, Math.sin(angle) * dist);
+      group.add(pole);
+    }
+
+    // arena fence
+    const fence = new THREE.Mesh(new THREE.TorusGeometry(4.7, 0.1, 8, 64), new THREE.MeshStandardMaterial({ color: 0x666666, metalness: 0.4 }));
     fence.position.y = 0.9;
     fence.rotation.x = Math.PI / 2;
     group.add(fence);
+
+    // overhead grid structure
+    const gridMat = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.5 });
+    const gridH = 3.5;
+    for (let i = 0; i < 4; i++) {
+      const angle = (i / 4) * Math.PI * 2;
+      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, gridH, 6), gridMat);
+      pillar.position.set(Math.cos(angle) * 4.5, gridH / 2, Math.sin(angle) * 4.5);
+      pillar.castShadow = true;
+      group.add(pillar);
+    }
+
+    // overhead disc (grid)
+    const overhead = new THREE.Mesh(
+      new THREE.CylinderGeometry(4.5, 4.5, 0.1, 32),
+      new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.8, metalness: 0.3 })
+    );
+    overhead.position.y = gridH;
+    group.add(overhead);
   }
 
   private createTrainRide(group: THREE.Group): void {
-    const trackMaterial = new THREE.LineBasicMaterial({ color: 0x6b3f1f });
-    const trainMaterial = new THREE.MeshPhysicalMaterial({ color: 0x2b8b2b, roughness: 0.5 });
+    const trackMat = new THREE.MeshStandardMaterial({ color: 0x6b3f1f, roughness: 0.85 });
+    const metalMat = new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.5, roughness: 0.5 });
 
-    const trackCurve = new THREE.EllipseCurve(0, 0, 4.2, 3.1);
+    // track oval
+    const trackCurve = new THREE.EllipseCurve(0, 0, 4.5, 3.3);
     const trackPoints = trackCurve.getPoints(200);
-    const pts = trackPoints.map(p => new THREE.Vector3(p.x, 0.1, p.y));
-    const trackGeometry = new THREE.BufferGeometry().setFromPoints(pts);
-    const track = new THREE.Line(trackGeometry, trackMaterial);
-    group.add(track);
 
-    const engine = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1, 0.9), trainMaterial);
-    engine.position.set(4.2, 0.55, 0);
-    engine.castShadow = true;
-    group.add(engine);
+    // rails as thin tubes
+    const pts3 = trackPoints.map(p => new THREE.Vector3(p.x, 0.1, p.y));
+    const curve3d = new THREE.CatmullRomCurve3(pts3, true);
+    const railGeo = new THREE.TubeGeometry(curve3d, 200, 0.04, 6, true);
+    const rail = new THREE.Mesh(railGeo, metalMat);
+    group.add(rail);
 
-    const chimney = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, 0.6), new THREE.MeshStandardMaterial({ color: 0x111111 }));
-    chimney.position.set(4.7, 1.05, 0);
+    // sleepers
+    for (let i = 0; i < 40; i++) {
+      const t = i / 40;
+      const p = curve3d.getPointAt(t);
+      const tangent = curve3d.getTangentAt(t);
+      const sleeper = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.06, 0.15), trackMat);
+      sleeper.position.set(p.x, 0.05, p.z);
+      sleeper.rotation.y = Math.atan2(tangent.x, tangent.z);
+      group.add(sleeper);
+    }
+
+    // locomotive (detailed)
+    const engineMat = new THREE.MeshPhysicalMaterial({ color: 0x1a6b1a, roughness: 0.4, metalness: 0.2, clearcoat: 0.3 });
+    const boiler = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 1.2, 12), engineMat);
+    boiler.position.set(4.5, 0.6, 0);
+    boiler.rotation.z = Math.PI / 2;
+    boiler.castShadow = true;
+    group.add(boiler);
+
+    const cab = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), engineMat);
+    cab.position.set(3.8, 0.65, 0);
+    cab.castShadow = true;
+    group.add(cab);
+
+    // chimney
+    const chimney = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.1, 0.14, 0.5),
+      new THREE.MeshStandardMaterial({ color: 0x111111 })
+    );
+    chimney.position.set(5.0, 1.1, 0);
     group.add(chimney);
 
-    for (let i = 1; i <= 2; i++) {
-      const car = new THREE.Mesh(new THREE.BoxGeometry(0.84, 0.6, 0.72), new THREE.MeshStandardMaterial({ color: 0xcc4444 }));
-      car.position.set(4.2 - i * 1.25, 0.45, 0);
+    // smoke puff
+    const smokeMat = new THREE.MeshBasicMaterial({ color: 0xcccccc, transparent: true, opacity: 0.4 });
+    for (let s = 0; s < 3; s++) {
+      const puff = new THREE.Mesh(new THREE.SphereGeometry(0.15 + s * 0.1, 6, 6), smokeMat);
+      puff.position.set(5.0, 1.5 + s * 0.35, (Math.random() - 0.5) * 0.3);
+      group.add(puff);
+    }
+
+    // passenger cars
+    const carColors = [0xcc3333, 0x3366cc, 0xcc9933];
+    for (let i = 0; i < 3; i++) {
+      const carMat = new THREE.MeshPhysicalMaterial({ color: carColors[i], roughness: 0.5, clearcoat: 0.2 });
+      const car = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.55, 0.65), carMat);
+      car.position.set(3.8 - (i + 1) * 1.1, 0.5, 0);
       car.castShadow = true;
       group.add(car);
+
+      // wheels
+      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
+      for (const z of [-0.35, 0.35]) {
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.06, 8), wheelMat);
+        wheel.position.set(3.8 - (i + 1) * 1.1, 0.2, z);
+        wheel.rotation.x = Math.PI / 2;
+        group.add(wheel);
+      }
     }
   }
 
   private createSwingRide(group: THREE.Group): void {
-    const poleMat = new THREE.MeshStandardMaterial({ color: 0xffd700 });
-    const topMat = new THREE.MeshStandardMaterial({ color: 0xff6b6b });
+    const poleMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.4, roughness: 0.3 });
+    const topMat = new THREE.MeshPhysicalMaterial({ color: 0xff5555, roughness: 0.5, clearcoat: 0.2 });
+    const chainMat = new THREE.MeshStandardMaterial({ color: 0x999999, metalness: 0.5 });
 
-    const centerPole = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.36, 8.4), poleMat);
-    centerPole.position.y = 4.2;
+    // center pole
+    const centerPole = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 9), poleMat);
+    centerPole.position.y = 4.5;
     centerPole.castShadow = true;
     group.add(centerPole);
 
-    const top = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 3.6, 0.9, 24), topMat);
-    top.position.y = 8.2;
-    top.castShadow = true;
-    group.add(top);
+    // decorative top disc
+    const topDisc = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 3.8, 1.0, 24), topMat);
+    topDisc.position.y = 8.8;
+    topDisc.castShadow = true;
+    group.add(topDisc);
 
+    // top trim
+    const trimMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.5, roughness: 0.3 });
+    const topTrim = new THREE.Mesh(new THREE.TorusGeometry(3.8, 0.1, 8, 24), trimMat);
+    topTrim.position.y = 9.3;
+    topTrim.rotation.x = Math.PI / 2;
+    group.add(topTrim);
+
+    // hanging swings
+    const seatColors = [0x4466ff, 0xff4444, 0x44cc44, 0xffcc00, 0xff66cc,
+      0x44cccc, 0xcc8844, 0x8844cc, 0xff8844, 0x44ff88];
     for (let i = 0; i < 10; i++) {
       const angle = (i / 10) * Math.PI * 2;
-      const chain = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 2.8), new THREE.MeshStandardMaterial({ color: 0xaaaaaa }));
-      chain.position.set(Math.cos(angle) * 3.2, 6.8, Math.sin(angle) * 3.2);
-      chain.rotation.z = Math.cos(angle) * 0.25;
+      const swingAngle = 0.25; // tilted outward
+
+      // chain
+      const chain = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 3.0), chainMat);
+      chain.position.set(
+        Math.cos(angle) * 3.4,
+        7.2,
+        Math.sin(angle) * 3.4
+      );
+      chain.rotation.z = Math.cos(angle) * swingAngle;
+      chain.rotation.x = Math.sin(angle) * swingAngle;
       group.add(chain);
 
-      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.11, 0.46), new THREE.MeshStandardMaterial({ color: 0x4466ff }));
-      seat.position.set(Math.cos(angle) * 3.6, 5.1, Math.sin(angle) * 3.6);
+      // seat
+      const seatMat = new THREE.MeshPhysicalMaterial({
+        color: seatColors[i],
+        roughness: 0.5,
+        clearcoat: 0.3,
+      });
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.12, 0.5), seatMat);
+      seat.position.set(
+        Math.cos(angle) * 3.8,
+        5.5,
+        Math.sin(angle) * 3.8
+      );
       seat.castShadow = true;
       group.add(seat);
+    }
+
+    // lights on top
+    const bulbMat = new THREE.MeshStandardMaterial({
+      color: 0xffee88,
+      emissive: 0xffdd44,
+      emissiveIntensity: 0.5,
+    });
+    for (let i = 0; i < 12; i++) {
+      const angle = (i / 12) * Math.PI * 2;
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), bulbMat);
+      bulb.position.set(Math.cos(angle) * 3.8, 8.3, Math.sin(angle) * 3.8);
+      group.add(bulb);
     }
   }
 
   private createDefaultMarker(group: THREE.Group): void {
-    const pinMat = new THREE.MeshStandardMaterial({ color: 0xff4444, roughness: 0.6 });
+    const pinMat = new THREE.MeshPhysicalMaterial({
+      color: 0xff3333,
+      roughness: 0.5,
+      metalness: 0.1,
+      clearcoat: 0.3,
+    });
     const baseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
 
+    // pin cone
     const pin = new THREE.Mesh(new THREE.ConeGeometry(0.7, 2.1, 12), pinMat);
     pin.position.y = 1.05;
     pin.castShadow = true;
     group.add(pin);
 
+    // pin head (sphere)
     const head = new THREE.Mesh(new THREE.SphereGeometry(0.9, 12, 12), pinMat);
     head.position.y = 2.6;
     head.castShadow = true;
     group.add(head);
 
+    // base disc
     const base = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 0.25, 12), baseMat);
     base.position.y = 0.125;
     group.add(base);
+
+    // pulsing glow ring
+    const glowMat = new THREE.MeshStandardMaterial({
+      color: 0xff4444,
+      emissive: 0xff2222,
+      emissiveIntensity: 0.6,
+      transparent: true,
+      opacity: 0.5,
+    });
+    const glowRing = new THREE.Mesh(new THREE.TorusGeometry(1.3, 0.08, 6, 24), glowMat);
+    glowRing.position.y = 0.2;
+    glowRing.rotation.x = Math.PI / 2;
+    group.add(glowRing);
   }
 }
