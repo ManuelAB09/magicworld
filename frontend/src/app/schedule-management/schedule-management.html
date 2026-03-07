@@ -136,7 +136,6 @@
                 <span class="break-badge">{{ cell.breakGroup }}</span>
                 <span class="break-time">{{ cell.breakTime }}</span>
               </div>
-              <button class="remove-btn" (click)="removeAssignment(row, dayIdx); $event.stopPropagation()">✕</button>
             </div>
             } @else {
             <div class="not-working" title="{{ 'schedule.clickToAssign' | translate }}">

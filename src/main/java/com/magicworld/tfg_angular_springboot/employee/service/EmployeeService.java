@@ -18,6 +18,7 @@ public class EmployeeService {
     private final WeeklyScheduleRepository scheduleRepository;
     private final DailyAssignmentRepository dailyAssignmentRepository;
     private final ReinforcementCallRepository reinforcementCallRepository;
+    private final WorkLogRepository workLogRepository;
 
     @Transactional(readOnly = true)
     public List<EmployeeDTO> getAllEmployees() {
@@ -85,6 +86,7 @@ public class EmployeeService {
                 .orElseThrow(() -> new IllegalArgumentException("error.employee.notfound"));
 
         // Delete all FK-referenced records first to avoid constraint violations
+        workLogRepository.deleteByEmployeeId(id);
         reinforcementCallRepository.deleteByEmployeeId(id);
         dailyAssignmentRepository.deleteByEmployeeId(id);
         scheduleRepository.deleteByEmployeeId(id);

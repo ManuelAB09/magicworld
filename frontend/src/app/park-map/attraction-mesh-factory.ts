@@ -807,42 +807,122 @@ export class AttractionMeshFactory {
   }
 
   private createDefaultMarker(group: THREE.Group): void {
-    const pinMat = new THREE.MeshPhysicalMaterial({
-      color: 0xff3333,
-      roughness: 0.5,
-      metalness: 0.1,
-      clearcoat: 0.3,
-    });
-    const baseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
+    // Carnival show pavilion / kiosk for generic "OTHER" attractions
 
-    // pin cone
-    const pin = new THREE.Mesh(new THREE.ConeGeometry(0.7, 2.1, 12), pinMat);
-    pin.position.y = 1.05;
-    pin.castShadow = true;
-    group.add(pin);
-
-    // pin head (sphere)
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.9, 12, 12), pinMat);
-    head.position.y = 2.6;
-    head.castShadow = true;
-    group.add(head);
-
-    // base disc
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 0.25, 12), baseMat);
-    base.position.y = 0.125;
+    // --- Base platform ---
+    const baseMat = new THREE.MeshStandardMaterial({ color: 0xdec9a0, roughness: 0.8 });
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(4, 4.3, 0.5, 8), baseMat);
+    base.position.y = 0.25;
+    base.castShadow = true;
+    base.receiveShadow = true;
     group.add(base);
 
-    // pulsing glow ring
-    const glowMat = new THREE.MeshStandardMaterial({
-      color: 0xff4444,
-      emissive: 0xff2222,
-      emissiveIntensity: 0.6,
-      transparent: true,
-      opacity: 0.5,
+    // --- Tent poles (8 around perimeter) ---
+    const poleMat = new THREE.MeshStandardMaterial({ color: 0x8b4513, roughness: 0.7 });
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 5, 6), poleMat);
+      pole.position.set(Math.cos(angle) * 3.5, 3, Math.sin(angle) * 3.5);
+      pole.castShadow = true;
+      group.add(pole);
+    }
+
+    // --- Center pole ---
+    const centerPole = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 7, 8), poleMat);
+    centerPole.position.y = 3.5;
+    centerPole.castShadow = true;
+    group.add(centerPole);
+
+    // --- Tent roof (cone) with stripes ---
+    const roofCanvas = document.createElement('canvas');
+    roofCanvas.width = 256;
+    roofCanvas.height = 256;
+    const rCtx = roofCanvas.getContext('2d')!;
+    const stripeColors = ['#cc0000', '#ffffff'];
+    const segments = 16;
+    for (let i = 0; i < segments; i++) {
+      rCtx.beginPath();
+      rCtx.moveTo(128, 128);
+      rCtx.arc(128, 128, 128, (i / segments) * Math.PI * 2, ((i + 1) / segments) * Math.PI * 2);
+      rCtx.closePath();
+      rCtx.fillStyle = stripeColors[i % 2];
+      rCtx.fill();
+    }
+    const roofTexture = new THREE.CanvasTexture(roofCanvas);
+    const roofMat = new THREE.MeshStandardMaterial({ map: roofTexture, roughness: 0.6, side: THREE.DoubleSide });
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(5, 3, 8, 1, true), roofMat);
+    roof.position.y = 6.5;
+    roof.castShadow = true;
+    group.add(roof);
+
+    // --- Roof brim (torus for overhang) ---
+    const brimMat = new THREE.MeshStandardMaterial({ color: 0xcc0000, roughness: 0.6 });
+    const brim = new THREE.Mesh(new THREE.TorusGeometry(4.2, 0.2, 8, 24), brimMat);
+    brim.position.y = 5.5;
+    brim.rotation.x = Math.PI / 2;
+    group.add(brim);
+
+    // --- Flag on top ---
+    const flagPoleMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
+    const flagPole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.5, 6), flagPoleMat);
+    flagPole.position.y = 8.5;
+    group.add(flagPole);
+
+    const flagMat = new THREE.MeshStandardMaterial({ color: 0xffcc00, side: THREE.DoubleSide });
+    const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.55), flagMat);
+    flag.position.set(0.45, 9.0, 0);
+    group.add(flag);
+
+    // --- Scalloped valance / bunting around roof edge ---
+    const buntingMat = new THREE.MeshStandardMaterial({
+      color: 0xffdd44,
+      roughness: 0.5,
+      side: THREE.DoubleSide,
     });
-    const glowRing = new THREE.Mesh(new THREE.TorusGeometry(1.3, 0.08, 6, 24), glowMat);
-    glowRing.position.y = 0.2;
-    glowRing.rotation.x = Math.PI / 2;
-    group.add(glowRing);
+    for (let i = 0; i < 16; i++) {
+      const angle = (i / 16) * Math.PI * 2;
+      const bunting = new THREE.Mesh(new THREE.SphereGeometry(0.25, 6, 4), buntingMat);
+      bunting.position.set(Math.cos(angle) * 4.2, 5.3, Math.sin(angle) * 4.2);
+      bunting.scale.y = 0.5;
+      group.add(bunting);
+    }
+
+    // --- Decorative lights around poles ---
+    const bulbMat = new THREE.MeshStandardMaterial({
+      color: 0xffee88,
+      emissive: 0xffdd44,
+      emissiveIntensity: 0.6,
+    });
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6), bulbMat);
+      bulb.position.set(Math.cos(angle) * 3.5, 5.3, Math.sin(angle) * 3.5);
+      group.add(bulb);
+    }
+
+    // --- Star ornament on top ---
+    const starMat = new THREE.MeshStandardMaterial({
+      color: 0xffd700,
+      emissive: 0xffaa00,
+      emissiveIntensity: 0.4,
+      metalness: 0.6,
+    });
+    const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.35, 0), starMat);
+    star.position.y = 9.4;
+    star.rotation.y = Math.PI / 4;
+    group.add(star);
+
+    // --- Small stage / counter inside ---
+    const counterMat = new THREE.MeshStandardMaterial({ color: 0x6b4226, roughness: 0.8 });
+    const counter = new THREE.Mesh(new THREE.BoxGeometry(3, 1.2, 0.5), counterMat);
+    counter.position.set(0, 1.1, 3.2);
+    counter.castShadow = true;
+    group.add(counter);
+
+    // --- Counter top ---
+    const topMat = new THREE.MeshStandardMaterial({ color: 0xf5deb3, roughness: 0.6 });
+    const counterTop = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.1, 0.7), topMat);
+    counterTop.position.set(0, 1.75, 3.2);
+    group.add(counterTop);
   }
 }

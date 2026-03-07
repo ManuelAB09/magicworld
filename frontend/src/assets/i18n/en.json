@@ -40,7 +40,8 @@
     "MONITORING": "Monitoring",
     "EMPLOYEES": "Employees",
     "SCHEDULE": "Schedule",
-    "PARK_CONFIG": "Park Config"
+    "PARK_CONFIG": "Park Config",
+    "STATISTICS": "Statistics"
   },
   "HOME": {
     "TITLE": "Welcome to MagicWorld",
@@ -215,6 +216,8 @@
       "MIN_WEIGHT": "Min weight (kg)",
       "DESCRIPTION": "Description",
       "IS_ACTIVE": "Active",
+      "OPENING_TIME": "Opening time",
+      "CLOSING_TIME": "Closing time",
       "PHOTO_URL": "Image",
       "UPLOAD_IMAGE": "Upload image",
       "MAP_POSITION": "Map position (click to place)"
@@ -254,7 +257,10 @@
     "MIN_AGE": "Minimum age",
     "MIN_WEIGHT": "Minimum weight",
     "YEARS": "years",
-    "VIEW_ALL": "View all attractions"
+    "VIEW_ALL": "View all attractions",
+    "SCHEDULE": "Schedule",
+    "OPENING_TIME": "Opening time",
+    "CLOSING_TIME": "Closing time"
   },
   "PARK_MAP": {
     "TITLE": "Park Map",
@@ -263,7 +269,10 @@
     "WEBGL_ERROR": "WebGL is not available in your browser. Please update your browser or enable hardware acceleration.",
     "TOOLTIP": {
       "VIEW_DETAILS": "View details",
-      "CLOSED": "Closed"
+      "CLOSED": "Closed",
+      "QUEUE": "In queue",
+      "WAIT": "Wait",
+      "MIN": "min"
     },
     "CONTROLS": {
       "ZOOM_IN": "Zoom in",
@@ -542,21 +551,24 @@
       "NO_SECURITY": "No security assigned",
       "NO_MEDICAL": "No medical team assigned",
       "NO_MAINTENANCE": "No maintenance staff assigned",
-      "NO_GUEST_SERVICES": "No guest services staff assigned"
+      "NO_GUEST_SERVICES": "No guest services staff assigned",
+      "EMPLOYEE_ABSENT": "Employee has recorded absence — position uncovered"
     },
     "issueGroups": {
       "NO_OPERATOR": "Operators",
       "NO_SECURITY": "Security",
       "NO_MEDICAL": "Medical Team",
       "NO_MAINTENANCE": "Maintenance",
-      "NO_GUEST_SERVICES": "Guest Services"
+      "NO_GUEST_SERVICES": "Guest Services",
+      "EMPLOYEE_ABSENT": "Absences"
     },
     "issueIcons": {
       "NO_OPERATOR": "🎢",
       "NO_SECURITY": "🛡️",
       "NO_MEDICAL": "🏥",
       "NO_MAINTENANCE": "🔧",
-      "NO_GUEST_SERVICES": "🎫"
+      "NO_GUEST_SERVICES": "🎫",
+      "EMPLOYEE_ABSENT": "❌"
     },
     "noIssues": "No coverage issues"
   },
@@ -565,6 +577,9 @@
   "error.schedule.operator.needs.attraction": "Operators must be assigned to an attraction",
   "error.schedule.security.needs.zone": "Security staff must be assigned to a zone",
   "error.employee.notfound": "Employee not found",
+  "error.worklog.past.date": "Cannot register actions for past dates",
+  "error.worklog.not.scheduled": "Employee has no scheduled shift for that day",
+  "error.worklog.no.absence": "No active absences to remove for that date",
   "error.zone.notfound": "Zone not found",
   "error.employee.not.working.today": "Employee is not working today",
   "error.employee.not.available": "Employee is not available",
@@ -714,6 +729,95 @@
       "no_attraction": "No attraction associated with this alert",
       "attraction_not_found": "Attraction not found",
       "attraction_already_closed": "Attraction is already closed"
+    }
+  },
+  "stats": {
+    "title": "Statistics & Metrics",
+    "from": "From",
+    "to": "To",
+    "loading": "Loading data...",
+    "noData": "No data for the selected range",
+    "tabs": {
+      "employees": "Employees",
+      "park": "Park",
+      "worklog": "Hours Control"
+    },
+    "employees": {
+      "hours": "Hours",
+      "absences": "Absences",
+      "salaryTab": "Salaries",
+      "frequencyTab": "Frequency",
+      "hoursRanking": "Hours Worked Ranking",
+      "absenceRanking": "Absence Ranking",
+      "salaryReport": "Salary Report",
+      "positionFrequency": "Position Assignment Frequency",
+      "name": "Name",
+      "role": "Role",
+      "normalHours": "Normal hours",
+      "overtimeHours": "Overtime hours",
+      "totalHours": "Total hours",
+      "absenceCount": "Absences",
+      "scheduledDays": "Scheduled days",
+      "absenceRate": "Rate",
+      "hourlyRate": "Rate/h",
+      "normalPay": "Normal pay",
+      "overtimePay": "Overtime pay",
+      "totalSalary": "Total salary",
+      "totalPayroll": "Total payroll for period",
+      "selectEmployee": "Select an employee",
+      "selectOne": "Select"
+    },
+    "park": {
+      "salesTab": "Sales",
+      "seasonalityTab": "Seasonality",
+      "attractionsTab": "Attractions",
+      "ticketsSold": "Tickets sold",
+      "totalRevenue": "Total revenue",
+      "avgTicketPrice": "Avg ticket price",
+      "seasonalityTitle": "Sales Seasonality",
+      "highSeason": "High season",
+      "mediumSeason": "Medium season",
+      "lowSeason": "Low season",
+      "attractionPerformance": "Attraction Performance",
+      "noSimulatorData": "No simulator data. Start the simulator from the monitoring dashboard to generate data.",
+      "attractionName": "Attraction",
+      "queueEvents": "Queue events",
+      "maxQueue": "Max queue",
+      "avgQueue": "Avg queue",
+      "queueLevel": "Level",
+      "levels": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      }
+    },
+    "worklog": {
+      "selectEmployee": "Select an employee",
+      "addEntry": "New adjustment",
+      "entryAdded": "Adjustment recorded successfully",
+      "error": "Error recording adjustment",
+      "scheduledDays": "Scheduled days",
+      "workedDays": "Worked days",
+      "normalHours": "Normal hours",
+      "overtimeHours": "Overtime hours",
+      "totalHours": "Total hours",
+      "absencesLabel": "Absences",
+      "auditLog": "Adjustment History",
+      "newEntry": "New Hours/Absence Adjustment",
+      "actionType": "Action type",
+      "targetDate": "Target date",
+      "hoursAffected": "Hours affected",
+      "reason": "Reason",
+      "reasonPlaceholder": "Describe the reason for this adjustment...",
+      "cancel": "Cancel",
+      "save": "Save",
+      "actions": {
+        "ADD_OVERTIME_HOURS": "Add overtime hours",
+        "REMOVE_SCHEDULED_DAY": "Remove scheduled day",
+        "ADD_ABSENCE": "Record absence",
+        "REMOVE_ABSENCE": "Remove absence",
+        "PARTIAL_ABSENCE": "Partial absence (hours)"
+      }
     }
   }
 }

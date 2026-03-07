@@ -40,7 +40,8 @@
     "MONITORING": "Monitorizacion",
     "EMPLOYEES": "Empleados",
     "SCHEDULE": "Cuadrante",
-    "PARK_CONFIG": "Config. Parque"
+    "PARK_CONFIG": "Config. Parque",
+    "STATISTICS": "Estadisticas"
   },
   "HOME": {
     "TITLE": "Bienvenido a MagicWorld",
@@ -215,6 +216,8 @@
       "MIN_WEIGHT": "Peso mínimo (kg)",
       "DESCRIPTION": "Descripción",
       "IS_ACTIVE": "Activa",
+      "OPENING_TIME": "Hora de apertura",
+      "CLOSING_TIME": "Hora de cierre",
       "PHOTO_URL": "Imagen",
       "UPLOAD_IMAGE": "Subir imagen",
       "MAP_POSITION": "Posición en el mapa (haz clic para posicionar)"
@@ -254,7 +257,10 @@
     "MIN_AGE": "Edad mínima",
     "MIN_WEIGHT": "Peso mínimo",
     "YEARS": "años",
-    "VIEW_ALL": "Ver todas las atracciones"
+    "VIEW_ALL": "Ver todas las atracciones",
+    "SCHEDULE": "Horario",
+    "OPENING_TIME": "Hora de apertura",
+    "CLOSING_TIME": "Hora de cierre"
   },
   "PARK_MAP": {
     "TITLE": "Mapa del Parque",
@@ -263,7 +269,10 @@
     "WEBGL_ERROR": "WebGL no está disponible en tu navegador. Por favor, actualiza tu navegador o habilita la aceleración por hardware.",
     "TOOLTIP": {
       "VIEW_DETAILS": "Ver detalles",
-      "CLOSED": "Cerrada"
+      "CLOSED": "Cerrada",
+      "QUEUE": "En cola",
+      "WAIT": "Espera",
+      "MIN": "min"
     },
     "CONTROLS": {
       "ZOOM_IN": "Acercar",
@@ -542,21 +551,24 @@
       "NO_SECURITY": "Sin seguridad asignada",
       "NO_MEDICAL": "Sin equipo medico asignado",
       "NO_MAINTENANCE": "Sin mantenimiento asignado",
-      "NO_GUEST_SERVICES": "Sin atencion al cliente asignada"
+      "NO_GUEST_SERVICES": "Sin atencion al cliente asignada",
+      "EMPLOYEE_ABSENT": "Empleado con falta registrada — puesto sin cubrir"
     },
     "issueGroups": {
       "NO_OPERATOR": "Operadores",
       "NO_SECURITY": "Seguridad",
       "NO_MEDICAL": "Equipo Medico",
       "NO_MAINTENANCE": "Mantenimiento",
-      "NO_GUEST_SERVICES": "Atencion al Cliente"
+      "NO_GUEST_SERVICES": "Atencion al Cliente",
+      "EMPLOYEE_ABSENT": "Ausencias"
     },
     "issueIcons": {
       "NO_OPERATOR": "🎢",
       "NO_SECURITY": "🛡️",
       "NO_MEDICAL": "🏥",
       "NO_MAINTENANCE": "🔧",
-      "NO_GUEST_SERVICES": "🎫"
+      "NO_GUEST_SERVICES": "🎫",
+      "EMPLOYEE_ABSENT": "❌"
     },
     "noIssues": "Sin problemas de cobertura"
   },
@@ -565,6 +577,9 @@
   "error.schedule.operator.needs.attraction": "Los operadores deben ser asignados a una atraccion",
   "error.schedule.security.needs.zone": "El personal de seguridad debe ser asignado a una zona",
   "error.employee.notfound": "Empleado no encontrado",
+  "error.worklog.past.date": "No se pueden registrar acciones en fechas pasadas",
+  "error.worklog.not.scheduled": "El empleado no tiene turno programado para ese dia",
+  "error.worklog.no.absence": "No hay faltas registradas para eliminar en esa fecha",
   "error.zone.notfound": "Zona no encontrada",
   "error.employee.not.working.today": "El empleado no esta trabajando hoy",
   "error.employee.not.available": "El empleado no esta disponible",
@@ -714,6 +729,95 @@
       "no_attraction": "No hay atraccion asociada a esta alerta",
       "attraction_not_found": "Atraccion no encontrada",
       "attraction_already_closed": "La atraccion ya esta cerrada"
+    }
+  },
+  "stats": {
+    "title": "Estadisticas y Metricas",
+    "from": "Desde",
+    "to": "Hasta",
+    "loading": "Cargando datos...",
+    "noData": "No hay datos para el rango seleccionado",
+    "tabs": {
+      "employees": "Empleados",
+      "park": "Parque",
+      "worklog": "Control de Horas"
+    },
+    "employees": {
+      "hours": "Horas",
+      "absences": "Faltas",
+      "salaryTab": "Salarios",
+      "frequencyTab": "Frecuencia",
+      "hoursRanking": "Ranking de Horas Trabajadas",
+      "absenceRanking": "Ranking de Faltas",
+      "salaryReport": "Informe de Salarios",
+      "positionFrequency": "Frecuencia de Asignacion a Puestos",
+      "name": "Nombre",
+      "role": "Rol",
+      "normalHours": "Horas normales",
+      "overtimeHours": "Horas extra",
+      "totalHours": "Total horas",
+      "absenceCount": "Faltas",
+      "scheduledDays": "Dias programados",
+      "absenceRate": "Tasa",
+      "hourlyRate": "Tarifa/h",
+      "normalPay": "Pago normal",
+      "overtimePay": "Pago extra",
+      "totalSalary": "Salario total",
+      "totalPayroll": "Total nomina del periodo",
+      "selectEmployee": "Selecciona un empleado",
+      "selectOne": "Seleccionar"
+    },
+    "park": {
+      "salesTab": "Ventas",
+      "seasonalityTab": "Estacionalidad",
+      "attractionsTab": "Atracciones",
+      "ticketsSold": "Entradas vendidas",
+      "totalRevenue": "Ingresos totales",
+      "avgTicketPrice": "Precio medio por entrada",
+      "seasonalityTitle": "Estacionalidad de Ventas",
+      "highSeason": "Temporada alta",
+      "mediumSeason": "Temporada media",
+      "lowSeason": "Temporada baja",
+      "attractionPerformance": "Rendimiento de Atracciones",
+      "noSimulatorData": "Sin datos del simulador. Inicia el simulador desde el panel de monitorizacion para generar datos.",
+      "attractionName": "Atraccion",
+      "queueEvents": "Eventos de cola",
+      "maxQueue": "Cola max.",
+      "avgQueue": "Cola media",
+      "queueLevel": "Nivel",
+      "levels": {
+        "low": "Bajo",
+        "medium": "Medio",
+        "high": "Alto"
+      }
+    },
+    "worklog": {
+      "selectEmployee": "Selecciona un empleado",
+      "addEntry": "Nuevo ajuste",
+      "entryAdded": "Ajuste registrado correctamente",
+      "error": "Error al registrar el ajuste",
+      "scheduledDays": "Dias programados",
+      "workedDays": "Dias trabajados",
+      "normalHours": "Horas normales",
+      "overtimeHours": "Horas extra",
+      "totalHours": "Total horas",
+      "absencesLabel": "Faltas",
+      "auditLog": "Historial de Ajustes",
+      "newEntry": "Nuevo Ajuste de Horas/Faltas",
+      "actionType": "Tipo de accion",
+      "targetDate": "Fecha objetivo",
+      "hoursAffected": "Horas afectadas",
+      "reason": "Motivo",
+      "reasonPlaceholder": "Describe el motivo del ajuste...",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "actions": {
+        "ADD_OVERTIME_HOURS": "Añadir horas extra",
+        "REMOVE_SCHEDULED_DAY": "Quitar dia programado",
+        "ADD_ABSENCE": "Registrar falta",
+        "REMOVE_ABSENCE": "Eliminar falta",
+        "PARTIAL_ABSENCE": "Ausencia parcial (horas)"
+      }
     }
   }
 }

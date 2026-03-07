@@ -67,6 +67,8 @@ public class AttractionController {
                 .isActive(request.getIsActive())
                 .mapPositionX(request.getMapPositionX())
                 .mapPositionY(request.getMapPositionY())
+                .openingTime(request.getOpeningTime() != null ? request.getOpeningTime() : java.time.LocalTime.of(9, 0))
+                .closingTime(request.getClosingTime() != null ? request.getClosingTime() : java.time.LocalTime.of(17, 0))
                 .build();
         Attraction saved = attractionService.saveAttraction(toSave);
         return ResponseEntity.created(URI.create("/api/v1/attractions/" + saved.getId())).body(saved);
@@ -141,6 +143,8 @@ public class AttractionController {
                 .isActive(request.getIsActive())
                 .mapPositionX(request.getMapPositionX())
                 .mapPositionY(request.getMapPositionY())
+                .openingTime(request.getOpeningTime())
+                .closingTime(request.getClosingTime())
                 .build();
         Attraction saved = attractionService.updateAttraction(id, update);
         notifyAttractionStateChange(saved);

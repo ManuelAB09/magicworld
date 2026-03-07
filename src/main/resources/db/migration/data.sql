@@ -23,42 +23,42 @@ JOIN ticket_type t ON 1=1
 WHERE d.discount_code = 'SUMMER10' AND t.type_name = 'Adult';
 
 
-INSERT INTO attraction (name, intensity, category, minimum_height, minimum_age, minimum_weight, description, photo_url, is_active, map_position_x, map_position_y, maintenance_status)
+INSERT INTO attraction (name, intensity, category, minimum_height, minimum_age, minimum_weight, description, photo_url, is_active, map_position_x, map_position_y, maintenance_status, opening_time, closing_time)
 VALUES
 
-    ('Dragon Fury', 'HIGH', 'ROLLER_COASTER', 140, 14, 40, 'La montaña rusa mas extrema del parque con 3 inversiones y una caida de 50 metros', '/img/dragon_fury.jpg', TRUE, 85.0, 80.0, 'OPERATIONAL'),
-    ('Thunder Tower', 'HIGH', 'DROP_TOWER', 130, 12, 35, 'Torre de caida libre de 60 metros con vistas panoramicas del parque', '/img/thunder_tower.jpg', TRUE, 90.0, 70.0, 'OPERATIONAL'),
+    ('Dragon Fury', 'HIGH', 'ROLLER_COASTER', 140, 14, 40, 'La montaña rusa mas extrema del parque con 3 inversiones y una caida de 50 metros', '/img/dragon_fury.jpg', TRUE, 85.0, 80.0, 'OPERATIONAL', '10:00', '18:00'),
+    ('Thunder Tower', 'HIGH', 'DROP_TOWER', 130, 12, 35, 'Torre de caida libre de 60 metros con vistas panoramicas del parque', '/img/thunder_tower.jpg', TRUE, 90.0, 70.0, 'OPERATIONAL', '10:00', '18:00'),
 
 
-    ('Velocity Coaster', 'HIGH', 'ROLLER_COASTER', 135, 12, 35, 'Montaña rusa lanzada con aceleración de 0 a 100 km/h en 3 segundos', '/img/velocity_coaster.jpg', TRUE, 85.0, 35.0, 'OPERATIONAL'),
-    ('Storm Chaser', 'HIGH', 'DROP_TOWER', 125, 10, 30, 'Torre de rebote con múltiples caidas y subidas', '/img/storm_chaser.jpg', TRUE, 90.0, 25.0, 'OPERATIONAL'),
+    ('Velocity Coaster', 'HIGH', 'ROLLER_COASTER', 135, 12, 35, 'Montaña rusa lanzada con aceleración de 0 a 100 km/h en 3 segundos', '/img/velocity_coaster.jpg', TRUE, 85.0, 35.0, 'OPERATIONAL', '10:00', '17:00'),
+    ('Storm Chaser', 'HIGH', 'DROP_TOWER', 125, 10, 30, 'Torre de rebote con múltiples caidas y subidas', '/img/storm_chaser.jpg', TRUE, 90.0, 25.0, 'OPERATIONAL', '10:00', '17:30'),
 
 
-    ('Splash Mountain', 'MEDIUM', 'WATER_RIDE', 110, 8, 25, 'Emocionante descenso acuatico con una cascada final de 20 metros', '/img/splash_mountain.jpg', TRUE, 15.0, 70.0, 'OPERATIONAL'),
-    ('Pirate Rapids', 'MEDIUM', 'WATER_RIDE', 100, 6, 20, 'Aventura en balsas por rapidos y cuevas piratas', '/img/pirate_rapids.jpg', TRUE, 10.0, 80.0, 'OPERATIONAL'),
+    ('Splash Mountain', 'MEDIUM', 'WATER_RIDE', 110, 8, 25, 'Emocionante descenso acuatico con una cascada final de 20 metros', '/img/splash_mountain.jpg', TRUE, 15.0, 70.0, 'OPERATIONAL', '10:30', '18:00'),
+    ('Pirate Rapids', 'MEDIUM', 'WATER_RIDE', 100, 6, 20, 'Aventura en balsas por rapidos y cuevas piratas', '/img/pirate_rapids.jpg', TRUE, 10.0, 80.0, 'OPERATIONAL', '11:00', '18:00'),
 
 
-    ('Magic Carousel', 'LOW', 'CAROUSEL', 0, 0, 0, 'Carrusel clásico con caballos magicos y música encantadora', '/img/magic_carousel.jpg', TRUE, 15.0, 35.0, 'OPERATIONAL'),
-    ('Mini Carousel', 'LOW', 'CAROUSEL', 0, 0, 0, 'Carrusel especial para los mas pequeños con animales de granja', '/img/mini_carousel.jpg', TRUE, 10.0, 25.0, 'OPERATIONAL'),
+    ('Magic Carousel', 'LOW', 'CAROUSEL', 0, 0, 0, 'Carrusel clásico con caballos magicos y música encantadora', '/img/magic_carousel.jpg', TRUE, 15.0, 35.0, 'OPERATIONAL', '09:00', '17:00'),
+    ('Mini Carousel', 'LOW', 'CAROUSEL', 0, 0, 0, 'Carrusel especial para los mas pequeños con animales de granja', '/img/mini_carousel.jpg', TRUE, 10.0, 25.0, 'OPERATIONAL', '09:30', '16:30'),
 
 
-    ('Haunted Manor', 'MEDIUM', 'HAUNTED_HOUSE', 100, 8, 0, 'Casa encantada interactiva con efectos especiales y sustos inesperados', '/img/haunted_manor.jpg', TRUE, 55.0, 85.0, 'OPERATIONAL'),
-    ('Sky Swings', 'MEDIUM', 'SWING_RIDE', 120, 10, 30, 'Sillas voladoras a 30 metros de altura con rotacion de 360 grados', '/img/sky_swings.jpg', TRUE, 45.0, 85.0, 'OPERATIONAL'),
+    ('Haunted Manor', 'MEDIUM', 'HAUNTED_HOUSE', 100, 8, 0, 'Casa encantada interactiva con efectos especiales y sustos inesperados', '/img/haunted_manor.jpg', TRUE, 55.0, 85.0, 'OPERATIONAL', '11:00', '19:00'),
+    ('Sky Swings', 'MEDIUM', 'SWING_RIDE', 120, 10, 30, 'Sillas voladoras a 30 metros de altura con rotacion de 360 grados', '/img/sky_swings.jpg', TRUE, 45.0, 85.0, 'OPERATIONAL', '10:00', '17:00'),
 
 
-    ('Wild River', 'MEDIUM', 'WATER_RIDE', 105, 7, 22, 'Recorrido por un río salvaje con sorpresas acuáticas', '/img/wild_river.jpg', TRUE, 92.0, 55.0, 'OPERATIONAL'),
-    ('Bumper Kingdom', 'LOW', 'BUMPER_CARS', 90, 5, 15, 'Coches de choque con tematica medieval para toda la familia', '/img/bumper_kingdom.jpg', TRUE, 70.0, 60.0, 'OPERATIONAL'),
+    ('Wild River', 'MEDIUM', 'WATER_RIDE', 105, 7, 22, 'Recorrido por un río salvaje con sorpresas acuáticas', '/img/wild_river.jpg', TRUE, 92.0, 55.0, 'OPERATIONAL', '10:30', '17:30'),
+    ('Bumper Kingdom', 'LOW', 'BUMPER_CARS', 90, 5, 15, 'Coches de choque con tematica medieval para toda la familia', '/img/bumper_kingdom.jpg', TRUE, 70.0, 60.0, 'OPERATIONAL', '10:00', '17:30'),
 
 
-    ('Enchanted Train', 'LOW', 'TRAIN_RIDE', 0, 0, 0, 'Recorrido panoramico por todo el parque en un tren de epoca', '/img/enchanted_train.jpg', TRUE, 8.0, 55.0, 'OPERATIONAL'),
-    ('Flying Carpet', 'LOW', 'SWING_RIDE', 90, 5, 15, 'Alfombra voladora que gira y sube suavemente', '/img/flying_carpet.jpg', TRUE, 30.0, 60.0, 'OPERATIONAL'),
+    ('Enchanted Train', 'LOW', 'TRAIN_RIDE', 0, 0, 0, 'Recorrido panoramico por todo el parque en un tren de epoca', '/img/enchanted_train.jpg', TRUE, 8.0, 55.0, 'OPERATIONAL', '09:00', '16:00'),
+    ('Flying Carpet', 'LOW', 'SWING_RIDE', 90, 5, 15, 'Alfombra voladora que gira y sube suavemente', '/img/flying_carpet.jpg', TRUE, 30.0, 60.0, 'OPERATIONAL', '10:00', '17:30'),
 
 
-    ('Space Journey', 'MEDIUM', 'OTHER', 100, 6, 0, 'Viaje espacial interactivo con proyecciones 4D', '/img/space_journey.jpg', TRUE, 65.0, 15.0, 'OPERATIONAL'),
-    ('Teacups Spin', 'LOW', 'OTHER', 0, 0, 0, 'Tazas giratorias para toda la familia', '/img/teacups.jpg', TRUE, 35.0, 15.0, 'OPERATIONAL'),
+    ('Space Journey', 'MEDIUM', 'OTHER', 100, 6, 0, 'Viaje espacial interactivo con proyecciones 4D', '/img/space_journey.jpg', TRUE, 65.0, 15.0, 'OPERATIONAL', '10:00', '17:00'),
+    ('Teacups Spin', 'LOW', 'OTHER', 0, 0, 0, 'Tazas giratorias para toda la familia', '/img/teacups.jpg', TRUE, 35.0, 15.0, 'OPERATIONAL', '09:30', '16:30'),
 
 
-    ('Giant Wheel', 'LOW', 'FERRIS_WHEEL', 0, 0, 0, 'Noria gigante de 50 metros con cabinas climatizadas y vistas espectaculares', '/img/giant_wheel.jpg', TRUE, 50.0, 65.0, 'OPERATIONAL');
+    ('Giant Wheel', 'LOW', 'FERRIS_WHEEL', 0, 0, 0, 'Noria gigante de 50 metros con cabinas climatizadas y vistas espectaculares', '/img/giant_wheel.jpg', TRUE, 50.0, 65.0, 'OPERATIONAL', '09:00', '17:00');
 
 
 
@@ -67,11 +67,19 @@ SELECT CURDATE(), u.id FROM users u WHERE u.username = 'user1';
 
 
 INSERT  INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
-SELECT CURDATE() + INTERVAL 1 DAY, 2, p.id, 2 * t.cost, t.type_name
+SELECT CURDATE() + INTERVAL 1 DAY, 200, p.id, 200 * t.cost, t.type_name
 FROM purchase p
 JOIN users u ON p.buyer_id = u.id
 JOIN ticket_type t ON t.type_name = 'Adult'
 WHERE u.username = 'user1';
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT CURDATE() + INTERVAL 1 DAY, 100, p.id, 100 * t.cost, t.type_name
+FROM purchase p
+JOIN users u ON p.buyer_id = u.id
+JOIN ticket_type t ON t.type_name = 'Child'
+WHERE u.username = 'user1'
+  AND p.purchase_date = CURDATE();
 
 
 INSERT  INTO review (stars, publication_date, visit_date, description, purchase_id)
@@ -95,10 +103,30 @@ VALUES
     (CURDATE() - INTERVAL 2 DAY, (SELECT id FROM users WHERE username = 'user1'));
 
 INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
-SELECT p.purchase_date + INTERVAL 1 DAY, 1, p.id, t.cost, t.type_name
+SELECT p.purchase_date + INTERVAL 1 DAY, 180, p.id, 180 * t.cost, t.type_name
 FROM purchase p
 JOIN users u ON p.buyer_id = u.id
 JOIN ticket_type t ON t.type_name = 'Adult'
+WHERE u.username = 'user1'
+  AND p.purchase_date IN (
+      CURDATE() - INTERVAL 12 DAY,
+      CURDATE() - INTERVAL 11 DAY,
+      CURDATE() - INTERVAL 10 DAY,
+      CURDATE() - INTERVAL 9 DAY,
+      CURDATE() - INTERVAL 8 DAY,
+      CURDATE() - INTERVAL 7 DAY,
+      CURDATE() - INTERVAL 6 DAY,
+      CURDATE() - INTERVAL 5 DAY,
+      CURDATE() - INTERVAL 4 DAY,
+      CURDATE() - INTERVAL 3 DAY,
+      CURDATE() - INTERVAL 2 DAY
+  );
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date + INTERVAL 1 DAY, 120, p.id, 120 * t.cost, t.type_name
+FROM purchase p
+JOIN users u ON p.buyer_id = u.id
+JOIN ticket_type t ON t.type_name = 'Child'
 WHERE u.username = 'user1'
   AND p.purchase_date IN (
       CURDATE() - INTERVAL 12 DAY,
@@ -572,6 +600,29 @@ SELECT p.purchase_date, 70, p.id, 70 * t.cost, 'Child'
 FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Child'
 WHERE u.username = 'bulk_buyer' AND p.purchase_date BETWEEN '2026-05-01' AND '2026-06-30';
 
+-- Recent bulk_buyer purchases (last 2 weeks — complements user1's 300/day up to ~450)
+INSERT INTO purchase (purchase_date, buyer_id)
+SELECT dates.d, (SELECT id FROM users WHERE username = 'bulk_buyer')
+FROM (
+    SELECT CURDATE() - INTERVAL 12 DAY AS d UNION ALL SELECT CURDATE() - INTERVAL 11 DAY
+    UNION ALL SELECT CURDATE() - INTERVAL 10 DAY UNION ALL SELECT CURDATE() - INTERVAL 9 DAY
+    UNION ALL SELECT CURDATE() - INTERVAL 8 DAY UNION ALL SELECT CURDATE() - INTERVAL 7 DAY
+    UNION ALL SELECT CURDATE() - INTERVAL 6 DAY UNION ALL SELECT CURDATE() - INTERVAL 5 DAY
+    UNION ALL SELECT CURDATE() - INTERVAL 4 DAY UNION ALL SELECT CURDATE() - INTERVAL 3 DAY
+    UNION ALL SELECT CURDATE() - INTERVAL 2 DAY UNION ALL SELECT CURDATE() - INTERVAL 1 DAY
+    UNION ALL SELECT CURDATE()
+) dates;
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 100, p.id, 100 * t.cost, 'Adult'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Adult'
+WHERE u.username = 'bulk_buyer' AND p.purchase_date >= CURDATE() - INTERVAL 12 DAY AND p.purchase_date <= CURDATE();
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 50, p.id, 50 * t.cost, 'Child'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Child'
+WHERE u.username = 'bulk_buyer' AND p.purchase_date >= CURDATE() - INTERVAL 12 DAY AND p.purchase_date <= CURDATE();
+
 -- Add is_overtime column defaults for existing data
 -- (Hibernate will auto-create the column; existing records default to false)
 
@@ -654,4 +705,277 @@ INSERT INTO park_closure_day (closure_date, reason) VALUES
     ('2027-01-29', 'Cierre enero - mantenimiento'),
     ('2027-01-30', 'Cierre enero - mantenimiento'),
     ('2027-01-31', 'Cierre enero - mantenimiento');
+
+
+-- =====================================================================
+-- DAILY ASSIGNMENTS for current week (to power statistics/hours)
+-- These simulate that employees actually worked their scheduled days
+-- =====================================================================
+
+INSERT INTO daily_assignment (employee_id, assignment_date, current_status, current_zone_id, current_attraction_id, break_group, is_overtime, break_start_time, break_end_time)
+SELECT
+  ws.employee_id,
+  DATE_ADD(ws.week_start_date, INTERVAL (
+    CASE ws.day_of_week
+      WHEN 'MONDAY' THEN 0 WHEN 'TUESDAY' THEN 1 WHEN 'WEDNESDAY' THEN 2
+      WHEN 'THURSDAY' THEN 3 WHEN 'FRIDAY' THEN 4 WHEN 'SATURDAY' THEN 5 WHEN 'SUNDAY' THEN 6
+    END
+  ) DAY) AS assignment_date,
+  CASE
+    WHEN DATE_ADD(ws.week_start_date, INTERVAL (
+      CASE ws.day_of_week
+        WHEN 'MONDAY' THEN 0 WHEN 'TUESDAY' THEN 1 WHEN 'WEDNESDAY' THEN 2
+        WHEN 'THURSDAY' THEN 3 WHEN 'FRIDAY' THEN 4 WHEN 'SATURDAY' THEN 5 WHEN 'SUNDAY' THEN 6
+      END
+    ) DAY) < CURDATE() THEN 'FINISHED'
+    WHEN DATE_ADD(ws.week_start_date, INTERVAL (
+      CASE ws.day_of_week
+        WHEN 'MONDAY' THEN 0 WHEN 'TUESDAY' THEN 1 WHEN 'WEDNESDAY' THEN 2
+        WHEN 'THURSDAY' THEN 3 WHEN 'FRIDAY' THEN 4 WHEN 'SATURDAY' THEN 5 WHEN 'SUNDAY' THEN 6
+      END
+    ) DAY) = CURDATE() THEN 'WORKING'
+    ELSE 'NOT_STARTED'
+  END AS current_status,
+  ws.zone_id,
+  ws.attraction_id,
+  ws.break_group,
+  COALESCE(ws.is_overtime, FALSE),
+  CASE ws.break_group
+    WHEN 'A' THEN '12:00:00' WHEN 'B' THEN '12:30:00'
+    WHEN 'C' THEN '13:00:00' WHEN 'D' THEN '13:30:00'
+  END,
+  CASE ws.break_group
+    WHEN 'A' THEN '12:30:00' WHEN 'B' THEN '13:00:00'
+    WHEN 'C' THEN '13:30:00' WHEN 'D' THEN '14:00:00'
+  END
+FROM weekly_schedule ws
+WHERE ws.week_start_date = @monday
+  AND DATE_ADD(ws.week_start_date, INTERVAL (
+    CASE ws.day_of_week
+      WHEN 'MONDAY' THEN 0 WHEN 'TUESDAY' THEN 1 WHEN 'WEDNESDAY' THEN 2
+      WHEN 'THURSDAY' THEN 3 WHEN 'FRIDAY' THEN 4 WHEN 'SATURDAY' THEN 5 WHEN 'SUNDAY' THEN 6
+    END
+  ) DAY) <= CURDATE()
+  AND NOT EXISTS (
+    SELECT 1 FROM daily_assignment da
+    WHERE da.employee_id = ws.employee_id
+      AND da.assignment_date = DATE_ADD(ws.week_start_date, INTERVAL (
+        CASE ws.day_of_week
+          WHEN 'MONDAY' THEN 0 WHEN 'TUESDAY' THEN 1 WHEN 'WEDNESDAY' THEN 2
+          WHEN 'THURSDAY' THEN 3 WHEN 'FRIDAY' THEN 4 WHEN 'SATURDAY' THEN 5 WHEN 'SUNDAY' THEN 6
+        END
+      ) DAY)
+  );
+
+
+-- =====================================================================
+-- WORK LOG ENTRIES — Audit trail of admin adjustments
+-- =====================================================================
+
+INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
+SELECT e.id, CURDATE() - INTERVAL 2 DAY, 'ADD_OVERTIME_HOURS', 4.00, TRUE,
+       'Cubrir turno extra por alerta critica en Dragon Fury', 'admin', NOW() - INTERVAL 2 DAY
+FROM employee e WHERE e.email = 'carlos.martinez@magicworld.com';
+
+INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
+SELECT e.id, CURDATE() - INTERVAL 3 DAY, 'ADD_OVERTIME_HOURS', 2.00, TRUE,
+       'Horas extra evento especial nocturno', 'admin', NOW() - INTERVAL 3 DAY
+FROM employee e WHERE e.email = 'ana.garcia@magicworld.com';
+
+INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
+SELECT e.id, CURDATE() - INTERVAL 1 DAY, 'REMOVE_SCHEDULED_DAY', 8.00, FALSE,
+       'Dia libre compensatorio por horas extra acumuladas', 'admin', NOW() - INTERVAL 1 DAY
+FROM employee e WHERE e.email = 'pedro.lopez@magicworld.com';
+
+INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
+SELECT e.id, CURDATE() - INTERVAL 4 DAY, 'ADD_ABSENCE', 8.00, FALSE,
+       'Falta injustificada - no se presento al turno', 'admin', NOW() - INTERVAL 4 DAY
+FROM employee e WHERE e.email = 'jorge.navarro@magicworld.com';
+
+INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
+SELECT e.id, CURDATE() - INTERVAL 5 DAY, 'ADD_OVERTIME_HOURS', 3.00, TRUE,
+       'Refuerzo de seguridad para evento VIP', 'admin', NOW() - INTERVAL 5 DAY
+FROM employee e WHERE e.email = 'antonio.vega@magicworld.com';
+
+INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
+SELECT e.id, CURDATE() - INTERVAL 2 DAY, 'ADD_OVERTIME_HOURS', 5.00, TRUE,
+       'Guardia medica extendida por incidencia', 'admin', NOW() - INTERVAL 2 DAY
+FROM employee e WHERE e.email = 'roberto.mendez@magicworld.com';
+
+INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
+SELECT e.id, CURDATE() - INTERVAL 1 DAY, 'REMOVE_ABSENCE', 8.00, FALSE,
+       'Correccion: la falta fue un error administrativo', 'admin', NOW() - INTERVAL 1 DAY
+FROM employee e WHERE e.email = 'jorge.navarro@magicworld.com';
+
+INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
+SELECT e.id, CURDATE() - INTERVAL 3 DAY, 'ADD_OVERTIME_HOURS', 2.50, TRUE,
+       'Mantenimiento urgente en Splash Mountain fuera de horario', 'admin', NOW() - INTERVAL 3 DAY
+FROM employee e WHERE e.email = 'ricardo.cabrera@magicworld.com';
+
+
+-- =====================================================================
+-- ADDITIONAL PARK EVENTS — More queue data for attraction performance stats
+-- =====================================================================
+
+INSERT INTO park_event (event_type, timestamp, attraction_id, queue_size, metadata)
+VALUES
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 3 HOUR, (SELECT id FROM attraction WHERE name = 'Velocity Coaster'), 20, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 2 HOUR, (SELECT id FROM attraction WHERE name = 'Velocity Coaster'), 38, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 1 HOUR, (SELECT id FROM attraction WHERE name = 'Velocity Coaster'), 55, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Velocity Coaster'), 62, NULL);
+
+INSERT INTO park_event (event_type, timestamp, attraction_id, queue_size, metadata)
+VALUES
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 2 HOUR - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Magic Carousel'), 12, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 1 HOUR - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Magic Carousel'), 18, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 45 MINUTE, (SELECT id FROM attraction WHERE name = 'Magic Carousel'), 22, NULL);
+
+INSERT INTO park_event (event_type, timestamp, attraction_id, queue_size, metadata)
+VALUES
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 2 HOUR, (SELECT id FROM attraction WHERE name = 'Pirate Rapids'), 25, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 1 HOUR, (SELECT id FROM attraction WHERE name = 'Pirate Rapids'), 40, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 20 MINUTE, (SELECT id FROM attraction WHERE name = 'Pirate Rapids'), 50, NULL);
+
+INSERT INTO park_event (event_type, timestamp, attraction_id, queue_size, metadata)
+VALUES
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 2 HOUR - INTERVAL 15 MINUTE, (SELECT id FROM attraction WHERE name = 'Haunted Manor'), 15, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 1 HOUR - INTERVAL 15 MINUTE, (SELECT id FROM attraction WHERE name = 'Haunted Manor'), 28, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Haunted Manor'), 35, NULL);
+
+INSERT INTO park_event (event_type, timestamp, attraction_id, queue_size, metadata)
+VALUES
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 1 HOUR - INTERVAL 45 MINUTE, (SELECT id FROM attraction WHERE name = 'Sky Swings'), 18, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 50 MINUTE, (SELECT id FROM attraction WHERE name = 'Sky Swings'), 30, NULL);
+
+INSERT INTO park_event (event_type, timestamp, attraction_id, queue_size, metadata)
+VALUES
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 2 HOUR - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Storm Chaser'), 22, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 1 HOUR - INTERVAL 30 MINUTE, (SELECT id FROM attraction WHERE name = 'Storm Chaser'), 42, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 40 MINUTE, (SELECT id FROM attraction WHERE name = 'Storm Chaser'), 58, NULL);
+
+INSERT INTO park_event (event_type, timestamp, attraction_id, queue_size, metadata)
+VALUES
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 2 HOUR, (SELECT id FROM attraction WHERE name = 'Space Journey'), 10, NULL),
+    ('ATTRACTION_QUEUE_JOIN', NOW() - INTERVAL 1 HOUR, (SELECT id FROM attraction WHERE name = 'Space Journey'), 16, NULL);
+
+INSERT INTO park_event (event_type, timestamp, visitor_count, queue_size, metadata)
+VALUES
+    ('PARK_ENTRY', NOW() - INTERVAL 4 HOUR, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 3 HOUR - INTERVAL 30 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 3 HOUR - INTERVAL 15 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 2 HOUR - INTERVAL 45 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 2 HOUR - INTERVAL 15 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 1 HOUR - INTERVAL 45 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 1 HOUR - INTERVAL 15 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 50 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 35 MINUTE, 1, NULL, NULL),
+    ('PARK_ENTRY', NOW() - INTERVAL 10 MINUTE, 1, NULL, NULL);
+
+
+-- =====================================================================
+-- ADDITIONAL PURCHASE DATA — Past/future months for seasonality
+-- =====================================================================
+
+INSERT INTO users (username, firstname, lastname, email, password, user_role)
+SELECT 'stats_buyer', 'Stats', 'Buyer', 'stats@magicworld.com', '$2a$10$npnS7VQwMJgzjsVSOe6YLuCfUZSh7Lql2OPjZXedTnhgaEih7GxMa', 'USER'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'stats_buyer');
+
+-- February 2026 (low season — winter)
+INSERT INTO purchase (purchase_date, buyer_id)
+SELECT dates.d, (SELECT id FROM users WHERE username = 'stats_buyer')
+FROM (
+    SELECT '2026-02-01' AS d UNION ALL SELECT '2026-02-07' UNION ALL SELECT '2026-02-14' UNION ALL SELECT '2026-02-21'
+) dates;
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 40, p.id, 40 * t.cost, 'Adult'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Adult'
+WHERE u.username = 'stats_buyer' AND p.purchase_date BETWEEN '2026-02-01' AND '2026-02-28';
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 20, p.id, 20 * t.cost, 'Child'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Child'
+WHERE u.username = 'stats_buyer' AND p.purchase_date BETWEEN '2026-02-01' AND '2026-02-28';
+
+-- July 2026 (peak summer)
+INSERT INTO purchase (purchase_date, buyer_id)
+SELECT dates.d, (SELECT id FROM users WHERE username = 'stats_buyer')
+FROM (
+    SELECT '2026-07-01' AS d UNION ALL SELECT '2026-07-05' UNION ALL SELECT '2026-07-10' UNION ALL
+    SELECT '2026-07-15' UNION ALL SELECT '2026-07-20' UNION ALL SELECT '2026-07-25' UNION ALL SELECT '2026-07-30'
+) dates;
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 280, p.id, 280 * t.cost, 'Adult'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Adult'
+WHERE u.username = 'stats_buyer' AND p.purchase_date BETWEEN '2026-07-01' AND '2026-07-31';
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 150, p.id, 150 * t.cost, 'Child'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Child'
+WHERE u.username = 'stats_buyer' AND p.purchase_date BETWEEN '2026-07-01' AND '2026-07-31';
+
+-- August 2026 (peak summer)
+INSERT INTO purchase (purchase_date, buyer_id)
+SELECT dates.d, (SELECT id FROM users WHERE username = 'stats_buyer')
+FROM (
+    SELECT '2026-08-01' AS d UNION ALL SELECT '2026-08-05' UNION ALL SELECT '2026-08-10' UNION ALL
+    SELECT '2026-08-15' UNION ALL SELECT '2026-08-20' UNION ALL SELECT '2026-08-25'
+) dates;
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 280, p.id, 280 * t.cost, 'Adult'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Adult'
+WHERE u.username = 'stats_buyer' AND p.purchase_date BETWEEN '2026-08-01' AND '2026-08-31';
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 120, p.id, 120 * t.cost, 'Child'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Child'
+WHERE u.username = 'stats_buyer' AND p.purchase_date BETWEEN '2026-08-01' AND '2026-08-31';
+
+-- September 2026 (moderate — back to school)
+INSERT INTO purchase (purchase_date, buyer_id)
+SELECT dates.d, (SELECT id FROM users WHERE username = 'stats_buyer')
+FROM (
+    SELECT '2026-09-05' AS d UNION ALL SELECT '2026-09-12' UNION ALL SELECT '2026-09-19' UNION ALL SELECT '2026-09-26'
+) dates;
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 80, p.id, 80 * t.cost, 'Adult'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Adult'
+WHERE u.username = 'stats_buyer' AND p.purchase_date BETWEEN '2026-09-01' AND '2026-09-30';
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 30, p.id, 30 * t.cost, 'Child'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Child'
+WHERE u.username = 'stats_buyer' AND p.purchase_date BETWEEN '2026-09-01' AND '2026-09-30';
+
+-- November 2026 (low season)
+INSERT INTO purchase (purchase_date, buyer_id)
+SELECT dates.d, (SELECT id FROM users WHERE username = 'stats_buyer')
+FROM (
+    SELECT '2026-11-07' AS d UNION ALL SELECT '2026-11-14' UNION ALL SELECT '2026-11-21'
+) dates;
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 50, p.id, 50 * t.cost, 'Adult'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Adult'
+WHERE u.username = 'stats_buyer' AND p.purchase_date BETWEEN '2026-11-01' AND '2026-11-30';
+
+-- December 2026 (Christmas boost)
+INSERT INTO purchase (purchase_date, buyer_id)
+SELECT dates.d, (SELECT id FROM users WHERE username = 'stats_buyer')
+FROM (
+    SELECT '2026-12-20' AS d UNION ALL SELECT '2026-12-23' UNION ALL SELECT '2026-12-26' UNION ALL SELECT '2026-12-30'
+) dates;
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 180, p.id, 180 * t.cost, 'Adult'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Adult'
+WHERE u.username = 'stats_buyer' AND p.purchase_date BETWEEN '2026-12-01' AND '2026-12-31';
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT p.purchase_date, 100, p.id, 100 * t.cost, 'Child'
+FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Child'
+WHERE u.username = 'stats_buyer' AND p.purchase_date BETWEEN '2026-12-01' AND '2026-12-31';
 

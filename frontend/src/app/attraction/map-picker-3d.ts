@@ -1,10 +1,11 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, Input, Output, EventEmitter, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { ParkEnvironment } from '../park-map/park-environment';
+import { ParkBuilder } from '../park-map/park-builder';
 import { AttractionMeshFactory } from '../park-map/attraction-mesh-factory';
-import { isWebGLAvailable, createPath, addSimpleLights } from '../park-map/three-utils';
+import { AttractionApiService } from './attraction.service';
+import { isWebGLAvailable, addSimpleLights } from '../park-map/three-utils';
 
 @Component({
   selector: 'app-map-picker-3d',
@@ -74,6 +75,7 @@ export class MapPicker3DComponent implements AfterViewInit, OnDestroy, OnChanges
   @Input() positionX = 50;
   @Input() positionY = 50;
   @Input() category = 'OTHER';
+  @Input() excludeId?: number;
   @Output() positionChange = new EventEmitter<{ x: number; y: number }>();
 
   markerScreenX = 0;
@@ -81,11 +83,13 @@ export class MapPicker3DComponent implements AfterViewInit, OnDestroy, OnChanges
   markerVisible = false;
   webglError = false;
 
+  private attractionApi = inject(AttractionApiService);
+
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
   private controls!: OrbitControls;
-  private parkEnvironment = new ParkEnvironment();
+  private parkBuilder = new ParkBuilder();
   private meshFactory = new AttractionMeshFactory();
   private animationId: number | null = null;
   private markerMesh: THREE.Group | null = null;
@@ -145,16 +149,17 @@ export class MapPicker3DComponent implements AfterViewInit, OnDestroy, OnChanges
 
     addSimpleLights(this.scene);
     this.buildEnvironment();
+    this.loadExistingAttractions();
     this.initialized = true;
     this.updateMarkerPosition();
     this.animate();
   }
 
-
   private buildEnvironment(): void {
-    const ground = this.parkEnvironment.createGround(120);
-    this.scene.add(ground);
+    // Use ParkBuilder for full environment (walls, towers, lake, decorations, etc.)
+    this.parkBuilder.buildParkEnvironment(this.scene);
 
+    // Add invisible ground plane for raycasting clicks
     const invisibleGround = new THREE.Mesh(
       new THREE.PlaneGeometry(120, 120),
       new THREE.MeshBasicMaterial({ visible: false })
@@ -163,46 +168,36 @@ export class MapPicker3DComponent implements AfterViewInit, OnDestroy, OnChanges
     invisibleGround.position.y = 0.1;
     this.groundPlane = invisibleGround;
     this.scene.add(invisibleGround);
+  }
 
-    // Plaza central
-    const centralPlaza = this.parkEnvironment.createCircularPlaza(12);
-    centralPlaza.position.set(0, 0.02, 0);
-    this.scene.add(centralPlaza);
+  private loadExistingAttractions(): void {
+    this.attractionApi.findAll().subscribe({
+      next: (attractions) => {
+        const parkSize = 100;
+        attractions.forEach(attraction => {
+          if (attraction.id === this.excludeId) return;
+          if (!attraction.isActive) return;
 
-    // Plaza de entrada
-    const entrancePlaza = this.parkEnvironment.createCircularPlaza(8);
-    entrancePlaza.position.set(0, 0.02, -45);
-    this.scene.add(entrancePlaza);
+          const mesh = this.meshFactory.createAttractionMesh(attraction);
+          const x = ((attraction.mapPositionX || 50) / 100 - 0.5) * parkSize;
+          const z = ((attraction.mapPositionY || 50) / 100 - 0.5) * parkSize;
+          mesh.position.set(x, 0, z);
 
-    // Caminos principales (cruz central)
-    this.scene.add(createPath(0, -45, 0, 40, 6, true));
-    this.scene.add(createPath(-40, 0, 40, 0, 5, false));
+          // Make existing attractions semi-transparent to distinguish from the placement marker
+          mesh.traverse((child: any) => {
+            if (child.isMesh && child.material) {
+              const mat = child.material.clone();
+              mat.transparent = true;
+              mat.opacity = 0.6;
+              child.material = mat;
+            }
+          });
 
-    // Plazas secundarias y conexiones
-    const plazaPositions = [
-      { x: 30, z: 25 }, { x: -30, z: 25 },
-      { x: 30, z: -20 }, { x: -30, z: -20 }
-    ];
-    plazaPositions.forEach(pos => {
-      const plaza = this.parkEnvironment.createCircularPlaza(5);
-      plaza.position.set(pos.x, 0.02, pos.z);
-      this.scene.add(plaza);
+          this.scene.add(mesh);
+        });
+      },
+      error: () => { /* silent – environment still works */ }
     });
-
-    // Caminos a plazas
-    this.scene.add(createPath(30, 0, 30, 25, 4, true));
-    this.scene.add(createPath(-30, 0, -30, 25, 4, true));
-    this.scene.add(createPath(30, 0, 30, -20, 4, true));
-    this.scene.add(createPath(-30, 0, -30, -20, 4, true));
-
-    // Anillo exterior
-    this.scene.add(createPath(-30, 25, 30, 25, 3, false));
-    this.scene.add(createPath(-30, -20, 30, -20, 3, false));
-    this.scene.add(createPath(30, -20, 30, 25, 3, true));
-    this.scene.add(createPath(-30, -20, -30, 25, 3, true));
-
-    // Decoraciones simplificadas
-    this.parkEnvironment.addDecorations(this.scene);
   }
 
 

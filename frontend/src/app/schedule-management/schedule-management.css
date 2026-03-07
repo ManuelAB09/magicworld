@@ -1,9 +1,13 @@
+:host {
+  display: block;
+  background-color: #faebd7;
+  min-height: 100vh;
+}
+
 .schedule-management {
   padding: 1.5rem;
   max-width: 100%;
   overflow-x: hidden;
-  background-color: #faebd7;
-  min-height: 100vh;
 }
 
 .page-header {

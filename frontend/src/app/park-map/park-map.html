@@ -36,6 +36,25 @@
         </div>
       </div>
       <p class="tooltip__description">{{ hoveredAttraction.description | slice:0:80 }}...</p>
+      @if (getQueueStatus(); as qs) {
+        <div class="tooltip__queue-info">
+          @if (qs.isOpen) {
+            <div class="tooltip__queue-row">
+              <span class="tooltip__queue-dot" [class.queue-low]="qs.queueSize < 20" [class.queue-mid]="qs.queueSize >= 20 && qs.queueSize < 50" [class.queue-high]="qs.queueSize >= 50"></span>
+              <span>{{ qs.queueSize }} {{ 'PARK_MAP.TOOLTIP.QUEUE' | translate }}</span>
+            </div>
+            <div class="tooltip__queue-row">
+              <i class="bi bi-clock"></i>
+              <span>{{ 'PARK_MAP.TOOLTIP.WAIT' | translate }}: {{ qs.estimatedWaitMinutes }} {{ 'PARK_MAP.TOOLTIP.MIN' | translate }}</span>
+            </div>
+          } @else {
+            <div class="tooltip__queue-row tooltip__queue-closed">
+              <i class="bi bi-x-circle"></i>
+              <span>{{ 'PARK_MAP.TOOLTIP.CLOSED' | translate }}</span>
+            </div>
+          }
+        </div>
+      }
       <span class="tooltip__cta">{{ 'PARK_MAP.TOOLTIP.VIEW_DETAILS' | translate }} →</span>
     </div>
   }

@@ -26,6 +26,7 @@ import { ProfileComponent } from './profile/profile';
 import { RequireAuthGuard } from './auth/RequireAuthGuard';
 import { OAuth2SetPassword } from './auth/oauth2-set-password/oauth2-set-password';
 import { ParkConfigComponent } from './park-config/park-config';
+import { StatisticsDashboardComponent } from './statistics/statistics-dashboard';
 
 export const routes: Routes = [
   { path: 'login',
@@ -75,6 +76,7 @@ export const routes: Routes = [
   { path: 'admin/employees', component: EmployeeManagementComponent, canActivate: [AdminGuard] },
   { path: 'admin/schedule', component: ScheduleManagementComponent, canActivate: [AdminGuard] },
   { path: 'admin/park-config', component: ParkConfigComponent, canActivate: [AdminGuard] },
+  { path: 'admin/statistics', component: StatisticsDashboardComponent, canActivate: [AdminGuard] },
 
   { path: 'checkout', component: CheckoutStep1Component },
   { path: 'checkout/step2', component: CheckoutStep2Component },

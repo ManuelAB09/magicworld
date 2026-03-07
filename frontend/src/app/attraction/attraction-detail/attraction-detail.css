@@ -247,6 +247,58 @@
   color: #2c0d0d;
 }
 
+.schedule {
+  background: linear-gradient(135deg, #f0f8ff 0%, #e8f4fd 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid #6ba3d6;
+}
+
+.schedule h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #2c0d0d;
+  font-weight: 700;
+}
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #6ba3d6;
+}
+
+.schedule-item i {
+  font-size: 1.5rem;
+  color: #2a6fad;
+}
+
+.schedule-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.schedule-label {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.schedule-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c0d0d;
+}
+
 .actions {
   display: flex;
   gap: 1rem;

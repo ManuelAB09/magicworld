@@ -67,6 +67,12 @@
               {{ 'ATTRACTIONS.MIN_CONSTRAINTS' | translate }}:
               {{ a.minimumHeight }}cm · {{ a.minimumAge }}y · {{ a.minimumWeight }}kg
             </p>
+            @if (a.openingTime && a.closingTime) {
+              <p class="attr-schedule">
+                <i class="bi bi-clock"></i>
+                {{ a.openingTime }} - {{ a.closingTime }}
+              </p>
+            }
             <p class="attr-desc" title="{{ a.description }}">{{ a.description }}</p>
             <p class="attr-is_active" [ngClass]="{ active: a.isActive, inactive: !a.isActive }">
               @if (a.isActive) {

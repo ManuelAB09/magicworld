@@ -78,6 +78,28 @@
             </div>
           </div>
 
+          @if (attraction.openingTime && attraction.closingTime) {
+            <div class="schedule">
+              <h3>{{ 'ATTRACTION_DETAIL.SCHEDULE' | translate }}</h3>
+              <div class="schedule-grid">
+                <div class="schedule-item">
+                  <i class="bi bi-door-open"></i>
+                  <div class="schedule-content">
+                    <span class="schedule-label">{{ 'ATTRACTION_DETAIL.OPENING_TIME' | translate }}</span>
+                    <span class="schedule-value">{{ attraction.openingTime }}</span>
+                  </div>
+                </div>
+                <div class="schedule-item">
+                  <i class="bi bi-door-closed"></i>
+                  <div class="schedule-content">
+                    <span class="schedule-label">{{ 'ATTRACTION_DETAIL.CLOSING_TIME' | translate }}</span>
+                    <span class="schedule-value">{{ attraction.closingTime }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
           <div class="actions">
             <button class="btn btn-outline" (click)="goToAttractions()">
               <i class="bi bi-grid"></i>

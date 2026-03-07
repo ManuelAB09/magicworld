@@ -1,0 +1,39 @@
+<div class="statistics-container">
+  <div class="page-header">
+    <h1>{{ 'stats.title' | translate }}</h1>
+    <div class="date-range-picker">
+      <label>{{ 'stats.from' | translate }}</label>
+      <input type="date" [(ngModel)]="dateFrom" />
+      <label>{{ 'stats.to' | translate }}</label>
+      <input type="date" [(ngModel)]="dateTo" />
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn" [class.active]="activeTab === 'employees'" (click)="setTab('employees')">
+      <i class="fa-solid fa-users"></i>
+      {{ 'stats.tabs.employees' | translate }}
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'park'" (click)="setTab('park')">
+      <i class="fa-solid fa-chart-bar"></i>
+      {{ 'stats.tabs.park' | translate }}
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'worklog'" (click)="setTab('worklog')">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+      {{ 'stats.tabs.worklog' | translate }}
+    </button>
+  </div>
+
+  <div class="tab-content">
+    @if (activeTab === 'employees') {
+      <app-employee-stats [dateFrom]="dateFrom" [dateTo]="dateTo" />
+    }
+    @if (activeTab === 'park') {
+      <app-park-stats [dateFrom]="dateFrom" [dateTo]="dateTo" />
+    }
+    @if (activeTab === 'worklog') {
+      <app-work-log [dateFrom]="dateFrom" [dateTo]="dateTo" />
+    }
+  </div>
+</div>
+

@@ -42,4 +42,12 @@ public interface WeeklyScheduleRepository extends JpaRepository<WeeklySchedule, 
         void deleteByEmployeeIdAndWeekStartDateGreaterThanEqual(Long employeeId, LocalDate fromDate);
 
         void deleteByEmployeeId(Long employeeId);
+
+        List<WeeklySchedule> findByEmployeeIdAndWeekStartDateBetween(
+                        Long employeeId, LocalDate from, LocalDate to);
+
+        @Query("SELECT ws FROM WeeklySchedule ws JOIN FETCH ws.employee " +
+                        "WHERE ws.weekStartDate BETWEEN :from AND :to")
+        List<WeeklySchedule> findAllInDateRangeWithEmployee(
+                        @Param("from") LocalDate from, @Param("to") LocalDate to);
 }

@@ -9,9 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +20,7 @@ public class ScheduleService {
     private final EmployeeRepository employeeRepository;
     private final AttractionRepository attractionRepository;
     private final ParkZoneRepository zoneRepository;
+    private final WorkLogRepository workLogRepository;
 
     @Transactional(readOnly = true)
     public List<WeeklyScheduleDTO> getWeekSchedule(LocalDate weekStart) {
@@ -47,7 +46,7 @@ public class ScheduleService {
                 .orElseThrow(() -> new IllegalArgumentException("error.employee.notfound"));
 
         validateAssignment(employee.getRole(), request);
-        validateMaxDaysPerWeek(employee.getId(), normalizedWeekStart, request.getDayOfWeek());
+        boolean isOvertime = checkAndValidateDays(employee.getId(), normalizedWeekStart, request.getDayOfWeek());
 
         WeeklySchedule schedule = WeeklySchedule.builder()
                 .employee(employee)
@@ -55,13 +54,21 @@ public class ScheduleService {
                 .dayOfWeek(request.getDayOfWeek())
                 .shift(request.getShift())
                 .breakGroup(request.getBreakGroup())
+                .isOvertime(isOvertime)
                 .build();
 
         assignLocation(schedule, request);
         return toDTO(scheduleRepository.save(schedule));
     }
 
-    private void validateMaxDaysPerWeek(Long employeeId, LocalDate weekStart, DayOfWeek newDay) {
+    /**
+     * Returns true if this assignment should be marked as overtime.
+     * Rules:
+     * - Cannot assign the same day twice.
+     * - Up to 5 days: normal assignment (returns false).
+     * - 6th/7th day: only allowed if there are coverage issues on that day (returns true = overtime).
+     */
+    private boolean checkAndValidateDays(Long employeeId, LocalDate weekStart, DayOfWeek newDay) {
         List<WeeklySchedule> existingSchedules = scheduleRepository
                 .findByEmployeeIdAndWeekStartDate(employeeId, weekStart);
 
@@ -71,13 +78,35 @@ public class ScheduleService {
             throw new IllegalArgumentException("error.schedule.already.assigned");
         }
 
-        if (existingSchedules.size() >= 5) {
-            throw new IllegalArgumentException("error.schedule.max.days.exceeded");
+        if (existingSchedules.size() < 5) {
+            return false; // Normal day, no overtime
         }
+
+        // 5+ days already — check if there are coverage issues to justify overtime
+        if (hasCoverageIssuesOnDay(weekStart, newDay)) {
+            return true; // Allow as overtime
+        }
+
+        throw new IllegalArgumentException("error.schedule.max.days.exceeded");
+    }
+
+    private boolean hasCoverageIssuesOnDay(LocalDate weekStart, DayOfWeek day) {
+        LocalDate date = weekStart.plusDays(day.getValue() - 1);
+        List<Attraction> activeAttractions = attractionRepository.findByIsActiveTrue();
+        List<ParkZone> zones = zoneRepository.findAll();
+
+        Map<LocalDate, Set<Long>> absentByDate = buildAbsentMap(weekStart, weekStart.plusDays(6));
+        Set<Long> absentIds = absentByDate.getOrDefault(date, Set.of());
+
+        List<CoverageValidationResult.CoverageIssue> issues =
+                validateDayCoverage(weekStart, day, date, activeAttractions, zones, absentIds);
+
+        return !issues.isEmpty();
     }
 
     @Transactional
     public void deleteScheduleEntry(Long id) {
+
         scheduleRepository.deleteById(id);
     }
 
@@ -243,16 +272,21 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public CoverageValidationResult validateWeekCoverage(LocalDate weekStart) {
         LocalDate normalizedWeekStart = normalizeToMonday(weekStart);
+        LocalDate weekEnd = normalizedWeekStart.plusDays(6);
         List<CoverageValidationResult.CoverageIssue> issues = new ArrayList<>();
 
         List<Attraction> activeAttractions = attractionRepository.findByIsActiveTrue();
         List<ParkZone> zones = zoneRepository.findAll();
 
+        // Build a map of date → set of absent employee IDs from WorkLog
+        Map<LocalDate, Set<Long>> absentByDate = buildAbsentMap(normalizedWeekStart, weekEnd);
+
         for (int i = 0; i < 7; i++) {
             DayOfWeek day = DayOfWeek.of((i % 7) + 1);
             LocalDate date = normalizedWeekStart.plusDays(i);
+            Set<Long> absentIds = absentByDate.getOrDefault(date, Set.of());
 
-            issues.addAll(validateDayCoverage(normalizedWeekStart, day, date, activeAttractions, zones));
+            issues.addAll(validateDayCoverage(normalizedWeekStart, day, date, activeAttractions, zones, absentIds));
         }
 
         return CoverageValidationResult.builder()
@@ -262,12 +296,61 @@ public class ScheduleService {
                 .build();
     }
 
+    private Map<LocalDate, Set<Long>> buildAbsentMap(LocalDate from, LocalDate to) {
+        List<WorkLog> absenceLogs = workLogRepository.findAllByTargetDateBetween(from, to);
+
+        Map<LocalDate, Map<Long, Integer>> countByDateEmployee = new HashMap<>();
+        for (WorkLog log : absenceLogs) {
+            if (log.getAction() == WorkLogAction.ADD_ABSENCE || log.getAction() == WorkLogAction.REMOVE_ABSENCE) {
+                Long empId = log.getEmployee().getId();
+                LocalDate date = log.getTargetDate();
+                countByDateEmployee.computeIfAbsent(date, k -> new HashMap<>());
+                int delta = log.getAction() == WorkLogAction.ADD_ABSENCE ? 1 : -1;
+                countByDateEmployee.get(date).merge(empId, delta, Integer::sum);
+            }
+        }
+
+        Map<LocalDate, Set<Long>> result = new HashMap<>();
+        for (var dateEntry : countByDateEmployee.entrySet()) {
+            Set<Long> absentIds = new HashSet<>();
+            for (var empEntry : dateEntry.getValue().entrySet()) {
+                if (empEntry.getValue() > 0) {
+                    absentIds.add(empEntry.getKey());
+                }
+            }
+            if (!absentIds.isEmpty()) {
+                result.put(dateEntry.getKey(), absentIds);
+            }
+        }
+        return result;
+    }
+
     private List<CoverageValidationResult.CoverageIssue> validateDayCoverage(
             LocalDate weekStart, DayOfWeek day, LocalDate date,
-            List<Attraction> attractions, List<ParkZone> zones) {
+            List<Attraction> attractions, List<ParkZone> zones, Set<Long> absentIds) {
 
         List<CoverageValidationResult.CoverageIssue> issues = new ArrayList<>();
-        List<WeeklySchedule> daySchedules = scheduleRepository.findByWeekStartDateAndDayOfWeek(weekStart, day);
+        List<WeeklySchedule> allDaySchedules = scheduleRepository.findByWeekStartDateAndDayOfWeek(weekStart, day);
+
+        // Flag absent employees
+        for (WeeklySchedule ws : allDaySchedules) {
+            if (absentIds.contains(ws.getEmployee().getId())) {
+                issues.add(CoverageValidationResult.CoverageIssue.builder()
+                        .date(date)
+                        .issueType("EMPLOYEE_ABSENT")
+                        .description("schedule.issues.EMPLOYEE_ABSENT")
+                        .attractionId(ws.getAssignedAttraction() != null ? ws.getAssignedAttraction().getId() : null)
+                        .attractionName(ws.getAssignedAttraction() != null ? ws.getAssignedAttraction().getName() : null)
+                        .zoneId(ws.getAssignedZone() != null ? ws.getAssignedZone().getId() : null)
+                        .zoneName(ws.getAssignedZone() != null ? ws.getAssignedZone().getZoneName().name() : null)
+                        .build());
+            }
+        }
+
+        // Only count non-absent employees for coverage
+        List<WeeklySchedule> daySchedules = allDaySchedules.stream()
+                .filter(s -> !absentIds.contains(s.getEmployee().getId()))
+                .toList();
 
         Map<Long, List<WeeklySchedule>> byAttraction = daySchedules.stream()
                 .filter(s -> s.getAssignedAttraction() != null)

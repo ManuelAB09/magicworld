@@ -28,4 +28,16 @@ public interface ParkEventRepository extends JpaRepository<ParkEvent, Long> {
             @Param("attractionId") Long attractionId,
             @Param("types") List<ParkEventType> types,
             @Param("since") LocalDateTime since);
+
+    @Query("SELECT e.attractionId, COUNT(e), " +
+           "COALESCE(MAX(e.queueSize), 0), " +
+           "COALESCE(AVG(e.queueSize), 0) " +
+           "FROM ParkEvent e " +
+           "WHERE e.eventType = 'ATTRACTION_QUEUE_JOIN' " +
+           "AND e.attractionId IS NOT NULL " +
+           "AND e.timestamp BETWEEN :from AND :to " +
+           "GROUP BY e.attractionId " +
+           "ORDER BY COUNT(e) DESC")
+    List<Object[]> findAttractionPerformanceStats(
+            @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 }

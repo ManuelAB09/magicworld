@@ -83,6 +83,16 @@
           </div>
 
           <div class="field">
+            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.OPENING_TIME' | translate }}</label>
+            <input type="time" class="field__input" formControlName="openingTime" />
+          </div>
+
+          <div class="field">
+            <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.CLOSING_TIME' | translate }}</label>
+            <input type="time" class="field__input" formControlName="closingTime" />
+          </div>
+
+          <div class="field">
             <label class="field__label">{{ 'ATTRACTION_FORM.FIELDS.PHOTO_URL' | translate }}</label>
             <div class="file-input">
               <label class="file-input__button" for="photoFile">
@@ -110,6 +120,7 @@
               [positionX]="form.value.mapPositionX"
               [positionY]="form.value.mapPositionY"
               [category]="form.value.category"
+              [excludeId]="id ?? undefined"
               (positionChange)="onMapPositionChange($event)">
             </app-map-picker-3d>
             @if ((form.get('mapPositionX')?.touched && form.get('mapPositionX')?.invalid) ||

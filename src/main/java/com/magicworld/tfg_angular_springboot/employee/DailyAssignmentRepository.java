@@ -38,4 +38,12 @@ public interface DailyAssignmentRepository extends JpaRepository<DailyAssignment
             @Param("attractionId") Long attractionId);
 
     void deleteByEmployeeId(Long employeeId);
+
+    List<DailyAssignment> findByEmployeeIdAndAssignmentDateBetween(
+            Long employeeId, LocalDate from, LocalDate to);
+
+    @Query("SELECT da FROM DailyAssignment da JOIN FETCH da.employee " +
+            "WHERE da.assignmentDate BETWEEN :from AND :to")
+    List<DailyAssignment> findAllInDateRangeWithEmployee(
+            @Param("from") LocalDate from, @Param("to") LocalDate to);
 }

@@ -1,0 +1,108 @@
+.employee-stats { display: flex; flex-direction: column; gap: 1rem; }
+
+.sub-tabs {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.sub-tabs button {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 8px;
+  background: white; color: #374151; font-size: 0.85rem; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+}
+.sub-tabs button:hover { background: #f3f4f6; }
+.sub-tabs button.active { background: #4f46e5; color: white; border-color: #4f46e5; }
+
+.card {
+  background: white; border-radius: 12px; padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.card h3 { margin: 0 0 1rem; color: #1f2937; font-size: 1.1rem; }
+
+.data-table {
+  width: 100%; border-collapse: collapse; font-size: 0.9rem;
+}
+.data-table th {
+  text-align: left; padding: 0.75rem; border-bottom: 2px solid #e5e7eb;
+  color: #6b7280; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;
+}
+.data-table td { padding: 0.75rem; border-bottom: 1px solid #f3f4f6; }
+.data-table tbody tr:hover { background: #f9fafb; }
+
+.rank-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #e5e7eb; font-weight: 700; font-size: 0.8rem;
+}
+.rank-badge.gold { background: #fbbf24; color: #78350f; }
+.rank-badge.silver { background: #d1d5db; color: #374151; }
+.rank-badge.bronze { background: #d97706; color: white; }
+.rank-badge.rank-warn { background: #fecaca; color: #991b1b; }
+
+.name-cell { font-weight: 500; color: #1f2937; }
+
+.role-tag {
+  display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px;
+  background: #ede9fe; color: #5b21b6; font-size: 0.78rem; font-weight: 500;
+}
+
+.overtime-badge {
+  display: inline-block; padding: 0.15rem 0.5rem; border-radius: 8px;
+  background: #fef3c7; color: #92400e; font-weight: 600; font-size: 0.85rem;
+}
+.total-cell { color: #1f2937; }
+.text-muted { color: #9ca3af; }
+
+.absence-high { color: #dc2626; font-weight: 700; }
+.absence-ok { color: #16a34a; font-weight: 600; }
+
+.salary-total {
+  background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;
+  padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 1rem; color: #166534;
+}
+.salary-total strong { font-size: 1.2rem; }
+
+.employee-selector { margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+.employee-selector label { font-weight: 500; color: #374151; white-space: nowrap; }
+.employee-selector select {
+  padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 8px;
+  font-size: 0.9rem; min-width: 280px; background: white;
+}
+
+.frequency-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.frequency-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem; background: #f9fafb; border-radius: 8px;
+}
+.freq-icon { font-size: 1.4rem; }
+.freq-info { display: flex; flex-direction: column; min-width: 140px; }
+.freq-name { font-weight: 600; color: #1f2937; font-size: 0.9rem; }
+.freq-type { font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; }
+.freq-bar-container {
+  flex: 1; height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden;
+}
+.freq-bar {
+  height: 100%; background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border-radius: 5px; transition: width 0.5s ease;
+}
+.freq-count { font-weight: 700; color: #4f46e5; font-size: 0.95rem; min-width: 40px; text-align: right; }
+
+.loading-bar {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 1.5rem; justify-content: center; color: #6b7280;
+}
+.spinner-sm {
+  width: 20px; height: 20px; border: 3px solid #e5e7eb;
+  border-top-color: #6366f1; border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.no-data { text-align: center; color: #9ca3af; padding: 2rem; font-style: italic; }
+
+@media (max-width: 768px) {
+  .data-table { font-size: 0.8rem; }
+  .data-table th, .data-table td { padding: 0.5rem; }
+  .employee-selector { flex-direction: column; align-items: flex-start; }
+  .employee-selector select { min-width: 100%; }
+}
+

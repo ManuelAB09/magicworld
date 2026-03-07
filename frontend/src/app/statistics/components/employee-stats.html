@@ -1,0 +1,198 @@
+<div class="employee-stats">
+  <div class="sub-tabs">
+    <button [class.active]="subView === 'hours'" (click)="setSubView('hours')">
+      <i class="fa-solid fa-clock"></i> {{ 'stats.employees.hours' | translate }}
+    </button>
+    <button [class.active]="subView === 'absences'" (click)="setSubView('absences')">
+      <i class="fa-solid fa-calendar-xmark"></i> {{ 'stats.employees.absences' | translate }}
+    </button>
+    <button [class.active]="subView === 'salary'" (click)="setSubView('salary')">
+      <i class="fa-solid fa-money-bill-wave"></i> {{ 'stats.employees.salaryTab' | translate }}
+    </button>
+    <button [class.active]="subView === 'frequency'" (click)="setSubView('frequency')">
+      <i class="fa-solid fa-map-pin"></i> {{ 'stats.employees.frequencyTab' | translate }}
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-bar">
+      <div class="spinner-sm"></div>
+      <span>{{ 'stats.loading' | translate }}</span>
+    </div>
+  }
+
+  <!-- HOURS RANKING -->
+  @if (subView === 'hours' && !loading) {
+    <div class="card">
+      <h3>{{ 'stats.employees.hoursRanking' | translate }}</h3>
+      @if (hoursRanking.length === 0) {
+        <p class="no-data">{{ 'stats.noData' | translate }}</p>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>{{ 'stats.employees.name' | translate }}</th>
+              <th>{{ 'stats.employees.role' | translate }}</th>
+              <th>{{ 'stats.employees.normalHours' | translate }}</th>
+              <th>{{ 'stats.employees.overtimeHours' | translate }}</th>
+              <th>{{ 'stats.employees.totalHours' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (emp of hoursRanking; track emp.employeeId; let i = $index) {
+              <tr>
+                <td>
+                  <span class="rank-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+                    {{ i + 1 }}
+                  </span>
+                </td>
+                <td class="name-cell">{{ emp.fullName }}</td>
+                <td><span class="role-tag">{{ getRoleLabel(emp.role) }}</span></td>
+                <td>{{ emp.normalHours | number:'1.1-1' }}h</td>
+                <td>
+                  @if (emp.overtimeHours > 0) {
+                    <span class="overtime-badge">+{{ emp.overtimeHours | number:'1.1-1' }}h</span>
+                  } @else {
+                    <span class="text-muted">0h</span>
+                  }
+                </td>
+                <td class="total-cell"><strong>{{ emp.totalHours | number:'1.1-1' }}h</strong></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  <!-- ABSENCES RANKING -->
+  @if (subView === 'absences' && !loading) {
+    <div class="card">
+      <h3>{{ 'stats.employees.absenceRanking' | translate }}</h3>
+      @if (absenceRanking.length === 0) {
+        <p class="no-data">{{ 'stats.noData' | translate }}</p>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>{{ 'stats.employees.name' | translate }}</th>
+              <th>{{ 'stats.employees.role' | translate }}</th>
+              <th>{{ 'stats.employees.absenceCount' | translate }}</th>
+              <th>{{ 'stats.employees.scheduledDays' | translate }}</th>
+              <th>{{ 'stats.employees.absenceRate' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (emp of absenceRanking; track emp.employeeId; let i = $index) {
+              <tr>
+                <td><span class="rank-badge rank-warn">{{ i + 1 }}</span></td>
+                <td class="name-cell">{{ emp.fullName }}</td>
+                <td><span class="role-tag">{{ getRoleLabel(emp.role) }}</span></td>
+                <td>
+                  <span [class.absence-high]="emp.absenceCount > 2" [class.absence-ok]="emp.absenceCount === 0">
+                    {{ emp.absenceCount }}
+                  </span>
+                </td>
+                <td>{{ emp.scheduledDays }}</td>
+                <td>
+                  @if (emp.scheduledDays > 0) {
+                    {{ (emp.absenceCount / emp.scheduledDays * 100) | number:'1.0-0' }}%
+                  } @else {
+                    —
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  <!-- SALARY REPORT -->
+  @if (subView === 'salary' && !loading) {
+    <div class="card">
+      <h3>{{ 'stats.employees.salaryReport' | translate }}</h3>
+      @if (salaryReport.length === 0) {
+        <p class="no-data">{{ 'stats.noData' | translate }}</p>
+      } @else {
+        <div class="salary-total">
+          {{ 'stats.employees.totalPayroll' | translate }}:
+          <strong>{{ getTotalSalary() | number:'1.2-2' }} {{ getCurrencySymbol() }}</strong>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>{{ 'stats.employees.name' | translate }}</th>
+              <th>{{ 'stats.employees.role' | translate }}</th>
+              <th>{{ 'stats.employees.hourlyRate' | translate }}</th>
+              <th>{{ 'stats.employees.normalHours' | translate }}</th>
+              <th>{{ 'stats.employees.overtimeHours' | translate }}</th>
+              <th>{{ 'stats.employees.normalPay' | translate }}</th>
+              <th>{{ 'stats.employees.overtimePay' | translate }}</th>
+              <th>{{ 'stats.employees.totalSalary' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (emp of salaryReport; track emp.employeeId) {
+              <tr>
+                <td class="name-cell">{{ emp.fullName }}</td>
+                <td><span class="role-tag">{{ getRoleLabel(emp.role) }}</span></td>
+                <td>{{ emp.hourlyRate | number:'1.2-2' }} {{ getCurrencySymbol() }}</td>
+                <td>{{ emp.normalHours | number:'1.1-1' }}h</td>
+                <td>
+                  @if (emp.overtimeHours > 0) {
+                    <span class="overtime-badge">+{{ emp.overtimeHours | number:'1.1-1' }}h</span>
+                  } @else {
+                    <span class="text-muted">0h</span>
+                  }
+                </td>
+                <td>{{ emp.normalPay | number:'1.2-2' }} {{ getCurrencySymbol() }}</td>
+                <td>{{ emp.overtimePay | number:'1.2-2' }} {{ getCurrencySymbol() }}</td>
+                <td class="total-cell"><strong>{{ emp.totalSalary | number:'1.2-2' }} {{ getCurrencySymbol() }}</strong></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  <!-- POSITION FREQUENCY -->
+  @if (subView === 'frequency' && !loading) {
+    <div class="card">
+      <h3>{{ 'stats.employees.positionFrequency' | translate }}</h3>
+      <div class="employee-selector">
+        <label>{{ 'stats.employees.selectEmployee' | translate }}:</label>
+        <select [(ngModel)]="selectedEmployeeId" (ngModelChange)="onEmployeeSelected()">
+          <option [ngValue]="null">-- {{ 'stats.employees.selectOne' | translate }} --</option>
+          @for (emp of employees; track emp.id) {
+            <option [ngValue]="emp.id">{{ emp.fullName }} ({{ getRoleLabel(emp.role) }})</option>
+          }
+        </select>
+      </div>
+      @if (selectedEmployeeId && positionFrequency.length > 0) {
+        <div class="frequency-list">
+          @for (pos of positionFrequency; track pos.positionName) {
+            <div class="frequency-item">
+              <span class="freq-icon">{{ getPositionIcon(pos.positionType) }}</span>
+              <div class="freq-info">
+                <span class="freq-name">{{ pos.positionName }}</span>
+                <span class="freq-type">{{ pos.positionType }}</span>
+              </div>
+              <div class="freq-bar-container">
+                <div class="freq-bar" [style.width.%]="(pos.assignmentCount / positionFrequency[0].assignmentCount) * 100"></div>
+              </div>
+              <span class="freq-count">{{ pos.assignmentCount }}x</span>
+            </div>
+          }
+        </div>
+      } @else if (selectedEmployeeId && positionFrequency.length === 0) {
+        <p class="no-data">{{ 'stats.noData' | translate }}</p>
+      }
+    </div>
+  }
+</div>
+

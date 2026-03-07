@@ -3,6 +3,8 @@ package com.magicworld.tfg_angular_springboot.attraction;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import java.time.LocalTime;
+
 @Data
 public class AttractionRequest {
     @NotBlank
@@ -39,5 +41,9 @@ public class AttractionRequest {
 
     @NotNull
     private Double mapPositionY;
+
+    private LocalTime openingTime;
+
+    private LocalTime closingTime;
 }
 

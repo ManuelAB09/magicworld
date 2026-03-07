@@ -112,6 +112,21 @@
   min-height: 50px;
 }
 
+.attr-schedule {
+  font-size: 0.9rem;
+  color: #2c0d0d;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.attr-schedule i {
+  color: #a11d1d;
+  font-size: 1rem;
+}
+
 .attraction-buttons {
   display: flex;
   justify-content: flex-end;

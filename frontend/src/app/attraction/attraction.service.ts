@@ -29,6 +29,8 @@ export interface Attraction {
   isActive: boolean;
   mapPositionX: number;
   mapPositionY: number;
+  openingTime?: string;
+  closingTime?: string;
 }
 
 export type AttractionData = Omit<Attraction, 'id' | 'photoUrl'>;

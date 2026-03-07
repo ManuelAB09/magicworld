@@ -43,6 +43,7 @@ public class ParkSimulatorService {
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final Map<Long, AtomicInteger> simulatedQueues = new ConcurrentHashMap<>();
     private final AtomicInteger simulatedVisitors = new AtomicInteger(0);
+    private volatile int maxVisitorsForSession = 0;
     private int tickCount = 0;
 
     @PostConstruct
@@ -53,10 +54,13 @@ public class ParkSimulatorService {
     public void start() {
         running.set(true);
         int ticketsSold = purchaseLineService.getTotalSoldForDate(java.time.LocalDate.now());
+        maxVisitorsForSession = ticketsSold > 0 ? Math.min(ticketsSold, parkMaxCapacity) : parkMaxCapacity;
         int initialVisitors = ticketsSold > 0 ? Math.min(ticketsSold, parkMaxCapacity) : 50 + random.nextInt(100);
+        initialVisitors = Math.min(initialVisitors, maxVisitorsForSession);
         simulatedVisitors.set(initialVisitors);
         initializeQueues();
-        log.info("Simulador iniciado con {} visitantes (tickets vendidos: {})", simulatedVisitors.get(), ticketsSold);
+        log.info("Simulador iniciado con {} visitantes (tickets vendidos: {}, máximo sesión: {})",
+                simulatedVisitors.get(), ticketsSold, maxVisitorsForSession);
     }
 
     public void stop() {
@@ -69,18 +73,31 @@ public class ParkSimulatorService {
     }
 
     private void initializeQueues() {
-        attractionRepository.findAll().forEach(a -> {
-            if (a.getIsActive()) {
-                int initialQueue = 5 + random.nextInt(25);
-                simulatedQueues.put(a.getId(), new AtomicInteger(initialQueue));
-                dashboardService.updateAttractionState(a.getId(), ParkEventType.ATTRACTION_OPEN, null);
-                dashboardService.updateAttractionState(a.getId(), ParkEventType.ATTRACTION_QUEUE_JOIN, initialQueue);
-            } else {
-                simulatedQueues.put(a.getId(), new AtomicInteger(0));
-                dashboardService.updateAttractionState(a.getId(), ParkEventType.ATTRACTION_CLOSE, null);
-                dashboardService.updateAttractionState(a.getId(), ParkEventType.ATTRACTION_QUEUE_JOIN, 0);
-            }
-        });
+        List<Attraction> activeAttractions = attractionRepository.findAll().stream()
+                .filter(Attraction::getIsActive)
+                .toList();
+
+        // Distribute visitors across active queues without exceeding the ticket cap
+        int budget = maxVisitorsForSession > 0 ? maxVisitorsForSession : simulatedVisitors.get();
+        int remaining = budget;
+
+        for (Attraction a : activeAttractions) {
+            int maxForThis = Math.max(0, remaining);
+            int initialQueue = maxForThis > 0 ? Math.min(5 + random.nextInt(Math.min(25, maxForThis)), maxForThis) : 0;
+            simulatedQueues.put(a.getId(), new AtomicInteger(initialQueue));
+            dashboardService.updateAttractionState(a.getId(), ParkEventType.ATTRACTION_OPEN, null);
+            dashboardService.updateAttractionState(a.getId(), ParkEventType.ATTRACTION_QUEUE_JOIN, initialQueue);
+            remaining -= initialQueue;
+        }
+
+        // Inactive attractions get zero
+        attractionRepository.findAll().stream()
+                .filter(a -> !a.getIsActive())
+                .forEach(a -> {
+                    simulatedQueues.put(a.getId(), new AtomicInteger(0));
+                    dashboardService.updateAttractionState(a.getId(), ParkEventType.ATTRACTION_CLOSE, null);
+                    dashboardService.updateAttractionState(a.getId(), ParkEventType.ATTRACTION_QUEUE_JOIN, 0);
+                });
     }
 
     @Scheduled(fixedRate = 2000)
@@ -112,10 +129,16 @@ public class ParkSimulatorService {
         int entryRate = calculateEntryRate(hour);
         int exitRate = calculateExitRate(hour);
 
-        int entries = random.nextInt(entryRate) + 1;
-        for (int i = 0; i < entries; i++) {
-            recordEvent(ParkEventType.PARK_ENTRY, null, null);
-            simulatedVisitors.incrementAndGet();
+        int currentVisitors = simulatedVisitors.get();
+
+        // Only allow entries if below the ticket cap
+        if (currentVisitors < maxVisitorsForSession) {
+            int maxEntries = maxVisitorsForSession - currentVisitors;
+            int entries = Math.min(random.nextInt(entryRate) + 1, maxEntries);
+            for (int i = 0; i < entries; i++) {
+                recordEvent(ParkEventType.PARK_ENTRY, null, null);
+                simulatedVisitors.incrementAndGet();
+            }
         }
 
         if (simulatedVisitors.get() > 20) {
@@ -145,6 +168,7 @@ public class ParkSimulatorService {
 
     private void simulateAllQueues() {
         List<Attraction> attractions = attractionRepository.findAll();
+        int totalInQueues = simulatedQueues.values().stream().mapToInt(AtomicInteger::get).sum();
 
         for (Attraction attraction : attractions) {
             if (!attraction.getIsActive())
@@ -155,9 +179,16 @@ public class ParkSimulatorService {
 
             int currentQueue = queueCounter.get();
             int change = calculateQueueChange(attraction, currentQueue);
-            int newQueue = Math.max(0, currentQueue + change);
 
+            // If change is positive, ensure total queues don't exceed ticket cap
+            if (change > 0 && maxVisitorsForSession > 0) {
+                int headroom = maxVisitorsForSession - totalInQueues;
+                change = Math.min(change, Math.max(0, headroom));
+            }
+
+            int newQueue = Math.max(0, currentQueue + change);
             queueCounter.set(newQueue);
+            totalInQueues += (newQueue - currentQueue);
 
             ParkEventType eventType = change > 0
                     ? ParkEventType.ATTRACTION_QUEUE_JOIN
@@ -237,7 +268,9 @@ public class ParkSimulatorService {
     }
 
     public void reopenAttraction(Long attractionId) {
-        int initialQueue = 5 + random.nextInt(15);
+        int totalInQueues = simulatedQueues.values().stream().mapToInt(AtomicInteger::get).sum();
+        int headroom = maxVisitorsForSession > 0 ? Math.max(0, maxVisitorsForSession - totalInQueues) : 20;
+        int initialQueue = Math.min(5 + random.nextInt(15), headroom);
         simulatedQueues.computeIfAbsent(attractionId, k -> new AtomicInteger(0)).set(initialQueue);
         dashboardService.updateAttractionState(attractionId, ParkEventType.ATTRACTION_QUEUE_JOIN, initialQueue);
 

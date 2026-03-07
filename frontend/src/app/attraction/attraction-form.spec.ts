@@ -33,10 +33,11 @@ describe('AttractionForm', () => {
   };
 
   beforeEach(async () => {
-    mockApiService = jasmine.createSpyObj('AttractionApiService', ['findById', 'createMultipart', 'updateMultipart', 'delete']);
+    mockApiService = jasmine.createSpyObj('AttractionApiService', ['findAll', 'findById', 'createMultipart', 'updateMultipart', 'delete']);
     mockErrorService = jasmine.createSpyObj('ErrorService', ['handleError', 'getValidationMessages']);
     mockErrorService.handleError.and.returnValue({ code: 'error.test', args: {} });
     mockErrorService.getValidationMessages.and.returnValue([]);
+    mockApiService.findAll.and.returnValue(of([]));
 
     await TestBed.configureTestingModule({
       imports: [AttractionForm, TranslateModule.forRoot(), ReactiveFormsModule],
@@ -120,8 +121,9 @@ describe('AttractionForm', () => {
   describe('Edit mode', () => {
     beforeEach(async () => {
       await TestBed.resetTestingModule();
-      mockApiService = jasmine.createSpyObj('AttractionApiService', ['findById', 'createMultipart', 'updateMultipart', 'delete']);
+      mockApiService = jasmine.createSpyObj('AttractionApiService', ['findAll', 'findById', 'createMultipart', 'updateMultipart', 'delete']);
       mockErrorService = jasmine.createSpyObj('ErrorService', ['handleError', 'getValidationMessages']);
+      mockApiService.findAll.and.returnValue(of([]));
       mockApiService.findById.and.returnValue(of(mockAttraction));
       mockErrorService.handleError.and.returnValue({ code: 'error.test', args: {} });
       mockErrorService.getValidationMessages.and.returnValue([]);
@@ -263,8 +265,9 @@ describe('AttractionForm', () => {
   describe('Submit with file', () => {
     beforeEach(async () => {
       await TestBed.resetTestingModule();
-      mockApiService = jasmine.createSpyObj('AttractionApiService', ['findById', 'createMultipart', 'updateMultipart', 'delete']);
+      mockApiService = jasmine.createSpyObj('AttractionApiService', ['findAll', 'findById', 'createMultipart', 'updateMultipart', 'delete']);
       mockErrorService = jasmine.createSpyObj('ErrorService', ['handleError', 'getValidationMessages']);
+      mockApiService.findAll.and.returnValue(of([]));
       mockErrorService.handleError.and.returnValue({ code: 'error.test', args: {} });
       mockErrorService.getValidationMessages.and.returnValue([]);
 

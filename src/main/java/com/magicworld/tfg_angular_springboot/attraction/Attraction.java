@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.time.LocalTime;
+
 @Getter
 @Setter
 @Builder
@@ -73,6 +75,16 @@ public class Attraction extends BaseEntity {
     @JoinColumn(name = "zone_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private ParkZone zone;
+
+    @NotNull
+    @Column(name = "opening_time", nullable = false)
+    @Builder.Default
+    private LocalTime openingTime = LocalTime.of(9, 0);
+
+    @NotNull
+    @Column(name = "closing_time", nullable = false)
+    @Builder.Default
+    private LocalTime closingTime = LocalTime.of(17, 0);
 
     @NotNull
     @Enumerated(EnumType.STRING)

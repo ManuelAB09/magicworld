@@ -132,6 +132,58 @@
   gap: 4px;
 }
 
+.tooltip__queue-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tooltip__queue-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2c0d0d;
+}
+
+.tooltip__queue-row i {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.tooltip__queue-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.tooltip__queue-dot.queue-low {
+  background: #10b981;
+}
+
+.tooltip__queue-dot.queue-mid {
+  background: #f59e0b;
+}
+
+.tooltip__queue-dot.queue-high {
+  background: #ef4444;
+}
+
+.tooltip__queue-closed {
+  color: #9ca3af;
+}
+
+.tooltip__queue-closed i {
+  color: #9ca3af;
+}
+
 .park-map__controls {
   position: absolute;
   bottom: 30px;

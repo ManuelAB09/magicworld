@@ -62,7 +62,9 @@ export class AttractionForm implements OnInit {
       description: ['', [Validators.required, Validators.maxLength(255)]],
       isActive: [true, [Validators.required]],
       mapPositionX: [50, [Validators.required, Validators.min(0), Validators.max(100)]],
-      mapPositionY: [50, [Validators.required, Validators.min(0), Validators.max(100)]]
+      mapPositionY: [50, [Validators.required, Validators.min(0), Validators.max(100)]],
+      openingTime: ['09:00', [Validators.required]],
+      closingTime: ['17:00', [Validators.required]]
     });
   }
 
@@ -91,7 +93,9 @@ export class AttractionForm implements OnInit {
             description: a.description,
             isActive: a.isActive,
             mapPositionX: a.mapPositionX,
-            mapPositionY: a.mapPositionY
+            mapPositionY: a.mapPositionY,
+            openingTime: a.openingTime || '09:00',
+            closingTime: a.closingTime || '17:00'
           });
           this.existingPhotoUrl = a.photoUrl;
         }
@@ -142,7 +146,9 @@ export class AttractionForm implements OnInit {
       description: this.form.value.description,
       isActive: !!this.form.value.isActive,
       mapPositionX: Number(this.form.value.mapPositionX),
-      mapPositionY: Number(this.form.value.mapPositionY)
+      mapPositionY: Number(this.form.value.mapPositionY),
+      openingTime: this.form.value.openingTime,
+      closingTime: this.form.value.closingTime
     };
   }
 

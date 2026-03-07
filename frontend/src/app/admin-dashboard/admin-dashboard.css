@@ -1,9 +1,13 @@
+:host {
+  display: block;
+  background-color: #faebd7;
+  min-height: 100vh;
+}
+
 .dashboard-container {
   padding: 1.5rem;
   max-width: 1400px;
   margin: 0 auto;
-  background-color: #faebd7;
-  min-height: 100vh;
 }
 
 .dashboard-header {

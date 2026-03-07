@@ -60,6 +60,12 @@ public class AttractionService {
         existingAttraction.setIsActive(updatedAttraction.getIsActive());
         existingAttraction.setMapPositionX(updatedAttraction.getMapPositionX());
         existingAttraction.setMapPositionY(updatedAttraction.getMapPositionY());
+        if (updatedAttraction.getOpeningTime() != null) {
+            existingAttraction.setOpeningTime(updatedAttraction.getOpeningTime());
+        }
+        if (updatedAttraction.getClosingTime() != null) {
+            existingAttraction.setClosingTime(updatedAttraction.getClosingTime());
+        }
         return attractionRepository.save(existingAttraction);
     }
 }

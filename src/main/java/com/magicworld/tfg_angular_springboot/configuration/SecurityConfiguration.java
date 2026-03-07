@@ -55,6 +55,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/v1/park-closures", "/api/v1/park-closures/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/seasonal-pricing", "/api/v1/seasonal-pricing/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/attractions", "/api/v1/attractions/**","/api/v1/ticket-types","/api/v1/ticket-types/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/park-status/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/reviews").permitAll()
                         .requestMatchers("/api/v1/reviews/**").authenticated()
                         .requestMatchers("/api/v1/purchases/**").authenticated()

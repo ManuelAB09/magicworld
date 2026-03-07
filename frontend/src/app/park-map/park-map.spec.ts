@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ParkMapComponent } from './park-map';
 import { AttractionApiService, Attraction } from '../attraction/attraction.service';
+import { ParkStatusService } from './park-status.service';
+import { MapMonitoringService } from './map-monitoring.service';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
@@ -10,6 +12,8 @@ describe('ParkMapComponent', () => {
   let component: ParkMapComponent;
   let fixture: ComponentFixture<ParkMapComponent>;
   let mockAttractionService: jasmine.SpyObj<AttractionApiService>;
+  let mockParkStatusService: jasmine.SpyObj<ParkStatusService>;
+  let mockMapMonitoringService: jasmine.SpyObj<MapMonitoringService>;
   let mockRouter: jasmine.SpyObj<Router>;
 
   const mockAttractions: Attraction[] = [
@@ -24,12 +28,21 @@ describe('ParkMapComponent', () => {
   beforeEach(async () => {
     mockAttractionService = jasmine.createSpyObj('AttractionApiService', ['findAll']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockParkStatusService = jasmine.createSpyObj('ParkStatusService', [
+      'getSimulatorStatus', 'getAttractionStatuses'
+    ]);
+    mockMapMonitoringService = jasmine.createSpyObj('MapMonitoringService', [
+      'createHeatCircle', 'updateHeatCircle', 'clearAll'
+    ]);
     mockAttractionService.findAll.and.returnValue(of(mockAttractions));
+    mockParkStatusService.getSimulatorStatus.and.returnValue(of({ running: false, simulatedVisitors: 0, activeQueues: 0, totalInQueues: 0 }));
 
     await TestBed.configureTestingModule({
       imports: [ParkMapComponent, TranslateModule.forRoot()],
       providers: [
         { provide: AttractionApiService, useValue: mockAttractionService },
+        { provide: ParkStatusService, useValue: mockParkStatusService },
+        { provide: MapMonitoringService, useValue: mockMapMonitoringService },
         { provide: Router, useValue: mockRouter }
       ]
     }).compileComponents();
@@ -118,6 +131,7 @@ describe('ParkMapComponent', () => {
     spyOn(component['sceneManager'], 'dispose');
     component.ngOnDestroy();
     expect(component['sceneManager'].dispose).toHaveBeenCalled();
+    expect(mockMapMonitoringService.clearAll).toHaveBeenCalled();
   });
 
   it('should initialize with loading true', () => {

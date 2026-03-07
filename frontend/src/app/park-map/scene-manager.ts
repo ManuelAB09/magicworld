@@ -259,6 +259,12 @@ export class SceneManager {
     this.hoveredAttraction = attraction;
   }
 
+  addToScene(object: THREE.Object3D): void {
+    if (this.initialized && this.scene) {
+      this.scene.add(object);
+    }
+  }
+
   getAttractionMeshes(): AttractionMesh[] {
     return this.attractionMeshes;
   }

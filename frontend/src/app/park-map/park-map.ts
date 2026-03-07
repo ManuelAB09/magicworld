@@ -3,7 +3,11 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import * as THREE from 'three';
+import { Subscription, interval } from 'rxjs';
 import { AttractionApiService, Attraction } from '../attraction/attraction.service';
+import { AttractionStatus } from '../admin-dashboard/monitoring.service';
+import { ParkStatusService } from './park-status.service';
+import { MapMonitoringService } from './map-monitoring.service';
 import { getImageUrl } from '../shared/utils';
 import { SceneManager, AttractionMesh } from './scene-manager';
 
@@ -27,17 +31,25 @@ export class ParkMapComponent implements OnInit, AfterViewInit, OnDestroy {
   tooltipX = 0;
   tooltipY = 0;
 
+  simulatorRunning = false;
+  attractionStatuses: Map<number, AttractionStatus> = new Map();
+
   private sceneManager = new SceneManager();
   private raycaster = new THREE.Raycaster();
   private mouse = new THREE.Vector2();
+  private pollSub?: Subscription;
+  private heatCirclesCreated = false;
 
   constructor(
     private attractionService: AttractionApiService,
+    private parkStatusService: ParkStatusService,
+    private mapMonitoringService: MapMonitoringService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadAttractions();
+    this.checkSimulatorStatus();
   }
 
   ngAfterViewInit(): void {
@@ -46,6 +58,8 @@ export class ParkMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sceneManager.dispose();
+    this.pollSub?.unsubscribe();
+    this.mapMonitoringService.clearAll();
   }
 
   @HostListener('window:resize')
@@ -54,6 +68,67 @@ export class ParkMapComponent implements OnInit, AfterViewInit, OnDestroy {
     const width = this.mapContainer.nativeElement.clientWidth;
     const height = this.mapContainer.nativeElement.clientHeight;
     this.sceneManager.handleResize(width, height);
+  }
+
+  private checkSimulatorStatus(): void {
+    this.parkStatusService.getSimulatorStatus().subscribe({
+      next: (status) => {
+        if (status.running) {
+          this.simulatorRunning = true;
+          this.loadAttractionStatuses();
+          this.startPolling();
+        }
+      },
+      error: () => { /* silent ignore */ }
+    });
+  }
+
+  private startPolling(): void {
+    this.pollSub = interval(3000).subscribe(() => {
+      this.parkStatusService.getSimulatorStatus().subscribe({
+        next: (status) => {
+          this.simulatorRunning = status.running;
+          if (status.running) {
+            this.loadAttractionStatuses();
+          }
+        },
+        error: () => {}
+      });
+    });
+  }
+
+  private loadAttractionStatuses(): void {
+    this.parkStatusService.getAttractionStatuses().subscribe({
+      next: (statuses) => {
+        statuses.forEach(s => {
+          this.attractionStatuses.set(s.attractionId, s);
+        });
+        this.updateHeatCircles(statuses);
+      },
+      error: () => {}
+    });
+  }
+
+  private updateHeatCircles(statuses: AttractionStatus[]): void {
+    if (!this.sceneManager.isInitialized()) return;
+    const meshes = this.sceneManager.getAttractionMeshes();
+
+    statuses.forEach(status => {
+      if (!this.heatCirclesCreated) {
+        const mesh = meshes.find(m => m.userData.attraction.id === status.attractionId);
+        if (mesh) {
+          const circle = this.mapMonitoringService.createHeatCircle(status.attractionId, mesh.position);
+          this.sceneManager.addToScene(circle);
+        }
+      }
+      this.mapMonitoringService.updateHeatCircle(status);
+    });
+    this.heatCirclesCreated = true;
+  }
+
+  getQueueStatus(): AttractionStatus | null {
+    if (!this.hoveredAttraction?.id || !this.simulatorRunning) return null;
+    return this.attractionStatuses.get(this.hoveredAttraction.id) || null;
   }
 
   private loadAttractions(): void {

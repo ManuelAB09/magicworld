@@ -1,0 +1,139 @@
+<div class="park-stats">
+  <div class="sub-tabs">
+    <button [class.active]="subView === 'sales'" (click)="setSubView('sales')">
+      <i class="fa-solid fa-ticket"></i> {{ 'stats.park.salesTab' | translate }}
+    </button>
+    <button [class.active]="subView === 'seasonality'" (click)="setSubView('seasonality')">
+      <i class="fa-solid fa-chart-column"></i> {{ 'stats.park.seasonalityTab' | translate }}
+    </button>
+    <button [class.active]="subView === 'attractions'" (click)="setSubView('attractions')">
+      <i class="fa-solid fa-ranking-star"></i> {{ 'stats.park.attractionsTab' | translate }}
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-bar">
+      <div class="spinner-sm"></div>
+      <span>{{ 'stats.loading' | translate }}</span>
+    </div>
+  }
+
+  <!-- TICKET SALES -->
+  @if (subView === 'sales' && !loading) {
+    <div class="sales-cards">
+      @if (ticketSales) {
+        <div class="metric-card tickets">
+          <div class="metric-icon"><i class="fa-solid fa-ticket"></i></div>
+          <div class="metric-info">
+            <span class="metric-value">{{ ticketSales.totalTicketsSold | number }}</span>
+            <span class="metric-label">{{ 'stats.park.ticketsSold' | translate }}</span>
+          </div>
+        </div>
+        <div class="metric-card revenue">
+          <div class="metric-icon"><i class="fa-solid fa-coins"></i></div>
+          <div class="metric-info">
+            <span class="metric-value">{{ ticketSales.totalRevenue | number:'1.2-2' }} {{ getCurrencySymbol() }}</span>
+            <span class="metric-label">{{ 'stats.park.totalRevenue' | translate }}</span>
+          </div>
+        </div>
+        <div class="metric-card average">
+          <div class="metric-icon"><i class="fa-solid fa-calculator"></i></div>
+          <div class="metric-info">
+            @if (ticketSales.totalTicketsSold > 0) {
+              <span class="metric-value">
+                {{ (ticketSales.totalRevenue / ticketSales.totalTicketsSold) | number:'1.2-2' }} {{ getCurrencySymbol() }}
+              </span>
+            } @else {
+              <span class="metric-value">0.00 {{ getCurrencySymbol() }}</span>
+            }
+            <span class="metric-label">{{ 'stats.park.avgTicketPrice' | translate }}</span>
+          </div>
+        </div>
+      } @else {
+        <p class="no-data">{{ 'stats.noData' | translate }}</p>
+      }
+    </div>
+  }
+
+  <!-- SEASONALITY -->
+  @if (subView === 'seasonality' && !loading) {
+    <div class="card">
+      <div class="seasonality-header">
+        <h3>{{ 'stats.park.seasonalityTitle' | translate }}</h3>
+        <div class="year-selector">
+          <button (click)="selectedYear = selectedYear - 1; onYearChange()">◀</button>
+          <span class="year-label">{{ selectedYear }}</span>
+          <button (click)="selectedYear = selectedYear + 1; onYearChange()">▶</button>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        @for (month of monthlySales; track month.month) {
+          <div class="chart-bar-wrapper">
+            <div class="chart-bar-value">
+              @if (month.ticketsSold > 0) {
+                {{ month.ticketsSold }}
+              }
+            </div>
+            <div class="chart-bar" [style.height.%]="getBarHeight(month.revenue)"
+                 [class.bar-high]="getBarHeight(month.revenue) > 60"
+                 [class.bar-medium]="getBarHeight(month.revenue) > 30 && getBarHeight(month.revenue) <= 60"
+                 [class.bar-low]="getBarHeight(month.revenue) <= 30">
+            </div>
+            <div class="chart-bar-label">{{ month.monthName | slice:0:3 }}</div>
+          </div>
+        }
+      </div>
+
+      <div class="seasonality-legend">
+        <span class="legend-item"><span class="legend-dot bar-high"></span> {{ 'stats.park.highSeason' | translate }}</span>
+        <span class="legend-item"><span class="legend-dot bar-medium"></span> {{ 'stats.park.mediumSeason' | translate }}</span>
+        <span class="legend-item"><span class="legend-dot bar-low"></span> {{ 'stats.park.lowSeason' | translate }}</span>
+      </div>
+    </div>
+  }
+
+  <!-- ATTRACTION PERFORMANCE -->
+  @if (subView === 'attractions' && !loading) {
+    <div class="card">
+      <h3>{{ 'stats.park.attractionPerformance' | translate }}</h3>
+      @if (attractionPerformance.length === 0) {
+        <p class="no-data">{{ 'stats.park.noSimulatorData' | translate }}</p>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>{{ 'stats.park.attractionName' | translate }}</th>
+              <th>{{ 'stats.park.queueEvents' | translate }}</th>
+              <th>{{ 'stats.park.maxQueue' | translate }}</th>
+              <th>{{ 'stats.park.avgQueue' | translate }}</th>
+              <th>{{ 'stats.park.queueLevel' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (attr of attractionPerformance; track attr.attractionId; let i = $index) {
+              <tr>
+                <td>
+                  <span class="rank-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+                    {{ i + 1 }}
+                  </span>
+                </td>
+                <td class="name-cell">{{ attr.attractionName }}</td>
+                <td>{{ attr.totalQueueEvents }}</td>
+                <td><strong>{{ attr.maxQueueSize }}</strong></td>
+                <td>{{ attr.avgQueueSize | number:'1.1-1' }}</td>
+                <td>
+                  <span class="queue-level" [class]="'level-' + getQueueLevel(attr.avgQueueSize)">
+                    {{ 'stats.park.levels.' + getQueueLevel(attr.avgQueueSize) | translate }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+</div>
+
