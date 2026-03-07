@@ -127,7 +127,7 @@ public class PaymentServiceTests {
                                                 .quantity(1)
                                                 .build());
 
-                PriceCalculationResponse response = paymentService.calculatePrice(items, null);
+                PriceCalculationResponse response = paymentService.calculatePrice(items, null, LocalDate.now().plusDays(1));
 
                 assertNotNull(response);
                 assertEquals(new BigDecimal("125.00"), response.getSubtotal());
@@ -163,7 +163,7 @@ public class PaymentServiceTests {
                                                 .quantity(2)
                                                 .build());
 
-                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("SAVE10"));
+                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("SAVE10"), LocalDate.now().plusDays(1));
 
                 assertNotNull(response);
                 assertEquals(new BigDecimal("100.00"), response.getSubtotal());
@@ -184,7 +184,7 @@ public class PaymentServiceTests {
                                                 .quantity(2)
                                                 .build());
 
-                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("INVALID_CODE"));
+                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("INVALID_CODE"), LocalDate.now().plusDays(1));
 
                 assertNotNull(response);
                 assertEquals(new BigDecimal("100.00"), response.getSubtotal());
@@ -232,7 +232,7 @@ public class PaymentServiceTests {
                                                 .quantity(2)
                                                 .build());
 
-                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("SAVE10", "SAVE20"));
+                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("SAVE10", "SAVE20"), LocalDate.now().plusDays(1));
 
                 assertNotNull(response);
                 assertEquals(new BigDecimal("100.00"), response.getSubtotal());
@@ -294,7 +294,7 @@ public class PaymentServiceTests {
                                                 .quantity(1)
                                                 .build());
 
-                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of());
+                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of(), LocalDate.now().plusDays(1));
 
                 assertNotNull(response);
                 assertEquals(COST_50, response.getTotal());
@@ -312,7 +312,7 @@ public class PaymentServiceTests {
                                                 .quantity(1)
                                                 .build());
 
-                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("   ", ""));
+                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("   ", ""), LocalDate.now().plusDays(1));
 
                 assertNotNull(response);
                 assertTrue(response.getInvalidDiscountCodes().isEmpty());
@@ -346,7 +346,7 @@ public class PaymentServiceTests {
                                                 .quantity(1)
                                                 .build());
 
-                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("PERCENT15"));
+                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("PERCENT15"), LocalDate.now().plusDays(1));
 
                 assertNotNull(response.getDiscountPercentages());
                 assertEquals(15, response.getDiscountPercentages().get("PERCENT15"));
@@ -380,7 +380,7 @@ public class PaymentServiceTests {
                                                 .quantity(1)
                                                 .build());
 
-                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("ADULTONLY"));
+                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("ADULTONLY"), LocalDate.now().plusDays(1));
 
                 assertNotNull(response.getDiscountAppliesTo());
                 assertTrue(response.getDiscountAppliesTo().get("ADULTONLY").contains(TYPE_NAME_ADULT));

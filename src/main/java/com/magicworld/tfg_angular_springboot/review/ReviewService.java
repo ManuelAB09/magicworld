@@ -23,7 +23,7 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public Page<ReviewDTO> findAllPaginated(Pageable pageable) {
-        return reviewRepository.findAllByOrderByPublicationDateDesc(pageable)
+        return reviewRepository.findAllByOrderByVisitDateDesc(pageable)
                 .map(this::toDTO);
     }
 

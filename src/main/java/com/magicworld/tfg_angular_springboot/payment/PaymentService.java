@@ -5,11 +5,13 @@ import com.magicworld.tfg_angular_springboot.discount.DiscountService;
 import com.magicworld.tfg_angular_springboot.discount_ticket_type.DiscountTicketTypeService;
 import com.magicworld.tfg_angular_springboot.email.EmailService;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidOperationException;
+import com.magicworld.tfg_angular_springboot.park_closure.ParkClosureDayService;
 import com.magicworld.tfg_angular_springboot.purchase.Purchase;
 import com.magicworld.tfg_angular_springboot.purchase.PurchaseService;
 import com.magicworld.tfg_angular_springboot.purchase_line.PurchaseLine;
 import com.magicworld.tfg_angular_springboot.purchase_line.PurchaseLineService;
 import com.magicworld.tfg_angular_springboot.qr.QrCodeService;
+import com.magicworld.tfg_angular_springboot.seasonal_pricing.SeasonalPricingService;
 import com.magicworld.tfg_angular_springboot.ticket_type.TicketType;
 import com.magicworld.tfg_angular_springboot.ticket_type.TicketTypeService;
 import com.magicworld.tfg_angular_springboot.user.Role;
@@ -47,18 +49,28 @@ public class PaymentService {
     private final QrCodeService qrCodeService;
     private final EmailService emailService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final SeasonalPricingService seasonalPricingService;
+    private final ParkClosureDayService parkClosureDayService;
 
     public List<TicketAvailabilityDTO> getAvailability(LocalDate date) {
+        if (parkClosureDayService.isClosedDay(date)) {
+            throw new InvalidOperationException("error.payment.park.closed");
+        }
+
+        BigDecimal multiplier = seasonalPricingService.getMultiplier(date);
         List<TicketType> ticketTypes = ticketTypeService.findAll();
 
         return ticketTypes.stream()
                 .map(tt -> {
                     int available = purchaseLineService.getAvailableQuantity(tt.getTypeName(), date);
+                    BigDecimal adjustedCost = tt.getCost().multiply(multiplier).setScale(2, RoundingMode.HALF_UP);
                     return TicketAvailabilityDTO.builder()
                             .id(tt.getId())
                             .typeName(tt.getTypeName())
                             .description(tt.getDescription())
                             .cost(tt.getCost())
+                            .adjustedCost(adjustedCost)
+                            .seasonalMultiplier(multiplier)
                             .photoUrl(tt.getPhotoUrl())
                             .maxPerDay(tt.getMaxPerDay())
                             .available(available)
@@ -69,14 +81,16 @@ public class PaymentService {
 
     @Transactional(readOnly = true)
     public PriceCalculationResponse calculatePrice(List<PaymentRequest.PaymentLineItem> items,
-            List<String> discountCodes) {
+            List<String> discountCodes, LocalDate visitDate) {
+        BigDecimal multiplier = visitDate != null ? seasonalPricingService.getMultiplier(visitDate) : BigDecimal.ONE;
         BigDecimal subtotal = BigDecimal.ZERO;
         Map<String, BigDecimal> itemSubtotals = new HashMap<>();
         Set<String> itemTicketTypes = new HashSet<>();
 
         for (PaymentRequest.PaymentLineItem item : items) {
             TicketType ticketType = ticketTypeService.findByTypeName(item.getTicketTypeName());
-            BigDecimal lineTotal = ticketType.getCost().multiply(BigDecimal.valueOf(item.getQuantity()));
+            BigDecimal adjustedCost = ticketType.getCost().multiply(multiplier).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal lineTotal = adjustedCost.multiply(BigDecimal.valueOf(item.getQuantity()));
             subtotal = subtotal.add(lineTotal);
             itemSubtotals.put(item.getTicketTypeName(), lineTotal);
             itemTicketTypes.add(item.getTicketTypeName());
@@ -172,7 +186,7 @@ public class PaymentService {
         validatePurchase(request);
 
         // Recalculate price at payment time to handle concurrent changes
-        PriceCalculationResponse priceCalc = calculatePrice(request.getItems(), request.getDiscountCodes());
+        PriceCalculationResponse priceCalc = calculatePrice(request.getItems(), request.getDiscountCodes(), request.getVisitDate());
 
         // Check if any discount codes the user thought were valid are now invalid or
         // not applicable
@@ -238,6 +252,14 @@ public class PaymentService {
             throw new InvalidOperationException("error.payment.date.past");
         }
 
+        if (request.getVisitDate().isAfter(LocalDate.now().plusMonths(2))) {
+            throw new InvalidOperationException("error.payment.date.too.far");
+        }
+
+        if (parkClosureDayService.isClosedDay(request.getVisitDate())) {
+            throw new InvalidOperationException("error.payment.park.closed");
+        }
+
         // Per-ticket-type availability check
         for (PaymentRequest.PaymentLineItem item : request.getItems()) {
             int available = purchaseLineService.getAvailableQuantity(item.getTicketTypeName(), request.getVisitDate());
@@ -275,11 +297,13 @@ public class PaymentService {
     }
 
     private Purchase createPurchaseFromRequest(PaymentRequest request, User buyer, PriceCalculationResponse priceCalc) {
+        BigDecimal multiplier = seasonalPricingService.getMultiplier(request.getVisitDate());
         List<PurchaseLine> lines = new ArrayList<>();
 
         for (PaymentRequest.PaymentLineItem item : request.getItems()) {
             TicketType ticketType = ticketTypeService.findByTypeName(item.getTicketTypeName());
-            BigDecimal lineTotal = ticketType.getCost().multiply(BigDecimal.valueOf(item.getQuantity()));
+            BigDecimal adjustedCost = ticketType.getCost().multiply(multiplier).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal lineTotal = adjustedCost.multiply(BigDecimal.valueOf(item.getQuantity()));
 
             PurchaseLine line = PurchaseLine.builder()
                     .validDate(request.getVisitDate())
@@ -350,7 +374,12 @@ public class PaymentService {
 
     @Transactional
     public void notifyAvailabilityChange(LocalDate date) {
-        List<TicketAvailabilityDTO> availability = getAvailability(date);
-        messagingTemplate.convertAndSend("/topic/availability/" + date, availability);
+        try {
+            List<TicketAvailabilityDTO> availability = getAvailability(date);
+            messagingTemplate.convertAndSend("/topic/availability/" + date, availability);
+        } catch (InvalidOperationException e) {
+            // Park is closed on this date, send empty list
+            messagingTemplate.convertAndSend("/topic/availability/" + date, List.of());
+        }
     }
 }

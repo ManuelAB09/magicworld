@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { secureRandom } from './secure-random';
 
 /* ─── Procedural noise (simplex-adjacent value noise) ─── */
 function hash2(ix: number, iy: number): number {
@@ -47,12 +48,12 @@ function createGrassTexture(size = 512): THREE.CanvasTexture {
 
   // grass variation patches
   for (let i = 0; i < 800; i++) {
-    const x = Math.random() * size;
-    const y = Math.random() * size;
-    const r = 6 + Math.random() * 18;
-    const h = 90 + Math.floor(Math.random() * 40);
-    const s = 40 + Math.floor(Math.random() * 25);
-    const l = 28 + Math.floor(Math.random() * 18);
+    const x = secureRandom() * size;
+    const y = secureRandom() * size;
+    const r = 6 + secureRandom() * 18;
+    const h = 90 + Math.floor(secureRandom() * 40);
+    const s = 40 + Math.floor(secureRandom() * 25);
+    const l = 28 + Math.floor(secureRandom() * 18);
     ctx.fillStyle = `hsla(${h}, ${s}%, ${l}%, 0.35)`;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -61,22 +62,22 @@ function createGrassTexture(size = 512): THREE.CanvasTexture {
 
   // tiny grass blades
   for (let i = 0; i < 2000; i++) {
-    const x = Math.random() * size;
-    const y = Math.random() * size;
-    const h = 85 + Math.floor(Math.random() * 50);
-    const l = 24 + Math.floor(Math.random() * 18);
+    const x = secureRandom() * size;
+    const y = secureRandom() * size;
+    const h = 85 + Math.floor(secureRandom() * 50);
+    const l = 24 + Math.floor(secureRandom() * 18);
     ctx.strokeStyle = `hsla(${h}, 45%, ${l}%, 0.5)`;
     ctx.lineWidth = 0.8;
     ctx.beginPath();
     ctx.moveTo(x, y);
-    ctx.lineTo(x + (Math.random() - 0.5) * 4, y - 3 - Math.random() * 5);
+    ctx.lineTo(x + (secureRandom() - 0.5) * 4, y - 3 - secureRandom() * 5);
     ctx.stroke();
   }
 
   // noise overlay
   const img = ctx.getImageData(0, 0, size, size);
   for (let i = 0; i < img.data.length; i += 4) {
-    const v = (Math.random() - 0.5) * 10;
+    const v = (secureRandom() - 0.5) * 10;
     img.data[i] = Math.max(0, Math.min(255, img.data[i] + v));
     img.data[i + 1] = Math.max(0, Math.min(255, img.data[i + 1] + v));
     img.data[i + 2] = Math.max(0, Math.min(255, img.data[i + 2] + v));
@@ -108,8 +109,8 @@ function createPlazaTileTexture(size = 512): THREE.CanvasTexture {
     for (let s = 0; s < segments; s++) {
       const a1 = (s / segments) * Math.PI * 2;
       const a2 = ((s + 1) / segments) * Math.PI * 2;
-      const lightness = 68 + Math.floor(Math.random() * 12);
-      const hue = 32 + Math.floor(Math.random() * 10);
+      const lightness = 68 + Math.floor(secureRandom() * 12);
+      const hue = 32 + Math.floor(secureRandom() * 10);
       ctx.fillStyle = `hsl(${hue}, 20%, ${lightness}%)`;
       ctx.beginPath();
       ctx.arc(cx, cy, r, a1, a2);
@@ -140,15 +141,15 @@ function createStoneWallTexture(size = 256): THREE.CanvasTexture {
   const rows = 8;
   const rowH = size / rows;
   for (let r = 0; r < rows; r++) {
-    const cols = 3 + Math.floor(Math.random() * 2);
+    const cols = 3 + Math.floor(secureRandom() * 2);
     const offset = (r % 2) * (size / cols / 2);
     const colW = size / cols;
     for (let c = 0; c < cols + 1; c++) {
-      const x = c * colW + offset + (Math.random() - 0.5) * 3;
-      const y = r * rowH + (Math.random() - 0.5) * 2;
+      const x = c * colW + offset + (secureRandom() - 0.5) * 3;
+      const y = r * rowH + (secureRandom() - 0.5) * 2;
       const w = colW - 3;
       const h = rowH - 3;
-      const l = 40 + Math.floor(Math.random() * 15);
+      const l = 40 + Math.floor(secureRandom() * 15);
       ctx.fillStyle = `hsl(30, 18%, ${l}%)`;
       ctx.beginPath();
       ctx.roundRect(x + 1, y + 1, w, h, 2);
@@ -176,18 +177,18 @@ function createBarkTexture(size = 128): THREE.CanvasTexture {
   ctx.fillRect(0, 0, size, size);
 
   for (let i = 0; i < 40; i++) {
-    const y = Math.random() * size;
-    const x = Math.random() * size * 0.3;
-    const w = size * 0.4 + Math.random() * size * 0.6;
-    const h = 1 + Math.random() * 3;
-    const l = 20 + Math.floor(Math.random() * 16);
+    const y = secureRandom() * size;
+    const x = secureRandom() * size * 0.3;
+    const w = size * 0.4 + secureRandom() * size * 0.6;
+    const h = 1 + secureRandom() * 3;
+    const l = 20 + Math.floor(secureRandom() * 16);
     ctx.fillStyle = `hsl(25, 30%, ${l}%)`;
     ctx.fillRect(x, y, w, h);
   }
 
   const img = ctx.getImageData(0, 0, size, size);
   for (let i = 0; i < img.data.length; i += 4) {
-    const v = (Math.random() - 0.5) * 16;
+    const v = (secureRandom() - 0.5) * 16;
     img.data[i] = Math.max(0, Math.min(255, img.data[i] + v));
     img.data[i + 1] = Math.max(0, Math.min(255, img.data[i + 1] + v));
     img.data[i + 2] = Math.max(0, Math.min(255, img.data[i + 2] + v));
@@ -247,12 +248,12 @@ export class ParkEnvironment {
     const grassInstanced = new THREE.InstancedMesh(grassGeo, grassMat, 600);
     const dummy = new THREE.Object3D();
     for (let i = 0; i < 600; i++) {
-      const gx = (Math.random() - 0.5) * size * 1.6;
-      const gz = (Math.random() - 0.5) * size * 1.6;
+      const gx = (secureRandom() - 0.5) * size * 1.6;
+      const gz = (secureRandom() - 0.5) * size * 1.6;
       const gy = fbm(gx, gz, 3, 0.015, 0.6) - 0.3;
       dummy.position.set(gx, gy, gz);
-      dummy.rotation.y = Math.random() * Math.PI;
-      dummy.scale.setScalar(0.6 + Math.random() * 0.8);
+      dummy.rotation.y = secureRandom() * Math.PI;
+      dummy.scale.setScalar(0.6 + secureRandom() * 0.8);
       dummy.updateMatrix();
       grassInstanced.setMatrixAt(i, dummy.matrix);
     }
@@ -334,16 +335,16 @@ export class ParkEnvironment {
     const rockMat = new THREE.MeshStandardMaterial({ color: 0x6b6b60, roughness: 0.95 });
     for (let i = 0; i < 20; i++) {
       const angle = (i / 20) * Math.PI * 2;
-      const rx = Math.cos(angle) * (radiusX + 0.5) + (Math.random() - 0.5) * 1.2;
-      const rz = Math.sin(angle) * (radiusX + 0.5) + (Math.random() - 0.5) * 1.2;
-      const rockSize = 0.4 + Math.random() * 0.6;
+      const rx = Math.cos(angle) * (radiusX + 0.5) + (secureRandom() - 0.5) * 1.2;
+      const rz = Math.sin(angle) * (radiusX + 0.5) + (secureRandom() - 0.5) * 1.2;
+      const rockSize = 0.4 + secureRandom() * 0.6;
       const rock = new THREE.Mesh(
         new THREE.DodecahedronGeometry(rockSize, 0),
         rockMat
       );
       rock.position.set(rx, 0.1, rz);
-      rock.rotation.set(Math.random(), Math.random(), Math.random());
-      rock.scale.y = 0.5 + Math.random() * 0.3;
+      rock.rotation.set(secureRandom(), secureRandom(), secureRandom());
+      rock.scale.y = 0.5 + secureRandom() * 0.3;
       rock.castShadow = true;
       group.add(rock);
     }
@@ -351,16 +352,16 @@ export class ParkEnvironment {
     // reed plants
     const reedMat = new THREE.MeshStandardMaterial({ color: 0x3a6830, roughness: 1 });
     for (let i = 0; i < 12; i++) {
-      const angle = (i / 12) * Math.PI * 2 + Math.random() * 0.4;
+      const angle = (i / 12) * Math.PI * 2 + secureRandom() * 0.4;
       const rx = Math.cos(angle) * (radiusX - 0.5);
       const rz = Math.sin(angle) * (radiusX - 0.5);
-      const reedH = 1.0 + Math.random() * 0.8;
+      const reedH = 1.0 + secureRandom() * 0.8;
       const reed = new THREE.Mesh(
         new THREE.CylinderGeometry(0.03, 0.05, reedH, 4),
         reedMat
       );
       reed.position.set(rx, reedH / 2, rz);
-      reed.rotation.z = (Math.random() - 0.5) * 0.15;
+      reed.rotation.z = (secureRandom() - 0.5) * 0.15;
       group.add(reed);
     }
 
@@ -552,7 +553,7 @@ export class ParkEnvironment {
 
         // branches
         for (let b = 0; b < 3; b++) {
-          const bAngle = (b / 3) * Math.PI * 2 + Math.random() * 0.5;
+          const bAngle = (b / 3) * Math.PI * 2 + secureRandom() * 0.5;
           const branch = new THREE.Mesh(
             new THREE.CylinderGeometry(0.08, 0.12, 2, 6),
             trunkMat
@@ -893,9 +894,9 @@ export class ParkEnvironment {
     }
 
     for (let i = 0; i < 14; i++) {
-      const x = (Math.random() - 0.5) * (width - 0.2);
-      const z = (Math.random() - 0.5) * (depth - 0.2);
-      const color = flowerColors[Math.floor(Math.random() * flowerColors.length)];
+      const x = (secureRandom() - 0.5) * (width - 0.2);
+      const z = (secureRandom() - 0.5) * (depth - 0.2);
+      const color = flowerColors[Math.floor(secureRandom() * flowerColors.length)];
 
       const stem = new THREE.Mesh(
         new THREE.CylinderGeometry(0.02, 0.02, 0.3),
@@ -958,9 +959,9 @@ export class ParkEnvironment {
             const pos = new THREE.Vector3().lerpVectors(a, b, t);
             const out = pos.clone().add(perp.clone().multiplyScalar(margin));
 
-            const r = Math.random();
+            const r = secureRandom();
             if (r < 0.5) {
-              const species = (['round', 'cone', 'oak'] as const)[Math.floor(Math.random() * 3)];
+              const species = (['round', 'cone', 'oak'] as const)[Math.floor(secureRandom() * 3)];
               const tree = this.createTree(species);
               tree.position.set(out.x, 0, out.z);
               scene.add(tree);

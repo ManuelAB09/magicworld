@@ -1,6 +1,7 @@
 package com.magicworld.tfg_angular_springboot.user;
 
 import com.magicworld.tfg_angular_springboot.configuration.CookieUtils;
+import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtService;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidTokenException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,6 +25,7 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final JwtService jwtService;
 
     @Operation(summary = "Update current user's profile")
     @ApiResponses({
@@ -34,9 +36,19 @@ public class UserController {
     })
     @PutMapping("/profile")
     public ResponseEntity<UserDTO> updateProfile(
-            @Valid @RequestBody UpdateProfileRequest request) {
+            @Valid @RequestBody UpdateProfileRequest request,
+            HttpServletRequest httpRequest,
+            HttpServletResponse response) {
         User user = getUserFromContext();
+        String oldUsername = user.getUsername();
         User saved = userService.updateProfile(user, request);
+
+        // If username changed, issue a new JWT token cookie
+        if (!oldUsername.equals(saved.getUsername())) {
+            String newToken = jwtService.getToken(saved);
+            CookieUtils.addCookie(response, httpRequest, "token", newToken, true, 2 * 60 * 60);
+        }
+
         return ResponseEntity.ok(toDTO(saved));
     }
 

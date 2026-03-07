@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { secureRandom } from './secure-random';
 
 export function isWebGLAvailable(): boolean {
   try {
@@ -29,12 +30,12 @@ export function createCobblestoneTexture(size = 512): THREE.CanvasTexture {
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const offsetX = (r % 2 === 0 ? 0 : sw * 0.5);
-      const x = c * sw + offsetX + (Math.random() - 0.5) * 4;
-      const y = r * sh + (Math.random() - 0.5) * 4;
-      const w = sw - 6 + (Math.random() - 0.5) * 6;
-      const h = sh - 6 + (Math.random() - 0.5) * 6;
-      const lightness = 62 + Math.floor(Math.random() * 14);
-      const hue = 30 + Math.floor(Math.random() * 12);
+      const x = c * sw + offsetX + (secureRandom() - 0.5) * 4;
+      const y = r * sh + (secureRandom() - 0.5) * 4;
+      const w = sw - 6 + (secureRandom() - 0.5) * 6;
+      const h = sh - 6 + (secureRandom() - 0.5) * 6;
+      const lightness = 62 + Math.floor(secureRandom() * 14);
+      const hue = 30 + Math.floor(secureRandom() * 12);
       stones.push({ x, y, w, h, c: `hsl(${hue}, 18%, ${lightness}%)` });
     }
   }
@@ -53,7 +54,7 @@ export function createCobblestoneTexture(size = 512): THREE.CanvasTexture {
   // noise grain
   const img = ctx.getImageData(0, 0, size, size);
   for (let i = 0; i < img.data.length; i += 4) {
-    const v = (Math.random() - 0.5) * 14;
+    const v = (secureRandom() - 0.5) * 14;
     img.data[i] = Math.max(0, Math.min(255, img.data[i] + v));
     img.data[i + 1] = Math.max(0, Math.min(255, img.data[i + 1] + v));
     img.data[i + 2] = Math.max(0, Math.min(255, img.data[i + 2] + v));

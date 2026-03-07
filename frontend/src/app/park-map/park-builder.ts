@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { ParkEnvironment } from './park-environment';
 import { createHorizontalPath, createVerticalPath } from './three-utils';
+import { secureRandom } from './secure-random';
 
 export interface AttractionZone {
   x: number;
@@ -11,11 +12,6 @@ export interface AttractionZone {
 export class ParkBuilder {
   private parkEnvironment = new ParkEnvironment();
   private attractionZones: AttractionZone[] = [];
-
-  getAttractionZones(): AttractionZone[] {
-    return this.attractionZones;
-  }
-
   buildParkEnvironment(scene: THREE.Scene): void {
     const ground = this.parkEnvironment.createGround(120);
     scene.add(ground);
@@ -266,7 +262,7 @@ export class ParkBuilder {
     treePositions.forEach((pos, i) => {
       if (!this.isInReservedZone(pos.x, pos.z)) {
         const tree = this.parkEnvironment.createTree(species[i % species.length]);
-        const scale = 0.8 + Math.random() * 0.5;
+        const scale = 0.8 + secureRandom() * 0.5;
         tree.scale.setScalar(scale);
         tree.position.set(pos.x, 0, pos.z);
         scene.add(tree);

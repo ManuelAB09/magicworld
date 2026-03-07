@@ -5,6 +5,7 @@ import { AuthService, UserProfile } from '../auth/auth.service';
 import { getBackendBaseUrl } from '../config/backend';
 
 export interface UpdateProfileRequest {
+  username?: string;
   firstname: string;
   lastname: string;
   email: string;

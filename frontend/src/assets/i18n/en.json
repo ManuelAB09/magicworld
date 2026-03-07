@@ -39,7 +39,8 @@
     "PROFILE": "My Profile",
     "MONITORING": "Monitoring",
     "EMPLOYEES": "Employees",
-    "SCHEDULE": "Schedule"
+    "SCHEDULE": "Schedule",
+    "PARK_CONFIG": "Park Config"
   },
   "HOME": {
     "TITLE": "Welcome to MagicWorld",
@@ -291,7 +292,11 @@
       "ORDER_SUMMARY": "Order Summary",
       "CART_EMPTY": "Your cart is empty",
       "SUBTOTAL": "Subtotal",
-      "PROCEED": "Continue to payment"
+      "PROCEED": "Continue to payment",
+      "CLOSED": "CLOSED",
+      "MAX_DATE_LABEL": "Out of range",
+      "MAX_DATE_REASON": "Tickets cannot be purchased more than 2 months in advance",
+      "SEASONAL_SURCHARGE": "Seasonal surcharge applied"
     },
     "STEP2": {
       "BACK": "Back",
@@ -335,7 +340,42 @@
   "error.payment.stripe.failed": "Error processing payment with Stripe",
   "error.payment.discount.changed": "The following discount codes are no longer valid or have changed: {{0}}. Please review your order.",
   "error.payment.park.capacity.exceeded": "Park maximum capacity has been reached for that day. No more tickets can be sold.",
+  "error.payment.park.closed": "The park is closed on the selected date. Please choose another day.",
+  "error.payment.date.too.far": "Tickets cannot be purchased more than 2 months in advance.",
+  "error.seasonal_pricing.notfound": "Seasonal pricing rule not found.",
+  "error.seasonal_pricing.end_before_start": "End date cannot be before start date.",
+  "error.closure.notfound": "Closure day not found.",
+  "error.closure.too.soon": "Cannot modify a park closure with less than 2 months' notice.",
+  "error.closure.already.exists": "A closure already exists for that date.",
   "success.payment.completed": "Payment completed successfully",
+  "PARK_CONFIG": {
+    "TITLE": "Park Configuration",
+    "TAB_CLOSURES": "Closure Days",
+    "TAB_PRICING": "Seasonal Pricing",
+    "LOADING": "Loading...",
+    "ADD_CLOSURE": "Add closure day",
+    "CLOSURE_HINT": "You can only add closures at least 2 months in advance.",
+    "CLOSURE_DATE": "Date",
+    "CLOSURE_REASON": "Reason",
+    "CLOSURE_REASON_PLACEHOLDER": "E.g.: Holiday, maintenance...",
+    "ADD": "Add",
+    "NO_CLOSURES": "No closure days configured.",
+    "CLOSURE_ADDED": "Closure day added successfully.",
+    "CLOSURE_DELETED": "Closure day deleted successfully.",
+    "ADD_PRICING": "Add seasonal pricing rule",
+    "PRICING_NAME": "Name",
+    "PRICING_START": "Start date",
+    "PRICING_END": "End date",
+    "PRICING_MULTIPLIER": "Multiplier",
+    "APPLY_WEEKDAYS": "Weekdays",
+    "APPLY_WEEKENDS": "Weekends",
+    "WEEKDAYS": "Weekdays",
+    "WEEKENDS": "Weekends",
+    "NO_PRICING": "No seasonal pricing rules.",
+    "PRICING_ADDED": "Pricing rule added successfully.",
+    "PRICING_DELETED": "Pricing rule deleted successfully.",
+    "ALL_YEAR": "Apply all year"
+  },
   "MAP_PICKER": {
     "WEBGL_ERROR": "WebGL is not available in your browser.",
     "MANUAL_COORDS": "Enter coordinates manually"

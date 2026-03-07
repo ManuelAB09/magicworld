@@ -574,3 +574,84 @@ WHERE u.username = 'bulk_buyer' AND p.purchase_date BETWEEN '2026-05-01' AND '20
 
 -- Add is_overtime column defaults for existing data
 -- (Hibernate will auto-create the column; existing records default to false)
+
+-- Seasonal Pricing Rules (admin-managed, these are default initial rules)
+INSERT INTO seasonal_pricing (name, start_date, end_date, multiplier, apply_on_weekdays, apply_on_weekends) VALUES
+    ('Recargo fin de semana', '2026-01-01', '2026-12-31', 1.25, FALSE, TRUE),
+    ('Temporada verano', '2026-06-01', '2026-08-31', 1.30, TRUE, TRUE);
+
+-- Park Closure Days - Festivos Andalucia 2026 + Octubre + Enero cerrado
+-- Note: only dates at least 2 months from now (2026-03-06) are inserted for validation
+INSERT INTO park_closure_day (closure_date, reason) VALUES
+    -- Festivos Andalucia 2026
+    ('2026-06-01', 'Dia del Trabajador (puente)'),
+    ('2026-08-15', 'Asuncion de la Virgen'),
+    ('2026-10-12', 'Fiesta Nacional de Espana'),
+    ('2026-11-01', 'Dia de Todos los Santos'),
+    ('2026-12-06', 'Dia de la Constitucion'),
+    ('2026-12-08', 'Inmaculada Concepcion'),
+    ('2026-12-25', 'Navidad'),
+    -- Octubre 2026 cerrado completo
+    ('2026-10-01', 'Cierre octubre - mantenimiento'),
+    ('2026-10-02', 'Cierre octubre - mantenimiento'),
+    ('2026-10-03', 'Cierre octubre - mantenimiento'),
+    ('2026-10-04', 'Cierre octubre - mantenimiento'),
+    ('2026-10-05', 'Cierre octubre - mantenimiento'),
+    ('2026-10-06', 'Cierre octubre - mantenimiento'),
+    ('2026-10-07', 'Cierre octubre - mantenimiento'),
+    ('2026-10-08', 'Cierre octubre - mantenimiento'),
+    ('2026-10-09', 'Cierre octubre - mantenimiento'),
+    ('2026-10-10', 'Cierre octubre - mantenimiento'),
+    ('2026-10-11', 'Cierre octubre - mantenimiento'),
+    ('2026-10-13', 'Cierre octubre - mantenimiento'),
+    ('2026-10-14', 'Cierre octubre - mantenimiento'),
+    ('2026-10-15', 'Cierre octubre - mantenimiento'),
+    ('2026-10-16', 'Cierre octubre - mantenimiento'),
+    ('2026-10-17', 'Cierre octubre - mantenimiento'),
+    ('2026-10-18', 'Cierre octubre - mantenimiento'),
+    ('2026-10-19', 'Cierre octubre - mantenimiento'),
+    ('2026-10-20', 'Cierre octubre - mantenimiento'),
+    ('2026-10-21', 'Cierre octubre - mantenimiento'),
+    ('2026-10-22', 'Cierre octubre - mantenimiento'),
+    ('2026-10-23', 'Cierre octubre - mantenimiento'),
+    ('2026-10-24', 'Cierre octubre - mantenimiento'),
+    ('2026-10-25', 'Cierre octubre - mantenimiento'),
+    ('2026-10-26', 'Cierre octubre - mantenimiento'),
+    ('2026-10-27', 'Cierre octubre - mantenimiento'),
+    ('2026-10-28', 'Cierre octubre - mantenimiento'),
+    ('2026-10-29', 'Cierre octubre - mantenimiento'),
+    ('2026-10-30', 'Cierre octubre - mantenimiento'),
+    ('2026-10-31', 'Cierre octubre - mantenimiento'),
+    -- Enero 2027 cerrado completo
+    ('2027-01-01', 'Cierre enero - mantenimiento'),
+    ('2027-01-02', 'Cierre enero - mantenimiento'),
+    ('2027-01-03', 'Cierre enero - mantenimiento'),
+    ('2027-01-04', 'Cierre enero - mantenimiento'),
+    ('2027-01-05', 'Cierre enero - mantenimiento'),
+    ('2027-01-06', 'Cierre enero - mantenimiento'),
+    ('2027-01-07', 'Cierre enero - mantenimiento'),
+    ('2027-01-08', 'Cierre enero - mantenimiento'),
+    ('2027-01-09', 'Cierre enero - mantenimiento'),
+    ('2027-01-10', 'Cierre enero - mantenimiento'),
+    ('2027-01-11', 'Cierre enero - mantenimiento'),
+    ('2027-01-12', 'Cierre enero - mantenimiento'),
+    ('2027-01-13', 'Cierre enero - mantenimiento'),
+    ('2027-01-14', 'Cierre enero - mantenimiento'),
+    ('2027-01-15', 'Cierre enero - mantenimiento'),
+    ('2027-01-16', 'Cierre enero - mantenimiento'),
+    ('2027-01-17', 'Cierre enero - mantenimiento'),
+    ('2027-01-18', 'Cierre enero - mantenimiento'),
+    ('2027-01-19', 'Cierre enero - mantenimiento'),
+    ('2027-01-20', 'Cierre enero - mantenimiento'),
+    ('2027-01-21', 'Cierre enero - mantenimiento'),
+    ('2027-01-22', 'Cierre enero - mantenimiento'),
+    ('2027-01-23', 'Cierre enero - mantenimiento'),
+    ('2027-01-24', 'Cierre enero - mantenimiento'),
+    ('2027-01-25', 'Cierre enero - mantenimiento'),
+    ('2027-01-26', 'Cierre enero - mantenimiento'),
+    ('2027-01-27', 'Cierre enero - mantenimiento'),
+    ('2027-01-28', 'Cierre enero - mantenimiento'),
+    ('2027-01-29', 'Cierre enero - mantenimiento'),
+    ('2027-01-30', 'Cierre enero - mantenimiento'),
+    ('2027-01-31', 'Cierre enero - mantenimiento');
+

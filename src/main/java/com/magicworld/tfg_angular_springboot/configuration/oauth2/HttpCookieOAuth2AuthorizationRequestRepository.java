@@ -1,5 +1,6 @@
 package com.magicworld.tfg_angular_springboot.configuration.oauth2;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
@@ -9,8 +10,9 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
 import java.util.Base64;
-
 
 @Component
 public class HttpCookieOAuth2AuthorizationRequestRepository
@@ -26,7 +28,7 @@ public class HttpCookieOAuth2AuthorizationRequestRepository
 
     @Override
     public void saveAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest,
-                                         HttpServletRequest request, HttpServletResponse response) {
+            HttpServletRequest request, HttpServletResponse response) {
         if (authorizationRequest == null) {
             removeCookie(request, response);
             return;
@@ -38,7 +40,7 @@ public class HttpCookieOAuth2AuthorizationRequestRepository
 
     @Override
     public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request,
-                                                                  HttpServletResponse response) {
+            HttpServletResponse response) {
         OAuth2AuthorizationRequest authRequest = getCookieValue(request);
         if (authRequest != null) {
             removeCookie(request, response);
@@ -47,12 +49,16 @@ public class HttpCookieOAuth2AuthorizationRequestRepository
     }
 
     private OAuth2AuthorizationRequest getCookieValue(HttpServletRequest request) {
-        if (request.getCookies() == null) return null;
-        for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+        if (request.getCookies() == null)
+            return null;
+        for (Cookie cookie : request.getCookies()) {
             if (COOKIE_NAME.equals(cookie.getName()) && cookie.getValue() != null && !cookie.getValue().isBlank()) {
                 try {
                     byte[] bytes = Base64.getUrlDecoder().decode(cookie.getValue());
-                    return (OAuth2AuthorizationRequest) SerializationUtils.deserialize(bytes);
+                    try (ObjectInputStream ois = new ObjectInputStream(
+                            new ByteArrayInputStream(bytes))) {
+                        return (OAuth2AuthorizationRequest) ois.readObject();
+                    }
                 } catch (Exception e) {
                     return null;
                 }

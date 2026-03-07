@@ -1,0 +1,149 @@
+<div class="park-config-page">
+  <div class="page-header">
+    <h2>{{ 'PARK_CONFIG.TITLE' | translate }}</h2>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'closures'" (click)="switchTab('closures')">
+      {{ 'PARK_CONFIG.TAB_CLOSURES' | translate }}
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'pricing'" (click)="switchTab('pricing')">
+      {{ 'PARK_CONFIG.TAB_PRICING' | translate }}
+    </button>
+  </div>
+
+  <!-- CLOSURE DAYS TAB -->
+  @if (activeTab === 'closures') {
+    @if (closureSuccess) {
+      <div class="alert alert-success">{{ closureSuccess | translate }}</div>
+    }
+    @if (closureError) {
+      <div class="alert alert-danger">{{ closureError }}</div>
+    }
+
+    <div class="form-card">
+      <h3>{{ 'PARK_CONFIG.ADD_CLOSURE' | translate }}</h3>
+      <p class="hint">{{ 'PARK_CONFIG.CLOSURE_HINT' | translate }}</p>
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{ 'PARK_CONFIG.CLOSURE_DATE' | translate }}</label>
+          <input type="date" [(ngModel)]="newClosureDate" [min]="minClosureDate">
+        </div>
+        <div class="form-group flex-grow">
+          <label>{{ 'PARK_CONFIG.CLOSURE_REASON' | translate }}</label>
+          <input type="text" [(ngModel)]="newClosureReason" maxlength="255"
+                 [placeholder]="'PARK_CONFIG.CLOSURE_REASON_PLACEHOLDER' | translate">
+        </div>
+        <button class="btn-add" (click)="addClosureDay()"
+                [disabled]="!newClosureDate || !newClosureReason.trim()">
+          {{ 'PARK_CONFIG.ADD' | translate }}
+        </button>
+      </div>
+    </div>
+
+    @if (closureLoading) {
+      <div class="loading">{{ 'PARK_CONFIG.LOADING' | translate }}</div>
+    } @else if (closureDays.length === 0) {
+      <div class="empty">{{ 'PARK_CONFIG.NO_CLOSURES' | translate }}</div>
+    } @else {
+      <div class="items-list">
+        @for (day of closureDays; track day.id) {
+          <div class="list-item">
+            <div class="item-info">
+              <span class="item-date">{{ day.closureDate }}</span>
+              <span class="item-reason">{{ day.reason }}</span>
+            </div>
+            <button class="btn-delete" (click)="deleteClosureDay(day.id)">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- SEASONAL PRICING TAB -->
+  @if (activeTab === 'pricing') {
+    @if (pricingSuccess) {
+      <div class="alert alert-success">{{ pricingSuccess | translate }}</div>
+    }
+    @if (pricingError) {
+      <div class="alert alert-danger">{{ pricingError }}</div>
+    }
+
+    <div class="form-card">
+      <h3>{{ 'PARK_CONFIG.ADD_PRICING' | translate }}</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{ 'PARK_CONFIG.PRICING_NAME' | translate }}</label>
+          <input type="text" [(ngModel)]="newPricingName" maxlength="100">
+        </div>
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="newPricingAllYear" (change)="onAllYearChange()">
+            {{ 'PARK_CONFIG.ALL_YEAR' | translate }}
+          </label>
+        </div>
+      </div>
+      @if (!newPricingAllYear) {
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'PARK_CONFIG.PRICING_START' | translate }}</label>
+            <input type="date" [(ngModel)]="newPricingStartDate">
+          </div>
+          <div class="form-group">
+            <label>{{ 'PARK_CONFIG.PRICING_END' | translate }}</label>
+            <input type="date" [(ngModel)]="newPricingEndDate">
+          </div>
+        </div>
+      }
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{ 'PARK_CONFIG.PRICING_MULTIPLIER' | translate }}</label>
+          <input type="number" [(ngModel)]="newPricingMultiplier" min="1" step="0.01">
+        </div>
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="newPricingWeekdays">
+            {{ 'PARK_CONFIG.APPLY_WEEKDAYS' | translate }}
+          </label>
+        </div>
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="newPricingWeekends">
+            {{ 'PARK_CONFIG.APPLY_WEEKENDS' | translate }}
+          </label>
+        </div>
+        <button class="btn-add" (click)="addSeasonalPricing()"
+                [disabled]="!newPricingName.trim() || (!newPricingAllYear && (!newPricingStartDate || !newPricingEndDate)) || newPricingMultiplier < 1">
+          {{ 'PARK_CONFIG.ADD' | translate }}
+        </button>
+      </div>
+    </div>
+
+    @if (pricingLoading) {
+      <div class="loading">{{ 'PARK_CONFIG.LOADING' | translate }}</div>
+    } @else if (seasonalPricings.length === 0) {
+      <div class="empty">{{ 'PARK_CONFIG.NO_PRICING' | translate }}</div>
+    } @else {
+      <div class="items-list">
+        @for (pricing of seasonalPricings; track pricing.id) {
+          <div class="list-item">
+            <div class="item-info">
+              <span class="item-name">{{ pricing.name }}</span>
+              <span class="item-details">
+                {{ pricing.startDate }} → {{ pricing.endDate }} | x{{ pricing.multiplier }}
+                @if (pricing.applyOnWeekdays) { <span class="badge">{{ 'PARK_CONFIG.WEEKDAYS' | translate }}</span> }
+                @if (pricing.applyOnWeekends) { <span class="badge">{{ 'PARK_CONFIG.WEEKENDS' | translate }}</span> }
+              </span>
+            </div>
+            <button class="btn-delete" (click)="deleteSeasonalPricing(pricing.id)">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+

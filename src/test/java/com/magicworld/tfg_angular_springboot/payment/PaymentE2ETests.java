@@ -165,6 +165,7 @@ public class PaymentE2ETests {
                         .build()
         ));
         request.setDiscountCodes(List.of());
+        request.setVisitDate(LocalDate.now().plusDays(1));
 
         var result = mockMvc.perform(post(API_PAYMENT + "/calculate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -188,6 +189,7 @@ public class PaymentE2ETests {
                         .build()
         ));
         request.setDiscountCodes(List.of());
+        request.setVisitDate(LocalDate.now().plusDays(1));
 
         var result = mockMvc.perform(post(API_PAYMENT + "/calculate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -227,6 +229,7 @@ public class PaymentE2ETests {
                         .build()
         ));
         request.setDiscountCodes(List.of("SAVE10"));
+        request.setVisitDate(LocalDate.now().plusDays(1));
 
         var result = mockMvc.perform(post(API_PAYMENT + "/calculate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -250,6 +253,7 @@ public class PaymentE2ETests {
                         .build()
         ));
         request.setDiscountCodes(List.of("INVALID_CODE"));
+        request.setVisitDate(LocalDate.now().plusDays(1));
 
         var result = mockMvc.perform(post(API_PAYMENT + "/calculate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -339,6 +343,7 @@ public class PaymentE2ETests {
                         .build()
         ));
         request.setDiscountCodes(List.of());
+        request.setVisitDate(LocalDate.now().plusDays(1));
 
         var result = mockMvc.perform(post(API_PAYMENT + "/calculate")
                         .contentType(MediaType.APPLICATION_JSON)

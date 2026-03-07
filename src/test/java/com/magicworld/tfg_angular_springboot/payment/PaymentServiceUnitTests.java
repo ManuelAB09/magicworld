@@ -4,9 +4,11 @@ import com.magicworld.tfg_angular_springboot.discount.DiscountService;
 import com.magicworld.tfg_angular_springboot.discount_ticket_type.DiscountTicketTypeService;
 import com.magicworld.tfg_angular_springboot.email.EmailService;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidOperationException;
+import com.magicworld.tfg_angular_springboot.park_closure.ParkClosureDayService;
 import com.magicworld.tfg_angular_springboot.purchase.PurchaseService;
 import com.magicworld.tfg_angular_springboot.purchase_line.PurchaseLineService;
 import com.magicworld.tfg_angular_springboot.qr.QrCodeService;
+import com.magicworld.tfg_angular_springboot.seasonal_pricing.SeasonalPricingService;
 import com.magicworld.tfg_angular_springboot.ticket_type.TicketType;
 import com.magicworld.tfg_angular_springboot.ticket_type.TicketTypeService;
 import com.magicworld.tfg_angular_springboot.user.UserRepository;
@@ -49,6 +51,10 @@ public class PaymentServiceUnitTests {
         private EmailService emailService;
         @Mock
         private SimpMessagingTemplate messagingTemplate;
+        @Mock
+        private SeasonalPricingService seasonalPricingService;
+        @Mock
+        private ParkClosureDayService parkClosureDayService;
 
         private PaymentService paymentService;
 
@@ -64,7 +70,13 @@ public class PaymentServiceUnitTests {
                                 userRepository,
                                 qrCodeService,
                                 emailService,
-                                messagingTemplate);
+                                messagingTemplate,
+                                seasonalPricingService,
+                                parkClosureDayService);
+
+                // Default: no closures, multiplier = 1
+                when(parkClosureDayService.isClosedDay(any(LocalDate.class))).thenReturn(false);
+                when(seasonalPricingService.getMultiplier(any(LocalDate.class))).thenReturn(BigDecimal.ONE);
         }
 
         @Test
@@ -176,7 +188,7 @@ public class PaymentServiceUnitTests {
                                                 .quantity(2)
                                                 .build());
 
-                PriceCalculationResponse response = paymentService.calculatePrice(items, null);
+                PriceCalculationResponse response = paymentService.calculatePrice(items, null, LocalDate.now().plusDays(1));
 
                 assertEquals(new BigDecimal("100.00"), response.getSubtotal());
         }
@@ -201,7 +213,7 @@ public class PaymentServiceUnitTests {
                                                 .quantity(1)
                                                 .build());
 
-                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("INVALID"));
+                PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("INVALID"), LocalDate.now().plusDays(1));
 
                 assertTrue(response.getInvalidDiscountCodes().contains("INVALID"));
         }

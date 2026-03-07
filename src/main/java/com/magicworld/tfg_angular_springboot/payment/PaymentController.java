@@ -52,15 +52,16 @@ public class PaymentController {
     public static class PriceCalculationRequest {
         private List<PaymentRequest.PaymentLineItem> items;
         private List<String> discountCodes;
+        private LocalDate visitDate;
     }
 
-    @Operation(summary = "Calculate price", description = "Calculate total price with discounts", tags = {"Payment"})
+    @Operation(summary = "Calculate price", description = "Calculate total price with discounts and seasonal pricing", tags = {"Payment"})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Price calculated", content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/calculate")
     public ResponseEntity<PriceCalculationResponse> calculatePrice(@RequestBody PriceCalculationRequest request) {
-        return ResponseEntity.ok(paymentService.calculatePrice(request.getItems(), request.getDiscountCodes()));
+        return ResponseEntity.ok(paymentService.calculatePrice(request.getItems(), request.getDiscountCodes(), request.getVisitDate()));
     }
 
     @Operation(summary = "Process payment", description = "Process payment with Stripe and create purchase", tags = {"Payment"})

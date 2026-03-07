@@ -6,6 +6,7 @@ import { ProfileComponent } from './profile';
 import { ProfileService, PurchaseDTO, UpdateProfileRequest } from './profile.service';
 import { AuthService, UserProfile, Role } from '../auth/auth.service';
 import { ErrorService } from '../error/error-service';
+import { CurrencyService } from '../shared/currency.service';
 import { of, throwError, Subject } from 'rxjs';
 
 describe('ProfileComponent', () => {
@@ -60,7 +61,8 @@ describe('ProfileComponent', () => {
         { provide: ProfileService, useValue: mockProfileService },
         { provide: AuthService, useValue: mockAuthService },
         { provide: ErrorService, useValue: mockErrorService },
-        { provide: Router, useValue: mockRouter }
+        { provide: Router, useValue: mockRouter },
+        { provide: CurrencyService, useValue: { convertFromEur: (v: number) => v, getCurrencySymbol: () => '€' } }
       ]
     }).compileComponents();
 

@@ -10,6 +10,9 @@ import lombok.*;
 @AllArgsConstructor
 public class UpdateProfileRequest {
 
+    @Size(min = 1, max = 50, message = "validation.username.size")
+    private String username;
+
     @NotBlank(message = "validation.firstname.required")
     @Size(min = 1, max = 50, message = "validation.firstname.size")
     @Pattern(regexp = "^[\\p{L}\\s'-]+$", message = "validation.firstname.pattern")

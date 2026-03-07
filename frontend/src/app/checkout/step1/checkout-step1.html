@@ -2,6 +2,12 @@
   <div class="tickets-section">
     <h2>{{ 'CHECKOUT.STEP1.TICKETS_TITLE' | translate }}</h2>
 
+    @if (hasSeasonalSurcharge) {
+      <div class="seasonal-surcharge-badge">
+        🔥 {{ 'CHECKOUT.STEP1.SEASONAL_SURCHARGE' | translate }} (x{{ seasonalMultiplier | number:'1.2-2' }})
+      </div>
+    }
+
     @if (loading) {
       <div class="loading">
         {{ 'CHECKOUT.LOADING' | translate }}
@@ -27,7 +33,12 @@
             <div class="ticket-info">
               <h3>{{ ticket.typeName }}</h3>
               <p class="description">{{ ticket.description }}</p>
-              <p class="price">{{ currency.convertFromEur(ticket.cost) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</p>
+              <div class="price-info">
+                @if (hasSeasonalSurcharge) {
+                  <span class="base-price strikethrough">{{ currency.convertFromEur(ticket.cost) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</span>
+                }
+                <p class="price">{{ currency.convertFromEur(ticket.adjustedCost) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</p>
+              </div>
             </div>
             <div class="quantity-controls">
               <button
@@ -63,7 +74,7 @@
             ‹
           </button>
           <span class="calendar-month">{{ getMonthName() }}</span>
-          <button class="calendar-nav" (click)="nextMonth()">›</button>
+          <button class="calendar-nav" (click)="nextMonth()" [disabled]="!canGoNext()">›</button>
         </div>
 
         <div class="calendar-weekdays">
@@ -79,12 +90,25 @@
               [class.empty]="day === null"
               [class.disabled]="!isDaySelectable(day)"
               [class.selected]="isDaySelected(day)"
+              [class.closed]="isClosedDay(day)"
+              [class.beyond-limit]="isBeyondMaxDate(day)"
               [disabled]="!isDaySelectable(day)"
+              [title]="isClosedDay(day) ? getClosureReason(day) : (isBeyondMaxDate(day) ? ('CHECKOUT.STEP1.MAX_DATE_REASON' | translate) : '')"
               (click)="selectDay(day)">
-              {{ day }}
+              @if (isClosedDay(day)) {
+                <span class="day-number">{{ day }}</span>
+                <span class="closed-label">{{ 'CHECKOUT.STEP1.CLOSED' | translate }}</span>
+              } @else {
+                {{ day }}
+              }
             </button>
           }
         </div>
+      </div>
+
+      <div class="calendar-legend">
+        <span class="legend-item"><span class="legend-dot closed-dot"></span> {{ 'CHECKOUT.STEP1.CLOSED' | translate }}</span>
+        <span class="legend-item"><span class="legend-dot beyond-dot"></span> {{ 'CHECKOUT.STEP1.MAX_DATE_LABEL' | translate }}</span>
       </div>
     </div>
 

@@ -75,6 +75,19 @@
   white-space: nowrap;
 }
 
+.nav-list--compact .nav-btn {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.68rem;
+  gap: 0.15rem;
+  border-width: 0.1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0.1rem 0.1rem 0.25rem rgba(0,0,0,0.12);
+}
+
+.nav-list--compact {
+  gap: 0.25rem;
+}
+
 .nav-btn i {
   font-size: 0.85em;
 }

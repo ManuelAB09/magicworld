@@ -100,6 +100,7 @@ public class PaymentControllerTests {
                         .build()
         ));
         request.setDiscountCodes(List.of());
+        request.setVisitDate(LocalDate.now().plusDays(1));
 
         mockMvc.perform(post("/api/v1/payment/calculate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -156,6 +157,7 @@ public class PaymentControllerTests {
                         .build()
         ));
         request.setDiscountCodes(List.of());
+        request.setVisitDate(LocalDate.now().plusDays(1));
 
         mockMvc.perform(post("/api/v1/payment/calculate")
                         .contentType(MediaType.APPLICATION_JSON)

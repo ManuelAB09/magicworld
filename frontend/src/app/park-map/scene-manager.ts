@@ -9,6 +9,7 @@ import { Attraction } from '../attraction/attraction.service';
 import { AttractionMeshFactory } from './attraction-mesh-factory';
 import { ParkBuilder } from './park-builder';
 import { isWebGLAvailable, addStandardLights } from './three-utils';
+import { secureRandom } from './secure-random';
 
 export interface AttractionMesh extends THREE.Group {
   userData: {
@@ -102,24 +103,24 @@ export class SceneManager {
 
     for (let i = 0; i < 15; i++) {
       const cloudGroup = new THREE.Group();
-      const puffCount = 3 + Math.floor(Math.random() * 4);
+      const puffCount = 3 + Math.floor(secureRandom() * 4);
       for (let p = 0; p < puffCount; p++) {
         const puff = new THREE.Mesh(
-          new THREE.SphereGeometry(5 + Math.random() * 8, 8, 6),
+          new THREE.SphereGeometry(5 + secureRandom() * 8, 8, 6),
           cloudMat
         );
         puff.position.set(
-          (Math.random() - 0.5) * 14,
-          (Math.random() - 0.5) * 3,
-          (Math.random() - 0.5) * 6
+          (secureRandom() - 0.5) * 14,
+          (secureRandom() - 0.5) * 3,
+          (secureRandom() - 0.5) * 6
         );
-        puff.scale.y = 0.4 + Math.random() * 0.3;
+        puff.scale.y = 0.4 + secureRandom() * 0.3;
         cloudGroup.add(puff);
       }
       cloudGroup.position.set(
-        (Math.random() - 0.5) * 300,
-        60 + Math.random() * 40,
-        (Math.random() - 0.5) * 300
+        (secureRandom() - 0.5) * 300,
+        60 + secureRandom() * 40,
+        (secureRandom() - 0.5) * 300
       );
       cloudGroup.name = 'cloud';
       this.scene.add(cloudGroup);

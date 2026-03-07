@@ -196,7 +196,8 @@ export class CheckoutStep2Component implements OnInit, OnDestroy, AfterViewInit 
         ticketTypeName: item.ticketTypeName,
         quantity: item.quantity
       })),
-      discountCodes: this.appliedCodes
+      discountCodes: this.appliedCodes,
+      visitDate: this.cart.visitDate
     };
 
     this.checkoutService.calculatePrice(request)

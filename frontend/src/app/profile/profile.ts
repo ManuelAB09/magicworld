@@ -7,6 +7,7 @@ import { AuthService, UserProfile } from '../auth/auth.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ErrorService } from '../error/error-service';
 import { handleApiError } from '../shared/utils';
+import { CurrencyService } from '../shared/currency.service';
 import { catchError, of } from 'rxjs';
 
 @Component({
@@ -32,6 +33,7 @@ export class ProfileComponent implements OnInit {
 
   // Edit form
   showEditForm = false;
+  editUsername = '';
   editFirstname = '';
   editLastname = '';
   editEmail = '';
@@ -44,7 +46,8 @@ export class ProfileComponent implements OnInit {
     private profileService: ProfileService,
     private auth: AuthService,
     private error: ErrorService,
-    private router: Router
+    private router: Router,
+    public currency: CurrencyService
   ) {}
 
   ngOnInit(): void {
@@ -87,6 +90,7 @@ export class ProfileComponent implements OnInit {
 
   openEditForm(): void {
     if (this.profile) {
+      this.editUsername = this.profile.username;
       this.editFirstname = this.profile.firstname;
       this.editLastname = this.profile.lastname;
       this.editEmail = this.profile.email;
@@ -110,6 +114,7 @@ export class ProfileComponent implements OnInit {
     this.clearMessages();
 
     const request: UpdateProfileRequest = {
+      username: this.editUsername.trim() || undefined,
       firstname: this.editFirstname.trim(),
       lastname: this.editLastname.trim(),
       email: this.editEmail.trim(),

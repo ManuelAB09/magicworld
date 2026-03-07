@@ -134,7 +134,7 @@ public class PaymentServiceIntegrationTests {
                         .build()
         );
 
-        PriceCalculationResponse response = paymentService.calculatePrice(items, null);
+        PriceCalculationResponse response = paymentService.calculatePrice(items, null, LocalDate.now().plusDays(1));
 
         assertEquals(new BigDecimal("100.00"), response.getSubtotal());
         assertEquals(new BigDecimal("100.00"), response.getTotal());
@@ -169,7 +169,7 @@ public class PaymentServiceIntegrationTests {
                         .build()
         );
 
-        PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("PROMO20"));
+        PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("PROMO20"), LocalDate.now().plusDays(1));
 
         assertEquals(new BigDecimal("100.00"), response.getSubtotal());
         assertEquals(new BigDecimal("20.00"), response.getDiscountAmount());
@@ -193,7 +193,7 @@ public class PaymentServiceIntegrationTests {
                         .build()
         );
 
-        PriceCalculationResponse response = paymentService.calculatePrice(items, null);
+        PriceCalculationResponse response = paymentService.calculatePrice(items, null, LocalDate.now().plusDays(1));
 
         assertEquals(new BigDecimal("175.00"), response.getSubtotal());
         assertEquals(new BigDecimal("175.00"), response.getTotal());
@@ -212,7 +212,7 @@ public class PaymentServiceIntegrationTests {
                         .build()
         );
 
-        PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("NONEXISTENT"));
+        PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("NONEXISTENT"), LocalDate.now().plusDays(1));
 
         assertTrue(response.getInvalidDiscountCodes().contains("NONEXISTENT"));
         assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP), response.getDiscountAmount());
@@ -258,7 +258,7 @@ public class PaymentServiceIntegrationTests {
                         .build()
         );
 
-        PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("SAVE10", "SAVE30"));
+        PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("SAVE10", "SAVE30"), LocalDate.now().plusDays(1));
 
         assertEquals(new BigDecimal("15.00"), response.getDiscountAmount());
     }
@@ -292,7 +292,7 @@ public class PaymentServiceIntegrationTests {
                         .build()
         );
 
-        PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("CHILDONLY"));
+        PriceCalculationResponse response = paymentService.calculatePrice(items, List.of("CHILDONLY"), LocalDate.now().plusDays(1));
 
         assertTrue(response.getValidButNotApplicableCodes().contains("CHILDONLY"));
         assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP), response.getDiscountAmount());

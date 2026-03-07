@@ -2,6 +2,7 @@ package com.magicworld.tfg_angular_springboot.user;
 
 import com.magicworld.tfg_angular_springboot.exceptions.EmailAlreadyExistsException;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidOperationException;
+import com.magicworld.tfg_angular_springboot.exceptions.UsernameAlreadyExistsException;
 import com.magicworld.tfg_angular_springboot.purchase.PurchaseRepository;
 import com.magicworld.tfg_angular_springboot.purchase_line.PurchaseLineRepository;
 import com.magicworld.tfg_angular_springboot.review.ReviewRepository;
@@ -28,27 +29,33 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(
-            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"
-    );
+            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$");
 
     @Transactional
     public void setCurrentUser(User user) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(
                 user.getAuthorities().toString());
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
-                        user.getUsername(),
-                        user.getPassword(),
-                        Collections.singletonList(authority));
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                user.getUsername(),
+                user.getPassword(),
+                Collections.singletonList(authority));
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
     }
 
     @Transactional
     public User updateProfile(User user, UpdateProfileRequest request) {
+        if (request.getUsername() != null && !request.getUsername().isBlank()
+                && !user.getUsername().equals(request.getUsername())) {
+            if (userRepository.existsByUsername(request.getUsername())) {
+                throw new UsernameAlreadyExistsException(request.getUsername());
+            }
+            user.setUsername(request.getUsername());
+        }
+
         if (!user.getEmail().equals(request.getEmail()) &&
-            userRepository.existsByEmail(request.getEmail())) {
+                userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExistsException(request.getEmail());
         }
 
@@ -63,21 +70,21 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        setCurrentUser(saved);
+        return saved;
     }
 
     @Transactional
     public void deleteUserWithRelatedData(User user) {
         reviewRepository.deleteAll(
-            reviewRepository.findAll().stream()
-                .filter(r -> r.getPurchase().getBuyer().getId().equals(user.getId()))
-                .toList()
-        );
+                reviewRepository.findAll().stream()
+                        .filter(r -> r.getPurchase().getBuyer().getId().equals(user.getId()))
+                        .toList());
 
         purchaseRepository.findByBuyerId(user.getId()).forEach(purchase -> {
             purchaseLineRepository.deleteAll(
-                purchaseLineRepository.findByPurchaseId(purchase.getId())
-            );
+                    purchaseLineRepository.findByPurchaseId(purchase.getId()));
         });
         purchaseRepository.deleteAll(purchaseRepository.findByBuyerId(user.getId()));
         userRepository.delete(user);

@@ -24,9 +24,11 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
   cart: Map<string, CartItem> = new Map();
   selectedDate = '';
   minDate = '';
+  maxDate = '';
   loading = false;
   error: string | null = null;
 
+  closureDays: Map<string, string> = new Map(); // date -> reason
 
   currentMonth: Date = new Date();
   calendarDays: (number | null)[] = [];
@@ -47,9 +49,15 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     this.minDate = this.formatDate(tomorrow);
+
+    const maxDateObj = new Date();
+    maxDateObj.setMonth(maxDateObj.getMonth() + 2);
+    this.maxDate = this.formatDate(maxDateObj);
+
     this.selectedDate = this.minDate;
     this.currentMonth = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), 1);
     this.generateCalendar();
+    this.loadClosureDays();
     this.loadAvailability();
     this.setupWebSocket();
   }
@@ -64,13 +72,42 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
     return Array.from(this.cart.values());
   }
 
+  get seasonalMultiplier(): number {
+    if (this.tickets.length > 0 && this.tickets[0].seasonalMultiplier) {
+      return this.tickets[0].seasonalMultiplier;
+    }
+    return 1;
+  }
+
+  get hasSeasonalSurcharge(): boolean {
+    return this.seasonalMultiplier > 1;
+  }
+
   private formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
 
   onDateChange(): void {
     this.loadAvailability();
     this.setupWebSocket();
+  }
+
+  private loadClosureDays(): void {
+    const from = this.minDate;
+    const to = this.maxDate;
+    this.checkoutService.getClosureDays(from, to)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (closures) => {
+          this.closureDays.clear();
+          closures.forEach(c => this.closureDays.set(c.closureDate, c.reason));
+          this.generateCalendar();
+        },
+        error: () => {}
+      });
   }
 
   private loadAvailability(): void {
@@ -90,6 +127,7 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
         error: (err) => {
           const { code, args } = this.errorService.handleError(err);
           this.error = this.translate.instant(code, args);
+          this.tickets = [];
           this.loading = false;
         }
       });
@@ -114,11 +152,16 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
   private updateCartAvailability(): void {
     this.cart.forEach((item, typeName) => {
       const ticket = this.tickets.find(t => t.typeName === typeName);
-      if (ticket && item.quantity > ticket.available) {
-        item.quantity = ticket.available;
+      if (ticket) {
+        // Update unit price with the adjusted cost for the selected date
+        item.unitPrice = ticket.adjustedCost;
         item.totalPrice = item.quantity * item.unitPrice;
-        if (item.quantity === 0) {
-          this.cart.delete(typeName);
+        if (item.quantity > ticket.available) {
+          item.quantity = ticket.available;
+          item.totalPrice = item.quantity * item.unitPrice;
+          if (item.quantity === 0) {
+            this.cart.delete(typeName);
+          }
         }
       }
     });
@@ -135,8 +178,8 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
       this.cart.set(ticket.typeName, {
         ticketTypeName: ticket.typeName,
         quantity: newQty,
-        unitPrice: ticket.cost,
-        totalPrice: newQty * ticket.cost,
+        unitPrice: ticket.adjustedCost,
+        totalPrice: newQty * ticket.adjustedCost,
         photoUrl: ticket.photoUrl,
         description: ticket.description
       });
@@ -212,12 +255,26 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
     if (newMonth >= minMonth) {
       this.currentMonth = newMonth;
       this.generateCalendar();
+      this.loadClosureDays();
     }
   }
 
   nextMonth(): void {
-    this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 1);
-    this.generateCalendar();
+    const nextMonthDate = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 1);
+    const maxDateObj = new Date(this.maxDate);
+    const maxMonth = new Date(maxDateObj.getFullYear(), maxDateObj.getMonth(), 1);
+    if (nextMonthDate <= maxMonth) {
+      this.currentMonth = nextMonthDate;
+      this.generateCalendar();
+      this.loadClosureDays();
+    }
+  }
+
+  canGoNext(): boolean {
+    const nextMonthDate = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 1);
+    const maxDateObj = new Date(this.maxDate);
+    const maxMonth = new Date(maxDateObj.getFullYear(), maxDateObj.getMonth(), 1);
+    return nextMonthDate <= maxMonth;
   }
 
   selectDay(day: number | null): void {
@@ -225,7 +282,31 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
 
     const selected = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth(), day);
     this.selectedDate = this.formatDate(selected);
+    this.cart.clear();
     this.onDateChange();
+  }
+
+  isClosedDay(day: number | null): boolean {
+    if (day === null) return false;
+    const date = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth(), day);
+    const dateStr = this.formatDate(date);
+    return this.closureDays.has(dateStr);
+  }
+
+  getClosureReason(day: number | null): string {
+    if (day === null) return '';
+    const date = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth(), day);
+    const dateStr = this.formatDate(date);
+    return this.closureDays.get(dateStr) || '';
+  }
+
+  isBeyondMaxDate(day: number | null): boolean {
+    if (day === null) return false;
+    const date = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth(), day);
+    const maxDateObj = new Date(this.maxDate);
+    date.setHours(0, 0, 0, 0);
+    maxDateObj.setHours(0, 0, 0, 0);
+    return date > maxDateObj;
   }
 
   isDaySelectable(day: number | null): boolean {
@@ -233,10 +314,15 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
 
     const date = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth(), day);
     const minDateObj = new Date(this.minDate);
+    const maxDateObj = new Date(this.maxDate);
     minDateObj.setHours(0, 0, 0, 0);
+    maxDateObj.setHours(0, 0, 0, 0);
     date.setHours(0, 0, 0, 0);
 
-    return date >= minDateObj;
+    if (date < minDateObj || date > maxDateObj) return false;
+    if (this.isClosedDay(day)) return false;
+
+    return true;
   }
 
   isDaySelected(day: number | null): boolean {
@@ -260,4 +346,3 @@ export class CheckoutStep1Component implements OnInit, OnDestroy {
     return prevMonth >= minMonth;
   }
 }
-

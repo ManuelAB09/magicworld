@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    Page<Review> findAllByOrderByPublicationDateDesc(Pageable pageable);
+    Page<Review> findAllByOrderByVisitDateDesc(Pageable pageable);
 
     boolean existsByPurchaseId(Long purchaseId);
 

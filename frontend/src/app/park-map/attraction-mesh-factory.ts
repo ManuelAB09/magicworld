@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Attraction } from '../attraction/attraction.service';
+import { secureRandom } from './secure-random';
 
 export class AttractionMeshFactory {
   createAttractionMesh(attraction: Attraction): THREE.Group {
@@ -65,7 +66,7 @@ export class AttractionMeshFactory {
     if (noise) {
       const img = ctx.getImageData(0, 0, size, size);
       for (let i = 0; i < img.data.length; i += 4) {
-        const v = (Math.random() - 0.5) * 20;
+        const v = (secureRandom() - 0.5) * 20;
         img.data[i] = Math.max(0, Math.min(255, img.data[i] + v));
         img.data[i + 1] = Math.max(0, Math.min(255, img.data[i + 1] + v));
         img.data[i + 2] = Math.max(0, Math.min(255, img.data[i + 2] + v));
@@ -497,8 +498,8 @@ export class AttractionMeshFactory {
     // bare branches
     for (let b = 0; b < 4; b++) {
       const branch = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.06, 1.2, 4), deadTreeMat);
-      branch.position.set(-3.8 + (Math.random() - 0.5) * 0.8, 2.5 + b * 0.3, 2);
-      branch.rotation.z = (Math.random() - 0.5) * 1.2;
+      branch.position.set(-3.8 + (secureRandom() - 0.5) * 0.8, 2.5 + b * 0.3, 2);
+      branch.rotation.z = (secureRandom() - 0.5) * 1.2;
       group.add(branch);
     }
   }
@@ -601,8 +602,8 @@ export class AttractionMeshFactory {
 
     // bumper cars
     for (let i = 0; i < 5; i++) {
-      const angle = (i / 5) * Math.PI * 2 + Math.random() * 0.5;
-      const dist = 1.5 + Math.random() * 1.5;
+      const angle = (i / 5) * Math.PI * 2 + secureRandom() * 0.5;
+      const dist = 1.5 + secureRandom() * 1.5;
       const carMat = new THREE.MeshPhysicalMaterial({
         color: carColors[i],
         roughness: 0.3,
@@ -709,7 +710,7 @@ export class AttractionMeshFactory {
     const smokeMat = new THREE.MeshBasicMaterial({ color: 0xcccccc, transparent: true, opacity: 0.4 });
     for (let s = 0; s < 3; s++) {
       const puff = new THREE.Mesh(new THREE.SphereGeometry(0.15 + s * 0.1, 6, 6), smokeMat);
-      puff.position.set(5.0, 1.5 + s * 0.35, (Math.random() - 0.5) * 0.3);
+      puff.position.set(5.0, 1.5 + s * 0.35, (secureRandom() - 0.5) * 0.3);
       group.add(puff);
     }
 

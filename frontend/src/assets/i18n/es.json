@@ -39,7 +39,8 @@
     "PROFILE": "Mi Perfil",
     "MONITORING": "Monitorizacion",
     "EMPLOYEES": "Empleados",
-    "SCHEDULE": "Cuadrante"
+    "SCHEDULE": "Cuadrante",
+    "PARK_CONFIG": "Config. Parque"
   },
   "HOME": {
     "TITLE": "Bienvenido a MagicWorld",
@@ -291,7 +292,11 @@
       "ORDER_SUMMARY": "Resumen del pedido",
       "CART_EMPTY": "Tu carrito está vacío",
       "SUBTOTAL": "Subtotal",
-      "PROCEED": "Continuar al pago"
+      "PROCEED": "Continuar al pago",
+      "CLOSED": "CERRADO",
+      "MAX_DATE_LABEL": "Fuera de plazo",
+      "MAX_DATE_REASON": "No se pueden comprar entradas con más de 2 meses de antelación",
+      "SEASONAL_SURCHARGE": "Recargo de temporada aplicado"
     },
     "STEP2": {
       "BACK": "Volver",
@@ -335,7 +340,42 @@
   "error.payment.stripe.failed": "Error al procesar el pago con Stripe",
   "error.payment.discount.changed": "Los siguientes códigos de descuento ya no son válidos o han cambiado: {{0}}. Por favor, revisa tu pedido.",
   "error.payment.park.capacity.exceeded": "Se ha alcanzado el aforo máximo del parque para ese día. No se pueden vender más entradas.",
+  "error.payment.park.closed": "El parque está cerrado en la fecha seleccionada. Por favor, elige otro día.",
+  "error.payment.date.too.far": "No se pueden comprar entradas con más de 2 meses de antelación.",
+  "error.seasonal_pricing.notfound": "Regla de precio estacional no encontrada.",
+  "error.seasonal_pricing.end_before_start": "La fecha de fin no puede ser anterior a la fecha de inicio.",
+  "error.closure.notfound": "Día de cierre no encontrado.",
+  "error.closure.too.soon": "No se puede modificar un cierre del parque con menos de 2 meses de antelación.",
+  "error.closure.already.exists": "Ya existe un cierre para esa fecha.",
   "success.payment.completed": "Pago completado correctamente",
+  "PARK_CONFIG": {
+    "TITLE": "Configuración del Parque",
+    "TAB_CLOSURES": "Días de cierre",
+    "TAB_PRICING": "Precios por temporada",
+    "LOADING": "Cargando...",
+    "ADD_CLOSURE": "Añadir día de cierre",
+    "CLOSURE_HINT": "Solo puedes añadir cierres con al menos 2 meses de antelación.",
+    "CLOSURE_DATE": "Fecha",
+    "CLOSURE_REASON": "Motivo",
+    "CLOSURE_REASON_PLACEHOLDER": "Ej: Festivo, mantenimiento...",
+    "ADD": "Añadir",
+    "NO_CLOSURES": "No hay días de cierre configurados.",
+    "CLOSURE_ADDED": "Día de cierre añadido correctamente.",
+    "CLOSURE_DELETED": "Día de cierre eliminado correctamente.",
+    "ADD_PRICING": "Añadir regla de precio estacional",
+    "PRICING_NAME": "Nombre",
+    "PRICING_START": "Fecha inicio",
+    "PRICING_END": "Fecha fin",
+    "PRICING_MULTIPLIER": "Multiplicador",
+    "APPLY_WEEKDAYS": "Laborables",
+    "APPLY_WEEKENDS": "Fines de semana",
+    "WEEKDAYS": "Laborables",
+    "WEEKENDS": "Fin de semana",
+    "NO_PRICING": "No hay reglas de precio estacional.",
+    "PRICING_ADDED": "Regla de precio añadida correctamente.",
+    "PRICING_DELETED": "Regla de precio eliminada correctamente.",
+    "ALL_YEAR": "Aplicar todo el año"
+  },
   "MAP_PICKER": {
     "WEBGL_ERROR": "WebGL no está disponible en tu navegador.",
     "MANUAL_COORDS": "Ingresa las coordenadas manualmente"

@@ -92,13 +92,13 @@
                     <span class="line-details">
                       x{{ line.quantity }} - {{ 'PROFILE.VISIT_DATE' | translate }}: {{ line.validDate }}
                     </span>
-                    <span class="line-cost">{{ line.totalCost | number:'1.2-2' }} €</span>
+                    <span class="line-cost">{{ currency.convertFromEur(line.totalCost) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</span>
                   </div>
                 }
               </div>
               <div class="purchase-total">
                 <span>{{ 'PROFILE.TOTAL' | translate }}:</span>
-                <span class="total-amount">{{ getTotalCost(purchase) | number:'1.2-2' }} €</span>
+                <span class="total-amount">{{ currency.convertFromEur(getTotalCost(purchase)) | number:'1.2-2' }} {{ currency.getCurrencySymbol() }}</span>
               </div>
             </div>
           }
@@ -114,6 +114,11 @@
     <div class="modal-overlay" (click)="closeEditForm()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <h3>{{ 'PROFILE.EDIT_TITLE' | translate }}</h3>
+
+        <div class="form-group">
+          <label>{{ 'PROFILE.USERNAME' | translate }}</label>
+          <input type="text" [(ngModel)]="editUsername" maxlength="50" />
+        </div>
 
         <div class="form-group">
           <label>{{ 'PROFILE.FIRSTNAME' | translate }}</label>
@@ -144,7 +149,7 @@
           <button
             class="btn-submit"
             (click)="saveProfile()"
-            [disabled]="saving || !editFirstname.trim() || !editLastname.trim() || !editEmail.trim()">
+            [disabled]="saving || !editUsername.trim() || !editFirstname.trim() || !editLastname.trim() || !editEmail.trim()">
             @if (saving) {
               <span class="loader"></span>
             } @else {

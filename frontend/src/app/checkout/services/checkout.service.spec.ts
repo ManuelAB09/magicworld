@@ -8,7 +8,7 @@ describe('CheckoutService', () => {
   let httpMock: HttpTestingController;
 
   const mockAvailability: TicketAvailability[] = [
-    { id: 1, typeName: 'ADULT', description: 'Adult ticket', cost: 50, photoUrl: '/img.jpg', maxPerDay: 100, available: 80 }
+    { id: 1, typeName: 'ADULT', description: 'Adult ticket', cost: 50, adjustedCost: 50, seasonalMultiplier: 1, photoUrl: '/img.jpg', maxPerDay: 100, available: 80 }
   ];
 
   const mockPriceResponse: PriceCalculationResponse = {
@@ -66,7 +66,8 @@ describe('CheckoutService', () => {
   it('should calculate price', () => {
     const request = {
       items: [{ ticketTypeName: 'ADULT', quantity: 2 }],
-      discountCodes: ['SAVE10']
+      discountCodes: ['SAVE10'],
+      visitDate: '2025-01-15'
     };
 
     service.calculatePrice(request).subscribe(response => {

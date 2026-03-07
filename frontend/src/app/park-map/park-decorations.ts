@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { secureRandom } from './secure-random';
 
 export class ParkDecorations {
 
@@ -24,16 +25,16 @@ export class ParkDecorations {
       const mesh = new THREE.Mesh(geom, crownMat);
       mesh.position.y = trunkHeight + i * (height * 0.18);
       mesh.castShadow = true;
-      mesh.rotation.y = (Math.random() - 0.5) * 0.4;
+      mesh.rotation.y = (secureRandom() - 0.5) * 0.4;
       tree.add(mesh);
     }
 
     for (let b = 0; b < Math.floor(height); b++) {
-      const bx = (Math.random() - 0.5) * 0.5;
-      const bz = (Math.random() - 0.5) * 0.5;
+      const bx = (secureRandom() - 0.5) * 0.5;
+      const bz = (secureRandom() - 0.5) * 0.5;
       const branch = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.03, 0.6, 6), trunkMat);
-      branch.position.set(bx, trunkHeight * (0.4 + Math.random() * 0.5), bz);
-      branch.rotation.z = Math.random() * 0.8 - 0.4;
+      branch.position.set(bx, trunkHeight * (0.4 + secureRandom() * 0.5), bz);
+      branch.rotation.z = secureRandom() * 0.8 - 0.4;
       branch.castShadow = true;
       tree.add(branch);
     }
@@ -221,9 +222,9 @@ export class ParkDecorations {
     bed.add(soil);
 
     for (let i = 0; i < 12; i++) {
-      const x = (Math.random() - 0.5) * (width - 0.2);
-      const z = (Math.random() - 0.5) * (depth - 0.2);
-      const color = flowerColors[Math.floor(Math.random() * flowerColors.length)];
+      const x = (secureRandom() - 0.5) * (width - 0.2);
+      const z = (secureRandom() - 0.5) * (depth - 0.2);
+      const color = flowerColors[Math.floor(secureRandom() * flowerColors.length)];
 
       const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.28), new THREE.MeshStandardMaterial({ color: 0x228b22 }));
       stem.position.set(x, 0.28, z);

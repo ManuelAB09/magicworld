@@ -365,6 +365,97 @@
   box-shadow: 0 4px 12px rgba(255, 183, 0, 0.4);
 }
 
+/* Seasonal surcharge badge */
+.seasonal-surcharge-badge {
+  background: linear-gradient(135deg, #ff6b35, #ff4500);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* Strikethrough base price */
+.price-info .base-price.strikethrough {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+}
+
+.price-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Calendar closed days */
+.calendar-day.closed {
+  background: #dc3545 !important;
+  color: white !important;
+  cursor: not-allowed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  padding: 2px;
+}
+
+.calendar-day.closed .day-number {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.calendar-day.closed .closed-label {
+  font-size: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Calendar beyond max date */
+.calendar-day.beyond-limit {
+  background: #e9ecef !important;
+  color: #adb5bd !important;
+  cursor: not-allowed;
+  position: relative;
+}
+
+/* Calendar legend */
+.calendar-legend {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.8rem;
+  font-size: 0.75rem;
+  color: #666;
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-dot.closed-dot {
+  background: #dc3545;
+}
+
+.legend-dot.beyond-dot {
+  background: #e9ecef;
+  border: 1px solid #adb5bd;
+}
+
 
 @media (max-width: 900px) {
   .checkout-container {
