@@ -216,7 +216,7 @@ export class ParkEnvironment {
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const z = pos.getZ(i);
-      const height = fbm(x, z, 3, 0.015, 0.6) - 0.3;
+      const height = fbm(x, z, 3, 0.015, 0.6) - 0.8;
       pos.setY(i, height);
 
       // colour based on height + noise
@@ -250,7 +250,7 @@ export class ParkEnvironment {
     for (let i = 0; i < 600; i++) {
       const gx = (secureRandom() - 0.5) * size * 1.6;
       const gz = (secureRandom() - 0.5) * size * 1.6;
-      const gy = fbm(gx, gz, 3, 0.015, 0.6) - 0.3;
+      const gy = fbm(gx, gz, 3, 0.015, 0.6) - 0.8;
       dummy.position.set(gx, gy, gz);
       dummy.rotation.y = secureRandom() * Math.PI;
       dummy.scale.setScalar(0.6 + secureRandom() * 0.8);

@@ -10,17 +10,17 @@ import java.util.List;
 @Repository
 public interface AttractionRepository extends JpaRepository<Attraction, Long> {
 
-    List<Attraction> findByIsActiveTrue();
+  List<Attraction> findByIsActiveTrue();
 
-    List<Attraction> findByZoneId(Long zoneId);
+  List<Attraction> findByZoneId(Long zoneId);
 
-    @Query("""
-        SELECT a FROM Attraction a
-        WHERE (:minHeight IS NULL OR a.minimumHeight <= :minHeight)
-          AND (:minWeight IS NULL OR a.minimumWeight <= :minWeight)
-          AND (:minAge IS NULL OR a.minimumAge <= :minAge)
-        """)
-    List<Attraction> findByOptionalFilters(@Param("minHeight") Integer minHeight,
-                                           @Param("minWeight") Integer minWeight,
-                                           @Param("minAge") Integer minAge);
+  @Query("""
+      SELECT a FROM Attraction a
+      WHERE (:minHeight IS NULL OR a.minimumHeight <= :minHeight)
+        AND (:minWeight IS NULL OR a.minimumWeight <= :minWeight)
+        AND (:minAge IS NULL OR a.minimumAge <= :minAge)
+      """)
+  List<Attraction> findByOptionalFilters(@Param("minHeight") Integer minHeight,
+      @Param("minWeight") Integer minWeight,
+      @Param("minAge") Integer minAge);
 }

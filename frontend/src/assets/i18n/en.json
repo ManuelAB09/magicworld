@@ -81,7 +81,7 @@
   "error.attraction.notfound": "Attraction not found",
   "error.bad.request": "Bad request parameters",
   "error.file.empty": "No file uploaded",
-  "error.file.size_exceeded": "File too large (max {{0}} bytes)",
+  "error.file.size_exceeded": "File too large (max {{0}})",
   "error.file.invalid_type": "Only image uploads are allowed",
   "error.file.save_failed": "Failed to save the uploaded file",
   "passwordReset": {
@@ -650,7 +650,6 @@
     "resolutions": {
       "add_staff": "Assign additional staff",
       "add_staff_desc": "Assign an available operator",
-
       "offer_fastpass": "Offer FastPass",
       "offer_fastpass_desc": "Give FastPass to waiting visitors",
       "announce_pa": "Make announcement",

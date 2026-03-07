@@ -21,7 +21,6 @@ public class EmployeeStatsService {
     private final WeeklyScheduleRepository weeklyScheduleRepository;
     private final WorkLogRepository workLogRepository;
 
-
     @Transactional(readOnly = true)
     public List<EmployeeHoursRankingDTO> getHoursRanking(LocalDate from, LocalDate to) {
         LocalDate weekFrom = normalizeToMonday(from);
@@ -163,12 +162,12 @@ public class EmployeeStatsService {
 
             if (ws.getAssignedAttraction() != null) {
                 String key = "ATTRACTION:" + ws.getAssignedAttraction().getName();
-                frequencyMap.merge(key, 1, Integer::sum);
+                frequencyMap.merge(key, 1, (a, b) -> a + b);
             } else if (ws.getAssignedZone() != null) {
                 String key = "ZONE:" + ws.getAssignedZone().getZoneName().name();
-                frequencyMap.merge(key, 1, Integer::sum);
+                frequencyMap.merge(key, 1, (a, b) -> a + b);
             } else {
-                frequencyMap.merge("GENERAL:General", 1, Integer::sum);
+                frequencyMap.merge("GENERAL:General", 1, (a, b) -> a + b);
             }
         }
 
@@ -228,8 +227,6 @@ public class EmployeeStatsService {
     // UTILITY
     // ──────────────────────────────────────────────────────────
 
-
-
     private LocalDate normalizeToMonday(LocalDate date) {
         return date.minusDays(date.getDayOfWeek().getValue() - 1);
     }
@@ -254,4 +251,3 @@ public class EmployeeStatsService {
         }
     }
 }
-

@@ -31,7 +31,7 @@ export class AttractionForm implements OnInit {
   photoRequiredError = false;
 
 
-  intensities: Array<'LOW'|'MEDIUM'|'HIGH'> = ['LOW','MEDIUM','HIGH'];
+  intensities: Array<'LOW' | 'MEDIUM' | 'HIGH'> = ['LOW', 'MEDIUM', 'HIGH'];
   categories: AttractionCategory[] = [
     'ROLLER_COASTER', 'FERRIS_WHEEL', 'CAROUSEL', 'WATER_RIDE',
     'HAUNTED_HOUSE', 'DROP_TOWER', 'BUMPER_CARS', 'TRAIN_RIDE', 'SWING_RIDE', 'OTHER'
@@ -44,7 +44,7 @@ export class AttractionForm implements OnInit {
     private router: Router,
     private translate: TranslateService,
     private error: ErrorService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -124,7 +124,7 @@ export class AttractionForm implements OnInit {
       } else if (validation.error === 'size_exceeded') {
         this.photoRequiredError = false;
         this.errorKey = 'error.file.size_exceeded';
-        this.errorArgs = { 0: DEFAULT_MAX_FILE_BYTES };
+        this.errorArgs = { 0: '15MB' };
         this.validationMessages = [];
       }
       return;

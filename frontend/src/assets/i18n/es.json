@@ -81,7 +81,7 @@
   "error.attraction.notfound": "Atracción no encontrada",
   "error.bad.request": "Solicitud incorrecta de parámetros",
   "error.file.empty": "No se ha subido ningún fichero",
-  "error.file.size_exceeded": "Fichero demasiado grande (máx. {{0}} bytes)",
+  "error.file.size_exceeded": "Fichero demasiado grande (máx. {{0}})",
   "error.file.invalid_type": "Solo se permiten imágenes",
   "error.file.save_failed": "No se pudo guardar el fichero subido",
   "passwordReset": {
@@ -650,7 +650,6 @@
     "resolutions": {
       "add_staff": "Asignar personal adicional",
       "add_staff_desc": "Asignar un operador disponible",
-
       "offer_fastpass": "Ofrecer FastPass",
       "offer_fastpass_desc": "Dar FastPass a visitantes en espera",
       "announce_pa": "Hacer anuncio",

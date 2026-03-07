@@ -23,7 +23,7 @@ export class AttractionList implements OnInit {
   errorKey: string | null = null;
   errorArgs: any = null;
   validationMessages: string[] = [];
-  filters = { minHeight: 0, minWeight: 0, minAge: 0 };
+  filters: { minHeight: number | null, minWeight: number | null, minAge: number | null } = { minHeight: null, minWeight: null, minAge: null };
 
   constructor(
     private api: AttractionApiService,
@@ -31,14 +31,14 @@ export class AttractionList implements OnInit {
     private error: ErrorService,
     private router: Router,
     private translate: TranslateService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     checkAdminRole(this.auth).subscribe(v => this.isAdmin = v);
     this.load();
   }
 
-  load(filters?: { minHeight?: number | null; minWeight?: number | null; minAge?: number | null }) {
+  load(filters?: { minHeight?: number | null | string; minWeight?: number | null | string; minAge?: number | null | string }) {
     this.loading = true;
     this.clearError();
     const apiFilters = this.buildApiFilters(filters);
@@ -54,12 +54,12 @@ export class AttractionList implements OnInit {
     });
   }
 
-  private buildApiFilters(filters?: { minHeight?: number | null; minWeight?: number | null; minAge?: number | null }): any {
+  private buildApiFilters(filters?: { minHeight?: number | null | string; minWeight?: number | null | string; minAge?: number | null | string }): any {
     const apiFilters: any = {};
     if (filters) {
-      if (filters.minHeight != null) apiFilters.minHeight = filters.minHeight;
-      if (filters.minWeight != null) apiFilters.minWeight = filters.minWeight;
-      if (filters.minAge != null) apiFilters.minAge = filters.minAge;
+      if (filters.minHeight != null && filters.minHeight !== '') apiFilters.minHeight = filters.minHeight;
+      if (filters.minWeight != null && filters.minWeight !== '') apiFilters.minWeight = filters.minWeight;
+      if (filters.minAge != null && filters.minAge !== '') apiFilters.minAge = filters.minAge;
     }
     return apiFilters;
   }
@@ -81,14 +81,14 @@ export class AttractionList implements OnInit {
 
   private buildFilterParams(): any {
     const f: any = {};
-    if (this.filters.minHeight != null) f.minHeight = this.filters.minHeight;
-    if (this.filters.minWeight != null) f.minWeight = this.filters.minWeight;
-    if (this.filters.minAge != null) f.minAge = this.filters.minAge;
+    if (this.filters.minHeight != null && this.filters.minHeight !== '' as any) f.minHeight = this.filters.minHeight;
+    if (this.filters.minWeight != null && this.filters.minWeight !== '' as any) f.minWeight = this.filters.minWeight;
+    if (this.filters.minAge != null && this.filters.minAge !== '' as any) f.minAge = this.filters.minAge;
     return f;
   }
 
   clearFilters() {
-    this.filters = { minHeight: 0, minWeight: 0, minAge: 0 };
+    this.filters = { minHeight: null, minWeight: null, minAge: null };
     this.load();
   }
 

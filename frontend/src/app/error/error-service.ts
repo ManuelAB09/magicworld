@@ -1,12 +1,24 @@
 import { Injectable } from '@angular/core';
-import {TranslateService} from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({ providedIn: 'root' })
 export class ErrorService {
-  constructor(private translate: TranslateService) {}
+  constructor(private translate: TranslateService) { }
   handleError(err: any): { code: string, args: any } {
-    const code = err.error?.code || 'error.unexpected';
+    let code = err.error?.code || 'error.unexpected';
     let args = err.error?.args;
+
+    // Tomcat / Spring Boot sometimes return a generic 413, 400, or 500 before ExceptionHandler
+    const errText = typeof err.error === 'string' ? err.error.toLowerCase() : '';
+    const errMessage = err.message ? err.message.toLowerCase() : '';
+    const isUploadError = err.status === 413 ||
+      errText.includes('maximum upload size exceeded') ||
+      errMessage.includes('maximum upload size exceeded');
+
+    if (isUploadError) {
+      code = 'error.file.size_exceeded';
+      args = args || ['15MB']; // Default fallback if args is empty
+    }
     if (code !== 'error.validation') {
       if (Array.isArray(args)) {
         args = args.reduce((acc, val, idx) => ({ ...acc, [idx]: val }), {});

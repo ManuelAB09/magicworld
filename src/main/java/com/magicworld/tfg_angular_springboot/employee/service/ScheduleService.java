@@ -66,7 +66,8 @@ public class ScheduleService {
      * Rules:
      * - Cannot assign the same day twice.
      * - Up to 5 days: normal assignment (returns false).
-     * - 6th/7th day: only allowed if there are coverage issues on that day (returns true = overtime).
+     * - 6th/7th day: only allowed if there are coverage issues on that day (returns
+     * true = overtime).
      */
     private boolean checkAndValidateDays(Long employeeId, LocalDate weekStart, DayOfWeek newDay) {
         List<WeeklySchedule> existingSchedules = scheduleRepository
@@ -98,8 +99,8 @@ public class ScheduleService {
         Map<LocalDate, Set<Long>> absentByDate = buildAbsentMap(weekStart, weekStart.plusDays(6));
         Set<Long> absentIds = absentByDate.getOrDefault(date, Set.of());
 
-        List<CoverageValidationResult.CoverageIssue> issues =
-                validateDayCoverage(weekStart, day, date, activeAttractions, zones, absentIds);
+        List<CoverageValidationResult.CoverageIssue> issues = validateDayCoverage(weekStart, day, date,
+                activeAttractions, zones, absentIds);
 
         return !issues.isEmpty();
     }
@@ -306,7 +307,7 @@ public class ScheduleService {
                 LocalDate date = log.getTargetDate();
                 countByDateEmployee.computeIfAbsent(date, k -> new HashMap<>());
                 int delta = log.getAction() == WorkLogAction.ADD_ABSENCE ? 1 : -1;
-                countByDateEmployee.get(date).merge(empId, delta, Integer::sum);
+                countByDateEmployee.get(date).merge(empId, delta, (a, b) -> a + b);
             }
         }
 
@@ -340,7 +341,8 @@ public class ScheduleService {
                         .issueType("EMPLOYEE_ABSENT")
                         .description("schedule.issues.EMPLOYEE_ABSENT")
                         .attractionId(ws.getAssignedAttraction() != null ? ws.getAssignedAttraction().getId() : null)
-                        .attractionName(ws.getAssignedAttraction() != null ? ws.getAssignedAttraction().getName() : null)
+                        .attractionName(
+                                ws.getAssignedAttraction() != null ? ws.getAssignedAttraction().getName() : null)
                         .zoneId(ws.getAssignedZone() != null ? ws.getAssignedZone().getId() : null)
                         .zoneName(ws.getAssignedZone() != null ? ws.getAssignedZone().getZoneName().name() : null)
                         .build());

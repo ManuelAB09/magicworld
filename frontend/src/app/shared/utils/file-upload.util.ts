@@ -25,5 +25,5 @@ export function readFileAsDataUrl(file: File): Promise<string> {
   });
 }
 
-export const DEFAULT_MAX_FILE_BYTES = 50 * 1024 * 1024;
+export const DEFAULT_MAX_FILE_BYTES = 15 * 1024 * 1024;
 

@@ -38,7 +38,7 @@ export class TicketTypeForm implements OnInit {
     private translate: TranslateService,
     private error: ErrorService,
     private currencyService: CurrencyService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -102,7 +102,7 @@ export class TicketTypeForm implements OnInit {
       } else if (validation.error === 'size_exceeded') {
         this.photoRequiredError = false;
         this.errorKey = 'error.file.size_exceeded';
-        this.errorArgs = { 0: DEFAULT_MAX_FILE_BYTES };
+        this.errorArgs = { 0: '15MB' };
         this.validationMessages = [];
       }
       return;
