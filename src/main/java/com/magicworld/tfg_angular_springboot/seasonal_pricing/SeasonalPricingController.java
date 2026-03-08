@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -61,7 +62,11 @@ public class SeasonalPricingController {
                 .applyOnWeekends(request.getApplyOnWeekends())
                 .build();
         SeasonalPricing saved = service.save(pricing);
-        return ResponseEntity.created(URI.create("/api/v1/seasonal-pricing/" + saved.getId())).body(saved);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(saved);
     }
 
     @Operation(summary = "Update seasonal pricing rule", tags = {"SeasonalPricing"})

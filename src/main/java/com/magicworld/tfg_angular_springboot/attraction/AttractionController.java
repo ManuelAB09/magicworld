@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -42,7 +43,11 @@ public class AttractionController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Attraction> createAttraction(@RequestBody @Valid Attraction attraction) {
         Attraction saved = attractionService.saveAttraction(attraction);
-        return ResponseEntity.created(URI.create("/api/v1/attractions/" + saved.getId())).body(saved);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(saved);
     }
 
     @Operation(summary = "Create attraction (multipart)", description = "Create a new attraction with image upload", tags = {"Attractions"})
@@ -71,7 +76,11 @@ public class AttractionController {
                 .closingTime(request.getClosingTime() != null ? request.getClosingTime() : java.time.LocalTime.of(17, 0))
                 .build();
         Attraction saved = attractionService.saveAttraction(toSave);
-        return ResponseEntity.created(URI.create("/api/v1/attractions/" + saved.getId())).body(saved);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(saved);
     }
 
     @Operation(summary = "Get all attractions", description = "Retrieve a list of all attractions", tags = {"Attractions"})

@@ -4,7 +4,9 @@ import {
   createPath,
   createHorizontalPath,
   createVerticalPath,
-  addStandardLights
+  addStandardLights,
+  addSimpleLights,
+  createCobblestoneTexture
 } from './three-utils';
 
 describe('ThreeUtils', () => {
@@ -76,6 +78,55 @@ describe('ThreeUtils', () => {
       addStandardLights(scene);
       const hasDirectional = scene.children.some(child => child instanceof THREE.DirectionalLight);
       expect(hasDirectional).toBeTrue();
+    });
+  });
+
+  describe('addSimpleLights', () => {
+    it('should add lights to scene', () => {
+      const scene = new THREE.Scene();
+      const initialCount = scene.children.length;
+      addSimpleLights(scene);
+      expect(scene.children.length).toBeGreaterThan(initialCount);
+    });
+
+    it('should add ambient light', () => {
+      const scene = new THREE.Scene();
+      addSimpleLights(scene);
+      const hasAmbient = scene.children.some(child => child instanceof THREE.AmbientLight);
+      expect(hasAmbient).toBeTrue();
+    });
+
+    it('should add directional light with shadows', () => {
+      const scene = new THREE.Scene();
+      addSimpleLights(scene);
+      const directional = scene.children.find(child => child instanceof THREE.DirectionalLight) as THREE.DirectionalLight;
+      expect(directional).toBeTruthy();
+      expect(directional.castShadow).toBeTrue();
+    });
+
+    it('should add hemisphere light', () => {
+      const scene = new THREE.Scene();
+      addSimpleLights(scene);
+      const hasHemi = scene.children.some(child => child instanceof THREE.HemisphereLight);
+      expect(hasHemi).toBeTrue();
+    });
+  });
+
+  describe('createCobblestoneTexture', () => {
+    it('should return a CanvasTexture', () => {
+      const tex = createCobblestoneTexture();
+      expect(tex).toBeInstanceOf(THREE.CanvasTexture);
+    });
+
+    it('should accept custom size', () => {
+      const tex = createCobblestoneTexture(256);
+      expect(tex).toBeInstanceOf(THREE.CanvasTexture);
+    });
+
+    it('should set repeat wrapping', () => {
+      const tex = createCobblestoneTexture();
+      expect(tex.wrapS).toBe(THREE.RepeatWrapping);
+      expect(tex.wrapT).toBe(THREE.RepeatWrapping);
     });
   });
 });

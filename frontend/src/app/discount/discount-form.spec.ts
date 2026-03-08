@@ -209,6 +209,74 @@ describe('DiscountForm', () => {
       tick();
       expect(mockApiService.delete).not.toHaveBeenCalled();
     }));
+
+    it('should handle submit error in edit mode', fakeAsync(() => {
+      mockApiService.update.and.returnValue(throwError(() => ({ status: 400, error: { code: 'error.bad_request' } })));
+      fixture.detectChanges();
+      tick();
+      component.submit();
+      tick();
+      expect(component.errorKey).toBe('error.test');
+      expect(component.loading).toBeFalse();
+    }));
+
+    it('should handle delete error', fakeAsync(() => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      mockApiService.delete.and.returnValue(throwError(() => ({ status: 500, error: { code: 'error.server' } })));
+      fixture.detectChanges();
+      tick();
+      component.delete();
+      tick();
+      expect(component.errorKey).toBe('error.test');
+      expect(component.loading).toBeFalse();
+    }));
+
+    it('should not delete when not in edit mode', fakeAsync(() => {
+      fixture.detectChanges();
+      tick();
+      component.isEdit = false;
+      component.id = null;
+      component.delete();
+      tick();
+      expect(mockApiService.delete).not.toHaveBeenCalled();
+    }));
+  });
+
+  describe('Error handling', () => {
+    it('should handle ticketsApi.findAll error during init', fakeAsync(() => {
+      mockTicketTypeService.findAll.and.returnValue(throwError(() => ({ status: 500 })));
+      fixture.detectChanges();
+      tick();
+      expect(component.errorKey).toBe('error.test');
+    }));
+
+    it('should handle submit error for new discount', fakeAsync(() => {
+      mockApiService.create.and.returnValue(throwError(() => ({ status: 409, error: { code: 'error.duplicate' } })));
+      fixture.detectChanges();
+      tick();
+      component.form.patchValue({
+        discountCode: 'DUPCODE',
+        discountPercentage: 15,
+        expiryDate: '2025-12-31'
+      });
+      component.toggleTypeName('Adult', true);
+      component.submit();
+      tick();
+      expect(component.errorKey).toBe('error.test');
+      expect(component.loading).toBeFalse();
+    }));
+
+    it('should validate discountCode maxLength', () => {
+      fixture.detectChanges();
+      component.form.patchValue({ discountCode: 'A'.repeat(21) });
+      expect(component.form.get('discountCode')?.hasError('maxlength')).toBeTrue();
+    });
+
+    it('should accept discountCode within maxLength', () => {
+      fixture.detectChanges();
+      component.form.patchValue({ discountCode: 'A'.repeat(20) });
+      expect(component.form.get('discountCode')?.hasError('maxlength')).toBeFalse();
+    });
   });
 });
 

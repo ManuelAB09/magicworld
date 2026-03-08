@@ -54,7 +54,7 @@
 }
 
 /* Tabs */
-.profile-tabs {
+.tabs {
   display: flex;
   justify-content: center;
   gap: 1rem;

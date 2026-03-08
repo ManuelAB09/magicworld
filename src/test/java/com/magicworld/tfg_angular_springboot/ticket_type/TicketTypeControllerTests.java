@@ -103,7 +103,7 @@ public class TicketTypeControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", API_TICKET_TYPES_ID + "1"))
+                .andExpect(header().string("Location", "http://localhost" + API_TICKET_TYPES_ID + "1"))
                 .andReturn();
         assertEquals(201, result.getResponse().getStatus());
     }

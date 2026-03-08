@@ -3,6 +3,7 @@ package com.magicworld.tfg_angular_springboot.employee.dto;
 import com.magicworld.tfg_angular_springboot.employee.EmployeeRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +29,7 @@ public class CreateEmployeeRequest {
     private String email;
 
     @Size(max = 20, message = "validation.employee.phone.size")
+    @Pattern(regexp = "^\\+?[0-9]{9,15}$", message = "validation.employee.phone.invalid")
     private String phone;
 
     @NotNull(message = "validation.employee.role.required")

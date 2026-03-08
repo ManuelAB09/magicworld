@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
@@ -65,7 +66,11 @@ public class ReviewController {
             @Valid @RequestBody ReviewRequest request) {
         User user = getUserFromContext();
         ReviewDTO created = reviewService.createReview(user, request);
-        return ResponseEntity.created(URI.create("/api/v1/reviews/" + created.getId()))
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(created.getId())
+                .toUri();
+        return ResponseEntity.created(location)
                 .body(created);
     }
 

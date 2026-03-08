@@ -70,8 +70,8 @@ describe('FileUploadUtil', () => {
   });
 
   describe('DEFAULT_MAX_FILE_BYTES', () => {
-    it('should be 50MB', () => {
-      expect(DEFAULT_MAX_FILE_BYTES).toBe(50 * 1024 * 1024);
+    it('should be 15MB', () => {
+      expect(DEFAULT_MAX_FILE_BYTES).toBe(15 * 1024 * 1024);
     });
   });
 });

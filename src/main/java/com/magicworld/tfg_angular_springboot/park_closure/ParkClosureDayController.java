@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -54,7 +55,11 @@ public class ParkClosureDayController {
                 .reason(request.getReason())
                 .build();
         ParkClosureDay saved = service.save(closureDay);
-        return ResponseEntity.created(URI.create("/api/v1/park-closures/" + saved.getId())).body(saved);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(saved);
     }
 
     @Operation(summary = "Delete a closure day", tags = {"ParkClosures"})

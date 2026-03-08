@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
@@ -47,7 +48,11 @@ public class DiscountController {
     @PostMapping
     public ResponseEntity<Discount> create(@RequestBody @Valid DiscountRequest request) {
         Discount saved = discountService.save(request.getDiscount(), request.getApplicableTicketTypesNames());
-        return ResponseEntity.created(URI.create("/api/v1/discounts/" + saved.getId())).body(saved);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(saved);
     }
 
     @Operation(summary = "Get all discounts", description = "Retrieve all discounts", tags = {"Discounts"})

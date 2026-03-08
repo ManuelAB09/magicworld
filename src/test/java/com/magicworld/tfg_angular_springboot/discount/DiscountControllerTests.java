@@ -114,7 +114,7 @@ public class DiscountControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", API_DISCOUNTS_ID + "1"))
+                .andExpect(header().string("Location", "http://localhost" + API_DISCOUNTS_ID + "1"))
                 .andReturn();
         assertEquals(201, result.getResponse().getStatus());
     }

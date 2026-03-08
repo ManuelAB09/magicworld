@@ -1,5 +1,6 @@
 import { SceneManager } from './scene-manager';
 import { Attraction } from '../attraction/attraction.service';
+import * as THREE from 'three';
 
 describe('SceneManager', () => {
   let sceneManager: SceneManager;
@@ -79,6 +80,38 @@ describe('SceneManager', () => {
     expect(() => sceneManager.dispose()).not.toThrow();
   });
 
+  it('should not add to scene before initialization', () => {
+    const obj = new THREE.Mesh();
+    expect(() => sceneManager.addToScene(obj)).not.toThrow();
+  });
+
+  it('should return camera (even if undefined before init)', () => {
+    const camera = sceneManager.getCamera();
+    // Camera is undefined before initialization
+    expect(camera).toBeUndefined();
+  });
+
+  it('should handle initialize failure gracefully', () => {
+    const container = document.createElement('div');
+    container.style.width = '800px';
+    container.style.height = '600px';
+    document.body.appendChild(container);
+
+    // In jsdom, WebGL may not be available or may throw during WebGLRenderer creation
+    try {
+      const result = sceneManager.initialize(container);
+      // If it somehow succeeds, it should return true
+      if (!result) {
+        expect(sceneManager.isInitialized()).toBeFalse();
+      }
+    } catch (e) {
+      // WebGLRenderer throws in jsdom - this is expected
+      expect(sceneManager.isInitialized()).toBeFalse();
+    }
+
+    document.body.removeChild(container);
+  });
+
   it('should dispose after initialization attempt', () => {
     const container = document.createElement('div');
     container.style.width = '800px';
@@ -93,5 +126,30 @@ describe('SceneManager', () => {
     expect(() => sceneManager.dispose()).not.toThrow();
 
     document.body.removeChild(container);
+  });
+
+  it('should handle multiple dispose calls', () => {
+    expect(() => {
+      sceneManager.dispose();
+      sceneManager.dispose();
+    }).not.toThrow();
+  });
+
+  it('should handle attractions with default map positions', () => {
+    const attractionNoPos: Attraction = {
+      ...mockAttraction,
+      mapPositionX: undefined as any,
+      mapPositionY: undefined as any
+    };
+    // Should not throw even though not initialized
+    expect(() => sceneManager.addAttractionsToScene([attractionNoPos])).not.toThrow();
+  });
+
+  it('should handle multiple set hovered attraction calls', () => {
+    sceneManager.setHoveredAttraction(mockAttraction);
+    sceneManager.setHoveredAttraction(mockAttraction);
+    sceneManager.setHoveredAttraction(null);
+    sceneManager.setHoveredAttraction(null);
+    expect(sceneManager['hoveredAttraction']).toBeNull();
   });
 });

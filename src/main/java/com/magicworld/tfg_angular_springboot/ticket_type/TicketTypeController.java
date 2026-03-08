@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
@@ -58,7 +59,11 @@ public class TicketTypeController {
     public ResponseEntity<TicketType> createTicketType(@RequestBody @Valid TicketType ticketType) {
         TicketType saved = ticketTypeService.save(ticketType);
         notifyTicketTypesChanged();
-        return ResponseEntity.created(URI.create("/api/v1/ticket-types/" + saved.getId())).body(saved);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(saved);
     }
 
 
@@ -81,7 +86,11 @@ public class TicketTypeController {
                 .build();
         TicketType saved = ticketTypeService.save(toSave);
         notifyTicketTypesChanged();
-        return ResponseEntity.created(URI.create("/api/v1/ticket-types/" + saved.getId())).body(saved);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(saved);
     }
 
 

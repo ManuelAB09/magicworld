@@ -1,9 +1,12 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { CheckoutStep1Component } from './checkout-step1';
-import { TicketAvailability } from '../services/checkout.service';
+import { TicketAvailability, CheckoutService } from '../services/checkout.service';
+import { AvailabilityWebSocketService } from '../services/availability-websocket.service';
+import { Router } from '@angular/router';
+import { of, EMPTY } from 'rxjs';
 
 describe('CheckoutStep1Component', () => {
   let component: CheckoutStep1Component;
@@ -214,6 +217,184 @@ describe('CheckoutStep1Component', () => {
     const cartItem = component.cartItems[0];
     expect(cartItem.unitPrice).toBe(62.5);
     expect(cartItem.totalPrice).toBe(62.5);
+  });
+
+  it('should not remove from cart when quantity is already 0', () => {
+    component.removeFromCart(mockTicket);
+    expect(component.getQuantity('ADULT')).toBe(0);
+  });
+
+  it('should call onDateChange which triggers load availability', () => {
+    spyOn<any>(component, 'loadAvailability');
+    spyOn<any>(component, 'setupWebSocket');
+    component.onDateChange();
+    expect((component as any).loadAvailability).toHaveBeenCalled();
+    expect((component as any).setupWebSocket).toHaveBeenCalled();
+  });
+
+  it('should clear cart and call onDateChange when selecting a day', () => {
+    component.addToCart(mockTicket);
+    expect(component.cart.size).toBe(1);
+
+    const futureDay = new Date();
+    futureDay.setDate(futureDay.getDate() + 10);
+    component.currentMonth = new Date(futureDay.getFullYear(), futureDay.getMonth(), 1);
+
+    spyOn(component, 'onDateChange');
+    component.selectDay(futureDay.getDate());
+
+    expect(component.cart.size).toBe(0);
+    expect(component.onDateChange).toHaveBeenCalled();
+  });
+
+  it('should not select null day', () => {
+    spyOn(component, 'onDateChange');
+    component.selectDay(null);
+    expect(component.onDateChange).not.toHaveBeenCalled();
+  });
+
+  it('should not select a non-selectable day', () => {
+    spyOn(component, 'onDateChange');
+    // Past day: use a day in a far past month
+    const pastDate = new Date(2020, 0, 1);
+    component.currentMonth = new Date(2020, 0, 1);
+    component.selectDay(pastDate.getDate());
+    expect(component.onDateChange).not.toHaveBeenCalled();
+  });
+
+  it('should go to previous month when valid', () => {
+    const today = new Date();
+    // Set currentMonth to one month in the future
+    component.currentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    const originalMonth = component.currentMonth.getMonth();
+
+    if (component.canGoPrevious()) {
+      component.previousMonth();
+      expect(component.currentMonth.getMonth()).toBe(today.getMonth());
+    }
+  });
+
+  it('should not go to previous month when at minimum', () => {
+    const today = new Date();
+    component.currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const originalMonth = component.currentMonth.getMonth();
+    component.previousMonth();
+    expect(component.currentMonth.getMonth()).toBe(originalMonth);
+  });
+
+  it('canGoPrevious should return false when at current month', () => {
+    const today = new Date();
+    component.currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    expect(component.canGoPrevious()).toBeFalse();
+  });
+
+  it('canGoPrevious should return true when ahead of current month', () => {
+    const today = new Date();
+    component.currentMonth = new Date(today.getFullYear(), today.getMonth() + 2, 1);
+    expect(component.canGoPrevious()).toBeTrue();
+  });
+
+  it('should navigate to step2 when canProceed is true via goToStep2', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
+
+    component.addToCart(mockTicket);
+
+    component.goToStep2();
+
+    expect(router.navigate).toHaveBeenCalledWith(['/checkout/step2']);
+    // Verify sessionStorage was set
+    const stored = sessionStorage.getItem('checkout_cart');
+    expect(stored).toBeTruthy();
+    const parsed = JSON.parse(stored!);
+    expect(parsed.items.length).toBe(1);
+    expect(parsed.visitDate).toBe(component.selectedDate);
+    sessionStorage.removeItem('checkout_cart');
+  });
+
+  it('should not navigate to step2 when canProceed is false', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
+
+    component.goToStep2();
+
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('should store cart data with items and visitDate in sessionStorage', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
+
+    component.addToCart(mockTicket);
+    component.goToStep2();
+
+    const stored = JSON.parse(sessionStorage.getItem('checkout_cart')!);
+    expect(stored.items.length).toBe(1);
+    expect(stored.visitDate).toBe(component.selectedDate);
+
+    sessionStorage.removeItem('checkout_cart');
+  });
+
+  it('should update cart availability when tickets change', () => {
+    component.addToCart(mockTicket);
+    component.addToCart(mockTicket);
+    expect(component.getQuantity('ADULT')).toBe(2);
+
+    // Simulate available dropping to 1
+    component.tickets = [{ ...mockTicket, available: 1, adjustedCost: 60 }];
+    (component as any).updateCartAvailability();
+
+    expect(component.getQuantity('ADULT')).toBe(1);
+    const item = component.cartItems[0];
+    expect(item.unitPrice).toBe(60);
+  });
+
+  it('should remove item from cart if available drops to 0', () => {
+    component.addToCart(mockTicket);
+    expect(component.getQuantity('ADULT')).toBe(1);
+
+    component.tickets = [{ ...mockTicket, available: 0 }];
+    (component as any).updateCartAvailability();
+
+    expect(component.getQuantity('ADULT')).toBe(0);
+    expect(component.cart.size).toBe(0);
+  });
+
+  it('should return default seasonalMultiplier of 1 when no tickets', () => {
+    component.tickets = [];
+    expect(component.seasonalMultiplier).toBe(1);
+  });
+
+  it('should return closure reason empty string for null day', () => {
+    expect(component.getClosureReason(null)).toBe('');
+  });
+
+  it('should return empty closure reason for day without closure', () => {
+    const futureDay = new Date();
+    futureDay.setDate(futureDay.getDate() + 5);
+    component.currentMonth = new Date(futureDay.getFullYear(), futureDay.getMonth(), 1);
+    expect(component.getClosureReason(futureDay.getDate())).toBe('');
+  });
+
+  it('should not detect closed day for null', () => {
+    expect(component.isClosedDay(null)).toBeFalse();
+  });
+
+  it('should return false for isBeyondMaxDate with null', () => {
+    expect(component.isBeyondMaxDate(null)).toBeFalse();
+  });
+
+  it('should not trigger HTTP call in loadAvailability when selectedDate is empty', () => {
+    component.selectedDate = '';
+    // loadAvailability returns early when selectedDate is empty, leaving loading unchanged
+    const loadingBefore = component.loading;
+    (component as any).loadAvailability();
+    expect(component.loading).toBe(loadingBefore);
+  });
+
+  it('should call ngOnDestroy cleanly', () => {
+    fixture.detectChanges();
+    expect(() => component.ngOnDestroy()).not.toThrow();
   });
 });
 

@@ -116,5 +116,122 @@ describe('CheckoutService', () => {
     expect(req.request.withCredentials).toBeTrue();
     req.flush({ publicKey: 'pk_test' });
   });
+
+  it('should get closure days with from and to params', () => {
+    const mockClosures = [
+      { id: 1, closureDate: '2025-06-01', reason: 'Maintenance' }
+    ];
+
+    service.getClosureDays('2025-06-01', '2025-06-30').subscribe(response => {
+      expect(response.length).toBe(1);
+      expect(response[0].reason).toBe('Maintenance');
+    });
+
+    const req = httpMock.expectOne(r =>
+      r.url.includes('/park-closures') &&
+      r.params.get('from') === '2025-06-01' &&
+      r.params.get('to') === '2025-06-30'
+    );
+    expect(req.request.method).toBe('GET');
+    expect(req.request.withCredentials).toBeTrue();
+    req.flush(mockClosures);
+  });
+
+  it('should get all closure days', () => {
+    const mockClosures = [
+      { id: 1, closureDate: '2025-06-01', reason: 'Maintenance' },
+      { id: 2, closureDate: '2025-07-04', reason: 'Holiday' }
+    ];
+
+    service.getAllClosureDays().subscribe(response => {
+      expect(response.length).toBe(2);
+    });
+
+    const req = httpMock.expectOne(r =>
+      r.url.includes('/park-closures') && !r.params.has('from')
+    );
+    expect(req.request.method).toBe('GET');
+    expect(req.request.withCredentials).toBeTrue();
+    req.flush(mockClosures);
+  });
+
+  it('should create closure day', () => {
+    const newClosure = { closureDate: '2025-08-15', reason: 'Special event' };
+    const mockResponse = { id: 3, ...newClosure };
+
+    service.createClosureDay(newClosure).subscribe(response => {
+      expect(response.id).toBe(3);
+      expect(response.reason).toBe('Special event');
+    });
+
+    const req = httpMock.expectOne(r => r.url.includes('/park-closures'));
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(newClosure);
+    expect(req.request.withCredentials).toBeTrue();
+    req.flush(mockResponse);
+  });
+
+  it('should delete closure day', () => {
+    service.deleteClosureDay(3).subscribe();
+
+    const req = httpMock.expectOne(r => r.url.includes('/park-closures/3'));
+    expect(req.request.method).toBe('DELETE');
+    expect(req.request.withCredentials).toBeTrue();
+    req.flush(null);
+  });
+
+  it('should get all seasonal pricing', () => {
+    const mockPricing = [
+      { id: 1, name: 'Summer', startDate: '2025-06-01', endDate: '2025-08-31', multiplier: 1.5, applyOnWeekdays: true, applyOnWeekends: true }
+    ];
+
+    service.getAllSeasonalPricing().subscribe(response => {
+      expect(response.length).toBe(1);
+      expect(response[0].name).toBe('Summer');
+    });
+
+    const req = httpMock.expectOne(r => r.url.includes('/seasonal-pricing'));
+    expect(req.request.method).toBe('GET');
+    expect(req.request.withCredentials).toBeTrue();
+    req.flush(mockPricing);
+  });
+
+  it('should create seasonal pricing', () => {
+    const newPricing = { name: 'Winter', startDate: '2025-12-01', endDate: '2026-02-28', multiplier: 1.2, applyOnWeekdays: true, applyOnWeekends: false };
+    const mockResponse = { id: 2, ...newPricing };
+
+    service.createSeasonalPricing(newPricing).subscribe(response => {
+      expect(response.id).toBe(2);
+      expect(response.name).toBe('Winter');
+    });
+
+    const req = httpMock.expectOne(r => r.url.includes('/seasonal-pricing'));
+    expect(req.request.method).toBe('POST');
+    expect(req.request.withCredentials).toBeTrue();
+    req.flush(mockResponse);
+  });
+
+  it('should update seasonal pricing', () => {
+    const updateData = { name: 'Summer Updated', multiplier: 1.8 };
+    const mockResponse = { id: 1, name: 'Summer Updated', startDate: '2025-06-01', endDate: '2025-08-31', multiplier: 1.8, applyOnWeekdays: true, applyOnWeekends: true };
+
+    service.updateSeasonalPricing(1, updateData).subscribe(response => {
+      expect(response.multiplier).toBe(1.8);
+    });
+
+    const req = httpMock.expectOne(r => r.url.includes('/seasonal-pricing/1'));
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.withCredentials).toBeTrue();
+    req.flush(mockResponse);
+  });
+
+  it('should delete seasonal pricing', () => {
+    service.deleteSeasonalPricing(1).subscribe();
+
+    const req = httpMock.expectOne(r => r.url.includes('/seasonal-pricing/1'));
+    expect(req.request.method).toBe('DELETE');
+    expect(req.request.withCredentials).toBeTrue();
+    req.flush(null);
+  });
 });
 

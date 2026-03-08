@@ -102,9 +102,9 @@ describe('AttractionList', () => {
     component.filters = { minHeight: 100, minWeight: 50, minAge: 10 };
     component.clearFilters();
     tick();
-    expect(component.filters.minHeight).toBe(0);
-    expect(component.filters.minWeight).toBe(0);
-    expect(component.filters.minAge).toBe(0);
+    expect(component.filters.minHeight).toBeNull();
+    expect(component.filters.minWeight).toBeNull();
+    expect(component.filters.minAge).toBeNull();
   }));
 
   it('should return correct image URL for relative path', () => {

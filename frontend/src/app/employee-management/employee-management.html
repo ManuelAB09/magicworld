@@ -21,12 +21,6 @@
       <option [value]="role">{{ getRoleLabel(role) }}</option>
       }
     </select>
-    <select [(ngModel)]="statusFilter" (change)="applyFilters()">
-      <option value="">{{ 'employees.allStatuses' | translate }}</option>
-      @for (status of statuses; track status) {
-      <option [value]="status">{{ getStatusLabel(status) }}</option>
-      }
-    </select>
   </div>
 
   @if (loading) {
@@ -77,22 +71,54 @@
       </div>
       }
 
-      <form (submit)="saveEmployee(); $event.preventDefault()">
+      <form (submit)="saveEmployee(); $event.preventDefault()" #empForm="ngForm">
         <div class="form-group">
           <label>{{ 'employees.firstName' | translate }}</label>
-          <input type="text" [(ngModel)]="formData.firstName" name="firstName" required>
+          <input type="text" [(ngModel)]="formData.firstName" name="firstName" required minlength="2" maxlength="50" #firstNameInput="ngModel">
+          @if (firstNameInput.invalid && (firstNameInput.dirty || firstNameInput.touched)) {
+            <small class="error-text" style="color: var(--c-primary-red); display: block; margin-top: 0.25rem;">
+              @if (firstNameInput.errors?.['required']) {
+                {{ 'validation.employee.firstName.required' | translate }}
+              } @else {
+                {{ 'validation.employee.firstName.size' | translate }}
+              }
+            </small>
+          }
         </div>
         <div class="form-group">
           <label>{{ 'employees.lastName' | translate }}</label>
-          <input type="text" [(ngModel)]="formData.lastName" name="lastName" required>
+          <input type="text" [(ngModel)]="formData.lastName" name="lastName" required minlength="2" maxlength="50" #lastNameInput="ngModel">
+          @if (lastNameInput.invalid && (lastNameInput.dirty || lastNameInput.touched)) {
+            <small class="error-text" style="color: var(--c-primary-red); display: block; margin-top: 0.25rem;">
+              @if (lastNameInput.errors?.['required']) {
+                {{ 'validation.employee.lastName.required' | translate }}
+              } @else {
+                {{ 'validation.employee.lastName.size' | translate }}
+              }
+            </small>
+          }
         </div>
         <div class="form-group">
           <label>{{ 'employees.email' | translate }}</label>
-          <input type="email" [(ngModel)]="formData.email" name="email" required [disabled]="!!editingEmployee">
+          <input type="email" [(ngModel)]="formData.email" name="email" required #emailInput="ngModel" [disabled]="!!editingEmployee">
+          @if (emailInput.invalid && (emailInput.dirty || emailInput.touched)) {
+            <small class="error-text" style="color: var(--c-primary-red); display: block; margin-top: 0.25rem;">
+              @if (emailInput.errors?.['required']) {
+                {{ 'validation.employee.email.required' | translate }}
+              } @else {
+                {{ 'validation.employee.email.invalid' | translate }}
+              }
+            </small>
+          }
         </div>
         <div class="form-group">
           <label>{{ 'employees.phone' | translate }}</label>
-          <input type="tel" [(ngModel)]="formData.phone" name="phone">
+          <input type="tel" [(ngModel)]="formData.phone" name="phone" pattern="^\+?[0-9]{9,15}$" #phoneInput="ngModel">
+          @if (phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)) {
+            <small class="error-text" style="color: var(--c-primary-red); display: block; margin-top: 0.25rem;">
+              {{ 'validation.employee.phone.invalid' | translate }}
+            </small>
+          }
         </div>
         <div class="form-group">
           <label>{{ 'employees.role' | translate }}</label>
@@ -104,7 +130,7 @@
         </div>
         <div class="form-actions">
           <button type="button" class="btn-cancel" (click)="closeForm()">{{ 'employees.cancel' | translate }}</button>
-          <button type="submit" class="btn-save">{{ 'employees.save' | translate }}</button>
+          <button type="submit" class="btn-save" [disabled]="empForm.invalid">{{ 'employees.save' | translate }}</button>
         </div>
       </form>
     </div>

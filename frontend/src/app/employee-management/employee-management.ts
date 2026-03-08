@@ -36,7 +36,7 @@ export class EmployeeManagementComponent implements OnInit {
   statusFilter: EmployeeStatus | '' = '';
 
   readonly roles: EmployeeRole[] = ['OPERATOR', 'SECURITY', 'MEDICAL', 'MAINTENANCE', 'GUEST_SERVICES'];
-  readonly statuses: EmployeeStatus[] = ['ACTIVE', 'ON_LEAVE', 'TERMINATED'];
+  readonly statuses: EmployeeStatus[] = ['ACTIVE'];
 
   constructor(
     private employeeService: EmployeeService,
