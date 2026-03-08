@@ -59,7 +59,7 @@ jobs:
 
       - name: Run Frontend Tests with Coverage
         working-directory: frontend
-        run: npx ng test --watch=false --code-coverage
+        run: npx ng test --watch=false --coverage
 
       - name: Upload LCOV Coverage Report
         uses: actions/upload-artifact@v4
