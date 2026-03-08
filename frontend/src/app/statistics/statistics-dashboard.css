@@ -21,8 +21,9 @@
 
 .page-header h1 {
   margin: 0;
-  color: #1f2937;
-  font-size: 1.75rem;
+  color: var(--c-primary-red);
+  font-family: var(--font-headers);
+  font-size: 2rem;
 }
 
 .date-range-picker {
@@ -39,10 +40,18 @@
 
 .date-range-picker input[type="date"] {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-input);
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  background: #fff;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.date-range-picker input[type="date"]:focus {
+  border-color: var(--c-amber);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 183, 0, 0.2);
 }
 
 .tab-bar {
@@ -70,12 +79,13 @@
 }
 
 .tab-btn:hover {
-  color: #4f46e5;
+  color: var(--c-primary-red);
 }
 
 .tab-btn.active {
-  color: #4f46e5;
-  border-bottom-color: #4f46e5;
+  color: var(--c-dark-brown);
+  border-bottom-color: var(--c-amber);
+  font-weight: 700;
 }
 
 .tab-content {
@@ -83,8 +93,15 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 768px) {
@@ -101,4 +118,3 @@
     overflow-x: auto;
   }
 }
-

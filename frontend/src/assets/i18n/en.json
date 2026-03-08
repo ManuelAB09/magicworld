@@ -305,7 +305,7 @@
       "CLOSED": "CLOSED",
       "MAX_DATE_LABEL": "Out of range",
       "MAX_DATE_REASON": "Tickets cannot be purchased more than 2 months in advance",
-      "SEASONAL_SURCHARGE": "Seasonal surcharge applied"
+      "SEASONAL_SURCHARGE": "High season surcharge applied"
     },
     "STEP2": {
       "BACK": "Back",

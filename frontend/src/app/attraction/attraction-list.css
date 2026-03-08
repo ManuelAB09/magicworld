@@ -281,7 +281,7 @@
 .filter-actions .btn-action:hover,
 .filter-actions .btn-action--outline:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
 }
 
 
@@ -321,4 +321,3 @@
     padding: 0.45rem;
   }
 }
-

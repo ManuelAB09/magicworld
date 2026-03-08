@@ -305,7 +305,7 @@
       "CLOSED": "CERRADO",
       "MAX_DATE_LABEL": "Fuera de plazo",
       "MAX_DATE_REASON": "No se pueden comprar entradas con más de 2 meses de antelación",
-      "SEASONAL_SURCHARGE": "Recargo de temporada aplicado"
+      "SEASONAL_SURCHARGE": "Subida de precio por temporada alta aplicada"
     },
     "STEP2": {
       "BACK": "Volver",

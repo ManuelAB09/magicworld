@@ -4,11 +4,11 @@
 }
 
 .reviews-page {
-  background-color: #faebd7;
+  background-color: var(--c-bg-antique);
   min-height: 100vh;
   padding: 2rem;
-  font-family: "Poppins", sans-serif;
-  color: #2c0d0d;
+  font-family: var(--font-body);
+  color: var(--c-dark-brown);
 }
 
 .page-header {
@@ -21,6 +21,9 @@
 }
 
 .page-header h2 {
+  font-family: var(--font-headers);
+  color: var(--c-primary-red);
+  font-size: 2.2rem;
   font-weight: 700;
   margin: 0;
   text-align: center;
@@ -33,13 +36,17 @@
 }
 
 .alert-info {
-  background-color: #e3f2fd;
-  color: #1565c0;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-amber);
+  color: var(--c-dark-brown);
+  font-weight: 600;
 }
 
 .alert-danger {
-  background-color: #ffebee;
-  color: #c62828;
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-bright-red);
+  color: var(--c-primary-red);
+  font-weight: 600;
 }
 
 .user-actions {
@@ -67,11 +74,13 @@
 }
 
 .info-message {
-  background-color: #fff3cd;
-  color: #856404;
+  background-color: var(--c-surface);
+  color: var(--c-dark-brown);
+  border: 1px solid var(--c-amber);
   padding: 0.8rem 1.2rem;
-  border-radius: 8px;
+  border-radius: var(--radius-input);
   text-align: center;
+  font-weight: 600;
 }
 
 .my-review-actions {
@@ -136,19 +145,23 @@
 }
 
 .modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
+  background: var(--c-surface);
+  padding: 2.5rem;
+  border-radius: var(--radius-card);
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
+  border: 2px solid var(--c-primary-red);
+  box-shadow: var(--shadow-md);
 }
 
 .modal-content h3 {
   margin: 0 0 1.5rem 0;
   text-align: center;
-  color: #2c0d0d;
+  color: var(--c-primary-red);
+  font-family: var(--font-headers);
+  font-size: 1.5rem;
 }
 
 .star-rating {
@@ -170,15 +183,16 @@
   font-size: 2rem;
   color: #ddd;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: transform 0.2s, color 0.2s;
 }
 
 .star-btn.filled {
-  color: #ffb700;
+  color: var(--c-amber);
 }
 
 .star-btn:hover {
-  color: #ffc107;
+  color: var(--c-amber-hover);
+  transform: scale(1.1);
 }
 
 .form-group {
@@ -194,32 +208,37 @@
 .form-group textarea {
   width: 100%;
   padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-input);
   font-family: inherit;
   font-size: 1rem;
   resize: vertical;
+  background-color: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-group textarea:focus {
   outline: none;
-  border-color: #ffb700;
+  border-color: var(--c-amber);
+  box-shadow: 0 0 0 3px rgba(255, 183, 0, 0.2);
 }
 
 .form-select {
   width: 100%;
   padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-input);
   font-family: inherit;
   font-size: 1rem;
   background-color: white;
   cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-select:focus {
   outline: none;
-  border-color: #ffb700;
+  border-color: var(--c-amber);
+  box-shadow: 0 0 0 3px rgba(255, 183, 0, 0.2);
 }
 
 .char-count {
@@ -237,17 +256,19 @@
 }
 
 .btn-cancel {
-  background-color: #9e9e9e;
-  color: white;
+  background-color: #fff;
+  color: var(--c-dark-brown);
   padding: 0.6rem 1.2rem;
-  border-radius: 20px;
-  border: none;
+  border-radius: var(--radius-btn);
+  border: 2px solid var(--c-dark-brown);
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
 .btn-cancel:hover {
-  background-color: #757575;
+  background-color: var(--c-dark-brown);
+  color: #fff;
 }
 
 .btn-submit {
@@ -281,19 +302,21 @@
 }
 
 .review-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.2s;
+  background: var(--c-surface);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, transform 0.2s;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .review-card:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .review-card.my-review {
-  border: 2px solid #ffb700;
+  border: 2px solid var(--c-amber);
 }
 
 .review-header {
@@ -303,8 +326,9 @@
 }
 
 .review-username {
-  font-weight: 600;
-  color: #2c0d0d;
+  font-weight: 700;
+  color: var(--c-primary-red);
+  font-size: 1.1rem;
 }
 
 .review-date {
@@ -323,7 +347,7 @@
 }
 
 .star.filled {
-  color: #ffb700;
+  color: var(--c-amber);
 }
 
 .review-description {
@@ -358,18 +382,20 @@
 }
 
 .page-size-selector select {
-  padding: 0.4rem 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-input);
   font-family: inherit;
   font-size: 0.95rem;
   background-color: white;
   cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 .page-size-selector select:focus {
   outline: none;
-  border-color: #ffb700;
+  border-color: var(--c-amber);
+  box-shadow: 0 0 0 3px rgba(255, 183, 0, 0.2);
 }
 
 .page-navigation {
@@ -420,7 +446,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive */

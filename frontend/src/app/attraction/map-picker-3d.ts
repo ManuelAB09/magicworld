@@ -161,7 +161,7 @@ export class MapPicker3DComponent implements AfterViewInit, OnDestroy, OnChanges
 
     // Add invisible ground plane for raycasting clicks
     const invisibleGround = new THREE.Mesh(
-      new THREE.PlaneGeometry(120, 120),
+      new THREE.PlaneGeometry(140, 140),
       new THREE.MeshBasicMaterial({ visible: false })
     );
     invisibleGround.rotation.x = -Math.PI / 2;
@@ -209,8 +209,8 @@ export class MapPicker3DComponent implements AfterViewInit, OnDestroy, OnChanges
     const attraction = { category: this.category } as any;
     this.markerMesh = this.meshFactory.createAttractionMesh(attraction);
 
-    const x = ((this.positionX / 100) - 0.5) * 90;
-    const z = ((this.positionY / 100) - 0.5) * 90;
+    const x = ((this.positionX / 100) - 0.5) * 100;
+    const z = ((this.positionY / 100) - 0.5) * 100;
     this.markerMesh.position.set(x, 0, z);
     this.markerMesh.scale.setScalar(1.2);
     this.scene.add(this.markerMesh);
@@ -252,8 +252,8 @@ export class MapPicker3DComponent implements AfterViewInit, OnDestroy, OnChanges
 
     if (intersects.length > 0) {
       const point = intersects[0].point;
-      const x = Math.max(0, Math.min(100, (point.x / 90 + 0.5) * 100));
-      const y = Math.max(0, Math.min(100, (point.z / 90 + 0.5) * 100));
+      const x = Math.max(0, Math.min(100, (point.x / 100 + 0.5) * 100));
+      const y = Math.max(0, Math.min(100, (point.z / 100 + 0.5) * 100));
 
       this.positionX = Math.round(x * 10) / 10;
       this.positionY = Math.round(y * 10) / 10;

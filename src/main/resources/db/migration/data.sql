@@ -8,8 +8,8 @@ VALUES ('user1', 'User', '1', 'user1@example.com', '$2a$10$JZA..SzcDSPyDZXa.ESvY
 
 
 INSERT  INTO ticket_type (cost, type_name, description, max_per_day, photo_url)
-VALUES (29.90, 'Adult', 'Entrada general para adultos', 100, '/img/adult_ticket.jpg'),
-       (19.90, 'Child', 'Entrada para peques', 50, '/img/child_ticket.jpg');
+VALUES (29.90, 'Adult', 'Entrada general para adultos', 100, '/images/ticket-types/e9dc4e2d-1636-418a-a2ae-f512b67bbf71.png'),
+       (19.90, 'Child', 'Entrada para peques', 50, '/images/ticket-types/bb720bd8-b4d4-4cd5-9452-5c12cdef52f2.png');
 
 
 INSERT  INTO discount (discount_percentage, expiry_date, discount_code)
@@ -26,39 +26,39 @@ WHERE d.discount_code = 'SUMMER10' AND t.type_name = 'Adult';
 INSERT INTO attraction (name, intensity, category, minimum_height, minimum_age, minimum_weight, description, photo_url, is_active, map_position_x, map_position_y, maintenance_status, opening_time, closing_time)
 VALUES
 
-    ('Dragon Fury', 'HIGH', 'ROLLER_COASTER', 140, 14, 40, 'La montaña rusa mas extrema del parque con 3 inversiones y una caida de 50 metros', '/img/dragon_fury.jpg', TRUE, 75.0, 45.0, 'OPERATIONAL', '10:00', '18:00'),
-    ('Thunder Tower', 'HIGH', 'DROP_TOWER', 130, 12, 35, 'Torre de caida libre de 60 metros con vistas panoramicas del parque', '/img/thunder_tower.jpg', TRUE, 70.0, 65.0, 'OPERATIONAL', '10:00', '18:00'),
+    ('Dragon Fury', 'HIGH', 'ROLLER_COASTER', 140, 14, 40, 'La montaña rusa mas extrema del parque con 3 inversiones y una caida de 50 metros', '/images/attractions/7fd38b89-47d6-4d2c-bfe5-25153a2a9d94.png', TRUE, 63.5, 37.6, 'OPERATIONAL', '10:00', '18:00'),
+    ('Thunder Tower', 'HIGH', 'DROP_TOWER', 130, 12, 35, 'Torre de caida libre de 60 metros con vistas panoramicas del parque', '/images/attractions/af8e40ed-c299-46ad-b82b-9a3f815c666b.png', TRUE, 74.8, 44.6, 'OPERATIONAL', '10:00', '18:00'),
 
 
-    ('Velocity Coaster', 'HIGH', 'ROLLER_COASTER', 135, 12, 35, 'Montaña rusa lanzada con aceleración de 0 a 100 km/h en 3 segundos', '/img/velocity_coaster.jpg', TRUE, 25.0, 45.0, 'OPERATIONAL', '10:00', '17:00'),
-    ('Storm Chaser', 'HIGH', 'DROP_TOWER', 125, 10, 30, 'Torre de rebote con múltiples caidas y subidas', '/img/storm_chaser.jpg', TRUE, 30.0, 65.0, 'OPERATIONAL', '10:00', '17:30'),
+    ('Velocity Coaster', 'HIGH', 'ROLLER_COASTER', 135, 12, 35, 'Montaña rusa lanzada con aceleración de 0 a 100 km/h en 3 segundos', '/images/attractions/7fd38b89-47d6-4d2c-bfe5-25153a2a9d94.png', TRUE, 39.9, 81.4, 'OPERATIONAL', '10:00', '17:00'),
+    ('Storm Chaser', 'HIGH', 'DROP_TOWER', 125, 10, 30, 'Torre de rebote con múltiples caidas y subidas', '/images/attractions/af8e40ed-c299-46ad-b82b-9a3f815c666b.png', TRUE, 24.2, 66.4, 'OPERATIONAL', '10:00', '17:30'),
 
 
-    ('Splash Mountain', 'MEDIUM', 'WATER_RIDE', 110, 8, 25, 'Emocionante descenso acuatico con una cascada final de 20 metros', '/img/splash_mountain.jpg', TRUE, 15.0, 75.0, 'OPERATIONAL', '10:30', '18:00'),
-    ('Pirate Rapids', 'MEDIUM', 'WATER_RIDE', 100, 6, 20, 'Aventura en balsas por rapidos y cuevas piratas', '/img/pirate_rapids.jpg', TRUE, 25.0, 90.0, 'OPERATIONAL', '11:00', '18:00'),
+    ('Splash Mountain', 'MEDIUM', 'WATER_RIDE', 110, 8, 25, 'Emocionante descenso acuatico con una cascada final de 20 metros', '/images/attractions/57c48af7-097a-46ce-b5d1-229db137dc56.png', TRUE, 31.0, 38.9, 'OPERATIONAL', '10:30', '18:00'),
+    ('Pirate Rapids', 'MEDIUM', 'WATER_RIDE', 100, 6, 20, 'Aventura en balsas por rapidos y cuevas piratas', '/images/attractions/57c48af7-097a-46ce-b5d1-229db137dc56.png', TRUE, 27.9, 58.2, 'OPERATIONAL', '11:00', '18:00'),
 
 
-    ('Magic Carousel', 'LOW', 'CAROUSEL', 0, 0, 0, 'Carrusel clásico con caballos magicos y música encantadora', '/img/magic_carousel.jpg', TRUE, 50.0, 30.0, 'OPERATIONAL', '09:00', '17:00'),
-    ('Mini Carousel', 'LOW', 'CAROUSEL', 0, 0, 0, 'Carrusel especial para los mas pequeños con animales de granja', '/img/mini_carousel.jpg', TRUE, 40.0, 30.0, 'OPERATIONAL', '09:30', '16:30'),
+    ('Magic Carousel', 'LOW', 'CAROUSEL', 0, 0, 0, 'Carrusel clásico con caballos magicos y música encantadora', '/images/attractions/693e1193-9c8c-402f-94ab-41ca7863d9db.png', TRUE, 72.8, 61.9, 'OPERATIONAL', '09:00', '17:00'),
+    ('Mini Carousel', 'LOW', 'CAROUSEL', 0, 0, 0, 'Carrusel especial para los mas pequeños con animales de granja', '/images/attractions/693e1193-9c8c-402f-94ab-41ca7863d9db.png', TRUE, 41.1, 68.5, 'OPERATIONAL', '09:30', '16:30'),
 
 
-    ('Haunted Manor', 'MEDIUM', 'HAUNTED_HOUSE', 100, 8, 0, 'Casa encantada interactiva con efectos especiales y sustos inesperados', '/img/haunted_manor.jpg', TRUE, 80.0, 75.0, 'OPERATIONAL', '11:00', '19:00'),
-    ('Sky Swings', 'MEDIUM', 'SWING_RIDE', 120, 10, 30, 'Sillas voladoras a 30 metros de altura con rotacion de 360 grados', '/img/sky_swings.jpg', TRUE, 65.0, 75.0, 'OPERATIONAL', '10:00', '17:00'),
+    ('Haunted Manor', 'MEDIUM', 'HAUNTED_HOUSE', 100, 8, 0, 'Casa encantada interactiva con efectos especiales y sustos inesperados', '/images/attractions/74bf0fad-523b-4aee-ba86-c0d89315ad1b.png', TRUE, 58.3, 83.0, 'OPERATIONAL', '11:00', '19:00'),
+    ('Sky Swings', 'MEDIUM', 'SWING_RIDE', 120, 10, 30, 'Sillas voladoras a 30 metros de altura con rotacion de 360 grados', '/images/attractions/f7fb7944-fb48-4a5f-92dd-8499256a7730.png', TRUE, 16.2, 61.5, 'OPERATIONAL', '10:00', '17:00'),
 
 
-    ('Wild River', 'MEDIUM', 'WATER_RIDE', 105, 7, 22, 'Recorrido por un río salvaje con sorpresas acuáticas', '/img/wild_river.jpg', TRUE, 10.0, 75.0, 'OPERATIONAL', '10:30', '17:30'),
-    ('Bumper Kingdom', 'LOW', 'BUMPER_CARS', 90, 5, 15, 'Coches de choque con tematica medieval para toda la familia', '/img/bumper_kingdom.jpg', TRUE, 20.0, 30.0, 'OPERATIONAL', '10:00', '17:30'),
+    ('Wild River', 'MEDIUM', 'WATER_RIDE', 105, 7, 22, 'Recorrido por un río salvaje con sorpresas acuáticas', '/images/attractions/57c48af7-097a-46ce-b5d1-229db137dc56.png', TRUE, 87.2, 83.8, 'OPERATIONAL', '10:30', '17:30'),
+    ('Bumper Kingdom', 'LOW', 'BUMPER_CARS', 90, 5, 15, 'Coches de choque con tematica medieval para toda la familia', '/images/attractions/bc6c7c42-1c9e-43a2-81d4-2955f1f25a55.png', TRUE, 12.0, 23.3, 'OPERATIONAL', '10:00', '17:30'),
 
 
-    ('Enchanted Train', 'LOW', 'TRAIN_RIDE', 0, 0, 0, 'Recorrido panoramico por todo el parque en un tren de epoca', '/img/enchanted_train.jpg', TRUE, 80.0, 50.0, 'OPERATIONAL', '09:00', '16:00'),
-    ('Flying Carpet', 'LOW', 'SWING_RIDE', 90, 5, 15, 'Alfombra voladora que gira y sube suavemente', '/img/flying_carpet.jpg', TRUE, 35.0, 25.0, 'OPERATIONAL', '10:00', '17:30'),
+    ('Enchanted Train', 'LOW', 'TRAIN_RIDE', 0, 0, 0, 'Recorrido panoramico por todo el parque en un tren de epoca', '/images/attractions/8cbda956-fba3-49d9-976a-3d89d35a9d3f.png', TRUE, 87.7, 43.1, 'OPERATIONAL', '09:00', '16:00'),
+    ('Flying Carpet', 'LOW', 'SWING_RIDE', 90, 5, 15, 'Alfombra voladora que gira y sube suavemente', '/images/attractions/f7fb7944-fb48-4a5f-92dd-8499256a7730.png', TRUE, 35.0, 25.0, 'OPERATIONAL', '10:00', '17:30'),
 
 
-    ('Space Journey', 'MEDIUM', 'OTHER', 100, 6, 0, 'Viaje espacial interactivo con proyecciones 4D', '/img/space_journey.jpg', TRUE, 80.0, 30.0, 'OPERATIONAL', '10:00', '17:00'),
-    ('Teacups Spin', 'LOW', 'OTHER', 0, 0, 0, 'Tazas giratorias para toda la familia', '/img/teacups.jpg', TRUE, 50.0, 20.0, 'OPERATIONAL', '09:30', '16:30'),
+    ('Space Journey', 'MEDIUM', 'OTHER', 100, 6, 0, 'Viaje espacial interactivo con proyecciones 4D', '/images/attractions/db5351aa-3c0c-46f4-bd88-5c4c65c96ce1.png', TRUE, 76.8, 19.7, 'OPERATIONAL', '10:00', '17:00'),
+    ('Teacups Spin', 'LOW', 'OTHER', 0, 0, 0, 'Tazas giratorias para toda la familia', '/images/attractions/db5351aa-3c0c-46f4-bd88-5c4c65c96ce1.png', TRUE, 11.2, 70.9, 'OPERATIONAL', '09:30', '16:30'),
 
 
-    ('Giant Wheel', 'LOW', 'FERRIS_WHEEL', 0, 0, 0, 'Noria gigante de 50 metros con cabinas climatizadas y vistas espectaculares', '/img/giant_wheel.jpg', TRUE, 50.0, 75.0, 'OPERATIONAL', '09:00', '17:00');
+    ('Giant Wheel', 'LOW', 'FERRIS_WHEEL', 0, 0, 0, 'Noria gigante de 50 metros con cabinas climatizadas y vistas espectaculares', '/images/attractions/21ffc9aa-afd5-4085-af00-ab5f7ec9ec19.png', TRUE, 61.0, 70.5, 'OPERATIONAL', '09:00', '17:00');
 
 
 

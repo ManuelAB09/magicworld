@@ -1,7 +1,7 @@
 :host {
   display: block;
-  font-family: 'Georgia', serif;
-  color: #2c0d0d;
+  font-family: var(--font-body);
+  color: var(--c-dark-brown);
   overflow: hidden;
 }
 
@@ -21,7 +21,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.6);
+  /* Darker for better contrast */
   z-index: 1;
 }
 
@@ -40,24 +41,30 @@
   position: relative;
   z-index: 2;
   text-align: center;
-  padding: 3rem 4rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 4rem 5rem;
+  background: rgba(44, 13, 13, 0.6);
+  /* Brand dark brown with opacity */
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(255, 183, 0, 0.3);
+  /* Subtle amber border */
+  box-shadow: var(--shadow-md);
   animation: fadeIn 1s ease-out both;
   color: #fff;
+  max-width: 800px;
 }
 
 .overlay h1 {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-  border-bottom: 4px solid #ffb700;
+  font-family: var(--font-headers);
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 3px solid var(--c-amber);
   display: inline-block;
-  padding-bottom: 0.3rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  padding-bottom: 0.5rem;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
   color: #fff;
+  font-weight: 700;
+  letter-spacing: 2px;
 }
 
 .overlay p {
@@ -73,42 +80,44 @@
 
 .buy-tickets-btn {
   display: inline-block;
-  background: linear-gradient(135deg, #ffb700 0%, #ff9500 100%);
-  border: 3px solid #2c0d0d;
-  color: #2c0d0d;
-  font-weight: bold;
-  font-size: 1.3rem;
-  padding: 1rem 2.5rem;
-  border-radius: 30px;
+  background: var(--c-amber);
+  color: var(--c-dark-brown);
+  font-family: var(--font-headers);
+  font-weight: 700;
+  font-size: 1.4rem;
+  padding: 1rem 3rem;
+  border-radius: var(--radius-btn);
   text-decoration: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s, box-shadow 0.3s;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
   margin-top: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .buy-tickets-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(255, 183, 0, 0.4);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(255, 183, 0, 0.5);
+  background: var(--c-amber-hover);
 }
 
 .btn-primary {
   display: inline-block;
-  background-color: #ffb700;
-  border: 2px solid #a11d1d;
-  color: #2c0d0d;
-  font-weight: bold;
+  background-color: var(--c-primary-red);
+  color: #fff;
+  font-weight: 700;
   padding: 0.8rem 1.6rem;
-  border-radius: 25px;
+  border-radius: var(--radius-btn);
   text-decoration: none;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
   transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
   margin-bottom: 3rem;
 }
 
 .btn-primary:hover {
-  background-color: #ffd35c;
+  background-color: #7b1414;
   transform: translateY(-3px);
-  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-md);
 }
 
 @keyframes fadeIn {

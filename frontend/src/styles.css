@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Poppins:wght@300;400;500;600;700&family=Pirata+One&display=swap');
+
+:root {
+    /* Brand Palette */
+    --c-primary-red: #8b1e1e;
+    --c-bright-red: #e2231a;
+    --c-amber: #ffb700;
+    --c-amber-hover: #ffd35c;
+    --c-dark-brown: #2c0d0d;
+    --c-bg-antique: #faebd7;
+    --c-bg-antique-dark: #e6d3bb;
+    --c-surface: #fffdf5;
+
+    /* Typography */
+    --font-headers: 'Cinzel', serif;
+    --font-body: 'Poppins', sans-serif;
+    --font-accent: 'Pirata One', cursive;
+
+    /* Standard Components */
+    --radius-card: 25px;
+    --radius-btn: 25px;
+    --radius-input: 12px;
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--c-bg-antique);
+    color: var(--c-dark-brown);
+    margin: 0;
+    padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-headers);
+    color: var(--c-primary-red);
+}
+
+/* Global Shared Classes */
+.btn-brand {
+    background-color: var(--c-amber);
+    color: var(--c-dark-brown);
+    border: 2px solid var(--c-primary-red);
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-btn);
+    font-family: var(--font-body);
+    font-weight: 600;
+    text-transform: capitalize;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-brand:hover {
+    background-color: var(--c-amber-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: var(--c-dark-brown);
+}
+
+.btn-brand:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-brand-danger {
+    background-color: var(--c-bright-red);
+    border-color: var(--c-dark-brown);
+    color: #fff;
+}
+
+.btn-brand-danger:hover {
+    background-color: var(--c-primary-red);
+    color: #fff;
+}
+
+.btn-brand-outline {
+    background-color: transparent;
+    border-color: var(--c-amber);
+    color: var(--c-amber);
+}
+
+.btn-brand-outline:hover {
+    background-color: var(--c-amber);
+    color: var(--c-dark-brown);
+}
+
+/* Base Input Styles */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="datetime-local"],
+select,
+textarea {
+    border-radius: var(--radius-input);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    padding: 0.6rem 1rem;
+    font-family: var(--font-body);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--c-amber);
+    box-shadow: 0 0 0 3px rgba(255, 183, 0, 0.2);
+}
+
+/* File Input Styling */
+input[type="file"]::file-selector-button {
+    border-radius: var(--radius-btn);
+    padding: 0 1rem;
+    height: 36px;
+    cursor: pointer;
+    background-color: var(--c-amber);
+    border: 1px solid var(--c-primary-red);
+    box-shadow: var(--shadow-sm);
+    color: var(--c-dark-brown);
+    font-family: var(--font-body);
+    font-weight: 600;
+    transition: background-color 0.2s;
+    margin-right: 15px;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background-color: var(--c-amber-hover);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--c-bg-antique);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(139, 30, 30, 0.4);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--c-primary-red);
+}
+
+/* Global Card Styles */
+.card-brand {
+    background-color: var(--c-surface);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-sm);
+    padding: 2rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-brand:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.page-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Component Route Transitions */
+@keyframes routeFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+router-outlet+* {
+    display: block;
+    /* Ensure the animated element is a block to apply transform */
+    animation: routeFadeIn 0.4s ease-out forwards;
+}
