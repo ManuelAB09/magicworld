@@ -213,7 +213,9 @@ public class ChatbotToolsBuilder {
                                 Map.entry("photoUrl", Schema.builder().type("STRING").description("Photo URL (optional) / URL foto").build()),
                                 Map.entry("isActive", Schema.builder().type("BOOLEAN").description("Is active / Está activa").build()),
                                 Map.entry("mapPositionX", Schema.builder().type("NUMBER").description("Map X position 0-100 (optional, default 50) / Posición X en mapa 0-100 (opcional, por defecto 50)").build()),
-                                Map.entry("mapPositionY", Schema.builder().type("NUMBER").description("Map Y position 0-100 (optional, default 50) / Posición Y en mapa 0-100 (opcional, por defecto 50)").build())
+                                Map.entry("mapPositionY", Schema.builder().type("NUMBER").description("Map Y position 0-100 (optional, default 50) / Posición Y en mapa 0-100 (opcional, por defecto 50)").build()),
+                                Map.entry("openingTime", Schema.builder().type("STRING").description("Opening time in HH:mm format (optional, default 09:00) / Hora de apertura en formato HH:mm (opcional, por defecto 09:00)").build()),
+                                Map.entry("closingTime", Schema.builder().type("STRING").description("Closing time in HH:mm format (optional, default 17:00) / Hora de cierre en formato HH:mm (opcional, por defecto 17:00)").build())
                         ))
                         .required(List.of("name", "intensity", "category", "minimumHeight", "minimumAge", "minimumWeight", "description", "isActive"))
                         .build())
@@ -236,7 +238,9 @@ public class ChatbotToolsBuilder {
                                 Map.entry("photoUrl", Schema.builder().type("STRING").description("Photo URL (optional) / URL foto (opcional)").build()),
                                 Map.entry("isActive", Schema.builder().type("BOOLEAN").description("Is active (optional) / Está activa (opcional)").build()),
                                 Map.entry("mapPositionX", Schema.builder().type("NUMBER").description("Map X position 0-100 (optional) / Posición X en mapa 0-100 (opcional)").build()),
-                                Map.entry("mapPositionY", Schema.builder().type("NUMBER").description("Map Y position 0-100 (optional) / Posición Y en mapa 0-100 (opcional)").build())
+                                Map.entry("mapPositionY", Schema.builder().type("NUMBER").description("Map Y position 0-100 (optional) / Posición Y en mapa 0-100 (opcional)").build()),
+                                Map.entry("openingTime", Schema.builder().type("STRING").description("Opening time in HH:mm format (optional) / Hora de apertura (opcional)").build()),
+                                Map.entry("closingTime", Schema.builder().type("STRING").description("Closing time in HH:mm format (optional) / Hora de cierre (opcional)").build())
                         ))
                         .required(List.of("id"))
                         .build())

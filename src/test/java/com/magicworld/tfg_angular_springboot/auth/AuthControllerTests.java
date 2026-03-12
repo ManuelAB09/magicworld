@@ -268,6 +268,63 @@ public class AuthControllerTests {
     }
 
     @Test
+    @Story("OAuth2 Registro Completo")
+    @Description("Verifica que sin cookie oauth2_pending retorna 401")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("completeOAuth2Registration sin cookie retorna 401")
+    public void testCompleteOAuth2RegistrationNoPendingCookieReturns401() throws Exception {
+        OAuth2CompleteRegistrationRequest request = OAuth2CompleteRegistrationRequest.builder()
+                .password("Password1@")
+                .confirmPassword("Password1@")
+                .build();
+
+        mockMvc.perform(post("/api/v1/auth/oauth2/complete-registration")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @Story("OAuth2 Registro Completo")
+    @Description("Verifica que cookie oauth2_pending vacía retorna 401")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("completeOAuth2Registration cookie vacía retorna 401")
+    public void testCompleteOAuth2RegistrationBlankCookieReturns401() throws Exception {
+        OAuth2CompleteRegistrationRequest request = OAuth2CompleteRegistrationRequest.builder()
+                .password("Password1@")
+                .confirmPassword("Password1@")
+                .build();
+
+        mockMvc.perform(post("/api/v1/auth/oauth2/complete-registration")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .cookie(new jakarta.servlet.http.Cookie("oauth2_pending", "  ")))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @Story("OAuth2 Registro Completo")
+    @Description("Verifica que con token válido completa registro retorna 201")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("completeOAuth2Registration exitoso retorna 201")
+    public void testCompleteOAuth2RegistrationSuccessReturns201() throws Exception {
+        OAuth2CompleteRegistrationRequest request = OAuth2CompleteRegistrationRequest.builder()
+                .password("Password1@")
+                .confirmPassword("Password1@")
+                .build();
+
+        when(authService.completeOAuth2Registration(any(String.class), any(OAuth2CompleteRegistrationRequest.class)))
+                .thenReturn(AuthResponse.builder().token("new-jwt-token").build());
+
+        mockMvc.perform(post("/api/v1/auth/oauth2/complete-registration")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .cookie(new jakarta.servlet.http.Cookie("oauth2_pending", "valid-pending-token")))
+                .andExpect(status().isCreated())
+                .andExpect(cookie().exists("token"));
+    }
+
+    @Test
     @Story("Recuperar Contraseña")
     @Description("Verifica que forgot-password retorna 200 OK")
     @Severity(SeverityLevel.NORMAL)

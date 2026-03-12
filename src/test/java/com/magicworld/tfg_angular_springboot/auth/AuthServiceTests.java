@@ -2,6 +2,7 @@ package com.magicworld.tfg_angular_springboot.auth;
 
 import com.magicworld.tfg_angular_springboot.exceptions.EmailAlreadyExistsException;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidCredentialsException;
+import com.magicworld.tfg_angular_springboot.exceptions.InvalidTokenException;
 import com.magicworld.tfg_angular_springboot.exceptions.PasswordsDoNoMatchException;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import com.magicworld.tfg_angular_springboot.exceptions.UsernameAlreadyExistsException;
@@ -243,5 +244,72 @@ public class AuthServiceTests {
                 .userRole(Role.USER)
                 .build());
         assertThrows(ResourceNotFoundException.class, () -> authService.getCurrentUser(fakeToken));
+    }
+
+    @Test
+    @Story("OAuth2 Registro Completo")
+    @Description("Verifica que completeOAuth2Registration exitoso retorna token")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("completeOAuth2Registration exitoso retorna token")
+    void testCompleteOAuth2RegistrationSuccess() {
+        String pendingToken = jwtService.generateOAuth2PendingToken(
+                "oauth2user@example.com", "OAuth", "User");
+
+        OAuth2CompleteRegistrationRequest request = OAuth2CompleteRegistrationRequest.builder()
+                .password("Password1@")
+                .confirmPassword("Password1@")
+                .build();
+
+        AuthResponse response = authService.completeOAuth2Registration(pendingToken, request);
+        assertNotNull(response.getToken());
+        assertTrue(userRepository.existsByEmail("oauth2user@example.com"));
+    }
+
+    @Test
+    @Story("OAuth2 Registro Completo")
+    @Description("Verifica que token inválido lanza InvalidTokenException")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("completeOAuth2Registration con token inválido lanza excepción")
+    void testCompleteOAuth2RegistrationInvalidToken() {
+        OAuth2CompleteRegistrationRequest request = OAuth2CompleteRegistrationRequest.builder()
+                .password("Password1@")
+                .confirmPassword("Password1@")
+                .build();
+        assertThrows(InvalidTokenException.class,
+                () -> authService.completeOAuth2Registration("invalid-token", request));
+    }
+
+    @Test
+    @Story("OAuth2 Registro Completo")
+    @Description("Verifica que email existente lanza EmailAlreadyExistsException")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("completeOAuth2Registration con email existente lanza excepción")
+    void testCompleteOAuth2RegistrationEmailExists() {
+        String pendingToken = jwtService.generateOAuth2PendingToken(
+                "john@example.com", "John", "Doe");
+
+        OAuth2CompleteRegistrationRequest request = OAuth2CompleteRegistrationRequest.builder()
+                .password("Password1@")
+                .confirmPassword("Password1@")
+                .build();
+        assertThrows(EmailAlreadyExistsException.class,
+                () -> authService.completeOAuth2Registration(pendingToken, request));
+    }
+
+    @Test
+    @Story("OAuth2 Registro Completo")
+    @Description("Verifica que contraseñas que no coinciden lanza PasswordsDoNoMatchException")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("completeOAuth2Registration contraseñas no coinciden lanza excepción")
+    void testCompleteOAuth2RegistrationPasswordsMismatch() {
+        String pendingToken = jwtService.generateOAuth2PendingToken(
+                "newuser@example.com", "New", "User");
+
+        OAuth2CompleteRegistrationRequest request = OAuth2CompleteRegistrationRequest.builder()
+                .password("Password1@")
+                .confirmPassword("DifferentPassword1@")
+                .build();
+        assertThrows(PasswordsDoNoMatchException.class,
+                () -> authService.completeOAuth2Registration(pendingToken, request));
     }
 }

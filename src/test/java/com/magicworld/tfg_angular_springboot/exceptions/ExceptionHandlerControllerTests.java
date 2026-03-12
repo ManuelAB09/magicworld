@@ -404,5 +404,158 @@ public class ExceptionHandlerControllerTests {
         assertNotNull(response.getBody());
         assertNotNull(response.getBody().getTimestamp());
     }
-}
 
+    @Test
+    @Story("Excepciones de Argumento Inválido")
+    @Description("Verifica que IllegalArgumentException retorna 400")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("handleIllegalArgumentRetorna400")
+    void handleIllegalArgumentRetorna400() {
+        IllegalArgumentException ex = new IllegalArgumentException("error.test");
+        ResponseEntity<ErrorMessage> response = exceptionHandler.handleIllegalArgument(ex, webRequest);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
+        assertEquals("error.invalid_argument", response.getBody().getCode());
+    }
+
+    @Test
+    @Story("Excepciones de Estado Inválido")
+    @Description("Verifica que IllegalStateException retorna 409")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("handleIllegalStateRetorna409")
+    void handleIllegalStateRetorna409() {
+        IllegalStateException ex = new IllegalStateException("error.state");
+        ResponseEntity<ErrorMessage> response = exceptionHandler.handleIllegalState(ex, webRequest);
+        assertEquals(HttpStatus.CONFLICT.value(), response.getStatusCode().value());
+        assertEquals("error.invalid_state", response.getBody().getCode());
+    }
+
+    @Test
+    @Story("Excepciones de Operación Inválida")
+    @Description("Verifica que InvalidOperationException retorna 400")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("handleInvalidOperationExceptionRetorna400")
+    void handleInvalidOperationExceptionRetorna400() {
+        InvalidOperationException ex = new InvalidOperationException("error.operation");
+        ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
+    }
+
+    @Test
+    @Story("Excepciones de Contraseña")
+    @Description("Verifica que InvalidPasswordPattern retorna 400")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("handleInvalidPasswordPatternRetorna400")
+    void handleInvalidPasswordPatternRetorna400() {
+        InvalidPasswordPattern ex = new InvalidPasswordPattern();
+        ResponseEntity<ErrorMessage> response = exceptionHandler.handleApiException(ex, webRequest);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
+    }
+
+    @Test
+    @Story("Parse Size")
+    @Description("Verifica que parseSizeToBytes con KB convierte correctamente")
+    @Severity(SeverityLevel.MINOR)
+    @DisplayName("parseSizeToBytesConKbConvierteCorrectamente")
+    void parseSizeToBytesConKbConvierteCorrectamente() {
+        MockEnvironment envKb = new MockEnvironment();
+        envKb.setProperty("spring.servlet.multipart.max-file-size", "5KB");
+        ExceptionHandlerController handler = new ExceptionHandlerController(envKb);
+
+        MaxUploadSizeExceededException ex = new MaxUploadSizeExceededException(5 * 1024);
+        ResponseEntity<ErrorMessage> response = handler.handleMaxUpload(ex, webRequest);
+
+        assertNotNull(response.getBody());
+        Object[] args = response.getBody().getArgs();
+        assertEquals(5L * 1024L, args[0]);
+    }
+
+    @Test
+    @Story("Parse Size")
+    @Description("Verifica que parseSizeToBytes con GB convierte correctamente")
+    @Severity(SeverityLevel.MINOR)
+    @DisplayName("parseSizeToBytesConGbConvierteCorrectamente")
+    void parseSizeToBytesConGbConvierteCorrectamente() {
+        MockEnvironment envGb = new MockEnvironment();
+        envGb.setProperty("spring.servlet.multipart.max-file-size", "1GB");
+        ExceptionHandlerController handler = new ExceptionHandlerController(envGb);
+
+        MaxUploadSizeExceededException ex = new MaxUploadSizeExceededException(1024L * 1024L * 1024L);
+        ResponseEntity<ErrorMessage> response = handler.handleMaxUpload(ex, webRequest);
+
+        assertNotNull(response.getBody());
+        Object[] args = response.getBody().getArgs();
+        assertEquals(1024L * 1024L * 1024L, args[0]);
+    }
+
+    @Test
+    @Story("Parse Size")
+    @Description("Verifica que parseSizeToBytes con sufijo B funciona")
+    @Severity(SeverityLevel.MINOR)
+    @DisplayName("parseSizeToBytesConSufijoBFunciona")
+    void parseSizeToBytesConSufijoBFunciona() {
+        MockEnvironment envB = new MockEnvironment();
+        envB.setProperty("spring.servlet.multipart.max-file-size", "500B");
+        ExceptionHandlerController handler = new ExceptionHandlerController(envB);
+
+        MaxUploadSizeExceededException ex = new MaxUploadSizeExceededException(500);
+        ResponseEntity<ErrorMessage> response = handler.handleMaxUpload(ex, webRequest);
+
+        assertNotNull(response.getBody());
+        Object[] args = response.getBody().getArgs();
+        assertEquals(500L, args[0]);
+    }
+
+    @Test
+    @Story("Parse Size")
+    @Description("Verifica que parseSizeToBytes con número plano funciona")
+    @Severity(SeverityLevel.MINOR)
+    @DisplayName("parseSizeToBytesConNumeroPlanoFunciona")
+    void parseSizeToBytesConNumeroPlanoFunciona() {
+        MockEnvironment envPlain = new MockEnvironment();
+        envPlain.setProperty("spring.servlet.multipart.max-file-size", "1024");
+        ExceptionHandlerController handler = new ExceptionHandlerController(envPlain);
+
+        MaxUploadSizeExceededException ex = new MaxUploadSizeExceededException(1024);
+        ResponseEntity<ErrorMessage> response = handler.handleMaxUpload(ex, webRequest);
+
+        assertNotNull(response.getBody());
+        Object[] args = response.getBody().getArgs();
+        assertEquals(1024L, args[0]);
+    }
+
+    @Test
+    @Story("Parse Size")
+    @Description("Verifica que parseSizeToBytes con valor inválido usa default")
+    @Severity(SeverityLevel.MINOR)
+    @DisplayName("parseSizeToBytesConValorInvalidoUsaDefault")
+    void parseSizeToBytesConValorInvalidoUsaDefault() {
+        MockEnvironment envInvalid = new MockEnvironment();
+        envInvalid.setProperty("spring.servlet.multipart.max-file-size", "invalid");
+        ExceptionHandlerController handler = new ExceptionHandlerController(envInvalid);
+
+        MaxUploadSizeExceededException ex = new MaxUploadSizeExceededException(0);
+        ResponseEntity<ErrorMessage> response = handler.handleMaxUpload(ex, webRequest);
+
+        assertNotNull(response.getBody());
+        Object[] args = response.getBody().getArgs();
+        assertEquals(20L * 1024L * 1024L, args[0]);
+    }
+
+    @Test
+    @Story("Parse Size")
+    @Description("Verifica que parseSizeToBytes con null usa default")
+    @Severity(SeverityLevel.MINOR)
+    @DisplayName("parseSizeToBytesConNullUsaDefault")
+    void parseSizeToBytesConNullUsaDefault() {
+        MockEnvironment envNull = new MockEnvironment();
+        // No property set
+        ExceptionHandlerController handler = new ExceptionHandlerController(envNull);
+
+        MaxUploadSizeExceededException ex = new MaxUploadSizeExceededException(0);
+        ResponseEntity<ErrorMessage> response = handler.handleMaxUpload(ex, webRequest);
+
+        assertNotNull(response.getBody());
+        Object[] args = response.getBody().getArgs();
+        assertEquals(20L * 1024L * 1024L, args[0]);
+    }
+}

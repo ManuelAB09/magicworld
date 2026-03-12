@@ -317,6 +317,7 @@ public class DailyOperationsService {
                 .shift(WorkShift.FULL_DAY)
                 .breakGroup(BreakGroup.D)
                 .isOvertime(true)
+                .isReinforcement(true)
                 .build();
 
         weeklyScheduleRepository.save(schedule);

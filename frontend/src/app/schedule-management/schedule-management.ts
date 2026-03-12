@@ -31,6 +31,7 @@ interface DayCell {
   breakGroup?: BreakGroup;
   breakTime?: string;
   isOvertime?: boolean;
+  isReinforcement?: boolean;
 }
 
 interface AttractionSimple {
@@ -119,7 +120,7 @@ export class ScheduleManagementComponent implements OnInit {
   }
 
   private loadZones(): void {
-    this.http.get<ZoneSimple[]>(`${this.baseUrl}/api/zones`, { withCredentials: true })
+    this.http.get<ZoneSimple[]>(`${this.baseUrl}/api/v1/zones`, { withCredentials: true })
       .subscribe(zones => this.zones = zones);
   }
 
@@ -237,6 +238,9 @@ export class ScheduleManagementComponent implements OnInit {
 
   getIssueDescription(issue: CoverageIssue): string {
     const translated = this.translate.instant(`schedule.issues.${issue.issueType}`);
+    if (issue.employeeName) {
+      return `${translated}: ${issue.employeeName}`;
+    }
     if (issue.attractionName) {
       return `${translated}: ${issue.attractionName}`;
     }
@@ -277,7 +281,8 @@ export class ScheduleManagementComponent implements OnInit {
             zoneId: schedule.assignedZoneId,
             breakGroup: schedule.breakGroup as BreakGroup,
             breakTime: this.breakTimes[schedule.breakGroup as BreakGroup],
-            isOvertime: schedule.isOvertime ?? false
+            isOvertime: schedule.isOvertime ?? false,
+            isReinforcement: schedule.isReinforcement ?? false
           };
         }
         return { assigned: false } as DayCell;
@@ -402,7 +407,7 @@ export class ScheduleManagementComponent implements OnInit {
 
     const headers = new HttpHeaders();
     this.auth.ensureCsrfToken(headers).pipe(
-      switchMap(h => this.http.post(`${this.baseUrl}/api/schedules`, request, { withCredentials: true, headers: h }))
+      switchMap(h => this.http.post(`${this.baseUrl}/api/v1/schedules`, request, { withCredentials: true, headers: h }))
     ).subscribe({
       next: () => {
         this.closeAssignModal();
@@ -421,7 +426,7 @@ export class ScheduleManagementComponent implements OnInit {
 
     const headers = new HttpHeaders();
     this.auth.ensureCsrfToken(headers).pipe(
-      switchMap(h => this.http.delete(`${this.baseUrl}/api/schedules/${cell.scheduleId}`, { withCredentials: true, headers: h }))
+      switchMap(h => this.http.delete(`${this.baseUrl}/api/v1/schedules/${cell.scheduleId}`, { withCredentials: true, headers: h }))
     ).subscribe({
       next: () => this.loadSchedule(),
       error: (err) => {

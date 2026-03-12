@@ -60,6 +60,13 @@
         <div class="summary-value">{{ summary.absences }}</div>
         <div class="summary-label">{{ 'stats.worklog.absencesLabel' | translate }}</div>
       </div>
+      @if (summary.reinforcementDays > 0) {
+      <div class="summary-card cyan">
+        <div class="summary-icon">🛡️</div>
+        <div class="summary-value">{{ summary.reinforcementDays }}</div>
+        <div class="summary-label">{{ 'stats.worklog.reinforcementDays' | translate }}</div>
+      </div>
+      }
     </div>
 
     <!-- AUDIT LOG -->

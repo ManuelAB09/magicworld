@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,10 +18,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/worklog")
+@RequestMapping("/api/v1/worklog")
 @RequiredArgsConstructor
 @Tag(name = "Work Log", description = "Employee hours, absences and audit log management")
-@PreAuthorize("hasRole('ADMIN')")
 public class WorkLogController {
 
     private final WorkLogService workLogService;
@@ -55,4 +53,3 @@ public class WorkLogController {
                 .body(workLogService.addWorkLogEntry(request, adminUsername));
     }
 }
-

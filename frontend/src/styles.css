@@ -203,6 +203,8 @@ input[type="file"]::file-selector-button:hover {
 
 router-outlet+* {
     display: block;
-    /* Ensure the animated element is a block to apply transform */
-    animation: routeFadeIn 0.4s ease-out forwards;
+    /* backwards applies the 'from' keyframe before animation starts (no flash).
+       After the animation ends, styles revert to computed values (no transform),
+       so position:fixed inside the component works correctly against the viewport. */
+    animation: routeFadeIn 0.4s ease-out backwards;
 }

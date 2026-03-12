@@ -29,6 +29,7 @@ public class CoverageValidationResult {
         private String attractionName;
         private Long zoneId;
         private String zoneName;
+        private String employeeName;
     }
 }
 

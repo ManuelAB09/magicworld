@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
@@ -55,12 +56,13 @@ public class AttractionFunctionExecutor {
             String status = a.getIsActive() ?
                     (lang.equals("en") ? "✅ Active" : "✅ Activa") :
                     (lang.equals("en") ? "❌ Inactive" : "❌ Inactiva");
-            sb.append(String.format("• **ID %d** - %s | %s: %s | %s: %s | %s\n",
+            sb.append(String.format("• **ID %d** - %s | %s: %s | %s: %s | 🕘 %s - %s | %s\n",
                     a.getId(), a.getName(),
                     lang.equals("en") ? "Category" : "Categoría",
                     a.getCategory(),
                     lang.equals("en") ? "Intensity" : "Intensidad",
-                    a.getIntensity(), status));
+                    a.getIntensity(), 
+                    a.getOpeningTime(), a.getClosingTime(), status));
         }
         return sb;
     }
@@ -83,6 +85,8 @@ public class AttractionFunctionExecutor {
                         "• **Minimum height:** %d cm\n" +
                         "• **Minimum age:** %d years\n" +
                         "• **Minimum weight:** %d kg\n" +
+                        "• **Opening time:** %s\n" +
+                        "• **Closing time:** %s\n" +
                         "• **Status:** %s\n" +
                         "• **Map Position:** (%.1f, %.1f)\n" +
                         "• **Photo URL:** %s" :
@@ -95,11 +99,14 @@ public class AttractionFunctionExecutor {
                         "• **Altura mínima:** %d cm\n" +
                         "• **Edad mínima:** %d años\n" +
                         "• **Peso mínimo:** %d kg\n" +
+                        "• **Hora de apertura:** %s\n" +
+                        "• **Hora de cierre:** %s\n" +
                         "• **Estado:** %s\n" +
                         "• **Posición en mapa:** (%.1f, %.1f)\n" +
                         "• **URL de foto:** %s",
                 a.getId(), a.getName(), a.getCategory(), a.getIntensity(), a.getDescription(),
                 a.getMinimumHeight(), a.getMinimumAge(), a.getMinimumWeight(),
+                a.getOpeningTime(), a.getClosingTime(),
                 status, a.getMapPositionX(), a.getMapPositionY(),
                 a.getPhotoUrl() != null ? a.getPhotoUrl() : (lang.equals("en") ? "None" : "Ninguna"));
 
@@ -126,6 +133,8 @@ public class AttractionFunctionExecutor {
 
         Double mapPositionX = getOrDefaultDouble(args, "mapPositionX", DEFAULT_MAP_POSITION_X);
         Double mapPositionY = getOrDefaultDouble(args, "mapPositionY", DEFAULT_MAP_POSITION_Y);
+        LocalTime openingTime = getOrDefaultLocalTime(args, "openingTime", LocalTime.of(9, 0));
+        LocalTime closingTime = getOrDefaultLocalTime(args, "closingTime", LocalTime.of(17, 0));
 
         Attraction attraction = Attraction.builder()
                 .name(name)
@@ -139,6 +148,8 @@ public class AttractionFunctionExecutor {
                 .isActive(isActive)
                 .mapPositionX(mapPositionX)
                 .mapPositionY(mapPositionY)
+                .openingTime(openingTime)
+                .closingTime(closingTime)
                 .build();
 
         Attraction saved = attractionService.saveAttraction(attraction);
@@ -151,9 +162,10 @@ public class AttractionFunctionExecutor {
         return ChatResponse.builder()
                 .success(true)
                 .message(String.format(lang.equals("en") ?
-                                "✅ Attraction created!\n\n• **ID:** %d\n• **Name:** %s\n• **Category:** %s\n• **Intensity:** %s\n• **Status:** %s\n• **Map Position:** (%.1f, %.1f)%s" :
-                                "✅ ¡Atracción creada!\n\n• **ID:** %d\n• **Nombre:** %s\n• **Categoría:** %s\n• **Intensidad:** %s\n• **Estado:** %s\n• **Posición en mapa:** (%.1f, %.1f)%s",
+                                "✅ Attraction created!\n\n• **ID:** %d\n• **Name:** %s\n• **Category:** %s\n• **Intensity:** %s\n• **Times:** %s - %s\n• **Status:** %s\n• **Map Position:** (%.1f, %.1f)%s" :
+                                "✅ ¡Atracción creada!\n\n• **ID:** %d\n• **Nombre:** %s\n• **Categoría:** %s\n• **Intensidad:** %s\n• **Horario:** %s - %s\n• **Estado:** %s\n• **Posición en mapa:** (%.1f, %.1f)%s",
                         saved.getId(), saved.getName(), saved.getCategory(), saved.getIntensity(),
+                        saved.getOpeningTime(), saved.getClosingTime(),
                         saved.getIsActive() ? (lang.equals("en") ? "Active" : "Activa") :
                                 (lang.equals("en") ? "Inactive" : "Inactiva"),
                         saved.getMapPositionX(), saved.getMapPositionY(), positionNote))
@@ -176,6 +188,8 @@ public class AttractionFunctionExecutor {
         String photoUrl = extractPhotoUrlForUpdate(args);
         Double mapPositionX = getOrDefaultDouble(args, "mapPositionX", existing.getMapPositionX());
         Double mapPositionY = getOrDefaultDouble(args, "mapPositionY", existing.getMapPositionY());
+        LocalTime openingTime = getOrDefaultLocalTime(args, "openingTime", existing.getOpeningTime());
+        LocalTime closingTime = getOrDefaultLocalTime(args, "closingTime", existing.getClosingTime());
 
         Attraction attraction = Attraction.builder()
                 .name(name)
@@ -189,6 +203,8 @@ public class AttractionFunctionExecutor {
                 .isActive(isActive)
                 .mapPositionX(mapPositionX)
                 .mapPositionY(mapPositionY)
+                .openingTime(openingTime)
+                .closingTime(closingTime)
                 .build();
 
         Attraction updated = attractionService.updateAttraction(id, attraction);
@@ -196,9 +212,10 @@ public class AttractionFunctionExecutor {
         return ChatResponse.builder()
                 .success(true)
                 .message(String.format(lang.equals("en") ?
-                                "✅ Attraction updated!\n\n• **ID:** %d\n• **Name:** %s\n• **Category:** %s\n• **Intensity:** %s\n• **Map Position:** (%.1f, %.1f)" :
-                                "✅ ¡Atracción actualizada!\n\n• **ID:** %d\n• **Nombre:** %s\n• **Categoría:** %s\n• **Intensidad:** %s\n• **Posición en mapa:** (%.1f, %.1f)",
+                                "✅ Attraction updated!\n\n• **ID:** %d\n• **Name:** %s\n• **Category:** %s\n• **Intensity:** %s\n• **Times:** %s - %s\n• **Map Position:** (%.1f, %.1f)" :
+                                "✅ ¡Atracción actualizada!\n\n• **ID:** %d\n• **Nombre:** %s\n• **Categoría:** %s\n• **Intensidad:** %s\n• **Horario:** %s - %s\n• **Posición en mapa:** (%.1f, %.1f)",
                         updated.getId(), updated.getName(), updated.getCategory(), updated.getIntensity(),
+                        updated.getOpeningTime(), updated.getClosingTime(),
                         updated.getMapPositionX(), updated.getMapPositionY()))
                 .data(updated)
                 .build();
@@ -276,6 +293,17 @@ public class AttractionFunctionExecutor {
     }
 
     // ===== HELPER METHODS =====
+
+    private LocalTime getOrDefaultLocalTime(Map<String, Object> args, String key, LocalTime defaultValue) {
+        if (args.containsKey(key) && args.get(key) != null) {
+            try {
+                return LocalTime.parse((String) args.get(key));
+            } catch (Exception e) {
+                log.warn("Invalid time format for {}: {}", key, args.get(key));
+            }
+        }
+        return defaultValue;
+    }
 
     /**
      * Extract photo URL from args, validating it's a proper URL

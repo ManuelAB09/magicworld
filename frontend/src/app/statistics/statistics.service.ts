@@ -74,6 +74,7 @@ export interface EmployeeHoursSummaryDTO {
   absences: number;
   scheduledDays: number;
   workedDays: number;
+  reinforcementDays: number;
   adjustments: WorkLogEntryDTO[];
 }
 
@@ -107,7 +108,7 @@ export class StatisticsService {
     private http: HttpClient,
     private translate: TranslateService,
     private auth: AuthService
-  ) {}
+  ) { }
 
   private withCsrf<T>(op: (h: HttpHeaders) => Observable<T>): Observable<T> {
     return this.auth.ensureCsrfToken(new HttpHeaders()).pipe(switchMap(op));
@@ -121,28 +122,28 @@ export class StatisticsService {
 
   getHoursRanking(from: string, to: string): Observable<EmployeeHoursRankingDTO[]> {
     return this.http.get<EmployeeHoursRankingDTO[]>(
-      `${this.baseUrl}/api/statistics/employees/hours-ranking?from=${from}&to=${to}`,
+      `${this.baseUrl}/api/v1/statistics/employees/hours-ranking?from=${from}&to=${to}`,
       { withCredentials: true }
     );
   }
 
   getAbsenceRanking(from: string, to: string): Observable<EmployeeAbsenceRankingDTO[]> {
     return this.http.get<EmployeeAbsenceRankingDTO[]>(
-      `${this.baseUrl}/api/statistics/employees/absence-ranking?from=${from}&to=${to}`,
+      `${this.baseUrl}/api/v1/statistics/employees/absence-ranking?from=${from}&to=${to}`,
       { withCredentials: true }
     );
   }
 
   getPositionFrequency(employeeId: number, from: string, to: string): Observable<PositionFrequencyDTO[]> {
     return this.http.get<PositionFrequencyDTO[]>(
-      `${this.baseUrl}/api/statistics/employees/position-frequency/${employeeId}?from=${from}&to=${to}`,
+      `${this.baseUrl}/api/v1/statistics/employees/position-frequency/${employeeId}?from=${from}&to=${to}`,
       { withCredentials: true }
     );
   }
 
   getSalaryReport(from: string, to: string): Observable<SalaryReportDTO[]> {
     return this.http.get<SalaryReportDTO[]>(
-      `${this.baseUrl}/api/statistics/employees/salary?from=${from}&to=${to}&locale=${this.locale}`,
+      `${this.baseUrl}/api/v1/statistics/employees/salary?from=${from}&to=${to}&locale=${this.locale}`,
       { withCredentials: true }
     );
   }
@@ -151,21 +152,21 @@ export class StatisticsService {
 
   getTicketSales(from: string, to: string): Observable<TicketSalesDTO> {
     return this.http.get<TicketSalesDTO>(
-      `${this.baseUrl}/api/statistics/park/ticket-sales?from=${from}&to=${to}&locale=${this.locale}`,
+      `${this.baseUrl}/api/v1/statistics/park/ticket-sales?from=${from}&to=${to}&locale=${this.locale}`,
       { withCredentials: true }
     );
   }
 
   getSeasonality(year: number): Observable<MonthlySalesDTO[]> {
     return this.http.get<MonthlySalesDTO[]>(
-      `${this.baseUrl}/api/statistics/park/seasonality?year=${year}&locale=${this.locale}`,
+      `${this.baseUrl}/api/v1/statistics/park/seasonality?year=${year}&locale=${this.locale}`,
       { withCredentials: true }
     );
   }
 
   getAttractionPerformance(from: string, to: string): Observable<AttractionPerformanceDTO[]> {
     return this.http.get<AttractionPerformanceDTO[]>(
-      `${this.baseUrl}/api/statistics/park/attraction-performance?from=${from}&to=${to}`,
+      `${this.baseUrl}/api/v1/statistics/park/attraction-performance?from=${from}&to=${to}`,
       { withCredentials: true }
     );
   }
@@ -174,14 +175,14 @@ export class StatisticsService {
 
   getEmployeeSummary(employeeId: number, from: string, to: string): Observable<EmployeeHoursSummaryDTO> {
     return this.http.get<EmployeeHoursSummaryDTO>(
-      `${this.baseUrl}/api/worklog/summary/${employeeId}?from=${from}&to=${to}`,
+      `${this.baseUrl}/api/v1/worklog/summary/${employeeId}?from=${from}&to=${to}`,
       { withCredentials: true }
     );
   }
 
   getWorkLogHistory(employeeId: number, from: string, to: string): Observable<WorkLogEntryDTO[]> {
     return this.http.get<WorkLogEntryDTO[]>(
-      `${this.baseUrl}/api/worklog/history/${employeeId}?from=${from}&to=${to}`,
+      `${this.baseUrl}/api/v1/worklog/history/${employeeId}?from=${from}&to=${to}`,
       { withCredentials: true }
     );
   }
@@ -189,7 +190,7 @@ export class StatisticsService {
   addWorkLogEntry(request: WorkLogEntryRequest): Observable<WorkLogEntryDTO> {
     return this.withCsrf(h =>
       this.http.post<WorkLogEntryDTO>(
-        `${this.baseUrl}/api/worklog/entry`, request,
+        `${this.baseUrl}/api/v1/worklog/entry`, request,
         { withCredentials: true, headers: h }
       )
     );

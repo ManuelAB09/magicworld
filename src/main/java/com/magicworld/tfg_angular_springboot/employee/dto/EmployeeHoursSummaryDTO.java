@@ -23,6 +23,7 @@ public class EmployeeHoursSummaryDTO {
     private int absences;
     private int scheduledDays;
     private int workedDays;
+    private int reinforcementDays;
     private List<WorkLogEntryDTO> adjustments;
 }
 

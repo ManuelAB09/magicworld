@@ -9,17 +9,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/schedules")
+@RequestMapping("/api/v1/schedules")
 @RequiredArgsConstructor
 @Tag(name = "Schedules", description = "Weekly schedule management endpoints")
-@PreAuthorize("hasRole('ADMIN')")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -77,4 +75,3 @@ public class ScheduleController {
         return ResponseEntity.ok().build();
     }
 }
-

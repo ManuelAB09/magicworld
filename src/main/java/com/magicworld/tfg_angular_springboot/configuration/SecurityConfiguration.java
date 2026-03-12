@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,72 +26,115 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final AuthEntryPointJwt unauthorizedHandler;
-    private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
-    private final OAuth2AuthenticationFailureHandler oAuth2FailureHandler;
-    private final HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository;
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final AuthEntryPointJwt unauthorizedHandler;
+        private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
+        private final OAuth2AuthenticationFailureHandler oAuth2FailureHandler;
+        private final HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository;
 
-    private static final String ADMIN_ROLE = "ADMIN";
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(withDefaults())
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                        .ignoringRequestMatchers("/api/v1/auth/login", "/api/v1/auth/register","/api/v1/auth/reset-password","/api/v1/auth/forgot-password","/api/v1/auth/oauth2/complete-registration","/oauth2/**","/api/v1/payment/**","/api/v1/park-closures/**","/api/v1/seasonal-pricing/**","/ws/**")
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(unauthorizedHandler))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/static/**", "/images/**", "/v3/api-docs/**", "/swagger-resources/**", "/api/v1/auth/login","/api/v1/auth/register",
-                                         "/api/v1/auth/reset-password","/api/v1/auth/forgot-password","/api/v1/auth/oauth2/complete-registration", "/swagger-ui.html", "/swagger-ui/**", "/oauth2/**", "/login/oauth2/**").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/api/v1/payment/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/park-closures", "/api/v1/park-closures/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/seasonal-pricing", "/api/v1/seasonal-pricing/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/attractions", "/api/v1/attractions/**","/api/v1/ticket-types","/api/v1/ticket-types/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/park-status/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/reviews").permitAll()
-                        .requestMatchers("/api/v1/reviews/**").authenticated()
-                        .requestMatchers("/api/v1/purchases/**").authenticated()
-                        .requestMatchers("/api/v1/users/**").authenticated()
-                        .requestMatchers(HttpMethod.GET,"/api/v1/discounts", "/api/v1/discounts/**").authenticated()
-                        .requestMatchers("/api/v1/chatbot/**").hasRole(ADMIN_ROLE)
-                        .requestMatchers("/api/v1/monitoring/**").hasRole(ADMIN_ROLE)
-                        .requestMatchers(HttpMethod.POST, "/api/v1/attractions/**","/api/v1/ticket-types/**","/api/v1/discounts", "/api/v1/discounts/**","/api/v1/park-closures","/api/v1/park-closures/**","/api/v1/seasonal-pricing","/api/v1/seasonal-pricing/**").hasRole(ADMIN_ROLE)
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/attractions/**","/api/v1/ticket-types/**","/api/v1/discounts", "/api/v1/discounts/**","/api/v1/seasonal-pricing","/api/v1/seasonal-pricing/**").hasRole(ADMIN_ROLE)
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/attractions/**","/api/v1/ticket-types/**","/api/v1/discounts", "/api/v1/discounts/**","/api/v1/park-closures","/api/v1/park-closures/**","/api/v1/seasonal-pricing","/api/v1/seasonal-pricing/**").hasRole(ADMIN_ROLE)
-                        .anyRequest().authenticated()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(auth -> auth
-                                .authorizationRequestRepository(cookieAuthorizationRequestRepository)
-                        )
-                        .successHandler(oAuth2SuccessHandler)
-                        .failureHandler(oAuth2FailureHandler)
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+        private static final String ADMIN_ROLE = "ADMIN";
 
-    @Bean
-    public FilterRegistrationBean<RateLimitFilter> rateLimitFilterRegistration(RateLimitFilter rateLimitFilter) {
-        FilterRegistrationBean<RateLimitFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(rateLimitFilter);
-        registrationBean.addUrlPatterns("/api/v1/auth/login");
-        registrationBean.setOrder(1);
-        return registrationBean;
-    }
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .cors(withDefaults())
+                                .csrf(csrf -> csrf
+                                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                                                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                                                .ignoringRequestMatchers("/api/v1/auth/login", "/api/v1/auth/register",
+                                                                "/api/v1/auth/reset-password",
+                                                                "/api/v1/auth/forgot-password",
+                                                                "/api/v1/auth/oauth2/complete-registration",
+                                                                "/oauth2/**", "/api/v1/payment/**",
+                                                                "/api/v1/park-closures/**",
+                                                                "/api/v1/seasonal-pricing/**", "/ws/**"))
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+                                .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(
+                                                unauthorizedHandler))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/static/**", "/images/**", "/v3/api-docs/**",
+                                                                "/swagger-resources/**", "/api/v1/auth/login",
+                                                                "/api/v1/auth/register",
+                                                                "/api/v1/auth/reset-password",
+                                                                "/api/v1/auth/forgot-password",
+                                                                "/api/v1/auth/oauth2/complete-registration",
+                                                                "/swagger-ui.html", "/swagger-ui/**", "/oauth2/**",
+                                                                "/login/oauth2/**")
+                                                .permitAll()
+                                                .requestMatchers("/ws/**").permitAll()
+                                                .requestMatchers("/api/v1/payment/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/park-closures",
+                                                                "/api/v1/park-closures/**")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/seasonal-pricing",
+                                                                "/api/v1/seasonal-pricing/**")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/attractions",
+                                                                "/api/v1/attractions/**", "/api/v1/ticket-types",
+                                                                "/api/v1/ticket-types/**")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/park-status/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/reviews").permitAll()
+                                                .requestMatchers("/api/v1/reviews/**").authenticated()
+                                                .requestMatchers("/api/v1/purchases/**").authenticated()
+                                                .requestMatchers("/api/v1/users/**").authenticated()
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/discounts",
+                                                                "/api/v1/discounts/**")
+                                                .authenticated()
+                                                .requestMatchers("/api/v1/chatbot/**").hasRole(ADMIN_ROLE)
+                                                .requestMatchers("/api/v1/monitoring/**").hasRole(ADMIN_ROLE)
+                                                .requestMatchers(HttpMethod.POST, "/api/v1/attractions/**",
+                                                                "/api/v1/ticket-types/**", "/api/v1/discounts",
+                                                                "/api/v1/discounts/**", "/api/v1/park-closures",
+                                                                "/api/v1/park-closures/**", "/api/v1/seasonal-pricing",
+                                                                "/api/v1/seasonal-pricing/**")
+                                                .hasRole(ADMIN_ROLE)
+                                                .requestMatchers("/api/v1/daily-operations/**", "/api/v1/employees/**",
+                                                                "/api/v1/schedules/**", "/api/v1/worklog/**",
+                                                                "/api/v1/statistics/**")
+                                                .hasRole(ADMIN_ROLE)
+                                                .requestMatchers(HttpMethod.PUT, "/api/v1/attractions/**",
+                                                                "/api/v1/ticket-types/**", "/api/v1/discounts",
+                                                                "/api/v1/discounts/**", "/api/v1/seasonal-pricing",
+                                                                "/api/v1/seasonal-pricing/**")
+                                                .hasRole(ADMIN_ROLE)
+                                                .requestMatchers(HttpMethod.DELETE, "/api/v1/attractions/**",
+                                                                "/api/v1/ticket-types/**", "/api/v1/discounts",
+                                                                "/api/v1/discounts/**", "/api/v1/park-closures",
+                                                                "/api/v1/park-closures/**", "/api/v1/seasonal-pricing",
+                                                                "/api/v1/seasonal-pricing/**")
+                                                .hasRole(ADMIN_ROLE)
+                                                .anyRequest().authenticated())
+                                .oauth2Login(oauth2 -> oauth2
+                                                .authorizationEndpoint(auth -> auth
+                                                                .authorizationRequestRepository(
+                                                                                cookieAuthorizationRequestRepository))
+                                                .successHandler(oAuth2SuccessHandler)
+                                                .failureHandler(oAuth2FailureHandler))
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                return http.build();
+        }
 
-    @Bean
-    public ForwardedHeaderFilter forwardedHeaderFilter() {
-        return new ForwardedHeaderFilter();
-    }
+        @Bean
+        public FilterRegistrationBean<RateLimitFilter> rateLimitFilterRegistration(RateLimitFilter rateLimitFilter) {
+                FilterRegistrationBean<RateLimitFilter> registrationBean = new FilterRegistrationBean<>();
+                registrationBean.setFilter(rateLimitFilter);
+                registrationBean.addUrlPatterns("/api/v1/auth/login", "/api/v1/auth/register",
+                                "/api/v1/auth/reset-password", "/api/v1/auth/forgot-password",
+                                "/api/v1/auth/oauth2/complete-registration");
+                registrationBean.setOrder(1);
+                return registrationBean;
+        }
+
+        @Bean
+        public ForwardedHeaderFilter forwardedHeaderFilter() {
+                return new ForwardedHeaderFilter();
+        }
 
 }

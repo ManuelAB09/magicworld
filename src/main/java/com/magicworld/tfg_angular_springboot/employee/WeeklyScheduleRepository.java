@@ -50,4 +50,7 @@ public interface WeeklyScheduleRepository extends JpaRepository<WeeklySchedule, 
                         "WHERE ws.weekStartDate BETWEEN :from AND :to")
         List<WeeklySchedule> findAllInDateRangeWithEmployee(
                         @Param("from") LocalDate from, @Param("to") LocalDate to);
+
+        @Query("SELECT ws FROM WeeklySchedule ws WHERE ws.assignedAttraction.id = :attractionId")
+        List<WeeklySchedule> findByAssignedAttractionId(@Param("attractionId") Long attractionId);
 }

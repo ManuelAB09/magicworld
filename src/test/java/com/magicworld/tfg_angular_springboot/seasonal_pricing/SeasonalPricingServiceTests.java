@@ -3,34 +3,41 @@ package com.magicworld.tfg_angular_springboot.seasonal_pricing;
 import com.magicworld.tfg_angular_springboot.exceptions.BadRequestException;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import io.qameta.allure.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
 @Epic("Precios Estacionales")
 @Feature("Servicio de Precios Estacionales")
 public class SeasonalPricingServiceTests {
 
-    @Mock
+    @Autowired
     private SeasonalPricingRepository repository;
 
+    @Autowired
     private SeasonalPricingService service;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        service = new SeasonalPricingService(repository);
+        repository.deleteAll();
+    }
+
+    @AfterEach
+    void tearDown() {
+        repository.deleteAll();
     }
 
     @Test
@@ -39,8 +46,6 @@ public class SeasonalPricingServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifica que sin reglas activas el multiplicador es 1.0")
     void getMultiplierReturnsOneWhenNoActiveRules() {
-        when(repository.findActiveForDate(any(LocalDate.class))).thenReturn(List.of());
-
         BigDecimal multiplier = service.getMultiplier(LocalDate.of(2026, 3, 10)); // Tuesday
 
         assertEquals(0, BigDecimal.ONE.compareTo(multiplier));
@@ -52,16 +57,14 @@ public class SeasonalPricingServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifica que se aplica el multiplicador en fin de semana")
     void getMultiplierAppliesWeekendMultiplier() {
-        SeasonalPricing weekendRule = SeasonalPricing.builder()
+        repository.save(SeasonalPricing.builder()
                 .name("Weekend surcharge")
                 .startDate(LocalDate.of(2026, 1, 1))
                 .endDate(LocalDate.of(2026, 12, 31))
                 .multiplier(new BigDecimal("1.25"))
                 .applyOnWeekdays(false)
                 .applyOnWeekends(true)
-                .build();
-
-        when(repository.findActiveForDate(any(LocalDate.class))).thenReturn(List.of(weekendRule));
+                .build());
 
         // 2026-03-07 is a Saturday
         BigDecimal multiplier = service.getMultiplier(LocalDate.of(2026, 3, 7));
@@ -75,16 +78,14 @@ public class SeasonalPricingServiceTests {
     @Severity(SeverityLevel.NORMAL)
     @Description("Verifica que la regla de fin de semana no se aplica en laborable")
     void getMultiplierDoesNotApplyWeekendRuleOnWeekday() {
-        SeasonalPricing weekendRule = SeasonalPricing.builder()
+        repository.save(SeasonalPricing.builder()
                 .name("Weekend surcharge")
                 .startDate(LocalDate.of(2026, 1, 1))
                 .endDate(LocalDate.of(2026, 12, 31))
                 .multiplier(new BigDecimal("1.25"))
                 .applyOnWeekdays(false)
                 .applyOnWeekends(true)
-                .build();
-
-        when(repository.findActiveForDate(any(LocalDate.class))).thenReturn(List.of(weekendRule));
+                .build());
 
         // 2026-03-10 is a Tuesday
         BigDecimal multiplier = service.getMultiplier(LocalDate.of(2026, 3, 10));
@@ -98,25 +99,23 @@ public class SeasonalPricingServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifica que los multiplicadores se acumulan (se multiplican)")
     void getMultiplierAccumulatesMultipliers() {
-        SeasonalPricing weekendRule = SeasonalPricing.builder()
+        repository.save(SeasonalPricing.builder()
                 .name("Weekend surcharge")
                 .startDate(LocalDate.of(2026, 1, 1))
                 .endDate(LocalDate.of(2026, 12, 31))
                 .multiplier(new BigDecimal("1.25"))
                 .applyOnWeekdays(false)
                 .applyOnWeekends(true)
-                .build();
+                .build());
 
-        SeasonalPricing summerRule = SeasonalPricing.builder()
+        repository.save(SeasonalPricing.builder()
                 .name("Summer surcharge")
                 .startDate(LocalDate.of(2026, 6, 1))
                 .endDate(LocalDate.of(2026, 8, 31))
                 .multiplier(new BigDecimal("1.30"))
                 .applyOnWeekdays(true)
                 .applyOnWeekends(true)
-                .build();
-
-        when(repository.findActiveForDate(any(LocalDate.class))).thenReturn(List.of(weekendRule, summerRule));
+                .build());
 
         // 2026-06-06 is a Saturday in summer
         BigDecimal multiplier = service.getMultiplier(LocalDate.of(2026, 6, 6));
@@ -149,7 +148,6 @@ public class SeasonalPricingServiceTests {
     @Story("CRUD de Reglas")
     @Severity(SeverityLevel.NORMAL)
     void findByIdThrowsExceptionWhenNotFound() {
-        when(repository.findById(999L)).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class, () -> service.findById(999L));
     }
 
@@ -158,21 +156,17 @@ public class SeasonalPricingServiceTests {
     @Story("CRUD de Reglas")
     @Severity(SeverityLevel.NORMAL)
     void deleteRemovesExistingRule() {
-        SeasonalPricing pricing = SeasonalPricing.builder()
+        SeasonalPricing saved = repository.save(SeasonalPricing.builder()
                 .name("Test")
                 .startDate(LocalDate.of(2026, 1, 1))
                 .endDate(LocalDate.of(2026, 12, 31))
                 .multiplier(new BigDecimal("1.25"))
                 .applyOnWeekdays(true)
                 .applyOnWeekends(true)
-                .build();
-        pricing.setId(1L);
+                .build());
 
-        when(repository.findById(1L)).thenReturn(Optional.of(pricing));
+        service.delete(saved.getId());
 
-        service.delete(1L);
-
-        verify(repository).delete(pricing);
+        assertThrows(ResourceNotFoundException.class, () -> service.findById(saved.getId()));
     }
 }
-

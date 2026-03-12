@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
@@ -48,6 +49,12 @@ public class WeeklySchedule extends BaseEntity {
     @JoinColumn(name = "attraction_id")
     private Attraction assignedAttraction;
 
+    @Column(name = "snapshot_attraction_name")
+    private String snapshotAttractionName;
+
+    @Column(name = "snapshot_effective_hours", precision = 5, scale = 2)
+    private BigDecimal snapshotEffectiveHours;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "break_group", nullable = false)
@@ -57,6 +64,10 @@ public class WeeklySchedule extends BaseEntity {
     @Column(name = "is_overtime")
     @Builder.Default
     private Boolean isOvertime = false;
+
+    @Column(name = "is_reinforcement")
+    @Builder.Default
+    private Boolean isReinforcement = false;
 
     public LocalDate getActualDate() {
         return weekStartDate.plusDays(dayOfWeek.getValue() - 1);

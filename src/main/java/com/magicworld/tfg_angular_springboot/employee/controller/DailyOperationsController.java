@@ -11,17 +11,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/daily-operations")
+@RequestMapping("/api/v1/daily-operations")
 @RequiredArgsConstructor
 @Tag(name = "Daily Operations", description = "Real-time daily staff operations")
-@PreAuthorize("hasRole('ADMIN')")
 public class DailyOperationsController {
 
     private final DailyOperationsService dailyOperationsService;
@@ -85,4 +83,3 @@ public class DailyOperationsController {
         return ResponseEntity.ok(dailyOperationsService.updateReinforcementStatus(callId, status));
     }
 }
-

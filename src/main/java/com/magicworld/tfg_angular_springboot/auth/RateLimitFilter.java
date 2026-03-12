@@ -23,6 +23,10 @@ public class RateLimitFilter implements Filter {
     private static final int LIMIT = 5;
     private static final Duration DURATION = Duration.ofMinutes(1);
 
+    public void clearBuckets() {
+        buckets.clear();
+    }
+
     private Bucket resolveBucket(String ip) {
         return buckets.computeIfAbsent(ip, k -> Bucket.builder()
                 .addLimit(Bandwidth.classic(LIMIT, Refill.intervally(LIMIT, DURATION)))

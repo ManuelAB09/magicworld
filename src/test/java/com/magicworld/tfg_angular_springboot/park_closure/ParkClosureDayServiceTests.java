@@ -4,33 +4,41 @@ import com.magicworld.tfg_angular_springboot.exceptions.BadRequestException;
 import com.magicworld.tfg_angular_springboot.exceptions.InvalidOperationException;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import io.qameta.allure.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
 @Epic("Cierre del Parque")
 @Feature("Servicio de Días de Cierre")
 public class ParkClosureDayServiceTests {
 
-    @Mock
+    @Autowired
     private ParkClosureDayRepository repository;
 
+    @Autowired
     private ParkClosureDayService service;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        service = new ParkClosureDayService(repository);
+        repository.deleteAll();
+    }
+
+    @AfterEach
+    void tearDown() {
+        repository.deleteAll();
     }
 
     @Test
@@ -39,9 +47,13 @@ public class ParkClosureDayServiceTests {
     @Severity(SeverityLevel.CRITICAL)
     @Description("Verifica que isClosedDay retorna true para fecha con cierre")
     void isClosedDayReturnsTrueWhenExists() {
-        when(repository.existsByClosureDate(LocalDate.of(2026, 10, 15))).thenReturn(true);
+        LocalDate closureDate = LocalDate.of(2026, 10, 15);
+        repository.save(ParkClosureDay.builder()
+                .closureDate(closureDate)
+                .reason("Maintenance")
+                .build());
 
-        assertTrue(service.isClosedDay(LocalDate.of(2026, 10, 15)));
+        assertTrue(service.isClosedDay(closureDate));
     }
 
     @Test
@@ -49,8 +61,6 @@ public class ParkClosureDayServiceTests {
     @Story("Consulta de Cierres")
     @Severity(SeverityLevel.CRITICAL)
     void isClosedDayReturnsFalseWhenNotExists() {
-        when(repository.existsByClosureDate(LocalDate.of(2026, 3, 10))).thenReturn(false);
-
         assertFalse(service.isClosedDay(LocalDate.of(2026, 3, 10)));
     }
 
@@ -80,13 +90,11 @@ public class ParkClosureDayServiceTests {
                 .reason("Maintenance")
                 .build();
 
-        when(repository.existsByClosureDate(futureDate)).thenReturn(false);
-        when(repository.save(any(ParkClosureDay.class))).thenReturn(closureDay);
-
         ParkClosureDay saved = service.save(closureDay);
 
         assertNotNull(saved);
-        verify(repository).save(closureDay);
+        assertNotNull(saved.getId());
+        assertEquals(futureDate, saved.getClosureDate());
     }
 
     @Test
@@ -95,14 +103,17 @@ public class ParkClosureDayServiceTests {
     @Severity(SeverityLevel.NORMAL)
     void saveThrowsExceptionWhenDateAlreadyExists() {
         LocalDate futureDate = LocalDate.now().plusMonths(3);
-        ParkClosureDay closureDay = ParkClosureDay.builder()
+        repository.save(ParkClosureDay.builder()
+                .closureDate(futureDate)
+                .reason("First closure")
+                .build());
+
+        ParkClosureDay duplicate = ParkClosureDay.builder()
                 .closureDate(futureDate)
                 .reason("Duplicate")
                 .build();
 
-        when(repository.existsByClosureDate(futureDate)).thenReturn(true);
-
-        assertThrows(BadRequestException.class, () -> service.save(closureDay));
+        assertThrows(BadRequestException.class, () -> service.save(duplicate));
     }
 
     @Test
@@ -110,15 +121,13 @@ public class ParkClosureDayServiceTests {
     @Story("Gestión de Cierres")
     @Severity(SeverityLevel.CRITICAL)
     void deleteThrowsExceptionWhenTooSoon() {
-        ParkClosureDay closureDay = ParkClosureDay.builder()
+        // Save directly via repository to bypass service validation
+        ParkClosureDay closureDay = repository.save(ParkClosureDay.builder()
                 .closureDate(LocalDate.now().plusDays(30))
                 .reason("Test")
-                .build();
-        closureDay.setId(1L);
+                .build());
 
-        when(repository.findById(1L)).thenReturn(Optional.of(closureDay));
-
-        assertThrows(InvalidOperationException.class, () -> service.delete(1L));
+        assertThrows(InvalidOperationException.class, () -> service.delete(closureDay.getId()));
     }
 
     @Test
@@ -126,17 +135,15 @@ public class ParkClosureDayServiceTests {
     @Story("Gestión de Cierres")
     @Severity(SeverityLevel.NORMAL)
     void deleteRemovesClosureWhenFarEnough() {
-        ParkClosureDay closureDay = ParkClosureDay.builder()
+        ParkClosureDay closureDay = repository.save(ParkClosureDay.builder()
                 .closureDate(LocalDate.now().plusMonths(3))
                 .reason("Maintenance")
-                .build();
-        closureDay.setId(1L);
+                .build());
+        Long id = closureDay.getId();
 
-        when(repository.findById(1L)).thenReturn(Optional.of(closureDay));
+        service.delete(id);
 
-        service.delete(1L);
-
-        verify(repository).delete(closureDay);
+        assertThrows(ResourceNotFoundException.class, () -> service.findById(id));
     }
 
     @Test
@@ -144,7 +151,6 @@ public class ParkClosureDayServiceTests {
     @Story("Consulta de Cierres")
     @Severity(SeverityLevel.NORMAL)
     void findByIdThrowsExceptionWhenNotFound() {
-        when(repository.findById(999L)).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class, () -> service.findById(999L));
     }
 
@@ -156,14 +162,17 @@ public class ParkClosureDayServiceTests {
         LocalDate from = LocalDate.of(2026, 10, 1);
         LocalDate to = LocalDate.of(2026, 10, 31);
 
-        ParkClosureDay day1 = ParkClosureDay.builder().closureDate(LocalDate.of(2026, 10, 5)).reason("Test").build();
-        ParkClosureDay day2 = ParkClosureDay.builder().closureDate(LocalDate.of(2026, 10, 20)).reason("Test").build();
-
-        when(repository.findByClosureDateBetween(from, to)).thenReturn(List.of(day1, day2));
+        repository.save(ParkClosureDay.builder()
+                .closureDate(LocalDate.of(2026, 10, 5))
+                .reason("Test 1")
+                .build());
+        repository.save(ParkClosureDay.builder()
+                .closureDate(LocalDate.of(2026, 10, 20))
+                .reason("Test 2")
+                .build());
 
         List<ParkClosureDay> result = service.findByRange(from, to);
 
         assertEquals(2, result.size());
     }
 }
-

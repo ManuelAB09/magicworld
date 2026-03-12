@@ -46,6 +46,16 @@ public class ScheduleService {
                 .orElseThrow(() -> new IllegalArgumentException("error.employee.notfound"));
 
         validateAssignment(employee.getRole(), request);
+
+        // Prevent assigning an employee who has an active absence on this day
+        LocalDate actualDate = normalizedWeekStart.plusDays(request.getDayOfWeek().getValue() - 1);
+        if (isEmployeeAbsentOnDate(employee.getId(), actualDate)) {
+            throw new IllegalArgumentException("error.schedule.employee.has.absence");
+        }
+
+        // Prevent duplicate attraction/zone assignments (except reinforcements from monitoring)
+        validateNoDuplicateLocation(normalizedWeekStart, request.getDayOfWeek(), request);
+
         boolean isOvertime = checkAndValidateDays(employee.getId(), normalizedWeekStart, request.getDayOfWeek());
 
         WeeklySchedule schedule = WeeklySchedule.builder()
@@ -118,8 +128,17 @@ public class ScheduleService {
 
         List<WeeklySchedule> previousSchedules = scheduleRepository.findByWeekStartDate(previousWeek);
 
+        // Build absent map for the target week to skip employees with absences
+        Map<LocalDate, Set<Long>> absentByDate = buildAbsentMap(normalizedTarget, normalizedTarget.plusDays(6));
+
         for (WeeklySchedule prev : previousSchedules) {
             if (prev.getEmployee().getStatus() != EmployeeStatus.ACTIVE)
+                continue;
+
+            // Skip if employee has an active absence on this day in the target week
+            LocalDate actualDate = normalizedTarget.plusDays(prev.getDayOfWeek().getValue() - 1);
+            Set<Long> absentIds = absentByDate.getOrDefault(actualDate, Set.of());
+            if (absentIds.contains(prev.getEmployee().getId()))
                 continue;
 
             WeeklySchedule newSchedule = WeeklySchedule.builder()
@@ -153,15 +172,18 @@ public class ScheduleService {
         List<Attraction> attractions = attractionRepository.findByIsActiveTrue();
         List<ParkZone> zones = zoneRepository.findAll();
 
-        assignOperatorsWithRotation(operators, attractions, normalizedWeekStart);
-        assignSecurityWithRotation(security, zones, normalizedWeekStart);
-        assignRoleWithRotation(medical, normalizedWeekStart, 2);
-        assignRoleWithRotation(maintenance, normalizedWeekStart, 3);
-        assignRoleWithRotation(guestServices, normalizedWeekStart, 4);
+        // Build absent map for the whole week to skip absent employees
+        Map<LocalDate, Set<Long>> absentByDate = buildAbsentMap(normalizedWeekStart, normalizedWeekStart.plusDays(6));
+
+        assignOperatorsWithRotation(operators, attractions, normalizedWeekStart, absentByDate);
+        assignSecurityWithRotation(security, zones, normalizedWeekStart, absentByDate);
+        assignRoleWithRotation(medical, normalizedWeekStart, 2, absentByDate);
+        assignRoleWithRotation(maintenance, normalizedWeekStart, 3, absentByDate);
+        assignRoleWithRotation(guestServices, normalizedWeekStart, 4, absentByDate);
     }
 
     private void assignOperatorsWithRotation(List<Employee> operators, List<Attraction> attractions,
-            LocalDate weekStart) {
+            LocalDate weekStart, Map<LocalDate, Set<Long>> absentByDate) {
         if (operators.isEmpty() || attractions.isEmpty())
             return;
         BreakGroup[] breakGroups = BreakGroup.values();
@@ -170,10 +192,14 @@ public class ScheduleService {
         int[][] restDays = computeRestDays(operators.size(), 0);
 
         for (int d = 0; d < 7; d++) {
+            LocalDate date = weekStart.plusDays(d);
+            Set<Long> absentIds = absentByDate.getOrDefault(date, Set.of());
+
             List<Employee> availableToday = new ArrayList<>();
             List<Integer> availableIndices = new ArrayList<>();
             for (int i = 0; i < operators.size(); i++) {
-                if (d != restDays[i][0] && d != restDays[i][1]) {
+                if (d != restDays[i][0] && d != restDays[i][1]
+                        && !absentIds.contains(operators.get(i).getId())) {
                     availableToday.add(operators.get(i));
                     availableIndices.add(i);
                 }
@@ -193,7 +219,8 @@ public class ScheduleService {
         }
     }
 
-    private void assignSecurityWithRotation(List<Employee> security, List<ParkZone> zones, LocalDate weekStart) {
+    private void assignSecurityWithRotation(List<Employee> security, List<ParkZone> zones, LocalDate weekStart,
+            Map<LocalDate, Set<Long>> absentByDate) {
         if (security.isEmpty() || zones.isEmpty())
             return;
         BreakGroup[] breakGroups = BreakGroup.values();
@@ -202,10 +229,14 @@ public class ScheduleService {
         int[][] restDays = computeRestDays(security.size(), 1);
 
         for (int d = 0; d < 7; d++) {
+            LocalDate date = weekStart.plusDays(d);
+            Set<Long> absentIds = absentByDate.getOrDefault(date, Set.of());
+
             List<Employee> availableToday = new ArrayList<>();
             List<Integer> availableIndices = new ArrayList<>();
             for (int i = 0; i < security.size(); i++) {
-                if (d != restDays[i][0] && d != restDays[i][1]) {
+                if (d != restDays[i][0] && d != restDays[i][1]
+                        && !absentIds.contains(security.get(i).getId())) {
                     availableToday.add(security.get(i));
                     availableIndices.add(i);
                 }
@@ -225,7 +256,8 @@ public class ScheduleService {
         }
     }
 
-    private void assignRoleWithRotation(List<Employee> employees, LocalDate weekStart, int offset) {
+    private void assignRoleWithRotation(List<Employee> employees, LocalDate weekStart, int offset,
+            Map<LocalDate, Set<Long>> absentByDate) {
         if (employees.isEmpty())
             return;
         BreakGroup[] breakGroups = BreakGroup.values();
@@ -240,6 +272,12 @@ public class ScheduleService {
             for (int d = 0; d < 7; d++) {
                 if (d == restDays[i][0] || d == restDays[i][1])
                     continue;
+
+                LocalDate date = weekStart.plusDays(d);
+                Set<Long> absentIds = absentByDate.getOrDefault(date, Set.of());
+                if (absentIds.contains(emp.getId()))
+                    continue;
+
                 createScheduleEntryInternal(emp, weekStart, allDays[d], null, null, breakGroup);
             }
         }
@@ -279,13 +317,24 @@ public class ScheduleService {
         List<Attraction> activeAttractions = attractionRepository.findByIsActiveTrue();
         List<ParkZone> zones = zoneRepository.findAll();
 
-        // Build a map of date → set of absent employee IDs from WorkLog
-        Map<LocalDate, Set<Long>> absentByDate = buildAbsentMap(normalizedWeekStart, weekEnd);
+        // Build maps of date → set of absent employee IDs and employee names from WorkLog
+        AbsentInfo absentInfo = buildAbsentInfo(normalizedWeekStart, weekEnd);
 
         for (int i = 0; i < 7; i++) {
             DayOfWeek day = DayOfWeek.of((i % 7) + 1);
             LocalDate date = normalizedWeekStart.plusDays(i);
-            Set<Long> absentIds = absentByDate.getOrDefault(date, Set.of());
+            Set<Long> absentIds = absentInfo.absentByDate.getOrDefault(date, Set.of());
+
+            // Add EMPLOYEE_ABSENT issues directly from WorkLog data (independent of schedule)
+            for (Long absentEmpId : absentIds) {
+                String empName = absentInfo.employeeNames.getOrDefault(absentEmpId, "");
+                issues.add(CoverageValidationResult.CoverageIssue.builder()
+                        .date(date)
+                        .issueType("EMPLOYEE_ABSENT")
+                        .description("schedule.issues.EMPLOYEE_ABSENT")
+                        .employeeName(empName)
+                        .build());
+            }
 
             issues.addAll(validateDayCoverage(normalizedWeekStart, day, date, activeAttractions, zones, absentIds));
         }
@@ -297,14 +346,30 @@ public class ScheduleService {
                 .build();
     }
 
-    private Map<LocalDate, Set<Long>> buildAbsentMap(LocalDate from, LocalDate to) {
+    /**
+     * Check if an employee has an active absence on a specific date.
+     */
+    private boolean isEmployeeAbsentOnDate(Long employeeId, LocalDate date) {
+        Map<LocalDate, Set<Long>> absentMap = buildAbsentMap(date, date);
+        Set<Long> absentIds = absentMap.getOrDefault(date, Set.of());
+        return absentIds.contains(employeeId);
+    }
+
+    private record AbsentInfo(Map<LocalDate, Set<Long>> absentByDate, Map<Long, String> employeeNames) {}
+
+    /**
+     * Build absence info including employee names for validation issue descriptions.
+     */
+    private AbsentInfo buildAbsentInfo(LocalDate from, LocalDate to) {
         List<WorkLog> absenceLogs = workLogRepository.findAllByTargetDateBetween(from, to);
 
         Map<LocalDate, Map<Long, Integer>> countByDateEmployee = new HashMap<>();
+        Map<Long, String> employeeNames = new HashMap<>();
         for (WorkLog log : absenceLogs) {
             if (log.getAction() == WorkLogAction.ADD_ABSENCE || log.getAction() == WorkLogAction.REMOVE_ABSENCE) {
                 Long empId = log.getEmployee().getId();
                 LocalDate date = log.getTargetDate();
+                employeeNames.putIfAbsent(empId, log.getEmployee().getFullName());
                 countByDateEmployee.computeIfAbsent(date, k -> new HashMap<>());
                 int delta = log.getAction() == WorkLogAction.ADD_ABSENCE ? 1 : -1;
                 countByDateEmployee.get(date).merge(empId, delta, (a, b) -> a + b);
@@ -323,7 +388,11 @@ public class ScheduleService {
                 result.put(dateEntry.getKey(), absentIds);
             }
         }
-        return result;
+        return new AbsentInfo(result, employeeNames);
+    }
+
+    private Map<LocalDate, Set<Long>> buildAbsentMap(LocalDate from, LocalDate to) {
+        return buildAbsentInfo(from, to).absentByDate;
     }
 
     private List<CoverageValidationResult.CoverageIssue> validateDayCoverage(
@@ -333,21 +402,6 @@ public class ScheduleService {
         List<CoverageValidationResult.CoverageIssue> issues = new ArrayList<>();
         List<WeeklySchedule> allDaySchedules = scheduleRepository.findByWeekStartDateAndDayOfWeek(weekStart, day);
 
-        // Flag absent employees
-        for (WeeklySchedule ws : allDaySchedules) {
-            if (absentIds.contains(ws.getEmployee().getId())) {
-                issues.add(CoverageValidationResult.CoverageIssue.builder()
-                        .date(date)
-                        .issueType("EMPLOYEE_ABSENT")
-                        .description("schedule.issues.EMPLOYEE_ABSENT")
-                        .attractionId(ws.getAssignedAttraction() != null ? ws.getAssignedAttraction().getId() : null)
-                        .attractionName(
-                                ws.getAssignedAttraction() != null ? ws.getAssignedAttraction().getName() : null)
-                        .zoneId(ws.getAssignedZone() != null ? ws.getAssignedZone().getId() : null)
-                        .zoneName(ws.getAssignedZone() != null ? ws.getAssignedZone().getZoneName().name() : null)
-                        .build());
-            }
-        }
 
         // Only count non-absent employees for coverage
         List<WeeklySchedule> daySchedules = allDaySchedules.stream()
@@ -431,6 +485,24 @@ public class ScheduleService {
             throw new IllegalArgumentException("error.schedule.security.needs.zone");
         }
     }
+    private void validateNoDuplicateLocation(LocalDate weekStart, DayOfWeek day, CreateScheduleRequest request) {
+        if (request.getAssignedAttractionId() != null) {
+            List<WeeklySchedule> existing = scheduleRepository.findByDateAndAttraction(weekStart, day, request.getAssignedAttractionId());
+            boolean alreadyOccupied = existing.stream()
+                    .anyMatch(ws -> !Boolean.TRUE.equals(ws.getIsReinforcement()));
+            if (alreadyOccupied) {
+                throw new IllegalArgumentException("error.schedule.attraction.already.assigned");
+            }
+        }
+        if (request.getAssignedZoneId() != null) {
+            List<WeeklySchedule> existing = scheduleRepository.findByDateAndZone(weekStart, day, request.getAssignedZoneId());
+            boolean alreadyOccupied = existing.stream()
+                    .anyMatch(ws -> !Boolean.TRUE.equals(ws.getIsReinforcement()));
+            if (alreadyOccupied) {
+                throw new IllegalArgumentException("error.schedule.zone.already.assigned");
+            }
+        }
+    }
 
     private void assignLocation(WeeklySchedule schedule, CreateScheduleRequest request) {
         if (request.getAssignedAttractionId() != null) {
@@ -448,6 +520,10 @@ public class ScheduleService {
     }
 
     private WeeklyScheduleDTO toDTO(WeeklySchedule s) {
+        String attractionName = s.getAssignedAttraction() != null
+                ? s.getAssignedAttraction().getName()
+                : s.getSnapshotAttractionName();
+
         return WeeklyScheduleDTO.builder()
                 .id(s.getId())
                 .employeeId(s.getEmployee().getId())
@@ -458,9 +534,10 @@ public class ScheduleService {
                 .assignedZoneId(s.getAssignedZone() != null ? s.getAssignedZone().getId() : null)
                 .assignedZoneName(s.getAssignedZone() != null ? s.getAssignedZone().getZoneName().name() : null)
                 .assignedAttractionId(s.getAssignedAttraction() != null ? s.getAssignedAttraction().getId() : null)
-                .assignedAttractionName(s.getAssignedAttraction() != null ? s.getAssignedAttraction().getName() : null)
+                .assignedAttractionName(attractionName)
                 .breakGroup(s.getBreakGroup())
                 .isOvertime(s.getIsOvertime())
+                .isReinforcement(s.getIsReinforcement())
                 .build();
     }
 }

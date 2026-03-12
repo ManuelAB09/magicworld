@@ -49,8 +49,12 @@ public class AuthE2ETests {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private RateLimitFilter rateLimitFilter;
+
     @BeforeEach
     void setUp() {
+        rateLimitFilter.clearBuckets();
         userRepository.deleteAll();
         User existingUser = User.builder()
                 .username("existinguser")

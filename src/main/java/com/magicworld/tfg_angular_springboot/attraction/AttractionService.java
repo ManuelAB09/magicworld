@@ -1,11 +1,15 @@
 package com.magicworld.tfg_angular_springboot.attraction;
 
+import com.magicworld.tfg_angular_springboot.employee.WeeklySchedule;
+import com.magicworld.tfg_angular_springboot.employee.WeeklyScheduleRepository;
+import com.magicworld.tfg_angular_springboot.employee.service.WorkLogService;
 import com.magicworld.tfg_angular_springboot.exceptions.BadRequestException;
 import com.magicworld.tfg_angular_springboot.exceptions.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -14,6 +18,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class AttractionService {
 
     private final AttractionRepository attractionRepository;
+    private final WeeklyScheduleRepository weeklyScheduleRepository;
     private final JdbcTemplate jdbcTemplate;
 
     @Transactional
@@ -47,8 +52,24 @@ public class AttractionService {
     public void deleteAttraction(Long id) {
         Attraction attraction = getAttractionById(id);
 
-        // Nullify references in employee assignments to avoid foreign key constraints
-        jdbcTemplate.update("UPDATE weekly_schedule SET attraction_id = NULL WHERE attraction_id = ?", id);
+        // Handle weekly_schedule entries referencing this attraction:
+        // - Future days (after today): delete the schedule entry entirely (unassign employee)
+        // - Past/today: just nullify the attraction reference to keep the historical record
+        LocalDate today = LocalDate.now();
+        List<WeeklySchedule> schedules = weeklyScheduleRepository.findByAssignedAttractionId(id);
+        for (WeeklySchedule ws : schedules) {
+            LocalDate actualDate = ws.getActualDate();
+            if (actualDate.isAfter(today)) {
+                weeklyScheduleRepository.delete(ws);
+            } else {
+                ws.setSnapshotAttractionName(attraction.getName());
+                ws.setSnapshotEffectiveHours(WorkLogService.calculateEffectiveHours(ws));
+                ws.setAssignedAttraction(null);
+                weeklyScheduleRepository.save(ws);
+            }
+        }
+
+        // Nullify references in other tables to avoid foreign key constraints
         jdbcTemplate.update("UPDATE work_log SET snapshot_attraction_id = NULL WHERE snapshot_attraction_id = ?", id);
         jdbcTemplate.update("UPDATE daily_assignment SET current_attraction_id = NULL WHERE current_attraction_id = ?",
                 id);

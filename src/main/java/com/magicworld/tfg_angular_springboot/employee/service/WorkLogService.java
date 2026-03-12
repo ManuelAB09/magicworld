@@ -187,6 +187,7 @@ public class WorkLogService {
                 .absences(absences)
                 .scheduledDays(baseline.scheduledDays)
                 .workedDays(workedDays)
+                .reinforcementDays(baseline.reinforcementDays)
                 .adjustments(logEntries)
                 .build();
     }
@@ -203,6 +204,7 @@ public class WorkLogService {
         BigDecimal normalHours = BigDecimal.ZERO;
         BigDecimal overtimeHours = BigDecimal.ZERO;
         int scheduledDays = 0;
+        int reinforcementDays = 0;
 
         for (WeeklySchedule ws : schedules) {
             LocalDate actualDate = ws.getActualDate();
@@ -211,6 +213,9 @@ public class WorkLogService {
             }
 
             scheduledDays++;
+            if (Boolean.TRUE.equals(ws.getIsReinforcement())) {
+                reinforcementDays++;
+            }
             BigDecimal shiftHours = calculateEffectiveHours(ws);
 
             if (Boolean.TRUE.equals(ws.getIsOvertime())) {
@@ -220,7 +225,7 @@ public class WorkLogService {
             }
         }
 
-        return new ScheduleBaseline(normalHours, overtimeHours, normalHours.add(overtimeHours), scheduledDays);
+        return new ScheduleBaseline(normalHours, overtimeHours, normalHours.add(overtimeHours), scheduledDays, reinforcementDays);
     }
 
     // ── Private: WorkLog Adjustments (only from WorkLog entries) ──
@@ -349,6 +354,10 @@ public class WorkLogService {
                         .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
             }
         }
+        // If the attraction was deleted, use the snapshot hours preserved at deletion time
+        if (ws.getSnapshotEffectiveHours() != null) {
+            return ws.getSnapshotEffectiveHours();
+        }
         return calculateShiftHours(ws.getShift());
     }
 
@@ -379,7 +388,7 @@ public class WorkLogService {
     // ── Records ──
 
     private record ScheduleBaseline(BigDecimal normalHours, BigDecimal overtimeHours,
-                                     BigDecimal totalScheduled, int scheduledDays) {}
+                                     BigDecimal totalScheduled, int scheduledDays, int reinforcementDays) {}
 
     private record WorkLogAdjustments(BigDecimal overtimeHours, BigDecimal absenceHours,
                                        BigDecimal partialAbsenceHours, int absences) {}

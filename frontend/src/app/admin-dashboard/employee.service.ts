@@ -80,6 +80,7 @@ export interface WeeklyScheduleDTO {
   assignedAttractionName?: string;
   breakGroup: BreakGroup;
   isOvertime?: boolean;
+  isReinforcement?: boolean;
 }
 
 export interface CoverageIssue {
@@ -90,6 +91,7 @@ export interface CoverageIssue {
   attractionName?: string;
   zoneId?: number;
   zoneName?: string;
+  employeeName?: string;
 }
 
 export interface CoverageValidationResult {
@@ -109,42 +111,42 @@ export class EmployeeService {
   }
 
   getAllEmployees(): Observable<EmployeeDTO[]> {
-    return this.http.get<EmployeeDTO[]>(`${this.baseUrl}/api/employees`, { withCredentials: true });
+    return this.http.get<EmployeeDTO[]>(`${this.baseUrl}/api/v1/employees`, { withCredentials: true });
   }
 
   getActiveEmployees(): Observable<EmployeeDTO[]> {
-    return this.http.get<EmployeeDTO[]>(`${this.baseUrl}/api/employees/active`, { withCredentials: true });
+    return this.http.get<EmployeeDTO[]>(`${this.baseUrl}/api/v1/employees/active`, { withCredentials: true });
   }
 
   getEmployeesByRole(role: EmployeeRole): Observable<EmployeeDTO[]> {
-    return this.http.get<EmployeeDTO[]>(`${this.baseUrl}/api/employees/role/${role}`, { withCredentials: true });
+    return this.http.get<EmployeeDTO[]>(`${this.baseUrl}/api/v1/employees/role/${role}`, { withCredentials: true });
   }
 
   createEmployee(request: CreateEmployeeRequest): Observable<EmployeeDTO> {
     return this.withCsrf(h =>
-      this.http.post<EmployeeDTO>(`${this.baseUrl}/api/employees`, request, { withCredentials: true, headers: h })
+      this.http.post<EmployeeDTO>(`${this.baseUrl}/api/v1/employees`, request, { withCredentials: true, headers: h })
     );
   }
 
   updateEmployee(id: number, request: CreateEmployeeRequest): Observable<EmployeeDTO> {
     return this.withCsrf(h =>
-      this.http.put<EmployeeDTO>(`${this.baseUrl}/api/employees/${id}`, request, { withCredentials: true, headers: h })
+      this.http.put<EmployeeDTO>(`${this.baseUrl}/api/v1/employees/${id}`, request, { withCredentials: true, headers: h })
     );
   }
 
   terminateEmployee(id: number): Observable<void> {
     return this.withCsrf(h =>
-      this.http.post<void>(`${this.baseUrl}/api/employees/${id}/terminate`, {}, { withCredentials: true, headers: h })
+      this.http.post<void>(`${this.baseUrl}/api/v1/employees/${id}/terminate`, {}, { withCredentials: true, headers: h })
     );
   }
 
   getTodayAssignments(): Observable<DailyAssignmentDTO[]> {
-    return this.http.get<DailyAssignmentDTO[]>(`${this.baseUrl}/api/daily-operations/today`, { withCredentials: true });
+    return this.http.get<DailyAssignmentDTO[]>(`${this.baseUrl}/api/v1/daily-operations/today`, { withCredentials: true });
   }
 
   getAvailableEmployees(role: EmployeeRole): Observable<AvailableEmployeesResponse> {
     return this.http.get<AvailableEmployeesResponse>(
-      `${this.baseUrl}/api/daily-operations/available?role=${role}`,
+      `${this.baseUrl}/api/v1/daily-operations/available?role=${role}`,
       { withCredentials: true }
     );
   }
@@ -152,7 +154,7 @@ export class EmployeeService {
   callReinforcement(employeeId: number, alertId: number): Observable<any> {
     return this.withCsrf(h =>
       this.http.post<any>(
-        `${this.baseUrl}/api/daily-operations/call-reinforcement?employeeId=${employeeId}&alertId=${alertId}`,
+        `${this.baseUrl}/api/v1/daily-operations/call-reinforcement?employeeId=${employeeId}&alertId=${alertId}`,
         {},
         { withCredentials: true, headers: h }
       )
@@ -161,21 +163,21 @@ export class EmployeeService {
 
   initializeDay(date: string): Observable<void> {
     return this.withCsrf(h =>
-      this.http.post<void>(`${this.baseUrl}/api/daily-operations/initialize?date=${date}`, {},
+      this.http.post<void>(`${this.baseUrl}/api/v1/daily-operations/initialize?date=${date}`, {},
         { withCredentials: true, headers: h })
     );
   }
 
   getWeekSchedule(weekStart: string): Observable<WeeklyScheduleDTO[]> {
     return this.http.get<WeeklyScheduleDTO[]>(
-      `${this.baseUrl}/api/schedules/week?weekStart=${weekStart}`,
+      `${this.baseUrl}/api/v1/schedules/week?weekStart=${weekStart}`,
       { withCredentials: true }
     );
   }
 
   validateWeekCoverage(weekStart: string): Observable<CoverageValidationResult> {
     return this.http.get<CoverageValidationResult>(
-      `${this.baseUrl}/api/schedules/validate?weekStart=${weekStart}`,
+      `${this.baseUrl}/api/v1/schedules/validate?weekStart=${weekStart}`,
       { withCredentials: true }
     );
   }
@@ -183,7 +185,7 @@ export class EmployeeService {
   copyPreviousWeek(targetWeekStart: string): Observable<void> {
     return this.withCsrf(h =>
       this.http.post<void>(
-        `${this.baseUrl}/api/schedules/copy-week?targetWeekStart=${targetWeekStart}`,
+        `${this.baseUrl}/api/v1/schedules/copy-week?targetWeekStart=${targetWeekStart}`,
         {},
         { withCredentials: true, headers: h }
       )
@@ -193,7 +195,7 @@ export class EmployeeService {
   autoAssignWeek(weekStart: string): Observable<void> {
     return this.withCsrf(h =>
       this.http.post<void>(
-        `${this.baseUrl}/api/schedules/auto-assign?weekStart=${weekStart}`,
+        `${this.baseUrl}/api/v1/schedules/auto-assign?weekStart=${weekStart}`,
         {},
         { withCredentials: true, headers: h }
       )

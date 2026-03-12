@@ -27,4 +27,5 @@ public class WeeklyScheduleDTO {
     private String assignedAttractionName;
     private BreakGroup breakGroup;
     private Boolean isOvertime;
+    private Boolean isReinforcement;
 }

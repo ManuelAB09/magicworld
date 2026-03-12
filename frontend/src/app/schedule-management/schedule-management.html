@@ -117,13 +117,17 @@
             </div>
           </td>
           @for (cell of row.days; track $index; let dayIdx = $index) {
-          <td class="day-cell" [class.assigned]="cell.assigned && !cell.isOvertime"
-            [class.overtime]="cell.assigned && cell.isOvertime" [class.not-assigned]="!cell.assigned"
+          <td class="day-cell" [class.assigned]="cell.assigned && !cell.isOvertime && !cell.isReinforcement"
+            [class.overtime]="cell.assigned && cell.isOvertime && !cell.isReinforcement"
+            [class.reinforcement]="cell.assigned && cell.isReinforcement"
+            [class.not-assigned]="!cell.assigned"
             [class.clickable]="!cell.assigned" (click)="!cell.assigned && openAssignModal(row, dayIdx)">
             @if (cell.assigned) {
             <div class="cell-content">
               <div class="shift-badge">{{ getShiftLabel(cell.shift!) }}</div>
-              @if (cell.isOvertime) {
+              @if (cell.isReinforcement) {
+              <div class="reinforcement-badge">🛡️ {{ 'schedule.reinforcement' | translate }}</div>
+              } @else if (cell.isOvertime) {
               <div class="overtime-badge">⏰ {{ 'schedule.overtime' | translate }}</div>
               }
               @if (cell.attractionName) {
