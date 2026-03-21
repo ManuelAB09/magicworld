@@ -1,6 +1,5 @@
 package com.magicworld.tfg_angular_springboot.attraction;
 
-import com.magicworld.tfg_angular_springboot.attraction.dto.ParkZoneDTO;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtAuthenticationFilter;
 import com.magicworld.tfg_angular_springboot.configuration.jwt.JwtService;
 import com.magicworld.tfg_angular_springboot.configuration.oauth2.OAuth2AuthenticationFailureHandler;

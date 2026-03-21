@@ -34,3 +34,10 @@ build/
 .env
 .allure
 allure-results/
+
+### PITest (mutation testing - backend) ###
+target/pit-reports/
+
+### Stryker (mutation testing - frontend) ###
+frontend/.stryker-tmp/
+frontend/reports/mutation/

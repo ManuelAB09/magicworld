@@ -20,6 +20,8 @@
 	<properties>
 		<java.version>21</java.version>
         <jacoco.version>0.8.14</jacoco.version>
+        <pitest.version>1.17.4</pitest.version>
+        <pitest-junit5.version>1.2.1</pitest-junit5.version>
         <frontend-src-dir>${project.basedir}/frontend</frontend-src-dir>
         <node.version>v22.12.0</node.version>
         <npm.version>11.4.2</npm.version>
@@ -298,6 +300,109 @@
                         <include>**/*Test.java</include>
                         <include>**/*Tests.java</include>
                     </includes>
+                </configuration>
+            </plugin>
+
+            <!-- PITest - Mutation Testing -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>${pitest-junit5.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <!-- Target all source packages -->
+                    <targetClasses>
+                        <param>com.magicworld.tfg_angular_springboot.attraction.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.auth.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.chatbot.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.discount.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.discount_ticket_type.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.email.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.employee.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.exceptions.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.monitoring.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.park_closure.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.payment.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.purchase.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.purchase_line.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.qr.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.reset_token.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.review.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.seasonal_pricing.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.statistics.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.storage.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.ticket_type.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.user.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.util.*</param>
+                    </targetClasses>
+
+                    <!-- Target all test packages -->
+                    <targetTests>
+                        <param>com.magicworld.tfg_angular_springboot.attraction.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.auth.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.chatbot.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.discount.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.email.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.employee.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.exceptions.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.monitoring.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.park_closure.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.payment.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.purchase.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.purchase_line.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.qr.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.reset_token.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.review.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.seasonal_pricing.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.statistics.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.storage.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.ticket_type.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.user.*</param>
+                        <param>com.magicworld.tfg_angular_springboot.configuration.*</param>
+                    </targetTests>
+
+                    <!-- Exclude configuration/security classes and DTOs from mutation -->
+                    <excludedClasses>
+                        <param>com.magicworld.tfg_angular_springboot.configuration.*Config*</param>
+                        <param>com.magicworld.tfg_angular_springboot.configuration.OAuth2*</param>
+                        <param>com.magicworld.tfg_angular_springboot.MagicWorldApplication</param>
+                    </excludedClasses>
+
+                    <!-- Mutation operators -->
+                    <mutators>
+                        <mutator>DEFAULTS</mutator>
+                    </mutators>
+
+                    <!-- Output formats: HTML report + XML for CI -->
+                    <outputFormats>
+                        <param>HTML</param>
+                        <param>XML</param>
+                    </outputFormats>
+
+                    <!-- Timeout factor for slow tests -->
+                    <timeoutFactor>1.5</timeoutFactor>
+                    <timeoutConstant>8000</timeoutConstant>
+
+                    <!-- Parallel execution threads -->
+                    <threads>4</threads>
+
+                    <!-- Timestamped reports disabled for cleaner output -->
+                    <timestampedReports>false</timestampedReports>
+
+                    <!-- Verbose output -->
+                    <verbose>false</verbose>
+
+                    <!-- Exclude tests that load full Spring context (E2E) to speed up mutation testing -->
+                    <excludedTestClasses>
+                        <param>**.*E2ETests</param>
+                        <param>com.magicworld.tfg_angular_springboot.MagicWorldApplicationTests</param>
+                    </excludedTestClasses>
                 </configuration>
             </plugin>
         </plugins>
