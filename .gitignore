@@ -35,6 +35,12 @@ build/
 .allure
 allure-results/
 
+### Runtime uploads (user-generated files) ###
+uploads/
+
+### Coverage reports (generated on every test run) ###
+coverage/
+
 ### PITest (mutation testing - backend) ###
 target/pit-reports/
 
