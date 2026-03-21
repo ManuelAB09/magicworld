@@ -47,3 +47,7 @@ target/pit-reports/
 ### Stryker (mutation testing - frontend) ###
 frontend/.stryker-tmp/
 frontend/reports/mutation/
+
+### Cypress (acceptance testing - frontend) ###
+frontend/cypress/videos/
+frontend/cypress/screenshots/

@@ -775,17 +775,17 @@ WHERE ws.week_start_date = @monday
 INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
 SELECT e.id, CURDATE() - INTERVAL 2 DAY, 'ADD_OVERTIME_HOURS', 4.00, TRUE,
        'Cubrir turno extra por alerta critica en Dragon Fury', 'admin', NOW() - INTERVAL 2 DAY
-FROM employee e WHERE e.email = 'carlos.martinez@magicworld.com';
+FROM employee e WHERE e.email = 'miguel.torres@magicworld.com';
 
 INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
-SELECT e.id, CURDATE() - INTERVAL 3 DAY, 'ADD_OVERTIME_HOURS', 2.00, TRUE,
+SELECT e.id, CURDATE() - INTERVAL 3 DAY, 'ADD_OVERTIME_HOURS', 4.00, TRUE,
        'Horas extra evento especial nocturno', 'admin', NOW() - INTERVAL 3 DAY
-FROM employee e WHERE e.email = 'ana.garcia@magicworld.com';
+FROM employee e WHERE e.email = 'sofia.ruiz@magicworld.com';
 
 INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
-SELECT e.id, CURDATE() - INTERVAL 1 DAY, 'REMOVE_SCHEDULED_DAY', 8.00, FALSE,
-       'Dia libre compensatorio por horas extra acumuladas', 'admin', NOW() - INTERVAL 1 DAY
-FROM employee e WHERE e.email = 'pedro.lopez@magicworld.com';
+SELECT e.id, CURDATE() - INTERVAL 1 DAY, 'REMOVE_SCHEDULED_DAY', 7.50, FALSE,
+       'Baja por enfermedad justificada', 'admin', NOW() - INTERVAL 1 DAY
+FROM employee e WHERE e.email = 'david.moreno@magicworld.com';
 
 INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
 SELECT e.id, CURDATE() - INTERVAL 4 DAY, 'ADD_ABSENCE', 8.00, FALSE,
@@ -803,13 +803,13 @@ SELECT e.id, CURDATE() - INTERVAL 2 DAY, 'ADD_OVERTIME_HOURS', 5.00, TRUE,
 FROM employee e WHERE e.email = 'roberto.mendez@magicworld.com';
 
 INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
-SELECT e.id, CURDATE() - INTERVAL 1 DAY, 'REMOVE_ABSENCE', 8.00, FALSE,
-       'Correccion: la falta fue un error administrativo', 'admin', NOW() - INTERVAL 1 DAY
+SELECT e.id, CURDATE() - INTERVAL 4 DAY, 'REMOVE_ABSENCE', 8.00, FALSE,
+       'Correccion: la falta fue un error administrativo', 'admin', NOW() - INTERVAL 4 DAY
 FROM employee e WHERE e.email = 'jorge.navarro@magicworld.com';
 
 INSERT INTO work_log (employee_id, target_date, action, hours_affected, is_overtime, reason, performed_by, created_at)
-SELECT e.id, CURDATE() - INTERVAL 3 DAY, 'ADD_OVERTIME_HOURS', 2.50, TRUE,
-       'Mantenimiento urgente en Splash Mountain fuera de horario', 'admin', NOW() - INTERVAL 3 DAY
+SELECT e.id, CURDATE() - INTERVAL 5 DAY, 'ADD_OVERTIME_HOURS', 2.50, TRUE,
+       'Mantenimiento urgente en Splash Mountain fuera de horario', 'admin', NOW() - INTERVAL 5 DAY
 FROM employee e WHERE e.email = 'ricardo.cabrera@magicworld.com';
 
 
