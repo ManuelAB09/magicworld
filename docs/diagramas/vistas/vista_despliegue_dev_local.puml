@@ -1,0 +1,50 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+LAYOUT_LEFT_RIGHT()
+
+AddElementTag("fe",  $bgColor="#b71c1c", $fontColor="#ffffff", $borderColor="#7f0000")
+AddElementTag("be",  $bgColor="#2e7d32", $fontColor="#ffffff", $borderColor="#1b5e20")
+AddElementTag("db",  $bgColor="#0277bd", $fontColor="#ffffff", $borderColor="#01579b")
+AddElementTag("ext", $bgColor="#546e7a", $fontColor="#ffffff", $borderColor="#37474f")
+
+title Despliegue — Desarrollo Local (sin Docker)
+
+Deployment_Node(browser, "Navegador", "Chrome / Firefox") {
+    Container(spa_dev, "Angular SPA", "Angular 20", "SPA en el navegador.", $tags="fe")
+}
+
+Deployment_Node(local, "Máquina Local", "Windows / macOS / Linux") {
+
+    Deployment_Node(ng_proc, "ng serve  :4200", "Node.js · Angular CLI") {
+        Container(ng_serve, "Angular Dev Server", "Angular 20 · HMR", "Dev server con recarga en caliente.", $tags="fe")
+    }
+
+    Deployment_Node(spring_proc, "java -jar  :8080", "JDK 21 · Tomcat embebido") {
+        Container(spring_boot, "Spring Boot API", "Java 21 · Spring Boot 3.5", "REST + WebSocket.", $tags="be")
+    }
+
+    Deployment_Node(mysql_proc, "mysqld  :3306", "MySQL 8.0") {
+        ContainerDb(mysql_local, "MySQL 8.0", "InnoDB", "BD local. Seed con data.sql.", $tags="db")
+    }
+}
+
+Deployment_Node(externos, "Servicios Externos", "Cloud · HTTPS") {
+    Container(oauth2,  "Google OAuth2",  "OAuth2 / OIDC",          "Login social con Google.",    $tags="ext")
+    Container(gemini,  "Gemini API",     "REST · gemini-2.5-flash", "LLM para el chatbot IA.",     $tags="ext")
+    Container(stripe,  "Stripe",         "REST · PaymentIntents",   "Cobros con tarjeta.",          $tags="ext")
+    Container(smtp,    "Gmail SMTP",     "JavaMail · STARTTLS",     "Emails transaccionales.",      $tags="ext")
+}
+
+Rel(browser,      ng_proc,     "localhost:4200",  "HTTP")
+Rel(browser,      spring_proc, "localhost:8080",  "HTTP / WS")
+Rel_D(ng_proc,    spring_proc, "/api/**",          "HTTP proxy")
+Rel_D(spring_proc, mysql_proc, "JDBC",             "TCP 3306")
+Rel_R(browser,    oauth2,      "Login social",     "HTTPS")
+Rel_D(spring_proc, oauth2,     "Valida token",     "HTTPS")
+Rel_D(spring_proc, gemini,     "Chatbot IA",       "HTTPS")
+Rel_D(spring_proc, stripe,     "Pago",             "HTTPS")
+Rel_D(spring_proc, smtp,       "Emails",           "SMTP 587")
+
+SHOW_LEGEND()
+@enduml

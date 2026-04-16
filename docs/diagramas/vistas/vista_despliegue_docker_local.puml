@@ -1,0 +1,65 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+AddElementTag("fe",   $bgColor="#b71c1c", $fontColor="#ffffff", $borderColor="#7f0000")
+AddElementTag("be",   $bgColor="#2e7d32", $fontColor="#ffffff", $borderColor="#1b5e20")
+AddElementTag("db",   $bgColor="#0277bd", $fontColor="#ffffff", $borderColor="#01579b")
+AddElementTag("seed", $bgColor="#4527a0", $fontColor="#ffffff", $borderColor="#311b92")
+AddElementTag("vol",  $bgColor="#37474f", $fontColor="#ffffff", $borderColor="#263238")
+AddElementTag("ext",  $bgColor="#546e7a", $fontColor="#ffffff", $borderColor="#37474f")
+
+title Despliegue — Local con Docker Compose
+
+Deployment_Node(browser, "Navegador", "Chrome / Firefox") {
+    Container(spa_cliente, "Angular SPA", "Angular 20", "SPA en el navegador.", $tags="fe")
+}
+
+Deployment_Node(local_host, "Máquina Local", "Docker Engine + Docker Compose") {
+
+    Deployment_Node(docker_net, "magicworld_default", "Bridge network") {
+
+        Deployment_Node(local_fe, "frontend  4200:80", "nginx:stable-alpine") {
+            Container(local_nginx, "Nginx", "nginx:stable-alpine", "Sirve el build estático. Fallback SPA.", $tags="fe")
+        }
+
+        Deployment_Node(local_be, "backend  8080:8080", "eclipse-temurin:21-jre") {
+            Container(local_spring, "Spring Boot API", "Java 21 · Spring Boot 3.5", "REST + WebSocket.", $tags="be")
+        }
+
+        Deployment_Node(local_db, "db  3306:3306", "mysql:8.0") {
+            ContainerDb(local_mysql, "MySQL 8.0", "InnoDB", "BD relacional. Healthcheck: mysqladmin ping.", $tags="db")
+        }
+
+        Deployment_Node(local_seed, "db-seed ", "mysql:8.0") {
+            Container(local_seeder, "DB Seeder", "data.sql", "Inserta datos iniciales del parque.", $tags="seed")
+        }
+    }
+
+    Deployment_Node(local_vols, "Volúmenes", "Persistencia local") {
+        Container(vol_mysql,   "mysql-data", "Docker Volume",  "Persiste /var/lib/mysql.", $tags="vol")
+        Container(vol_uploads, "uploads/",   "Bind mount",     "Imágenes subidas por admins.", $tags="vol")
+    }
+}
+
+Deployment_Node(externos, "Servicios Externos", "Cloud · HTTPS") {
+    Container(oauth2, "Google OAuth2", "OAuth2 / OIDC",          "Login social con Google.",    $tags="ext")
+    Container(gemini, "Gemini API",    "REST · gemini-2.5-flash", "LLM para el chatbot IA.",     $tags="ext")
+    Container(stripe, "Stripe",        "REST · PaymentIntents",   "Cobros con tarjeta.",          $tags="ext")
+    Container(smtp,   "Gmail SMTP",    "JavaMail · STARTTLS",     "Emails transaccionales.",      $tags="ext")
+}
+
+Rel_D(browser,      local_fe,     "localhost:4200", "HTTP")
+Rel_D(browser,      local_be,     "localhost:8080", "HTTP / WS")
+Rel_R(local_nginx,  local_spring, "Proxy /api/**",  "HTTP interno")
+Rel_D(local_spring, local_mysql,  "JDBC",           "TCP 3306")
+Rel_D(local_seeder, local_mysql,  "Seed (una vez)", "TCP 3306")
+Rel_D(local_mysql,  vol_mysql,    "Persiste datos", "I/O")
+Rel_D(local_spring, vol_uploads,  "Imágenes",       "I/O")
+Rel_R(browser,      oauth2,       "Login social",   "HTTPS")
+Rel_D(local_spring, oauth2,       "Valida token",   "HTTPS")
+Rel_D(local_spring, gemini,       "Chatbot IA",     "HTTPS")
+Rel_D(local_spring, stripe,       "Pago",           "HTTPS")
+Rel_D(local_spring, smtp,         "Emails",         "SMTP 587")
+
+SHOW_LEGEND()
+@enduml

@@ -8,8 +8,8 @@ VALUES ('user1', 'User', '1', 'user1@example.com', '$2a$10$JZA..SzcDSPyDZXa.ESvY
 
 
 INSERT  INTO ticket_type (cost, type_name, description, max_per_day, photo_url)
-VALUES (29.90, 'Adult', 'Entrada general para adultos', 100, '/images/ticket-types/e9dc4e2d-1636-418a-a2ae-f512b67bbf71.png'),
-       (19.90, 'Child', 'Entrada para peques', 50, '/images/ticket-types/bb720bd8-b4d4-4cd5-9452-5c12cdef52f2.png');
+VALUES (29.90, 'Adult', 'Entrada general para adultos', 300, '/images/ticket-types/e9dc4e2d-1636-418a-a2ae-f512b67bbf71.png'),
+       (19.90, 'Child', 'Entrada para peques', 200, '/images/ticket-types/bb720bd8-b4d4-4cd5-9452-5c12cdef52f2.png');
 
 
 INSERT  INTO discount (discount_percentage, expiry_date, discount_code)
@@ -294,232 +294,6 @@ INSERT INTO employee (first_name, last_name, email, phone, role, status, hire_da
     ('Natalia', 'Aguilar', 'natalia.aguilar@magicworld.com', '612345036', 'GUEST_SERVICES', 'ACTIVE', '2024-06-20'),
     ('Sergio', 'Fuentes', 'sergio.fuentes@magicworld.com', '612345037', 'GUEST_SERVICES', 'ACTIVE', '2024-09-01');
 
--- Weekly schedules for current and next week - generated programmatically
--- Rules implemented:
---  - Two weeks: current week (Monday) and next week
---  - Each employee works 5 of 7 days (5 consecutive days, rotating start by employee index)
---  - Every attraction has one OPERATOR every day
---  - Every park zone has one SECURITY every day
---  - At least one MEDICAL, MAINTENANCE and GUEST_SERVICES employee per day
-
--- Remove existing generated schedules for current and next week (safe to re-run)
-SET @monday := DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2 + 7) % 7 DAY);
-DELETE FROM weekly_schedule WHERE week_start_date IN (@monday, DATE_ADD(@monday, INTERVAL 7 DAY));
-
--- Helper derived table for days (0..6)
--- We'll build inline derived tables in each INSERT below to avoid CTEs
-
--- 1) OPERATORS -> assign one operator per attraction per day for both weeks
-INSERT INTO weekly_schedule (employee_id, week_start_date, day_of_week, shift, break_group, attraction_id, zone_id)
-SELECT DISTINCT
-  o.employee_id,
-  DATE_ADD(w.week_start, INTERVAL w.week_index * 7 DAY) AS week_start_date,
-  d.day_name AS day_of_week,
-  'FULL_DAY' AS shift,
-  'A' AS break_group,
-  a.id AS attraction_id,
-  NULL AS zone_id
-FROM
-  (
-    SELECT DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2 + 7) % 7 DAY) AS week_start, 0 AS week_index
-    UNION ALL
-    SELECT DATE_ADD(DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2 + 7) % 7 DAY), INTERVAL 7 DAY), 1
-  ) w
-CROSS JOIN (
-  SELECT 0 AS day_index, 'MONDAY' AS day_name UNION ALL
-  SELECT 1, 'TUESDAY' UNION ALL
-  SELECT 2, 'WEDNESDAY' UNION ALL
-  SELECT 3, 'THURSDAY' UNION ALL
-  SELECT 4, 'FRIDAY' UNION ALL
-  SELECT 5, 'SATURDAY' UNION ALL
-  SELECT 6, 'SUNDAY'
-) d
-CROSS JOIN (
-  SELECT t.id, (@a_idx := @a_idx + 1) - 1 AS attr_idx
-  FROM (SELECT @a_idx := 0) init, (SELECT id FROM attraction WHERE is_active = TRUE ORDER BY id) t
-) a
-CROSS JOIN (
-  SELECT e.id AS employee_id, (@o_idx := @o_idx + 1) - 1 AS emp_idx
-  FROM (SELECT @o_idx := 0) init2, (SELECT id FROM employee WHERE role = 'OPERATOR' ORDER BY id) e
-) o
-WHERE
-  (SELECT COUNT(*) FROM employee WHERE role = 'OPERATOR') > 0
-  AND MOD(a.attr_idx + d.day_index + w.week_index, (SELECT COUNT(*) FROM employee WHERE role = 'OPERATOR')) = o.emp_idx
-  AND MOD(d.day_index - o.emp_idx + 7, 7) < 5
-  AND NOT EXISTS (
-    SELECT 1 FROM weekly_schedule ws
-    WHERE ws.week_start_date = DATE_ADD(w.week_start, INTERVAL w.week_index * 7 DAY)
-      AND ws.day_of_week = d.day_name
-      AND ws.attraction_id = a.id
-  );
-
--- 2) SECURITY -> assign one security per zone per day for both weeks
-INSERT INTO weekly_schedule (employee_id, week_start_date, day_of_week, shift, break_group, attraction_id, zone_id)
-SELECT DISTINCT
-  s.employee_id,
-  DATE_ADD(w.week_start, INTERVAL w.week_index * 7 DAY) AS week_start_date,
-  d.day_name AS day_of_week,
-  'FULL_DAY' AS shift,
-  'B' AS break_group,
-  NULL AS attraction_id,
-  z.id AS zone_id
-FROM
-  (
-    SELECT DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2 + 7) % 7 DAY) AS week_start, 0 AS week_index
-    UNION ALL
-    SELECT DATE_ADD(DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2 + 7) % 7 DAY), INTERVAL 7 DAY), 1
-  ) w
-CROSS JOIN (
-  SELECT 0 AS day_index, 'MONDAY' AS day_name UNION ALL
-  SELECT 1, 'TUESDAY' UNION ALL
-  SELECT 2, 'WEDNESDAY' UNION ALL
-  SELECT 3, 'THURSDAY' UNION ALL
-  SELECT 4, 'FRIDAY' UNION ALL
-  SELECT 5, 'SATURDAY' UNION ALL
-  SELECT 6, 'SUNDAY'
-) d
-CROSS JOIN (
-  SELECT zt.id, (@z_idx := @z_idx + 1) - 1 AS zone_idx
-  FROM (SELECT @z_idx := 0) iz, (SELECT id FROM park_zone ORDER BY id) zt
-) z
-CROSS JOIN (
-  SELECT se.id AS employee_id, (@s_idx := @s_idx + 1) - 1 AS emp_idx
-  FROM (SELECT @s_idx := 0) isec, (SELECT id FROM employee WHERE role = 'SECURITY' ORDER BY id) se
-) s
-WHERE
-  (SELECT COUNT(*) FROM employee WHERE role = 'SECURITY') > 0
-  AND MOD(z.zone_idx + d.day_index + w.week_index, (SELECT COUNT(*) FROM employee WHERE role = 'SECURITY')) = s.emp_idx
-  AND MOD(d.day_index - s.emp_idx + 7, 7) < 5
-  AND NOT EXISTS (
-    SELECT 1 FROM weekly_schedule ws
-    WHERE ws.week_start_date = DATE_ADD(w.week_start, INTERVAL w.week_index * 7 DAY)
-      AND ws.day_of_week = d.day_name
-      AND ws.zone_id = z.id
-  );
-
--- 3) Roles MEDICAL, MAINTENANCE, GUEST_SERVICES -> ensure at least one employee per day
--- MEDICAL
-INSERT INTO weekly_schedule (employee_id, week_start_date, day_of_week, shift, break_group, attraction_id, zone_id)
-SELECT DISTINCT
-  r.employee_id,
-  DATE_ADD(w.week_start, INTERVAL w.week_index * 7 DAY) AS week_start_date,
-  d.day_name AS day_of_week,
-  'FULL_DAY' AS shift,
-  'C' AS break_group,
-  NULL AS attraction_id,
-  NULL AS zone_id
-FROM
-  (
-    SELECT DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2 + 7) % 7 DAY) AS week_start, 0 AS week_index
-    UNION ALL
-    SELECT DATE_ADD(DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2 + 7) % 7 DAY), INTERVAL 7 DAY), 1
-  ) w
-CROSS JOIN (
-  SELECT 0 AS day_index, 'MONDAY' AS day_name UNION ALL
-  SELECT 1, 'TUESDAY' UNION ALL
-  SELECT 2, 'WEDNESDAY' UNION ALL
-  SELECT 3, 'THURSDAY' UNION ALL
-  SELECT 4, 'FRIDAY' UNION ALL
-  SELECT 5, 'SATURDAY' UNION ALL
-  SELECT 6, 'SUNDAY'
-) d
-CROSS JOIN (
-  SELECT e.id AS employee_id, (@m_idx := @m_idx + 1) - 1 AS emp_idx
-  FROM (SELECT @m_idx := 0) im, (SELECT id FROM employee WHERE role = 'MEDICAL' ORDER BY id) e
-) r
-WHERE
-  (SELECT COUNT(*) FROM employee WHERE role = 'MEDICAL') > 0
-  AND MOD(d.day_index - r.emp_idx + 7, 7) < 5
-  AND r.emp_idx = MOD(d.day_index + w.week_index, (SELECT COUNT(*) FROM employee WHERE role = 'MEDICAL'))
-  AND NOT EXISTS (
-    SELECT 1 FROM weekly_schedule ws
-    WHERE ws.week_start_date = DATE_ADD(w.week_start, INTERVAL w.week_index * 7 DAY)
-      AND ws.day_of_week = d.day_name
-      AND ws.employee_id = r.employee_id
-  );
-
--- MAINTENANCE
-INSERT INTO weekly_schedule (employee_id, week_start_date, day_of_week, shift, break_group, attraction_id, zone_id)
-SELECT DISTINCT
-  r.employee_id,
-  DATE_ADD(w.week_start, INTERVAL w.week_index * 7 DAY) AS week_start_date,
-  d.day_name AS day_of_week,
-  'FULL_DAY' AS shift,
-  'A' AS break_group,
-  NULL AS attraction_id,
-  NULL AS zone_id
-FROM
-  (
-    SELECT DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2 + 7) % 7 DAY) AS week_start, 0 AS week_index
-    UNION ALL
-    SELECT DATE_ADD(DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2 + 7) % 7 DAY), INTERVAL 7 DAY), 1
-  ) w
-CROSS JOIN (
-  SELECT 0 AS day_index, 'MONDAY' AS day_name UNION ALL
-  SELECT 1, 'TUESDAY' UNION ALL
-  SELECT 2, 'WEDNESDAY' UNION ALL
-  SELECT 3, 'THURSDAY' UNION ALL
-  SELECT 4, 'FRIDAY' UNION ALL
-  SELECT 5, 'SATURDAY' UNION ALL
-  SELECT 6, 'SUNDAY'
-) d
-CROSS JOIN (
-  SELECT e.id AS employee_id, (@mm_idx := @mm_idx + 1) - 1 AS emp_idx
-  FROM (SELECT @mm_idx := 0) imm, (SELECT id FROM employee WHERE role = 'MAINTENANCE' ORDER BY id) e
-) r
-WHERE
-  (SELECT COUNT(*) FROM employee WHERE role = 'MAINTENANCE') > 0
-  AND MOD(d.day_index - r.emp_idx + 7, 7) < 5
-  AND r.emp_idx = MOD(d.day_index + w.week_index, (SELECT COUNT(*) FROM employee WHERE role = 'MAINTENANCE'))
-  AND NOT EXISTS (
-    SELECT 1 FROM weekly_schedule ws
-    WHERE ws.week_start_date = DATE_ADD(w.week_start, INTERVAL w.week_index * 7 DAY)
-      AND ws.day_of_week = d.day_name
-      AND ws.employee_id = r.employee_id
-  );
-
--- GUEST_SERVICES
-INSERT INTO weekly_schedule (employee_id, week_start_date, day_of_week, shift, break_group, attraction_id, zone_id)
-SELECT DISTINCT
-  r.employee_id,
-  DATE_ADD(w.week_start, INTERVAL w.week_index * 7 DAY) AS week_start_date,
-  d.day_name AS day_of_week,
-  'FULL_DAY' AS shift,
-  'B' AS break_group,
-  NULL AS attraction_id,
-  NULL AS zone_id
-FROM
-  (
-    SELECT DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2 + 7) % 7 DAY) AS week_start, 0 AS week_index
-    UNION ALL
-    SELECT DATE_ADD(DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2 + 7) % 7 DAY), INTERVAL 7 DAY), 1
-  ) w
-CROSS JOIN (
-  SELECT 0 AS day_index, 'MONDAY' AS day_name UNION ALL
-  SELECT 1, 'TUESDAY' UNION ALL
-  SELECT 2, 'WEDNESDAY' UNION ALL
-  SELECT 3, 'THURSDAY' UNION ALL
-  SELECT 4, 'FRIDAY' UNION ALL
-  SELECT 5, 'SATURDAY' UNION ALL
-  SELECT 6, 'SUNDAY'
-) d
-CROSS JOIN (
-  SELECT e.id AS employee_id, (@g_idx := @g_idx + 1) - 1 AS emp_idx
-  FROM (SELECT @g_idx := 0) ig, (SELECT id FROM employee WHERE role = 'GUEST_SERVICES' ORDER BY id) e
-) r
-WHERE
-  (SELECT COUNT(*) FROM employee WHERE role = 'GUEST_SERVICES') > 0
-  AND MOD(d.day_index - r.emp_idx + 7, 7) < 5
-  AND r.emp_idx = MOD(d.day_index + w.week_index, (SELECT COUNT(*) FROM employee WHERE role = 'GUEST_SERVICES'))
-  AND NOT EXISTS (
-    SELECT 1 FROM weekly_schedule ws
-    WHERE ws.week_start_date = DATE_ADD(w.week_start, INTERVAL w.week_index * 7 DAY)
-      AND ws.day_of_week = d.day_name
-      AND ws.employee_id = r.employee_id
-  );
-
--- End of generated schedules
-
 -- Additional employees for reinforcement pool
 INSERT INTO employee (first_name, last_name, email, phone, role, status, hire_date) VALUES
     -- Extra Security
@@ -540,6 +314,301 @@ INSERT INTO employee (first_name, last_name, email, phone, role, status, hire_da
     ('Valeria', 'Montes', 'valeria.montes@magicworld.com', '612345048', 'OPERATOR', 'ACTIVE', '2025-03-01'),
     ('Ignacio', 'Rojas', 'ignacio.rojas@magicworld.com', '612345049', 'OPERATOR', 'ACTIVE', '2025-04-01'),
     ('Camila', 'Pena', 'camila.pena@magicworld.com', '612345050', 'OPERATOR', 'ACTIVE', '2025-05-01');
+
+-- Weekly schedules for current and next week.
+-- This follows the same principles as ScheduleService.autoAssignWeek:
+--  - two rest days per employee (offset and offset+3)
+--  - rotating assignments for operators and security
+--  - full coverage of attractions/zones with seeded staffing counts
+--  - overtime only for explicit reinforcement entries
+SET @monday := DATE_SUB(CURDATE(), INTERVAL (DAYOFWEEK(CURDATE()) - 2 + 7) % 7 DAY);
+DELETE FROM weekly_schedule WHERE week_start_date IN (@monday, DATE_ADD(@monday, INTERVAL 7 DAY));
+
+DROP TEMPORARY TABLE IF EXISTS tmp_schedule_weeks;
+CREATE TEMPORARY TABLE tmp_schedule_weeks (
+  week_start DATE PRIMARY KEY
+);
+INSERT INTO tmp_schedule_weeks (week_start)
+VALUES (@monday), (DATE_ADD(@monday, INTERVAL 7 DAY));
+
+DROP TEMPORARY TABLE IF EXISTS tmp_schedule_days;
+CREATE TEMPORARY TABLE tmp_schedule_days (
+  day_index INT PRIMARY KEY,
+  day_name VARCHAR(10) NOT NULL
+);
+INSERT INTO tmp_schedule_days (day_index, day_name)
+VALUES
+  (0, 'MONDAY'),
+  (1, 'TUESDAY'),
+  (2, 'WEDNESDAY'),
+  (3, 'THURSDAY'),
+  (4, 'FRIDAY'),
+  (5, 'SATURDAY'),
+  (6, 'SUNDAY');
+
+DROP TEMPORARY TABLE IF EXISTS tmp_active_attractions;
+CREATE TEMPORARY TABLE tmp_active_attractions AS
+SELECT
+  a.id AS attraction_id,
+  ROW_NUMBER() OVER (ORDER BY a.id) - 1 AS attraction_idx
+FROM attraction a
+WHERE a.is_active = TRUE;
+
+DROP TEMPORARY TABLE IF EXISTS tmp_active_zones;
+CREATE TEMPORARY TABLE tmp_active_zones AS
+SELECT
+  z.id AS zone_id,
+  ROW_NUMBER() OVER (ORDER BY z.id) - 1 AS zone_idx
+FROM park_zone z;
+
+SET @attraction_count := (SELECT COUNT(*) FROM tmp_active_attractions);
+SET @zone_count := (SELECT COUNT(*) FROM tmp_active_zones);
+
+-- OPERATORS (offset 0)
+DROP TEMPORARY TABLE IF EXISTS tmp_operator_employees;
+CREATE TEMPORARY TABLE tmp_operator_employees AS
+SELECT
+  e.id AS employee_id,
+  ROW_NUMBER() OVER (ORDER BY e.id) - 1 AS emp_idx
+FROM employee e
+WHERE e.role = 'OPERATOR' AND e.status = 'ACTIVE';
+
+DROP TEMPORARY TABLE IF EXISTS tmp_operator_slots;
+CREATE TEMPORARY TABLE tmp_operator_slots AS
+SELECT
+  w.week_start,
+  d.day_index,
+  d.day_name,
+  oe.employee_id,
+  oe.emp_idx,
+  ROW_NUMBER() OVER (PARTITION BY w.week_start, d.day_index ORDER BY oe.emp_idx) - 1 AS available_idx
+FROM tmp_schedule_weeks w
+CROSS JOIN tmp_schedule_days d
+JOIN tmp_operator_employees oe
+  ON d.day_index <> MOD(oe.emp_idx, 7)
+ AND d.day_index <> MOD(oe.emp_idx + 3, 7);
+
+INSERT INTO weekly_schedule (employee_id, week_start_date, day_of_week, shift, break_group, attraction_id, zone_id)
+SELECT
+  os.employee_id,
+  os.week_start,
+  os.day_name,
+  'FULL_DAY',
+  CASE MOD(os.emp_idx, 4)
+    WHEN 0 THEN 'A'
+    WHEN 1 THEN 'B'
+    WHEN 2 THEN 'C'
+    ELSE 'D'
+  END AS break_group,
+  aa.attraction_id,
+  NULL
+FROM tmp_operator_slots os
+JOIN tmp_active_attractions aa
+  ON aa.attraction_idx = MOD(os.available_idx + os.day_index, NULLIF(@attraction_count, 0))
+WHERE @attraction_count > 0;
+
+-- SECURITY (offset 1)
+DROP TEMPORARY TABLE IF EXISTS tmp_security_employees;
+CREATE TEMPORARY TABLE tmp_security_employees AS
+SELECT
+  e.id AS employee_id,
+  ROW_NUMBER() OVER (ORDER BY e.id) - 1 AS emp_idx
+FROM employee e
+WHERE e.role = 'SECURITY' AND e.status = 'ACTIVE';
+
+DROP TEMPORARY TABLE IF EXISTS tmp_security_slots;
+CREATE TEMPORARY TABLE tmp_security_slots AS
+SELECT
+  w.week_start,
+  d.day_index,
+  d.day_name,
+  se.employee_id,
+  se.emp_idx,
+  ROW_NUMBER() OVER (PARTITION BY w.week_start, d.day_index ORDER BY se.emp_idx) - 1 AS available_idx
+FROM tmp_schedule_weeks w
+CROSS JOIN tmp_schedule_days d
+JOIN tmp_security_employees se
+  ON d.day_index <> MOD(se.emp_idx + 1, 7)
+ AND d.day_index <> MOD(se.emp_idx + 4, 7);
+
+INSERT INTO weekly_schedule (employee_id, week_start_date, day_of_week, shift, break_group, attraction_id, zone_id)
+SELECT
+  ss.employee_id,
+  ss.week_start,
+  ss.day_name,
+  'FULL_DAY',
+  CASE MOD(ss.emp_idx, 4)
+    WHEN 0 THEN 'A'
+    WHEN 1 THEN 'B'
+    WHEN 2 THEN 'C'
+    ELSE 'D'
+  END AS break_group,
+  NULL,
+  az.zone_id
+FROM tmp_security_slots ss
+JOIN tmp_active_zones az
+  ON az.zone_idx = MOD(ss.available_idx + ss.day_index, NULLIF(@zone_count, 0))
+WHERE @zone_count > 0;
+
+-- MEDICAL (offset 2)
+DROP TEMPORARY TABLE IF EXISTS tmp_medical_employees;
+CREATE TEMPORARY TABLE tmp_medical_employees AS
+SELECT
+  e.id AS employee_id,
+  ROW_NUMBER() OVER (ORDER BY e.id) - 1 AS emp_idx
+FROM employee e
+WHERE e.role = 'MEDICAL' AND e.status = 'ACTIVE';
+
+INSERT INTO weekly_schedule (employee_id, week_start_date, day_of_week, shift, break_group, attraction_id, zone_id)
+SELECT
+  me.employee_id,
+  w.week_start,
+  d.day_name,
+  'FULL_DAY',
+  CASE MOD(me.emp_idx, 4)
+    WHEN 0 THEN 'A'
+    WHEN 1 THEN 'B'
+    WHEN 2 THEN 'C'
+    ELSE 'D'
+  END AS break_group,
+  NULL,
+  NULL
+FROM tmp_schedule_weeks w
+CROSS JOIN tmp_schedule_days d
+JOIN tmp_medical_employees me
+  ON d.day_index <> MOD(me.emp_idx + 2, 7)
+ AND d.day_index <> MOD(me.emp_idx + 5, 7);
+
+-- MAINTENANCE (offset 3)
+DROP TEMPORARY TABLE IF EXISTS tmp_maintenance_employees;
+CREATE TEMPORARY TABLE tmp_maintenance_employees AS
+SELECT
+  e.id AS employee_id,
+  ROW_NUMBER() OVER (ORDER BY e.id) - 1 AS emp_idx
+FROM employee e
+WHERE e.role = 'MAINTENANCE' AND e.status = 'ACTIVE';
+
+INSERT INTO weekly_schedule (employee_id, week_start_date, day_of_week, shift, break_group, attraction_id, zone_id)
+SELECT
+  me.employee_id,
+  w.week_start,
+  d.day_name,
+  'FULL_DAY',
+  CASE MOD(me.emp_idx, 4)
+    WHEN 0 THEN 'A'
+    WHEN 1 THEN 'B'
+    WHEN 2 THEN 'C'
+    ELSE 'D'
+  END AS break_group,
+  NULL,
+  NULL
+FROM tmp_schedule_weeks w
+CROSS JOIN tmp_schedule_days d
+JOIN tmp_maintenance_employees me
+  ON d.day_index <> MOD(me.emp_idx + 3, 7)
+ AND d.day_index <> MOD(me.emp_idx + 6, 7);
+
+-- GUEST_SERVICES (offset 4)
+DROP TEMPORARY TABLE IF EXISTS tmp_guest_services_employees;
+CREATE TEMPORARY TABLE tmp_guest_services_employees AS
+SELECT
+  e.id AS employee_id,
+  ROW_NUMBER() OVER (ORDER BY e.id) - 1 AS emp_idx
+FROM employee e
+WHERE e.role = 'GUEST_SERVICES' AND e.status = 'ACTIVE';
+
+INSERT INTO weekly_schedule (employee_id, week_start_date, day_of_week, shift, break_group, attraction_id, zone_id)
+SELECT
+  ge.employee_id,
+  w.week_start,
+  d.day_name,
+  'FULL_DAY',
+  CASE MOD(ge.emp_idx, 4)
+    WHEN 0 THEN 'A'
+    WHEN 1 THEN 'B'
+    WHEN 2 THEN 'C'
+    ELSE 'D'
+  END AS break_group,
+  NULL,
+  NULL
+FROM tmp_schedule_weeks w
+CROSS JOIN tmp_schedule_days d
+JOIN tmp_guest_services_employees ge
+  ON d.day_index <> MOD(ge.emp_idx + 4, 7)
+ AND d.day_index <> MOD(ge.emp_idx + 7, 7);
+
+-- Seed one realistic reinforcement day as overtime (same shape as DailyOperationsService).
+SET @today_name := CASE DAYOFWEEK(CURDATE())
+  WHEN 2 THEN 'MONDAY'
+  WHEN 3 THEN 'TUESDAY'
+  WHEN 4 THEN 'WEDNESDAY'
+  WHEN 5 THEN 'THURSDAY'
+  WHEN 6 THEN 'FRIDAY'
+  WHEN 7 THEN 'SATURDAY'
+  ELSE 'SUNDAY'
+END;
+
+INSERT INTO weekly_schedule (
+  employee_id,
+  week_start_date,
+  day_of_week,
+  shift,
+  break_group,
+  attraction_id,
+  zone_id,
+  is_overtime,
+  is_reinforcement
+)
+SELECT
+  e.id,
+  @monday,
+  @today_name,
+  'FULL_DAY',
+  'D',
+  NULL,
+  NULL,
+  TRUE,
+  TRUE
+FROM employee e
+WHERE e.role = 'OPERATOR'
+  AND e.status = 'ACTIVE'
+  AND NOT EXISTS (
+    SELECT 1
+    FROM weekly_schedule ws
+    WHERE ws.employee_id = e.id
+      AND ws.week_start_date = @monday
+      AND ws.day_of_week = @today_name
+  )
+ORDER BY e.id
+LIMIT 1;
+
+INSERT INTO reinforcement_call (employee_id, call_time, alert_id, status, response_time, arrival_time, is_overtime)
+SELECT
+  ws.employee_id,
+  NOW() - INTERVAL 40 MINUTE,
+  (SELECT pa.id FROM park_alert pa WHERE pa.is_active = TRUE ORDER BY pa.timestamp DESC LIMIT 1),
+  'ACCEPTED',
+  NOW() - INTERVAL 35 MINUTE,
+  NOW() - INTERVAL 25 MINUTE,
+  TRUE
+FROM weekly_schedule ws
+WHERE ws.week_start_date = @monday
+  AND ws.day_of_week = @today_name
+  AND ws.is_reinforcement = TRUE
+ORDER BY ws.id DESC
+LIMIT 1;
+
+DROP TEMPORARY TABLE IF EXISTS tmp_guest_services_employees;
+DROP TEMPORARY TABLE IF EXISTS tmp_maintenance_employees;
+DROP TEMPORARY TABLE IF EXISTS tmp_medical_employees;
+DROP TEMPORARY TABLE IF EXISTS tmp_security_slots;
+DROP TEMPORARY TABLE IF EXISTS tmp_security_employees;
+DROP TEMPORARY TABLE IF EXISTS tmp_operator_slots;
+DROP TEMPORARY TABLE IF EXISTS tmp_operator_employees;
+DROP TEMPORARY TABLE IF EXISTS tmp_active_zones;
+DROP TEMPORARY TABLE IF EXISTS tmp_active_attractions;
+DROP TEMPORARY TABLE IF EXISTS tmp_schedule_days;
+DROP TEMPORARY TABLE IF EXISTS tmp_schedule_weeks;
 
 -- Bulk ticket purchases for today and future dates (simulating varying occupancy)
 -- These create purchase_lines with valid_date in the future for capacity simulation
@@ -978,4 +1047,63 @@ INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket
 SELECT p.purchase_date, 100, p.id, 100 * t.cost, 'Child'
 FROM purchase p JOIN users u ON p.buyer_id = u.id JOIN ticket_type t ON t.type_name = 'Child'
 WHERE u.username = 'stats_buyer' AND p.purchase_date BETWEEN '2026-12-01' AND '2026-12-31';
+
+-- Normalize seeded daily ticket sales to the [300, 450] range.
+DROP TEMPORARY TABLE IF EXISTS tmp_target_sales_dates;
+CREATE TEMPORARY TABLE tmp_target_sales_dates AS
+SELECT DISTINCT pl.valid_date
+FROM purchase_line pl;
+
+INSERT INTO purchase (purchase_date, buyer_id)
+SELECT d.valid_date, u.id
+FROM tmp_target_sales_dates d
+JOIN users u ON u.username = 'bulk_buyer'
+LEFT JOIN purchase p ON p.purchase_date = d.valid_date AND p.buyer_id = u.id
+WHERE p.id IS NULL;
+
+DROP TEMPORARY TABLE IF EXISTS tmp_target_sales_purchase;
+CREATE TEMPORARY TABLE tmp_target_sales_purchase AS
+SELECT p.purchase_date AS valid_date, MIN(p.id) AS purchase_id
+FROM purchase p
+JOIN users u ON p.buyer_id = u.id
+JOIN tmp_target_sales_dates d ON d.valid_date = p.purchase_date
+WHERE u.username = 'bulk_buyer'
+GROUP BY p.purchase_date;
+
+DELETE pl
+FROM purchase_line pl
+JOIN tmp_target_sales_dates d ON d.valid_date = pl.valid_date;
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT v.valid_date,
+     v.adult_quantity,
+     tp.purchase_id,
+     v.adult_quantity * t.cost,
+     'Adult'
+FROM (
+  SELECT d.valid_date,
+       300 + MOD(DAYOFYEAR(d.valid_date), 151) AS target_quantity,
+       FLOOR((300 + MOD(DAYOFYEAR(d.valid_date), 151)) * 0.65) AS adult_quantity
+  FROM tmp_target_sales_dates d
+) v
+JOIN tmp_target_sales_purchase tp ON tp.valid_date = v.valid_date
+JOIN ticket_type t ON t.type_name = 'Adult';
+
+INSERT INTO purchase_line (valid_date, quantity, purchase_id, total_cost, ticket_type_name)
+SELECT v.valid_date,
+     v.target_quantity - v.adult_quantity,
+     tp.purchase_id,
+     (v.target_quantity - v.adult_quantity) * t.cost,
+     'Child'
+FROM (
+  SELECT d.valid_date,
+       300 + MOD(DAYOFYEAR(d.valid_date), 151) AS target_quantity,
+       FLOOR((300 + MOD(DAYOFYEAR(d.valid_date), 151)) * 0.65) AS adult_quantity
+  FROM tmp_target_sales_dates d
+) v
+JOIN tmp_target_sales_purchase tp ON tp.valid_date = v.valid_date
+JOIN ticket_type t ON t.type_name = 'Child';
+
+DROP TEMPORARY TABLE IF EXISTS tmp_target_sales_purchase;
+DROP TEMPORARY TABLE IF EXISTS tmp_target_sales_dates;
 

@@ -1,4 +1,4 @@
-<div class="profile-page">
+<div class="profile-page" data-cy="profile-page">
   <div class="page-header">
     <h2>{{ 'PROFILE.TITLE' | translate }}</h2>
   </div>
@@ -24,12 +24,14 @@
     <div class="tabs">
       <button
         class="tab-btn"
+        data-cy="profile-tab-profile"
         [class.active]="activeTab === 'profile'"
         (click)="switchTab('profile')">
         {{ 'PROFILE.TAB_PROFILE' | translate }}
       </button>
       <button
         class="tab-btn"
+        data-cy="profile-tab-purchases"
         [class.active]="activeTab === 'purchases'"
         (click)="switchTab('purchases')">
         {{ 'PROFILE.TAB_PURCHASES' | translate }}
@@ -59,10 +61,10 @@
         </div>
 
         <div class="profile-actions">
-          <button class="btn-edit" (click)="openEditForm()">
+          <button class="btn-edit" data-cy="profile-edit-button" (click)="openEditForm()">
             {{ 'PROFILE.EDIT' | translate }}
           </button>
-          <button class="btn-delete" (click)="confirmDelete()" [disabled]="deleting">
+          <button class="btn-delete" data-cy="profile-delete-button" (click)="confirmDelete()" [disabled]="deleting">
             @if (deleting) {
               <span class="loader"></span>
             } @else {
@@ -80,7 +82,7 @@
       } @else if (purchases.length) {
         <div class="purchases-container">
           @for (purchase of purchases; track purchase.id) {
-            <div class="purchase-card">
+            <div class="purchase-card" data-cy="purchase-card">
               <div class="purchase-header">
                 <span class="purchase-id">{{ 'PROFILE.PURCHASE_ID' | translate }}: #{{ purchase.id }}</span>
                 <span class="purchase-date">{{ purchase.purchaseDate }}</span>
@@ -112,7 +114,7 @@
   <!-- Edit Profile Modal -->
   @if (showEditForm) {
     <div class="modal-overlay" (click)="closeEditForm()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-content" data-cy="profile-edit-modal" (click)="$event.stopPropagation()">
         <h3>{{ 'PROFILE.EDIT_TITLE' | translate }}</h3>
 
         <div class="form-group">
@@ -148,6 +150,7 @@
           </button>
           <button
             class="btn-submit"
+            data-cy="profile-save-button"
             (click)="saveProfile()"
             [disabled]="saving || !editUsername.trim() || !editFirstname.trim() || !editLastname.trim() || !editEmail.trim()">
             @if (saving) {

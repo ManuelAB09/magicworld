@@ -50,7 +50,7 @@ export class AttractionApiService {
     if (!filters) {
       return this.http.get<Attraction[]>(this.baseUrl, { withCredentials: true});
     }
-    let params: any = {};
+    const params: any = {};
     if (filters.minHeight != null) params.minHeight = String(filters.minHeight);
     if (filters.minWeight != null) params.minWeight = String(filters.minWeight);
     if (filters.minAge != null) params.minAge = String(filters.minAge);

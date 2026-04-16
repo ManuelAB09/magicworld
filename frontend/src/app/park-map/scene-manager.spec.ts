@@ -104,7 +104,7 @@ describe('SceneManager', () => {
       if (!result) {
         expect(sceneManager.isInitialized()).toBeFalse();
       }
-    } catch (e) {
+    } catch {
       // WebGLRenderer throws in jsdom - this is expected
       expect(sceneManager.isInitialized()).toBeFalse();
     }
@@ -120,7 +120,7 @@ describe('SceneManager', () => {
 
     try {
       sceneManager.initialize(container);
-    } catch (e) {
+    } catch {
     }
 
     expect(() => sceneManager.dispose()).not.toThrow();

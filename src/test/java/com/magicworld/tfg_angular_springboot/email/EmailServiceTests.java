@@ -1,16 +1,19 @@
 package com.magicworld.tfg_angular_springboot.email;
 
 import io.qameta.allure.*;
+import com.sendgrid.helpers.mail.Mail;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +35,8 @@ public class EmailServiceTests {
         mailSender = mock(JavaMailSender.class);
         templateEngine = mock(TemplateEngine.class);
         emailService = new EmailService(mailSender, templateEngine);
+        ReflectionTestUtils.setField(emailService, "sendGridApiKey", "");
+        ReflectionTestUtils.setField(emailService, "mailFrom", "noreply@magicworld.local");
     }
 
     @Test
@@ -196,5 +201,76 @@ public class EmailServiceTests {
         emailService.sendHtmlEmailWithQr("test@example.com", "Subject", "template", vars, null);
 
         verify(templateEngine, timeout(1000)).process(eq("template"), any(Context.class));
+    }
+
+    @Test
+    @DisplayName("Con API key usa SendGrid para mensaje simple")
+    @Story("Proveedor de Email")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Verifica que con SENDGRID_API_KEY se usa SendGrid en lugar de SMTP")
+    void sendSimpleMessageUsesSendGridWhenApiKeyPresent() throws IOException {
+        EmailService serviceSpy = spy(emailService);
+        ReflectionTestUtils.setField(serviceSpy, "sendGridApiKey", "SG.test-key");
+        doReturn(null).when(serviceSpy).invokeSendGridApi(any(Mail.class));
+
+        serviceSpy.sendSimpleMessage("test@example.com", "Subject", "Body");
+
+        verify(serviceSpy, timeout(1000)).invokeSendGridApi(any(Mail.class));
+        verify(mailSender, never()).send(any(SimpleMailMessage.class));
+    }
+
+    @Test
+    @DisplayName("Si SendGrid falla en simple, hace fallback a SMTP")
+    @Story("Proveedor de Email")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Verifica fallback a SMTP cuando SendGrid lanza excepción en mensaje simple")
+    void sendSimpleMessageFallsBackToSmtpWhenSendGridFails() throws IOException {
+        EmailService serviceSpy = spy(emailService);
+        ReflectionTestUtils.setField(serviceSpy, "sendGridApiKey", "SG.test-key");
+        doThrow(new IOException("SendGrid unavailable")).when(serviceSpy).invokeSendGridApi(any(Mail.class));
+
+        serviceSpy.sendSimpleMessage("test@example.com", "Subject", "Body");
+
+        verify(serviceSpy, timeout(1000)).invokeSendGridApi(any(Mail.class));
+        verify(mailSender, timeout(1000)).send(any(SimpleMailMessage.class));
+    }
+
+    @Test
+    @DisplayName("Con API key usa SendGrid para email HTML")
+    @Story("Proveedor de Email")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Verifica que email HTML con QR se envia por SendGrid cuando hay API key")
+    void sendHtmlEmailWithQrUsesSendGridWhenApiKeyPresent() throws IOException {
+        EmailService serviceSpy = spy(emailService);
+        ReflectionTestUtils.setField(serviceSpy, "sendGridApiKey", "SG.test-key");
+        when(templateEngine.process(eq("template"), any(Context.class))).thenReturn("<html>HTML</html>");
+        doReturn(null).when(serviceSpy).invokeSendGridApi(any(Mail.class));
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("name", "Test");
+
+        serviceSpy.sendHtmlEmailWithQr("test@example.com", "Subject", "template", vars, new byte[]{1, 2, 3});
+
+        verify(serviceSpy, timeout(1000)).invokeSendGridApi(any(Mail.class));
+        verify(mailSender, never()).send(any(MimeMessage.class));
+    }
+
+    @Test
+    @DisplayName("Si SendGrid falla en HTML, hace fallback a SMTP")
+    @Story("Proveedor de Email")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Verifica fallback a SMTP cuando SendGrid falla en email HTML con QR")
+    void sendHtmlEmailWithQrFallsBackToSmtpWhenSendGridFails() throws IOException {
+        EmailService serviceSpy = spy(emailService);
+        ReflectionTestUtils.setField(serviceSpy, "sendGridApiKey", "SG.test-key");
+        MimeMessage mimeMessage = mock(MimeMessage.class);
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        when(templateEngine.process(eq("template"), any(Context.class))).thenReturn("<html>HTML</html>");
+        doThrow(new IOException("SendGrid unavailable")).when(serviceSpy).invokeSendGridApi(any(Mail.class));
+
+        serviceSpy.sendHtmlEmailWithQr("test@example.com", "Subject", "template", new HashMap<>(), new byte[]{1, 2, 3});
+
+        verify(serviceSpy, timeout(1000)).invokeSendGridApi(any(Mail.class));
+        verify(mailSender, timeout(1000)).send(any(MimeMessage.class));
     }
 }

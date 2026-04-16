@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+  Checkstyle configuration para MagicWorld:
+    - Sin importaciones no utilizadas
+    - PascalCase para clases, interfaces y enums
+    - camelCase para métodos y variables
+    - SCREAMING_SNAKE_CASE para constantes (static final)
+-->
+<module name="Checker">
+    <property name="severity" value="error"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- Suprimir avisos en líneas con @SuppressWarnings o anotaciones especiales -->
+    <module name="SuppressWarningsFilter"/>
+
+    <module name="TreeWalker">
+
+        <!-- ===================================================== -->
+        <!-- 1. Sin importaciones no utilizadas                      -->
+        <!-- ===================================================== -->
+        <module name="UnusedImports">
+            <property name="processJavadoc" value="false"/>
+        </module>
+
+        <!-- ===================================================== -->
+        <!-- 2. PascalCase para clases, interfaces, enums y         -->
+        <!--    anotaciones                                          -->
+        <!-- ===================================================== -->
+        <module name="TypeName">
+            <!-- ^[A-Z][a-zA-Z0-9]*$ = PascalCase -->
+            <property name="format" value="^[A-Z][a-zA-Z0-9]*$"/>
+            <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, ANNOTATION_DEF, RECORD_DEF"/>
+        </module>
+
+        <!-- ===================================================== -->
+        <!-- 3. camelCase para métodos                               -->
+        <!-- ===================================================== -->
+        <module name="MethodName">
+            <!-- ^[a-z][a-zA-Z0-9]*$ = camelCase -->
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <!-- ===================================================== -->
+        <!-- 4. camelCase para variables de instancia (campos)      -->
+        <!-- ===================================================== -->
+        <module name="MemberName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <!-- ===================================================== -->
+        <!-- 5. camelCase para variables locales                     -->
+        <!-- ===================================================== -->
+        <module name="LocalVariableName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <!-- ===================================================== -->
+        <!-- 6. camelCase para parámetros de métodos                 -->
+        <!-- ===================================================== -->
+        <module name="ParameterName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <!-- ===================================================== -->
+        <!-- 7. camelCase para variables locales finales             -->
+        <!-- ===================================================== -->
+        <module name="LocalFinalVariableName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <!-- ===================================================== -->
+        <!-- 8. SCREAMING_SNAKE_CASE para constantes                 -->
+        <!--    (campos static final)                                -->
+        <!-- ===================================================== -->
+        <module name="ConstantName">
+            <!-- ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$ = SCREAMING_SNAKE_CASE -->
+            <property name="format" value="^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"/>
+        </module>
+
+        <!-- ===================================================== -->
+        <!-- 9. camelCase para variables estáticas no finales        -->
+        <!-- ===================================================== -->
+        <module name="StaticVariableName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <!-- Soporte para @SuppressWarnings en el código -->
+        <module name="SuppressWarningsHolder"/>
+
+    </module>
+</module>
+

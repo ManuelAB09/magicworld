@@ -1,0 +1,53 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Diagrama de Componentes (Flujos Principales) — API Backend\nMagicWorld · C4 Model · Nivel 3
+
+' ─── SISTEMAS EXTERNOS ────────────────────────────────────────────────────────
+System_Ext(spa,    "Angular SPA",       "Frontend SPA (Angular 20).")
+System_Ext(mysql,  "MySQL Database",    "Base de datos relacional.")
+System_Ext(stripe, "Stripe API",        "Pasarela de pago.")
+System_Ext(oauth2, "Google OAuth2",     "Proveedor de identidad social.")
+
+' ─── CONTENEDOR: API Backend ──────────────────────────────────────────────────
+Container_Boundary(backend, "API Backend · Spring Boot 3.5") {
+
+    ' Capa de Seguridad
+    Component(jwtFilter, "JwtAuthFilter", "OncePerRequestFilter", "Intercepta y valida el token JWT en cada petición.")
+    
+    ' Capa de Controladores
+    Component(authCtrl,     "AuthController",     "@RestController", "Endpoints de Login y Registro.")
+    Component(purchaseCtrl, "PurchaseController", "@RestController", "Endpoints de creación de compras de entradas.")
+
+    ' Capa de Servicios
+    Component(authSvc,     "AuthService",     "@Service", "Lógica de autenticación y gestión de usuarios.")
+    Component(purchaseSvc, "PurchaseService", "@Service", "Lógica de negocio de carrito y precios.")
+    Component(paymentSvc,  "PaymentService",  "@Service", "Integración con Stripe SDK y webhooks.")
+
+    ' Capa de Repositorios
+    Component(userRepo,     "UserRepository",     "Spring Data JPA", "CRUD sobre entidad User.")
+    Component(purchaseRepo, "PurchaseRepository", "Spring Data JPA", "CRUD sobre entidad Purchase.")
+}
+
+' ─── RELACIONES ───────────────────────────────────────────────────────────────
+Rel(spa,    jwtFilter, "Petición REST", "HTTPS · Bearer JWT")
+Rel(oauth2, authSvc,   "Callback OAuth2", "HTTPS")
+
+Rel(jwtFilter, authCtrl,     "Delega (Público)", "/api/auth")
+Rel(jwtFilter, purchaseCtrl, "Delega (Protegido)", "/api/purchases")
+
+Rel(authCtrl,     authSvc,     "Llama a", "Método Java")
+Rel(purchaseCtrl, purchaseSvc, "Llama a", "Método Java")
+Rel(purchaseCtrl, paymentSvc,  "Llama a", "Método Java")
+
+Rel(authSvc,     userRepo,     "Lee / Escribe", "JPA")
+Rel(purchaseSvc, purchaseRepo, "Lee / Escribe", "JPA")
+Rel(paymentSvc,  purchaseRepo, "Actualiza estado", "JPA")
+
+Rel(userRepo,     mysql, "Persiste", "JDBC")
+Rel(purchaseRepo, mysql, "Persiste", "JDBC")
+Rel(paymentSvc,   stripe, "Crea sesión", "REST API")
+
+@enduml

@@ -1,0 +1,113 @@
+@startuml MagicWorld_UsuariosYCompras
+
+!theme plain
+hide circle
+skinparam linetype ortho
+skinparam backgroundColor #FFFFFF
+skinparam class {
+    BackgroundColor #EBF5FB
+    BorderColor #1278DF
+    HeaderBackgroundColor #1278DF
+    HeaderFontColor White
+    FontName Arial
+    FontSize 11
+    AttributeFontSize 10
+}
+skinparam package {
+    BackgroundColor #FAFAFA
+    BorderColor #ADB5BD
+    FontColor #212529
+    FontStyle bold
+    FontSize 12
+}
+skinparam arrow {
+    Color #343A40
+    FontSize 9
+    FontColor #555555
+    Thickness 1.5
+}
+
+title "<b>MagicWorld — Usuarios, Compras, Tickets y Cierres</b>"
+
+' ─────────────────────────────────────────
+package "Autenticación" {
+    class User {
+        username  : String
+        firstname : String
+        lastname  : String
+        email     : String
+        password  : String
+        role      : Role
+    }
+    class PasswordResetToken {
+        token      : String
+        expiryDate : LocalDateTime
+    }
+}
+
+' ─────────────────────────────────────────
+package "Entradas y Precios" {
+    class TicketType {
+        typeName  : String
+        description : String
+        cost      : BigDecimal
+        maxPerDay : Integer
+        photoUrl  : String
+    }
+    class Discount {
+        discountCode        : String
+        discountPercentage  : Integer
+        expiryDate          : LocalDate
+    }
+    class SeasonalPricing {
+        name            : String
+        multiplier      : BigDecimal
+        startDate       : LocalDate
+        endDate         : LocalDate
+        applyOnWeekdays : Boolean
+        applyOnWeekends : Boolean
+    }
+    class DiscountTicketType {
+        discountId   : Long
+        ticketTypeId : Long
+    }
+    class ParkClosureDay {
+        closureDate : LocalDate
+        reason      : String
+    }
+}
+
+' ─────────────────────────────────────────
+package "Compras y Valoraciones" {
+    class Purchase {
+        purchaseDate : LocalDate
+    }
+    class PurchaseLine {
+        quantity  : Integer
+        validDate : LocalDate
+        totalCost : BigDecimal
+    }
+    class Review {
+        stars       : Double
+        publicationDate : LocalDate
+        visitDate   : LocalDate
+        description : String
+    }
+}
+
+' ─────────────────────────────────────────
+'  RELACIONES
+' ─────────────────────────────────────────
+User             "1"    -->  "0..*"  PasswordResetToken  : "solicita >"
+User             "1"    -->  "0..*"  Purchase            : "realiza >"
+
+Purchase         "1"    *--  "1..*"  PurchaseLine        : "contiene >"
+PurchaseLine     "0..*" -->  "1"     TicketType          : "corresponde a >"
+Purchase         "1"    -->  "0..*"  Review              : "genera >"
+
+Discount         "1"    -->  "0..*"  DiscountTicketType  : "se asigna en >"
+TicketType       "1"    -->  "0..*"  DiscountTicketType  : "participa en >"
+SeasonalPricing  "0..*" ..>          TicketType          : "modifica precio de >"
+ParkClosureDay   "0..*" ..>          PurchaseLine        : "bloquea validDate de >"
+
+@enduml

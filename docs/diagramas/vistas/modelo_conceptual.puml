@@ -1,0 +1,104 @@
+@startuml MagicWorld_VistaGeneral
+
+!theme plain
+hide circle
+hide members
+skinparam linetype ortho
+skinparam backgroundColor #FFFFFF
+skinparam class {
+    BackgroundColor #EBF5FB
+    BorderColor #1278DF
+    HeaderBackgroundColor #1278DF
+    HeaderFontColor White
+    FontName Arial
+    FontSize 12
+}
+skinparam package {
+    BackgroundColor #FAFAFA
+    BorderColor #ADB5BD
+    FontColor #212529
+    FontStyle bold
+    FontSize 12
+}
+skinparam arrow {
+    Color #343A40
+    FontSize 9
+    FontColor #555555
+    Thickness 1.5
+}
+
+title "<b>MagicWorld — Vista General del Dominio</b>\n<size:10>Ver diagramas 1-3 para detalle por área</size>"
+
+' ─────────────────────────────────────────
+package "Usuarios y Autenticación" {
+    class User
+    class PasswordResetToken
+}
+
+package "Parque" {
+    class ParkZone
+    class Attraction
+}
+
+package "Tickets y Precios" {
+    class TicketType
+    class Discount
+    class DiscountTicketType
+    class SeasonalPricing
+}
+
+package "Compras" {
+    class Purchase
+    class PurchaseLine
+    class Review
+}
+
+package "Empleados" {
+    class Employee
+    class DailyAssignment
+    class WeeklySchedule
+    class WorkLog
+    class ReinforcementCall
+}
+
+package "Monitorización" {
+    class ParkAlert
+    class ParkEvent
+}
+
+package "Operaciones" {
+    class ParkClosureDay
+}
+
+' ─────────────────────────────────────────
+'  RELACIONES PRINCIPALES
+' ─────────────────────────────────────────
+User             "1"    -->  "0..*"  PasswordResetToken  : "solicita >"
+User             "1"    -->  "0..*"  Purchase            : "realiza >"
+
+ParkZone         "1"    *--  "0..*"  Attraction          : "alberga >"
+
+Discount         "1"    -->  "0..*"  DiscountTicketType  : "se asigna en >"
+TicketType       "1"    -->  "0..*"  DiscountTicketType  : "participa en >"
+SeasonalPricing  "0..*" ..>          TicketType          : "modifica precio de >"
+
+Purchase         "1"    *--  "1..*"  PurchaseLine        : "contiene >"
+PurchaseLine     "0..*" -->  "1"     TicketType          : "corresponde a >"
+Purchase         "1"    -->  "0..*"  Review              : "genera >"
+ParkClosureDay   "0..*" ..>          PurchaseLine        : "bloquea validDate de >"
+
+Employee         "1"    *--  "0..*"  DailyAssignment     : "tiene >"
+Employee         "1"    *--  "0..*"  WeeklySchedule      : "planifica >"
+Employee         "1"    *--  "0..*"  WorkLog             : "registra >"
+Employee         "1"    -->  "0..*"  ReinforcementCall   : "atiende >"
+
+DailyAssignment  "0..*" -->  "0..1"  ParkZone            : "trabaja en >"
+DailyAssignment  "0..*" -->  "0..1"  Attraction          : "opera en >"
+DailyAssignment  "0..*" -->  "0..1"  ParkAlert           : "responde a >"
+
+WeeklySchedule   "0..*" -->  "0..1"  ParkZone            : "asignado a >"
+WeeklySchedule   "0..*" -->  "0..1"  Attraction          : "asignado a >"
+
+ReinforcementCall "0..*" --> "0..1"  ParkAlert           : "originada por >"
+
+@enduml

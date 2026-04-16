@@ -1,9 +1,9 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AttractionDetailComponent } from './attraction-detail';
 import { AttractionApiService, Attraction } from '../attraction.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { of, throwError } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
+import { of } from 'rxjs';
 
 describe('AttractionDetailComponent', () => {
   let component: AttractionDetailComponent;

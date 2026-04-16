@@ -1,8 +1,7 @@
 import {
   validateImageFile,
   readFileAsDataUrl,
-  DEFAULT_MAX_FILE_BYTES,
-  FileValidationResult
+  DEFAULT_MAX_FILE_BYTES
 } from './file-upload.util';
 
 describe('FileUploadUtil', () => {

@@ -1,17 +1,17 @@
-<nav class="custom-navbar px-4">
-  <a class="brand" routerLink="/">
+<nav class="custom-navbar px-4" data-cy="navbar">
+  <a class="brand" data-cy="navbar-logo" routerLink="/">
     <img class="brand__logo" ngSrc="assets/images/FondoMagicworld.png" alt="Magicworld logo" width="200" height="60" />
   </a>
   <ul class="nav-list">
     @if (!isAuthenticated) {
     <li class="nav-list__item">
-      <a class="nav-btn" routerLink="/login">
+      <a class="nav-btn" data-cy="nav-login" routerLink="/login">
         <i class="fa-solid fa-right-to-bracket"></i>
         {{ 'NAV.LOGIN' | translate }}
       </a>
     </li>
     <li class="nav-list__item">
-      <a class="nav-btn" routerLink="/register">
+      <a class="nav-btn" data-cy="nav-register" routerLink="/register">
         <i class="fa-solid fa-user-plus"></i>
         {{ 'NAV.REGISTER' | translate }}
       </a>
@@ -19,38 +19,38 @@
     }
     @if (isAuthenticated) {
     <li class="nav-list__item">
-      <button class="nav-btn" (click)="logout()">
+      <button class="nav-btn" data-cy="nav-logout" (click)="logout()">
         <i class="fa-solid fa-right-from-bracket"></i>
         {{ 'NAV.LOGOUT' | translate }}
       </button>
     </li>
     <li class="nav-list__item">
-      <a class="nav-btn" routerLink="/profile">
+      <a class="nav-btn" data-cy="nav-profile" routerLink="/profile">
         <i class="fa-solid fa-user"></i>
         {{ 'NAV.PROFILE' | translate }}
       </a>
     </li>
     <li class="nav-list__item">
-      <a class="nav-btn" routerLink="/discounts">
+      <a class="nav-btn" data-cy="nav-discounts" routerLink="/discounts">
         <i class="fa-solid fa-percent"></i>
         {{ 'NAV.DISCOUNT' | translate }}
       </a>
     </li>
     }
     <li class="nav-list__item">
-      <a class="nav-btn" routerLink="/reviews">
+      <a class="nav-btn" data-cy="nav-reviews" routerLink="/reviews">
         <i class="fa-solid fa-star-half-stroke"></i>
         {{ 'NAV.REVIEWS' | translate }}
       </a>
     </li>
     <li class="nav-list__item">
-      <a class="nav-btn" routerLink="/attractions">
+      <a class="nav-btn" data-cy="nav-attractions" routerLink="/attractions">
         <i class="fa-solid fa-star"></i>
         {{ 'NAV.ATTRACTIONS' | translate }}
       </a>
     </li>
     <li class="nav-list__item">
-      <a class="nav-btn" routerLink="/park-map">
+      <a class="nav-btn" data-cy="nav-park-map" routerLink="/park-map">
         <i class="fa-solid fa-map"></i>
         {{ 'NAV.PARK_MAP' | translate }}
       </a>
@@ -117,7 +117,7 @@
     <li class="nav-list__item">
       <div class="lang-switcher">
         <span class="world-icon">🌐</span>
-        <select class="lang-select" [value]="currentLang" (change)="changeLang($event)">
+        <select class="lang-select" data-cy="language-select" [value]="currentLang" (change)="changeLang($event)">
           <option value="es">Español</option>
           <option value="en">English</option>
         </select>

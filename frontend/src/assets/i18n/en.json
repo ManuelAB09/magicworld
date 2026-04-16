@@ -49,7 +49,7 @@
     "CTA": "Buy your tickets!"
   },
   "error.resource.not.found": "Resource not found: {{0}}",
-  "error.invalid.credentials": "Invalid credentials",
+  "error.invalid.credentials": "Invalid credentials or username not found",
   "error.password.do.not.match": "Passwords do not match",
   "error.username.already.exists": "Username already registered: {{0}}",
   "error.email.already.exists": "Email already registered: {{0}}",

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { CheckoutStep2Component } from './checkout-step2';
 import { CheckoutService, PriceCalculationResponse, PaymentResponse } from '../services/checkout.service';
@@ -469,7 +469,7 @@ describe('CheckoutStep2Component', () => {
     mockCheckoutService.getStripePublicKey().subscribe({
       next: () => {},
       error: (err: any) => {
-        const { code, args } = mockErrorService.handleError(err);
+        mockErrorService.handleError(err);
         component.error = 'Stripe initialization failed';
       }
     });

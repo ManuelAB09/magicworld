@@ -1,6 +1,6 @@
-<div class="checkout-container">
+<div class="checkout-container" data-cy="checkout-step2-page">
   <div class="order-section">
-    <button class="back-btn" (click)="goBack()">
+    <button class="back-btn" data-cy="checkout-back-step1" (click)="goBack()">
       ← {{ 'CHECKOUT.STEP2.BACK' | translate }}
     </button>
 
@@ -36,6 +36,7 @@
       <input
         type="text"
         class="discount-input"
+        data-cy="discount-input"
         [(ngModel)]="discountInput"
         (input)="onDiscountInputChange()"
         [placeholder]="'CHECKOUT.STEP2.DISCOUNT_PLACEHOLDER' | translate">
@@ -140,7 +141,7 @@
 
     <div class="form-group">
       <label>{{ 'CHECKOUT.STEP2.CARD_DETAILS' | translate }} *</label>
-      <div class="card-element-container" #cardElement></div>
+      <div class="card-element-container" data-cy="stripe-card-container" #cardElement></div>
     </div>
 
     @if (error) {
@@ -151,6 +152,7 @@
 
     <button
       class="pay-btn"
+      data-cy="checkout-pay-now"
       [disabled]="!isFormValid() || processingPayment"
       (click)="processPayment()">
       @if (!processingPayment) {

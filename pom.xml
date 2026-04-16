@@ -111,6 +111,12 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.sendgrid</groupId>
+            <artifactId>sendgrid-java</artifactId>
+            <version>4.10.3</version>
+        </dependency>
+
 
         <dependency>
             <groupId>com.github.vladimir-bukhtoyarov</groupId>
@@ -301,6 +307,61 @@
                         <include>**/*Tests.java</include>
                     </includes>
                 </configuration>
+            </plugin>
+
+            <!-- ============================================= -->
+            <!-- Checkstyle: naming conventions + unused imports -->
+            <!-- ============================================= -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <configLocation>checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <!-- Excluir código generado y tests -->
+                    <includeTestSourceDirectory>false</includeTestSourceDirectory>
+                    <excludes>**/generated/**/*</excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>checkstyle-validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- ============================================= -->
+            <!-- PMD: detección de variables/imports sin usar  -->
+            <!-- ============================================= -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.25.0</version>
+                <configuration>
+                    <rulesets>
+                        <ruleset>pmd-ruleset.xml</ruleset>
+                    </rulesets>
+                    <printFailingErrors>true</printFailingErrors>
+                    <failOnViolation>true</failOnViolation>
+                    <!-- Excluir tests del análisis -->
+                    <excludeFromFailureFile></excludeFromFailureFile>
+                    <includeTests>false</includeTests>
+                    <targetJdk>21</targetJdk>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pmd-check</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- PITest - Mutation Testing -->

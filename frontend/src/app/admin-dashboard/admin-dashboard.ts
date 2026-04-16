@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
-import { MonitoringService, DashboardSnapshot, AlertDTO } from './monitoring.service';
+import { MonitoringService, DashboardSnapshot } from './monitoring.service';
 import { DashboardStatsComponent } from './components/dashboard-stats';
 import { AttractionQueueListComponent } from './components/attraction-queue-list';
 import { AlertListComponent } from './components/alert-list';

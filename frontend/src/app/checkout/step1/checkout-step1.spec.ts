@@ -1,12 +1,10 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { CheckoutStep1Component } from './checkout-step1';
-import { TicketAvailability, CheckoutService } from '../services/checkout.service';
-import { AvailabilityWebSocketService } from '../services/availability-websocket.service';
+import { TicketAvailability } from '../services/checkout.service';
 import { Router } from '@angular/router';
-import { of, EMPTY } from 'rxjs';
 
 describe('CheckoutStep1Component', () => {
   let component: CheckoutStep1Component;
@@ -266,7 +264,6 @@ describe('CheckoutStep1Component', () => {
     const today = new Date();
     // Set currentMonth to one month in the future
     component.currentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-    const originalMonth = component.currentMonth.getMonth();
 
     if (component.canGoPrevious()) {
       component.previousMonth();

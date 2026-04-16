@@ -1,5 +1,5 @@
 import { FormatMarkdownPipe } from './format-markdown.pipe';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { TestBed } from '@angular/core/testing';
 
 describe('FormatMarkdownPipe', () => {

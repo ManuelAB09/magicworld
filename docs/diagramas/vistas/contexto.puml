@@ -1,0 +1,38 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+' ESTILOS VISUALES RECOMENDADOS (Personalizando colores C4)
+AddElementTag("central", $bgColor="#005b9f", $fontColor="#ffffff")
+AddElementTag("external", $bgColor="#707b7c", $fontColor="#ffffff")
+AddElementTag("actor", $bgColor="#1e8449", $fontColor="#ffffff")
+
+title Diagrama de Contexto de Sistema - MagicWorld
+
+Person(cliente, "Cliente / Visitante", "Interactúa con el sistema para buscar atracciones, comprar entradas y gestionar su cuenta.", $tags="actor")
+Person(admin, "Administrador", "Gestiona la configuración del parque, monitoriza el estado y visualiza estadísticas.", $tags="actor")
+
+System(magicworld, "Plataforma MagicWorld", $tags="central")
+
+System_Boundary(c1, "Servicios o Sistemas Externos (Cloud/Terceros)") {
+    System_Ext(stripe, "Stripe", "Plataforma de procesamiento de pagos")
+    System_Ext(google_oauth, "Google OAuth2", "Proveedor de Identidad/Autenticación")
+    System_Ext(gemini, "Google Gemini API", "Servicio de Inteligencia Artificial")
+    System_Ext(smtp, "Servidor SMTP / SendGrid", "Servicio integral de envíos de Email transaccional")
+}
+
+Rel_R(cliente, google_oauth, "Se autentica mediante", "OAuth2")
+Rel_D(cliente, magicworld, "\n- Compra entradas\n- Gestiona perfil\n- Ve reseñas y mapas", "HTTPS/REST")
+
+Rel_D(admin, magicworld, "\n- Configura parque\n- Consulta métricas", "HTTPS/REST")
+Rel_D(admin, magicworld, "\n- Monitorización de alertas", "WebSocket")
+
+Rel_L(google_oauth, magicworld, "Retorna token de sesión", "HTTPS")
+
+Rel_D(magicworld, stripe, "Procesa cargos a tarjetas", "Stripe API")
+Rel_D(magicworld, gemini, "Consultas del chatbot admin", "API REST")
+Rel_D(magicworld, smtp, "Envío de emails (Ticketing, Reset Pass)", "SMTP/API")
+
+Rel_U(smtp, cliente, "Envía correos electrónicos", "Email")
+
+SHOW_LEGEND()
+@enduml

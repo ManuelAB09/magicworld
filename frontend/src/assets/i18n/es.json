@@ -49,7 +49,7 @@
     "CTA": "¡Compra tus entradas!"
   },
   "error.resource.not.found": "Recurso no encontrado: {{0}}",
-  "error.invalid.credentials": "Credenciales inválidas",
+  "error.invalid.credentials": "Credenciales inválidas o usuario no encontrado",
   "error.password.do.not.match": "Las contraseñas no coinciden",
   "error.username.already.exists": "El usuario ya está registrado: {{0}}",
   "error.email.already.exists": "El correo electrónico ya está registrado: {{0}}",

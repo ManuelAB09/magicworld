@@ -1,0 +1,13 @@
+---
+exclude_paths:
+  - "**/test/**"
+  - "**/tests/**"
+  - "**/__tests__/**"
+  - "**/*.test.*"
+  - "**/*.spec.*"
+  - "**/css/**"
+  - "**/*.css"
+
+languages:
+  css:
+    enabled: false

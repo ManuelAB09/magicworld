@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MultipartFile;
-
+import java.util.Set;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @Slf4j
 public class ImageStorageService {
 
-    private static final java.util.Set<String> ALLOWED_EXTENSIONS = java.util.Set.of(
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
             "jpg", "jpeg", "png", "gif", "bmp", "webp", "svg", "ico", "tiff", "tif"
     );
 

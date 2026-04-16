@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { ResetPasswordForm } from './reset-password-form';
 import { AuthService } from '../../auth.service';
 import { ErrorService } from '../../../error/error-service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { provideRouter, ActivatedRoute, Router } from '@angular/router';
 import { of, throwError, Subject } from 'rxjs';
 import { ReactiveFormsModule } from '@angular/forms';

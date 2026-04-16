@@ -1,0 +1,134 @@
+@startuml MagicWorld_ParqueYMonitorizacion
+
+!theme plain
+hide circle
+skinparam linetype ortho
+skinparam backgroundColor #FFFFFF
+skinparam class {
+    BackgroundColor #EBF5FB
+    BorderColor #1278DF
+    HeaderBackgroundColor #1278DF
+    HeaderFontColor White
+    FontName Arial
+    FontSize 11
+    AttributeFontSize 10
+}
+skinparam class<<externo>> {
+    BackgroundColor #F0F0F0
+    BorderColor #999999
+    HeaderBackgroundColor #999999
+    HeaderFontColor White
+}
+skinparam package {
+    BackgroundColor #FAFAFA
+    BorderColor #ADB5BD
+    FontColor #212529
+    FontStyle bold
+    FontSize 12
+}
+skinparam arrow {
+    Color #343A40
+    FontSize 9
+    FontColor #555555
+    Thickness 1.5
+}
+
+title "<b>MagicWorld — Parque y Monitorización</b>"
+
+' ─────────────────────────────────────────
+package "Parque" {
+    class ParkZone {
+        zoneName    : String
+        description : String
+    }
+    class Attraction {
+        name              : String
+        category          : AttractionCategory
+        intensity         : Intensity
+        minimumHeight     : Integer
+        minimumAge        : Integer
+        minimumWeight     : Integer
+        description       : String
+        photoUrl          : String
+        maintenanceStatus : MaintenanceStatus
+        isActive          : Boolean
+        mapPositionX      : Double
+        mapPositionY      : Double
+        openingTime       : LocalTime
+        closingTime       : LocalTime
+        zone              : ParkZone
+    }
+}
+
+' ─────────────────────────────────────────
+package "Monitorización" {
+    class ParkAlert {
+        alertType    : AlertType
+        severity     : AlertSeverity
+        message      : String
+        suggestion   : String
+        attractionId : Long
+        isActive     : Boolean
+        timestamp    : LocalDateTime
+        resolvedAt   : LocalDateTime
+    }
+    class ParkEvent {
+        eventType    : ParkEventType
+        timestamp    : LocalDateTime
+        attractionId : Long
+        userId       : Long
+        visitorCount : Integer
+        queueSize    : Integer
+        metadata     : String
+    }
+}
+
+' ─────────────────────────────────────────
+package "Operaciones" {
+    class ParkClosureDay {
+        closureDate : LocalDate
+        reason      : String
+    }
+}
+
+package "Ref. Compras" <<Frame>> {
+    class PurchaseLine <<externo>> {
+        validDate : LocalDate
+    }
+}
+
+' ─────────────────────────────────────────
+'  RELACIONES
+' ─────────────────────────────────────────
+ParkZone  "1"    *--  "0..*"  Attraction  : "alberga >"
+ParkAlert "0..*" ..>  "0..1"  Attraction  : "relacionada con >"
+ParkClosureDay "0..*" ..> PurchaseLine : "bloquea validDate de >"
+
+note bottom of ParkEvent
+  Registro histórico de eventos del parque.
+  attractionId y userId son referencias
+  denormalizadas (sin FK) para
+  eficiencia analítica y de rendimiento.
+end note
+
+note right of ParkAlert
+  Alertas operacionales en tiempo real.
+    Incluyen sugerencia y attractionId.
+  Son consultadas por DailyAssignment
+  y ReinforcementCall
+  (ver Diagrama 2 — Empleados).
+end note
+
+note right of ParkClosureDay
+    Registro de días de cierre del parque.
+    Se usa en checkout para impedir
+    compras en fechas no operativas.
+end note
+
+note bottom of PurchaseLine
+    Entidad definida en el
+    Diagrama 1 (Usuarios, Compras y Tickets).
+    Se muestra aquí como referencia.
+end note
+
+@enduml

@@ -1,4 +1,4 @@
-<div class="reviews-page">
+<div class="reviews-page" data-cy="reviews-page">
   <div class="page-header">
     <h2>{{ 'REVIEWS.TITLE' | translate }}</h2>
   </div>
@@ -16,7 +16,7 @@
 
   @if (isAuthenticated && availablePurchases.length > 0) {
   <div class="user-actions">
-    <button class="btn-brand" (click)="openCreateForm()">
+    <button class="btn-brand" data-cy="reviews-open-create" (click)="openCreateForm()">
       {{ 'REVIEWS.WRITE_REVIEW' | translate }}
     </button>
   </div>
@@ -28,12 +28,12 @@
 
   @if (showForm) {
   <div class="modal-overlay" (click)="closeForm()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-content" data-cy="reviews-create-modal" (click)="$event.stopPropagation()">
       <h3>{{ 'REVIEWS.CREATE_TITLE' | translate }}</h3>
 
       <div class="form-group">
         <label>{{ 'REVIEWS.SELECT_PURCHASE' | translate }}</label>
-        <select class="form-select" (change)="onPurchaseSelect(+$any($event.target).value)">
+        <select class="form-select" data-cy="reviews-purchase-select" (change)="onPurchaseSelect(+$any($event.target).value)">
           <option value="">{{ 'REVIEWS.SELECT_PURCHASE_PLACEHOLDER' | translate }}</option>
           @for (purchase of availablePurchases; track purchase.id) {
           <option [value]="purchase.id">#{{ purchase.id }} - {{ purchase.purchaseDate }}</option>
@@ -46,14 +46,14 @@
         <label>{{ 'REVIEWS.RATING' | translate }}</label>
         <div class="stars-input">
           @for (i of [1,2,3,4,5]; track i) {
-          <span class="star-btn" [class.filled]="i <= formStars" (click)="setStars(i)">★</span>
+          <span class="star-btn" data-cy="reviews-star-btn" [class.filled]="i <= formStars" (click)="setStars(i)">★</span>
           }
         </div>
       </div>
 
       <div class="form-group">
         <label>{{ 'REVIEWS.DESCRIPTION' | translate }}</label>
-        <textarea [(ngModel)]="formDescription" maxlength="255" rows="4"
+        <textarea data-cy="reviews-description" [(ngModel)]="formDescription" maxlength="255" rows="4"
           [placeholder]="'REVIEWS.DESCRIPTION_PLACEHOLDER' | translate"></textarea>
         <small class="char-count">{{ formDescription.length }}/255</small>
       </div>
@@ -61,7 +61,7 @@
 
       <div class="form-actions">
         <button class="btn-cancel" (click)="closeForm()">{{ 'REVIEWS.CANCEL' | translate }}</button>
-        <button class="btn-brand" (click)="submitReview()"
+        <button class="btn-brand" data-cy="reviews-submit" (click)="submitReview()"
           [disabled]="submitting || !formDescription.trim() || !selectedPurchaseId">
           @if (submitting) {
           <span class="loader"></span>
@@ -88,9 +88,9 @@
     </select>
   </div>
 
-  <div class="reviews-container">
+  <div class="reviews-container" data-cy="reviews-container">
     @for (review of reviews; track review.id) {
-    <div class="review-card">
+    <div class="review-card" data-cy="review-card">
       <div class="review-header">
         <span class="review-username">{{ review.username }}</span>
       </div>

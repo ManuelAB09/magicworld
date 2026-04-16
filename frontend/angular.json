@@ -73,11 +73,23 @@
           "options": {
             "tsConfig": "tsconfig.spec.json"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": "8841acc5-96c4-4b8e-aad4-af2ab75a46b3"
+    "analytics": "8841acc5-96c4-4b8e-aad4-af2ab75a46b3",
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   }
 }

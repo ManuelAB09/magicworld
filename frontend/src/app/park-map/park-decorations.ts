@@ -20,7 +20,6 @@ export class ParkDecorations {
     const layerCount = 3;
     for (let i = 0; i < layerCount; i++) {
       const scale = 1 - i * 0.2;
-      const h = height * (0.35 + 0.15 * i);
       const geom = new THREE.ConeGeometry(height * 0.28 * scale, height * 0.45 * (1 - i * 0.08), 12);
       const mesh = new THREE.Mesh(geom, crownMat);
       mesh.position.y = trunkHeight + i * (height * 0.18);
@@ -238,7 +237,7 @@ export class ParkDecorations {
     return bed;
   }
 
-  createInfoSign(text?: string): THREE.Group {
+  createInfoSign(_text?: string): THREE.Group {
     const sign = new THREE.Group();
     const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2), new THREE.MeshStandardMaterial({ color: 0x8b4513 }));
     post.position.y = 1;

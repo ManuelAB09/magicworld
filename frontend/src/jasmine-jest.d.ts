@@ -1,6 +1,7 @@
 // Augment Jest matchers with Jasmine-style toBeTrue/toBeFalse
 declare namespace jest {
-  interface Matchers<R, T = {}> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface Matchers<R, T = unknown> {
     toBeTrue(): R;
     toBeFalse(): R;
   }

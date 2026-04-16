@@ -1,0 +1,1834 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:open-bpmn="http://open-bpmn.org/XMLSchema" id="Definitions_1" targetNamespace="http://www.magicworld.com/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.13.2">
+  <bpmn2:collaboration id="Collaboration_AdminMonitor">
+    <bpmn2:participant id="Pool_Admin" name="Gestión Administrativa del Parque" processRef="Process_Admin">
+      <bpmn2:documentation id="documentation_PWfH6w" />
+    </bpmn2:participant>
+    <bpmn2:participant id="Pool_Monitor" name="Monitorización del Estado del Parque" processRef="Process_Monitor">
+      <bpmn2:documentation id="documentation_0R1g6A" />
+    </bpmn2:participant>
+    <bpmn2:messageFlow id="MF_AdminToMonitor" name="Iniciar simulación" sourceRef="Pool_Admin" targetRef="Pool_Monitor">
+      <bpmn2:documentation id="documentation_ji73fQ" />
+    </bpmn2:messageFlow>
+  </bpmn2:collaboration>
+  <bpmn2:process id="Process_Admin" name="Gestión Administrativa del Parque" processType="Private" isExecutable="false">
+    <bpmn2:laneSet id="LaneSet_Admin">
+      <bpmn2:lane id="Lane_Admin_Chatbot" name="Chatbot IA (Gemini)">
+        <bpmn2:documentation id="documentation_X6Wwsg" />
+        <bpmn2:flowNodeRef>P3_EnviarMensaje</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_DetectarIntencion</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_EjecutarFuncion</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_GW_Confirmacion</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_ConfirmarAccion</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_GW_MergeConfirm</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_DevolverResultado</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_End_Chatbot</bpmn2:flowNodeRef>
+      </bpmn2:lane>
+      <bpmn2:lane id="Lane_Admin_Admin" name="Administrador">
+        <bpmn2:documentation id="documentation_Y0wkvA" />
+        <bpmn2:flowNodeRef>P3_Start</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_GW_Canal</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_GW_Modulo</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_GW_MergeModulos</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_End_Web</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_SP_TiposEntrada</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_SP_Atracciones</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_SP_Empleados</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_SP_Descuentos</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P3_SP_Estadisticas</bpmn2:flowNodeRef>
+      </bpmn2:lane>
+    </bpmn2:laneSet>
+    <bpmn2:startEvent id="P3_Start" name="Administrador accede al panel">
+      <bpmn2:documentation id="documentation_J0FXaQ" />
+      <bpmn2:outgoing>SF_P3_01</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:exclusiveGateway id="P3_GW_Canal" name="¿Canal de gestión?">
+      <bpmn2:documentation id="documentation_4tuGzg" />
+      <bpmn2:incoming>SF_P3_01</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_02_Web</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P3_03_Chatbot</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:exclusiveGateway id="P3_GW_Modulo" name="¿Módulo a gestionar?">
+      <bpmn2:documentation id="documentation_FWX5Jg" />
+      <bpmn2:incoming>SF_P3_02_Web</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_04_Atrac</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P3_05_Ticket</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P3_06_Desc</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P3_07_Empl</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P3_08_Stats</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:userTask id="P3_EnviarMensaje" name="Enviar mensaje al chatbot">
+      <bpmn2:documentation id="documentation_0iOQhQ" />
+      <bpmn2:incoming>SF_P3_03_Chatbot</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_14</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="P3_DetectarIntencion" name="Gemini detecta intención y función requerida">
+      <bpmn2:documentation id="documentation_wj0RbA" />
+      <bpmn2:incoming>SF_P3_14</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_15</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P3_EjecutarFuncion" name="Ejecutar función correspondiente (CRUD)">
+      <bpmn2:documentation id="documentation_tsN4zQ" />
+      <bpmn2:incoming>SF_P3_15</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_16</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:exclusiveGateway id="P3_GW_Confirmacion" name="¿Requiere confirmación?">
+      <bpmn2:documentation id="documentation_fwcyew" />
+      <bpmn2:incoming>SF_P3_16</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_17_Si</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P3_18_No</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:userTask id="P3_ConfirmarAccion" name="Confirmar acción de eliminación">
+      <bpmn2:documentation id="documentation_8wRnsQ" />
+      <bpmn2:incoming>SF_P3_17_Si</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_19</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:exclusiveGateway id="P3_GW_MergeConfirm" name="Merge confirmación">
+      <bpmn2:documentation id="documentation_fp5d6A" />
+      <bpmn2:incoming>SF_P3_18_No</bpmn2:incoming>
+      <bpmn2:incoming>SF_P3_19</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_20</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:serviceTask id="P3_DevolverResultado" name="Devolver resultado al administrador">
+      <bpmn2:documentation id="documentation_YAUekA" />
+      <bpmn2:incoming>SF_P3_20</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_21</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:endEvent id="P3_End_Chatbot" name="Operación chatbot completada">
+      <bpmn2:documentation id="documentation_zjtWTA" />
+      <bpmn2:incoming>SF_P3_21</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:exclusiveGateway id="P3_GW_MergeModulos" name="Merge módulos">
+      <bpmn2:documentation id="documentation_zM8fhQ" />
+      <bpmn2:incoming>SF_P3_09_Atrac</bpmn2:incoming>
+      <bpmn2:incoming>SF_P3_10_Ticket</bpmn2:incoming>
+      <bpmn2:incoming>SF_P3_11_Desc</bpmn2:incoming>
+      <bpmn2:incoming>SF_P3_12_Empl</bpmn2:incoming>
+      <bpmn2:incoming>SF_P3_13_Stats</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_22</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:endEvent id="P3_End_Web" name="Gestión web completada">
+      <bpmn2:documentation id="documentation_dRmr9g" />
+      <bpmn2:incoming>SF_P3_22</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="SF_P3_01" sourceRef="P3_Start" targetRef="P3_GW_Canal">
+      <bpmn2:documentation id="documentation_Lj37AQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_02_Web" name="Interfaz web" sourceRef="P3_GW_Canal" targetRef="P3_GW_Modulo">
+      <bpmn2:documentation id="documentation_kbX0iQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_03_Chatbot" name="Chatbot IA" sourceRef="P3_GW_Canal" targetRef="P3_EnviarMensaje">
+      <bpmn2:documentation id="documentation_YcWI8w" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_04_Atrac" name="Atracciones" sourceRef="P3_GW_Modulo" targetRef="P3_SP_Atracciones">
+      <bpmn2:documentation id="documentation_muha3w" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_05_Ticket" name="Tipos de entrada" sourceRef="P3_GW_Modulo" targetRef="P3_SP_TiposEntrada">
+      <bpmn2:documentation id="documentation_0DV61Q" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_06_Desc" name="Descuentos" sourceRef="P3_GW_Modulo" targetRef="P3_SP_Descuentos">
+      <bpmn2:documentation id="documentation_0UnnFQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_07_Empl" name="Empleados" sourceRef="P3_GW_Modulo" targetRef="P3_SP_Empleados">
+      <bpmn2:documentation id="documentation_gyfdRQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_08_Stats" name="Estadísticas" sourceRef="P3_GW_Modulo" targetRef="P3_SP_Estadisticas">
+      <bpmn2:documentation id="documentation_a0dZ4A" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_09_Atrac" sourceRef="P3_SP_Atracciones" targetRef="P3_GW_MergeModulos">
+      <bpmn2:documentation id="documentation_0Czbrg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_10_Ticket" sourceRef="P3_SP_TiposEntrada" targetRef="P3_GW_MergeModulos">
+      <bpmn2:documentation id="documentation_qftgCQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_11_Desc" sourceRef="P3_SP_Descuentos" targetRef="P3_GW_MergeModulos">
+      <bpmn2:documentation id="documentation_Vl5JvQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_13_Stats" sourceRef="P3_SP_Estadisticas" targetRef="P3_GW_MergeModulos">
+      <bpmn2:documentation id="documentation_k9Z10A" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_14" sourceRef="P3_EnviarMensaje" targetRef="P3_DetectarIntencion">
+      <bpmn2:documentation id="documentation_AIVGZQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_15" sourceRef="P3_DetectarIntencion" targetRef="P3_EjecutarFuncion">
+      <bpmn2:documentation id="documentation_0aZJYQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_16" sourceRef="P3_EjecutarFuncion" targetRef="P3_GW_Confirmacion">
+      <bpmn2:documentation id="documentation_QTGjsQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_17_Si" name="Sí (eliminación)" sourceRef="P3_GW_Confirmacion" targetRef="P3_ConfirmarAccion">
+      <bpmn2:documentation id="documentation_BtFZyA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_18_No" name="No" sourceRef="P3_GW_Confirmacion" targetRef="P3_GW_MergeConfirm">
+      <bpmn2:documentation id="documentation_vOGiwQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_19" sourceRef="P3_ConfirmarAccion" targetRef="P3_GW_MergeConfirm">
+      <bpmn2:documentation id="documentation_n07H6g" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_20" sourceRef="P3_GW_MergeConfirm" targetRef="P3_DevolverResultado">
+      <bpmn2:documentation id="documentation_gjRpTA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_21" sourceRef="P3_DevolverResultado" targetRef="P3_End_Chatbot">
+      <bpmn2:documentation id="documentation_0CE0fw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_12_Empl" sourceRef="P3_SP_Empleados" targetRef="P3_GW_MergeModulos">
+      <bpmn2:documentation id="documentation_7SY0bw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P3_22" sourceRef="P3_GW_MergeModulos" targetRef="P3_End_Web">
+      <bpmn2:documentation id="documentation_zdt4Vg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:subProcess id="P3_SP_TiposEntrada" name="Gestión de Tipos de Entrada (CRUD)">
+      <bpmn2:documentation id="documentation_kKuAPA" />
+      <bpmn2:incoming>SF_P3_05_Ticket</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_10_Ticket</bpmn2:outgoing>
+      <bpmn2:startEvent id="P3_ST_Start" name="Inicio gestión tipos de entrada">
+        <bpmn2:outgoing>SF_P3_ST_01</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:exclusiveGateway id="P3_ST_GW_Op" name="¿Operación?">
+        <bpmn2:incoming>SF_P3_ST_01</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_ST_02_Crear</bpmn2:outgoing>
+        <bpmn2:outgoing>SF_P3_ST_03_Editar</bpmn2:outgoing>
+        <bpmn2:outgoing>SF_P3_ST_04_Eliminar</bpmn2:outgoing>
+      </bpmn2:exclusiveGateway>
+      <bpmn2:userTask id="P3_ST_FormCrear" name="Completar formulario de tipo de entrada">
+        <bpmn2:incoming>SF_P3_ST_02_Crear</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_ST_05</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:serviceTask id="P3_ST_ValidarCapacidad" name="Validar capacidad del parque (máx. 500)">
+        <bpmn2:incoming>SF_P3_ST_05</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_ST_06</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P3_ST_RegistrarTipo" name="Registrar tipo de entrada">
+        <bpmn2:incoming>SF_P3_ST_06</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_ST_07</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:userTask id="P3_ST_SeleccionarEditar" name="Seleccionar y modificar tipo de entrada">
+        <bpmn2:incoming>SF_P3_ST_03_Editar</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_ST_08</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:serviceTask id="P3_ST_RevalidarCapacidad" name="Revalidar capacidad y actualizar tipo">
+        <bpmn2:incoming>SF_P3_ST_08</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_ST_09</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P3_ST_VerificarDescuentos" name="Verificar no hay descuentos asociados">
+        <bpmn2:incoming>SF_P3_ST_04_Eliminar</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_ST_10</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P3_ST_EliminarTipo" name="Eliminar tipo de entrada">
+        <bpmn2:incoming>SF_P3_ST_10</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_ST_11</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:exclusiveGateway id="P3_ST_GW_Merge" name="Merge operaciones">
+        <bpmn2:incoming>SF_P3_ST_07</bpmn2:incoming>
+        <bpmn2:incoming>SF_P3_ST_09</bpmn2:incoming>
+        <bpmn2:incoming>SF_P3_ST_11</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_ST_12</bpmn2:outgoing>
+      </bpmn2:exclusiveGateway>
+      <bpmn2:serviceTask id="P3_ST_NotificarWebSocket" name="Notificar cambio por WebSocket a compra de entradas">
+        <bpmn2:incoming>SF_P3_ST_12</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_ST_13</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:endEvent id="P3_ST_End" name="Tipo de entrada gestionado">
+        <bpmn2:incoming>SF_P3_ST_13</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="SF_P3_ST_01" sourceRef="P3_ST_Start" targetRef="P3_ST_GW_Op" />
+      <bpmn2:sequenceFlow id="SF_P3_ST_02_Crear" name="Crear" sourceRef="P3_ST_GW_Op" targetRef="P3_ST_FormCrear" />
+      <bpmn2:sequenceFlow id="SF_P3_ST_03_Editar" name="Editar" sourceRef="P3_ST_GW_Op" targetRef="P3_ST_SeleccionarEditar" />
+      <bpmn2:sequenceFlow id="SF_P3_ST_04_Eliminar" name="Eliminar" sourceRef="P3_ST_GW_Op" targetRef="P3_ST_VerificarDescuentos" />
+      <bpmn2:sequenceFlow id="SF_P3_ST_05" sourceRef="P3_ST_FormCrear" targetRef="P3_ST_ValidarCapacidad" />
+      <bpmn2:sequenceFlow id="SF_P3_ST_06" sourceRef="P3_ST_ValidarCapacidad" targetRef="P3_ST_RegistrarTipo" />
+      <bpmn2:sequenceFlow id="SF_P3_ST_07" sourceRef="P3_ST_RegistrarTipo" targetRef="P3_ST_GW_Merge" />
+      <bpmn2:sequenceFlow id="SF_P3_ST_08" sourceRef="P3_ST_SeleccionarEditar" targetRef="P3_ST_RevalidarCapacidad" />
+      <bpmn2:sequenceFlow id="SF_P3_ST_09" sourceRef="P3_ST_RevalidarCapacidad" targetRef="P3_ST_GW_Merge" />
+      <bpmn2:sequenceFlow id="SF_P3_ST_10" sourceRef="P3_ST_VerificarDescuentos" targetRef="P3_ST_EliminarTipo" />
+      <bpmn2:sequenceFlow id="SF_P3_ST_11" sourceRef="P3_ST_EliminarTipo" targetRef="P3_ST_GW_Merge" />
+      <bpmn2:sequenceFlow id="SF_P3_ST_12" sourceRef="P3_ST_GW_Merge" targetRef="P3_ST_NotificarWebSocket" />
+      <bpmn2:sequenceFlow id="SF_P3_ST_13" sourceRef="P3_ST_NotificarWebSocket" targetRef="P3_ST_End" />
+    </bpmn2:subProcess>
+    <bpmn2:subProcess id="P3_SP_Atracciones" name="Gestión de Atracciones (CRUD)">
+      <bpmn2:documentation id="documentation_YXFPKA" />
+      <bpmn2:incoming>SF_P3_04_Atrac</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_09_Atrac</bpmn2:outgoing>
+      <bpmn2:startEvent id="P3_SA_Start" name="Inicio gestión atracciones">
+        <bpmn2:documentation id="documentation_wXSSYw" />
+        <bpmn2:outgoing>SF_P3_SA_01</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:exclusiveGateway id="P3_SA_GW_Op" name="¿Operación?">
+        <bpmn2:documentation id="documentation_LDbNnA" />
+        <bpmn2:incoming>SF_P3_SA_01</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SA_02_Crear</bpmn2:outgoing>
+        <bpmn2:outgoing>SF_P3_SA_03_Editar</bpmn2:outgoing>
+        <bpmn2:outgoing>SF_P3_SA_04_Eliminar</bpmn2:outgoing>
+      </bpmn2:exclusiveGateway>
+      <bpmn2:userTask id="P3_SA_FormCrear" name="Completar formulario con mapa 3D y subir imagen">
+        <bpmn2:documentation id="documentation_ja7yeA" />
+        <bpmn2:incoming>SF_P3_SA_02_Crear</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SA_05</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:serviceTask id="P3_SA_ValidarCrear" name="Validar datos de atracción">
+        <bpmn2:documentation id="documentation_ya3bMw" />
+        <bpmn2:incoming>SF_P3_SA_05</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SA_06</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P3_SA_RegistrarAtraccion" name="Registrar atracción">
+        <bpmn2:documentation id="documentation_0DSukg" />
+        <bpmn2:incoming>SF_P3_SA_06</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SA_07</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:userTask id="P3_SA_SeleccionarEditar" name="Seleccionar y modificar atracción">
+        <bpmn2:documentation id="documentation_AtnNwQ" />
+        <bpmn2:incoming>SF_P3_SA_03_Editar</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SA_08</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:serviceTask id="P3_SA_ValidarEditar" name="Validar y actualizar atracción">
+        <bpmn2:documentation id="documentation_aPBMKw" />
+        <bpmn2:incoming>SF_P3_SA_08</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SA_09</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:userTask id="P3_SA_SeleccionarEliminar" name="Seleccionar atracción a eliminar">
+        <bpmn2:documentation id="documentation_QYGb8g" />
+        <bpmn2:incoming>SF_P3_SA_04_Eliminar</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SA_10</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:serviceTask id="P3_SA_LimpiarDependencias" name="Limpiar horarios y asignaciones">
+        <bpmn2:documentation id="documentation_99Jh2w" />
+        <bpmn2:incoming>SF_P3_SA_10</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SA_11</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P3_SA_EliminarAtraccion" name="Eliminar atracción">
+        <bpmn2:documentation id="documentation_yZitbw" />
+        <bpmn2:incoming>SF_P3_SA_11</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SA_12</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:exclusiveGateway id="P3_SA_GW_Merge" name="Merge operaciones">
+        <bpmn2:documentation id="documentation_0AjmxQ" />
+        <bpmn2:incoming>SF_P3_SA_07</bpmn2:incoming>
+        <bpmn2:incoming>SF_P3_SA_09</bpmn2:incoming>
+        <bpmn2:incoming>SF_P3_SA_12</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SA_13</bpmn2:outgoing>
+      </bpmn2:exclusiveGateway>
+      <bpmn2:serviceTask id="P3_SA_ActualizarDashboard" name="Actualizar dashboard de monitorización">
+        <bpmn2:documentation id="documentation_HgT3yQ" />
+        <bpmn2:incoming>SF_P3_SA_13</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SA_14</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:endEvent id="P3_SA_End" name="Atracción gestionada">
+        <bpmn2:documentation id="documentation_PZxnug" />
+        <bpmn2:incoming>SF_P3_SA_14</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="SF_P3_SA_01" sourceRef="P3_SA_Start" targetRef="P3_SA_GW_Op">
+        <bpmn2:documentation id="documentation_DUwpFg" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_02_Crear" name="Crear" sourceRef="P3_SA_GW_Op" targetRef="P3_SA_FormCrear">
+        <bpmn2:documentation id="documentation_zDMsXg" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_03_Editar" name="Editar" sourceRef="P3_SA_GW_Op" targetRef="P3_SA_SeleccionarEditar">
+        <bpmn2:documentation id="documentation_kthaHQ" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_04_Eliminar" name="Eliminar" sourceRef="P3_SA_GW_Op" targetRef="P3_SA_SeleccionarEliminar">
+        <bpmn2:documentation id="documentation_utpvnQ" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_05" sourceRef="P3_SA_FormCrear" targetRef="P3_SA_ValidarCrear">
+        <bpmn2:documentation id="documentation_qZDrCg" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_06" sourceRef="P3_SA_ValidarCrear" targetRef="P3_SA_RegistrarAtraccion">
+        <bpmn2:documentation id="documentation_141RLw" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_07" sourceRef="P3_SA_RegistrarAtraccion" targetRef="P3_SA_GW_Merge">
+        <bpmn2:documentation id="documentation_rAqHIQ" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_08" sourceRef="P3_SA_SeleccionarEditar" targetRef="P3_SA_ValidarEditar">
+        <bpmn2:documentation id="documentation_N6DMOg" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_09" sourceRef="P3_SA_ValidarEditar" targetRef="P3_SA_GW_Merge">
+        <bpmn2:documentation id="documentation_t1B0yQ" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_10" sourceRef="P3_SA_SeleccionarEliminar" targetRef="P3_SA_LimpiarDependencias">
+        <bpmn2:documentation id="documentation_NaM3Wg" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_11" sourceRef="P3_SA_LimpiarDependencias" targetRef="P3_SA_EliminarAtraccion">
+        <bpmn2:documentation id="documentation_Jk0xiw" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_12" sourceRef="P3_SA_EliminarAtraccion" targetRef="P3_SA_GW_Merge">
+        <bpmn2:documentation id="documentation_vJQibg" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_13" sourceRef="P3_SA_GW_Merge" targetRef="P3_SA_ActualizarDashboard">
+        <bpmn2:documentation id="documentation_jjIBuA" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P3_SA_14" sourceRef="P3_SA_ActualizarDashboard" targetRef="P3_SA_End">
+        <bpmn2:documentation id="documentation_7jy4aA" />
+      </bpmn2:sequenceFlow>
+    </bpmn2:subProcess>
+    <bpmn2:subProcess id="P3_SP_Empleados" name="Gestión de Empleados y Cuadrante">
+      <bpmn2:documentation id="documentation_scAYxA" />
+      <bpmn2:incoming>SF_P3_07_Empl</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_12_Empl</bpmn2:outgoing>
+      <bpmn2:startEvent id="P3_SE_Start" name="Inicio gestión empleados">
+        <bpmn2:outgoing>SF_P3_SE_01</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:exclusiveGateway id="P3_SE_GW_Op" name="¿Operación?">
+        <bpmn2:incoming>SF_P3_SE_01</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SE_02_Alta</bpmn2:outgoing>
+        <bpmn2:outgoing>SF_P3_SE_03_Horario</bpmn2:outgoing>
+        <bpmn2:outgoing>SF_P3_SE_04_Baja</bpmn2:outgoing>
+      </bpmn2:exclusiveGateway>
+      <bpmn2:userTask id="P3_SE_RegistrarEmpleado" name="Registrar empleado (rol, datos personales)">
+        <bpmn2:incoming>SF_P3_SE_02_Alta</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SE_05</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:userTask id="P3_SE_SeleccionarSemana" name="Seleccionar semana y asignar turnos">
+        <bpmn2:incoming>SF_P3_SE_03_Horario</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SE_07</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:serviceTask id="P3_SE_ValidarAusencias" name="Validar ausencias y duplicados">
+        <bpmn2:incoming>SF_P3_SE_07</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SE_08</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P3_SE_RegistrarHorario" name="Registrar horario semanal">
+        <bpmn2:incoming>SF_P3_SE_08</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SE_09</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:userTask id="P3_SE_SeleccionarBaja" name="Seleccionar empleado a eliminar">
+        <bpmn2:incoming>SF_P3_SE_04_Baja</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SE_10</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:serviceTask id="P3_SE_EliminarRegistros" name="Eliminar horarios y registros asociados">
+        <bpmn2:incoming>SF_P3_SE_10</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SE_11</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P3_SE_TerminarEmpleado" name="Terminar empleado">
+        <bpmn2:incoming>SF_P3_SE_11</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SE_12</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:exclusiveGateway id="P3_SE_GW_Merge" name="Merge operaciones">
+        <bpmn2:incoming>SF_P3_SE_09</bpmn2:incoming>
+        <bpmn2:incoming>SF_P3_SE_12</bpmn2:incoming>
+        <bpmn2:incoming>SF_P3_SE_05</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SE_13</bpmn2:outgoing>
+      </bpmn2:exclusiveGateway>
+      <bpmn2:endEvent id="P3_SE_End" name="Empleado gestionado">
+        <bpmn2:incoming>SF_P3_SE_13</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="SF_P3_SE_01" sourceRef="P3_SE_Start" targetRef="P3_SE_GW_Op" />
+      <bpmn2:sequenceFlow id="SF_P3_SE_02_Alta" name="Alta" sourceRef="P3_SE_GW_Op" targetRef="P3_SE_RegistrarEmpleado" />
+      <bpmn2:sequenceFlow id="SF_P3_SE_03_Horario" name="Gestionar horario" sourceRef="P3_SE_GW_Op" targetRef="P3_SE_SeleccionarSemana" />
+      <bpmn2:sequenceFlow id="SF_P3_SE_04_Baja" name="Baja" sourceRef="P3_SE_GW_Op" targetRef="P3_SE_SeleccionarBaja" />
+      <bpmn2:sequenceFlow id="SF_P3_SE_05" sourceRef="P3_SE_RegistrarEmpleado" targetRef="P3_SE_GW_Merge" />
+      <bpmn2:sequenceFlow id="SF_P3_SE_07" sourceRef="P3_SE_SeleccionarSemana" targetRef="P3_SE_ValidarAusencias" />
+      <bpmn2:sequenceFlow id="SF_P3_SE_08" sourceRef="P3_SE_ValidarAusencias" targetRef="P3_SE_RegistrarHorario" />
+      <bpmn2:sequenceFlow id="SF_P3_SE_09" sourceRef="P3_SE_RegistrarHorario" targetRef="P3_SE_GW_Merge" />
+      <bpmn2:sequenceFlow id="SF_P3_SE_10" sourceRef="P3_SE_SeleccionarBaja" targetRef="P3_SE_EliminarRegistros" />
+      <bpmn2:sequenceFlow id="SF_P3_SE_11" sourceRef="P3_SE_EliminarRegistros" targetRef="P3_SE_TerminarEmpleado" />
+      <bpmn2:sequenceFlow id="SF_P3_SE_12" sourceRef="P3_SE_TerminarEmpleado" targetRef="P3_SE_GW_Merge" />
+      <bpmn2:sequenceFlow id="SF_P3_SE_13" sourceRef="P3_SE_GW_Merge" targetRef="P3_SE_End" />
+    </bpmn2:subProcess>
+    <bpmn2:subProcess id="P3_SP_Descuentos" name="Gestión de Códigos de Descuento (CRUD)">
+      <bpmn2:documentation id="documentation_NEvuzg" />
+      <bpmn2:incoming>SF_P3_06_Desc</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_11_Desc</bpmn2:outgoing>
+      <bpmn2:startEvent id="P3_SD_Start" name="Inicio gestión descuentos">
+        <bpmn2:outgoing>SF_P3_SD_01</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:exclusiveGateway id="P3_SD_GW_Op" name="¿Operación?">
+        <bpmn2:incoming>SF_P3_SD_01</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SD_02_Crear</bpmn2:outgoing>
+        <bpmn2:outgoing>SF_P3_SD_03_Editar</bpmn2:outgoing>
+        <bpmn2:outgoing>SF_P3_SD_04_Eliminar</bpmn2:outgoing>
+      </bpmn2:exclusiveGateway>
+      <bpmn2:userTask id="P3_SD_FormCrear" name="Definir código, porcentaje y fecha de expiración">
+        <bpmn2:incoming>SF_P3_SD_02_Crear</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SD_05</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:serviceTask id="P3_SD_AsignarTipos" name="Asignar tipos de entrada aplicables">
+        <bpmn2:incoming>SF_P3_SD_05</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SD_06</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P3_SD_RegistrarDescuento" name="Registrar descuento">
+        <bpmn2:incoming>SF_P3_SD_06</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SD_07</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:userTask id="P3_SD_SeleccionarEditar" name="Seleccionar y modificar descuento">
+        <bpmn2:incoming>SF_P3_SD_03_Editar</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SD_08</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:serviceTask id="P3_SD_ReemplazarAsociaciones" name="Reemplazar asociaciones de tipos de entrada">
+        <bpmn2:incoming>SF_P3_SD_08</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SD_09</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P3_SD_EliminarAsociaciones" name="Eliminar asociaciones de tipos de entrada">
+        <bpmn2:incoming>SF_P3_SD_04_Eliminar</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SD_10</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P3_SD_EliminarDescuento" name="Eliminar descuento">
+        <bpmn2:incoming>SF_P3_SD_10</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SD_11</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:exclusiveGateway id="P3_SD_GW_Merge" name="Merge operaciones">
+        <bpmn2:incoming>SF_P3_SD_07</bpmn2:incoming>
+        <bpmn2:incoming>SF_P3_SD_09</bpmn2:incoming>
+        <bpmn2:incoming>SF_P3_SD_11</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SD_12</bpmn2:outgoing>
+      </bpmn2:exclusiveGateway>
+      <bpmn2:endEvent id="P3_SD_End" name="Descuento gestionado">
+        <bpmn2:incoming>SF_P3_SD_12</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="SF_P3_SD_01" sourceRef="P3_SD_Start" targetRef="P3_SD_GW_Op" />
+      <bpmn2:sequenceFlow id="SF_P3_SD_02_Crear" name="Crear" sourceRef="P3_SD_GW_Op" targetRef="P3_SD_FormCrear" />
+      <bpmn2:sequenceFlow id="SF_P3_SD_03_Editar" name="Editar" sourceRef="P3_SD_GW_Op" targetRef="P3_SD_SeleccionarEditar" />
+      <bpmn2:sequenceFlow id="SF_P3_SD_04_Eliminar" name="Eliminar" sourceRef="P3_SD_GW_Op" targetRef="P3_SD_EliminarAsociaciones" />
+      <bpmn2:sequenceFlow id="SF_P3_SD_05" sourceRef="P3_SD_FormCrear" targetRef="P3_SD_AsignarTipos" />
+      <bpmn2:sequenceFlow id="SF_P3_SD_06" sourceRef="P3_SD_AsignarTipos" targetRef="P3_SD_RegistrarDescuento" />
+      <bpmn2:sequenceFlow id="SF_P3_SD_07" sourceRef="P3_SD_RegistrarDescuento" targetRef="P3_SD_GW_Merge" />
+      <bpmn2:sequenceFlow id="SF_P3_SD_08" sourceRef="P3_SD_SeleccionarEditar" targetRef="P3_SD_ReemplazarAsociaciones" />
+      <bpmn2:sequenceFlow id="SF_P3_SD_09" sourceRef="P3_SD_ReemplazarAsociaciones" targetRef="P3_SD_GW_Merge" />
+      <bpmn2:sequenceFlow id="SF_P3_SD_10" sourceRef="P3_SD_EliminarAsociaciones" targetRef="P3_SD_EliminarDescuento" />
+      <bpmn2:sequenceFlow id="SF_P3_SD_11" sourceRef="P3_SD_EliminarDescuento" targetRef="P3_SD_GW_Merge" />
+      <bpmn2:sequenceFlow id="SF_P3_SD_12" sourceRef="P3_SD_GW_Merge" targetRef="P3_SD_End" />
+    </bpmn2:subProcess>
+    <bpmn2:subProcess id="P3_SP_Estadisticas" name="Estadísticas y Precios Estacionales">
+      <bpmn2:documentation id="documentation_oXo60A" />
+      <bpmn2:incoming>SF_P3_08_Stats</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P3_13_Stats</bpmn2:outgoing>
+      <bpmn2:startEvent id="P3_SS_Start" name="Inicio estadísticas">
+        <bpmn2:outgoing>SF_P3_SS_01</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:parallelGateway id="P3_SS_GW_Fork" name="Consultas paralelas">
+        <bpmn2:incoming>SF_P3_SS_01</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SS_02</bpmn2:outgoing>
+        <bpmn2:outgoing>SF_P3_SS_03</bpmn2:outgoing>
+        <bpmn2:outgoing>SF_P3_SS_04</bpmn2:outgoing>
+        <bpmn2:outgoing>Flow_1kett5z</bpmn2:outgoing>
+        <bpmn2:outgoing>Flow_1kxjhn7</bpmn2:outgoing>
+        <bpmn2:outgoing>Flow_03abgr1</bpmn2:outgoing>
+        <bpmn2:outgoing>Flow_1sb7bbj</bpmn2:outgoing>
+      </bpmn2:parallelGateway>
+      <bpmn2:serviceTask id="P3_SS_RankingHoras" name="Consultar ranking de horas trabajadas">
+        <bpmn2:incoming>SF_P3_SS_02</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SS_05</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P3_SS_RankingAusencias" name="Consultar ranking de ausencias">
+        <bpmn2:incoming>SF_P3_SS_03</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SS_06</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:userTask id="P3_SS_PreciosEstacionales" name="Gestionar precios estacionales (CRUD)">
+        <bpmn2:incoming>SF_P3_SS_04</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SS_07</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:parallelGateway id="P3_SS_GW_Join" name="Sincronizar resultados">
+        <bpmn2:incoming>SF_P3_SS_05</bpmn2:incoming>
+        <bpmn2:incoming>SF_P3_SS_06</bpmn2:incoming>
+        <bpmn2:incoming>SF_P3_SS_07</bpmn2:incoming>
+        <bpmn2:incoming>Flow_02omahr</bpmn2:incoming>
+        <bpmn2:incoming>Flow_14dbxkh</bpmn2:incoming>
+        <bpmn2:incoming>Flow_088z91x</bpmn2:incoming>
+        <bpmn2:incoming>Flow_19wurtj</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P3_SS_08</bpmn2:outgoing>
+      </bpmn2:parallelGateway>
+      <bpmn2:endEvent id="P3_SS_End" name="Estadísticas consultadas">
+        <bpmn2:incoming>SF_P3_SS_08</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="SF_P3_SS_01" sourceRef="P3_SS_Start" targetRef="P3_SS_GW_Fork" />
+      <bpmn2:sequenceFlow id="SF_P3_SS_02" sourceRef="P3_SS_GW_Fork" targetRef="P3_SS_RankingHoras" />
+      <bpmn2:sequenceFlow id="SF_P3_SS_03" sourceRef="P3_SS_GW_Fork" targetRef="P3_SS_RankingAusencias" />
+      <bpmn2:sequenceFlow id="SF_P3_SS_04" sourceRef="P3_SS_GW_Fork" targetRef="P3_SS_PreciosEstacionales" />
+      <bpmn2:sequenceFlow id="SF_P3_SS_05" sourceRef="P3_SS_RankingHoras" targetRef="P3_SS_GW_Join" />
+      <bpmn2:sequenceFlow id="SF_P3_SS_06" sourceRef="P3_SS_RankingAusencias" targetRef="P3_SS_GW_Join" />
+      <bpmn2:sequenceFlow id="SF_P3_SS_07" sourceRef="P3_SS_PreciosEstacionales" targetRef="P3_SS_GW_Join" />
+      <bpmn2:sequenceFlow id="SF_P3_SS_08" sourceRef="P3_SS_GW_Join" targetRef="P3_SS_End" />
+      <bpmn2:serviceTask id="Activity_0fj9ysw" name="Consultar detalles asistencia por empleado">
+        <bpmn2:incoming>Flow_1kett5z</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_02omahr</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="Activity_117wmxr" name="Consultar visitas al parque y ganancias">
+        <bpmn2:incoming>Flow_1kxjhn7</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_14dbxkh</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="Activity_00okwhw" name="Consultar días de cierre del parque y/o modificarlos (CRUD)">
+        <bpmn2:incoming>Flow_03abgr1</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_088z91x</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:sequenceFlow id="Flow_1kett5z" sourceRef="P3_SS_GW_Fork" targetRef="Activity_0fj9ysw" />
+      <bpmn2:sequenceFlow id="Flow_1kxjhn7" sourceRef="P3_SS_GW_Fork" targetRef="Activity_117wmxr" />
+      <bpmn2:sequenceFlow id="Flow_03abgr1" sourceRef="P3_SS_GW_Fork" targetRef="Activity_00okwhw" />
+      <bpmn2:sequenceFlow id="Flow_02omahr" sourceRef="Activity_0fj9ysw" targetRef="P3_SS_GW_Join" />
+      <bpmn2:sequenceFlow id="Flow_14dbxkh" sourceRef="Activity_117wmxr" targetRef="P3_SS_GW_Join" />
+      <bpmn2:sequenceFlow id="Flow_088z91x" sourceRef="Activity_00okwhw" targetRef="P3_SS_GW_Join" />
+      <bpmn2:serviceTask id="Activity_10tpfvz" name="Consultar gastos">
+        <bpmn2:incoming>Flow_1sb7bbj</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_19wurtj</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:sequenceFlow id="Flow_1sb7bbj" sourceRef="P3_SS_GW_Fork" targetRef="Activity_10tpfvz" />
+      <bpmn2:sequenceFlow id="Flow_19wurtj" sourceRef="Activity_10tpfvz" targetRef="P3_SS_GW_Join" />
+    </bpmn2:subProcess>
+  </bpmn2:process>
+  <bpmn2:process id="Process_Monitor" name="Monitorización del Estado del Parque" processType="Private" isExecutable="false">
+    <bpmn2:laneSet id="LaneSet_Monitor">
+      <bpmn2:lane id="Lane_Monitor_Sistema" name="Sistema Automático">
+        <bpmn2:documentation id="documentation_OqbbYg" />
+        <bpmn2:flowNodeRef>P4_GenerarEventos</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_RegistrarEvento</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_ActualizarDashboard</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_DifundirColas</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_GW_Umbral</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_DifundirActualizacion</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_End_Loop</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_DeterminarSeveridad</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_GenerarAlerta</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_DifundirAlerta</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_DesactivarAlerta</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_DifundirResolucion</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_End_Resolucion</bpmn2:flowNodeRef>
+      </bpmn2:lane>
+      <bpmn2:lane id="Lane_Monitor_Admin" name="Administrador">
+        <bpmn2:documentation id="documentation_ykeRnA" />
+        <bpmn2:flowNodeRef>P4_Start</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_IniciarSimulacion</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_RecibirNotificacion</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_GW_Resolucion</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_AsignarOperativo</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_EnviarMedico</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_PatrullaSeguridad</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_LlamarRefuerzo</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P4_GW_MergeResolucion</bpmn2:flowNodeRef>
+      </bpmn2:lane>
+    </bpmn2:laneSet>
+    <bpmn2:startEvent id="P4_Start" name="Administrador accede a monitorización">
+      <bpmn2:documentation id="documentation_LFmzsg" />
+      <bpmn2:outgoing>SF_P4_01</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:userTask id="P4_IniciarSimulacion" name="Iniciar simulación del parque (día actual)">
+      <bpmn2:documentation id="documentation_cfIuUQ" />
+      <bpmn2:incoming>SF_P4_01</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_02</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="P4_GenerarEventos" name="Generar eventos">
+      <bpmn2:documentation id="documentation_06DHOA" />
+      <bpmn2:incoming>SF_P4_02</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_03</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P4_RegistrarEvento" name="Registrar evento">
+      <bpmn2:documentation id="documentation_EDd6Zg" />
+      <bpmn2:incoming>SF_P4_03</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_04</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P4_ActualizarDashboard" name="Actualizar snapshot del dashboard">
+      <bpmn2:documentation id="documentation_ZvEFNg" />
+      <bpmn2:incoming>SF_P4_04</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_05</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P4_DifundirColas" name="Difundir estado de colas por WebSocket al mapa del cliente">
+      <bpmn2:documentation id="documentation_I8GtLw" />
+      <bpmn2:incoming>SF_P4_05</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_06</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:exclusiveGateway id="P4_GW_Umbral" name="¿Supera umbral de alerta?">
+      <bpmn2:documentation id="documentation_nYvXwg" />
+      <bpmn2:incoming>SF_P4_06</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_07_No</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P4_08_Si</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:serviceTask id="P4_DifundirActualizacion" name="Difundir actualización normal por WebSocket">
+      <bpmn2:documentation id="documentation_gMpRWA" />
+      <bpmn2:incoming>SF_P4_07_No</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_09</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:endEvent id="P4_End_Loop" name="Continuar escuchando eventos">
+      <bpmn2:documentation id="documentation_u0xTvw" />
+      <bpmn2:incoming>SF_P4_09</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:serviceTask id="P4_DeterminarSeveridad" name="Determinar tipo y severidad">
+      <bpmn2:documentation id="documentation_cnI6pA" />
+      <bpmn2:incoming>SF_P4_08_Si</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_10</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P4_GenerarAlerta" name="Generar alerta en el sistema">
+      <bpmn2:documentation id="documentation_zjtoyw" />
+      <bpmn2:incoming>SF_P4_10</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_11</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P4_DifundirAlerta" name="Difundir alerta por WebSocket">
+      <bpmn2:documentation id="documentation_U9Vp5g" />
+      <bpmn2:incoming>SF_P4_11</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_12</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:userTask id="P4_RecibirNotificacion" name="Administrador recibe notificación de alerta">
+      <bpmn2:documentation id="documentation_X20q6g" />
+      <bpmn2:incoming>SF_P4_12</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_13</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:exclusiveGateway id="P4_GW_Resolucion" name="¿Tipo de resolución?">
+      <bpmn2:documentation id="documentation_jW0ozQ" />
+      <bpmn2:incoming>SF_P4_13</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_14_Operativo</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P4_15_Medico</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P4_16_Seguridad</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P4_17_Refuerzo</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:userTask id="P4_AsignarOperativo" name="Asignar personal operativo disponible">
+      <bpmn2:documentation id="documentation_Pk0E4w" />
+      <bpmn2:incoming>SF_P4_14_Operativo</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_18</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="P4_EnviarMedico" name="Enviar equipo médico disponible">
+      <bpmn2:documentation id="documentation_WAMWCA" />
+      <bpmn2:incoming>SF_P4_15_Medico</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_19</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="P4_PatrullaSeguridad" name="Enviar patrulla de seguridad">
+      <bpmn2:documentation id="documentation_XLfNuA" />
+      <bpmn2:incoming>SF_P4_16_Seguridad</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_20</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="P4_LlamarRefuerzo" name="Contactar empleado fuera de turno">
+      <bpmn2:documentation id="documentation_DhFDSg" />
+      <bpmn2:incoming>SF_P4_17_Refuerzo</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_21</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:exclusiveGateway id="P4_GW_MergeResolucion" name="Merge resolución">
+      <bpmn2:documentation id="documentation_djcqwg" />
+      <bpmn2:incoming>SF_P4_18</bpmn2:incoming>
+      <bpmn2:incoming>SF_P4_19</bpmn2:incoming>
+      <bpmn2:incoming>SF_P4_20</bpmn2:incoming>
+      <bpmn2:incoming>SF_P4_21</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_22</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:serviceTask id="P4_DesactivarAlerta" name="Desactivar alerta">
+      <bpmn2:documentation id="documentation_712VTQ" />
+      <bpmn2:incoming>SF_P4_22</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_24</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P4_DifundirResolucion" name="Difundir actualización de resolución (WebSocket)">
+      <bpmn2:documentation id="documentation_9f3HMg" />
+      <bpmn2:incoming>SF_P4_24</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P4_25</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:endEvent id="P4_End_Resolucion" name="Alerta resuelta">
+      <bpmn2:documentation id="documentation_dYlK9Q" />
+      <bpmn2:incoming>SF_P4_25</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="SF_P4_01" sourceRef="P4_Start" targetRef="P4_IniciarSimulacion">
+      <bpmn2:documentation id="documentation_Qjcecg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_02" sourceRef="P4_IniciarSimulacion" targetRef="P4_GenerarEventos">
+      <bpmn2:documentation id="documentation_XU2Asg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_03" sourceRef="P4_GenerarEventos" targetRef="P4_RegistrarEvento">
+      <bpmn2:documentation id="documentation_KNpBxw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_04" sourceRef="P4_RegistrarEvento" targetRef="P4_ActualizarDashboard">
+      <bpmn2:documentation id="documentation_rSux0A" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_05" sourceRef="P4_ActualizarDashboard" targetRef="P4_DifundirColas">
+      <bpmn2:documentation id="documentation_4PmYEA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_06" sourceRef="P4_DifundirColas" targetRef="P4_GW_Umbral">
+      <bpmn2:documentation id="documentation_zeGzig" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_07_No" name="No" sourceRef="P4_GW_Umbral" targetRef="P4_DifundirActualizacion">
+      <bpmn2:documentation id="documentation_xuYpfw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_08_Si" name="Sí" sourceRef="P4_GW_Umbral" targetRef="P4_DeterminarSeveridad">
+      <bpmn2:documentation id="documentation_dSjMvw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_09" sourceRef="P4_DifundirActualizacion" targetRef="P4_End_Loop">
+      <bpmn2:documentation id="documentation_3J9vgA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_10" sourceRef="P4_DeterminarSeveridad" targetRef="P4_GenerarAlerta">
+      <bpmn2:documentation id="documentation_24AhCg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_11" sourceRef="P4_GenerarAlerta" targetRef="P4_DifundirAlerta">
+      <bpmn2:documentation id="documentation_GSD30Q" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_12" sourceRef="P4_DifundirAlerta" targetRef="P4_RecibirNotificacion">
+      <bpmn2:documentation id="documentation_oWXg2A" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_13" sourceRef="P4_RecibirNotificacion" targetRef="P4_GW_Resolucion">
+      <bpmn2:documentation id="documentation_0h3wXA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_14_Operativo" name="Asignar operativo" sourceRef="P4_GW_Resolucion" targetRef="P4_AsignarOperativo">
+      <bpmn2:documentation id="documentation_90XkaA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_15_Medico" name="Enviar médico" sourceRef="P4_GW_Resolucion" targetRef="P4_EnviarMedico">
+      <bpmn2:documentation id="documentation_qQSUZQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_16_Seguridad" name="Patrulla seguridad" sourceRef="P4_GW_Resolucion" targetRef="P4_PatrullaSeguridad">
+      <bpmn2:documentation id="documentation_hxgNtA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_17_Refuerzo" name="Llamar refuerzo" sourceRef="P4_GW_Resolucion" targetRef="P4_LlamarRefuerzo">
+      <bpmn2:documentation id="documentation_Tz1Jpg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_18" sourceRef="P4_AsignarOperativo" targetRef="P4_GW_MergeResolucion">
+      <bpmn2:documentation id="documentation_1cmrXg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_19" sourceRef="P4_EnviarMedico" targetRef="P4_GW_MergeResolucion">
+      <bpmn2:documentation id="documentation_x0Unjg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_20" sourceRef="P4_PatrullaSeguridad" targetRef="P4_GW_MergeResolucion">
+      <bpmn2:documentation id="documentation_x9Tpfw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_21" sourceRef="P4_LlamarRefuerzo" targetRef="P4_GW_MergeResolucion">
+      <bpmn2:documentation id="documentation_N1av0Q" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_22" sourceRef="P4_GW_MergeResolucion" targetRef="P4_DesactivarAlerta">
+      <bpmn2:documentation id="documentation_001XTQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_24" sourceRef="P4_DesactivarAlerta" targetRef="P4_DifundirResolucion">
+      <bpmn2:documentation id="documentation_1FwQAw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P4_25" sourceRef="P4_DifundirResolucion" targetRef="P4_End_Resolucion">
+      <bpmn2:documentation id="documentation_Ol2D8w" />
+    </bpmn2:sequenceFlow>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_AdminMonitor" name="MagicWorld - Admin y Monitor">
+    <bpmndi:BPMNPlane id="BPMNPlane_AdminMonitor" bpmnElement="Collaboration_AdminMonitor">
+      <bpmndi:BPMNShape id="Shape_Pool_Admin" bpmnElement="Pool_Admin" isHorizontal="true">
+        <dc:Bounds x="160" y="110" width="2600" height="1100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_Admin_Admin" bpmnElement="Lane_Admin_Admin" isHorizontal="true">
+        <dc:Bounds x="190" y="110" width="2570" height="800" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_Admin_Chatbot" bpmnElement="Lane_Admin_Chatbot" isHorizontal="true">
+        <dc:Bounds x="190" y="910" width="2570" height="300" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_Start" bpmnElement="P3_Start">
+        <dc:Bounds x="240" y="242" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="219" y="281" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_GW_Canal" bpmnElement="P3_GW_Canal" isMarkerVisible="true">
+        <dc:Bounds x="325" y="235" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="325" y="288" width="51" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_GW_Modulo" bpmnElement="P3_GW_Modulo" isMarkerVisible="true">
+        <dc:Bounds x="425" y="235" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="473" y="268" width="52" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_EnviarMensaje" bpmnElement="P3_EnviarMensaje">
+        <dc:Bounds x="440" y="990" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_DetectarIntencion" bpmnElement="P3_DetectarIntencion">
+        <dc:Bounds x="650" y="990" width="180" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_EjecutarFuncion" bpmnElement="P3_EjecutarFuncion">
+        <dc:Bounds x="880" y="990" width="180" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_GW_Confirmacion" bpmnElement="P3_GW_Confirmacion" isMarkerVisible="true">
+        <dc:Bounds x="1110" y="985" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1101" y="1038" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_ConfirmarAccion" bpmnElement="P3_ConfirmarAccion">
+        <dc:Bounds x="1210" y="940" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_GW_MergeConfirm" bpmnElement="P3_GW_MergeConfirm" isMarkerVisible="true">
+        <dc:Bounds x="1420" y="985" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1414" y="1038" width="63" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_DevolverResultado" bpmnElement="P3_DevolverResultado">
+        <dc:Bounds x="1520" y="990" width="180" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_End_Chatbot" bpmnElement="P3_End_Chatbot">
+        <dc:Bounds x="1750" y="992" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1740" y="1031" width="57" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_GW_MergeModulos" bpmnElement="P3_GW_MergeModulos" isMarkerVisible="true">
+        <dc:Bounds x="770" y="235" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="757" y="288" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_End_Web" bpmnElement="P3_End_Web">
+        <dc:Bounds x="870" y="242" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="857" y="281" width="63" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_SP_TiposEntrada" bpmnElement="P3_SP_TiposEntrada" isExpanded="false">
+        <dc:Bounds x="540" y="210" width="160" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_SP_Atracciones" bpmnElement="P3_SP_Atracciones" isExpanded="false">
+        <dc:Bounds x="540" y="120" width="160" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_SP_Empleados" bpmnElement="P3_SP_Empleados" isExpanded="false">
+        <dc:Bounds x="540" y="440" width="160" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_SP_Descuentos" bpmnElement="P3_SP_Descuentos" isExpanded="false">
+        <dc:Bounds x="540" y="330" width="160" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3_SP_Estadisticas" bpmnElement="P3_SP_Estadisticas" isExpanded="false">
+        <dc:Bounds x="540" y="570" width="160" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_01" bpmnElement="SF_P3_01">
+        <di:waypoint x="276" y="260" />
+        <di:waypoint x="325" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_02_Web" bpmnElement="SF_P3_02_Web">
+        <di:waypoint x="375" y="260" />
+        <di:waypoint x="425" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="370" y="235" width="61" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_03_Chatbot" bpmnElement="SF_P3_03_Chatbot">
+        <di:waypoint x="350" y="285" />
+        <di:waypoint x="350" y="1010" />
+        <di:waypoint x="440" y="1010" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="339" y="638" width="53" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_04_Atrac" bpmnElement="SF_P3_04_Atrac">
+        <di:waypoint x="450" y="235" />
+        <di:waypoint x="450" y="150" />
+        <di:waypoint x="540" y="150" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="437" y="183" width="57" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_05_Ticket" bpmnElement="SF_P3_05_Ticket">
+        <di:waypoint x="475" y="260" />
+        <di:waypoint x="508" y="260" />
+        <di:waypoint x="508" y="240" />
+        <di:waypoint x="540" y="240" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="482" y="240" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_06_Desc" bpmnElement="SF_P3_06_Desc">
+        <di:waypoint x="450" y="285" />
+        <di:waypoint x="450" y="366" />
+        <di:waypoint x="540" y="366" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="436" y="314" width="59" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_07_Empl" bpmnElement="SF_P3_07_Empl">
+        <di:waypoint x="450" y="285" />
+        <di:waypoint x="450" y="470" />
+        <di:waypoint x="540" y="470" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="437" y="367" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_08_Stats" bpmnElement="SF_P3_08_Stats">
+        <di:waypoint x="450" y="285" />
+        <di:waypoint x="450" y="600" />
+        <di:waypoint x="540" y="600" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="435" y="432" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_09_Atrac" bpmnElement="SF_P3_09_Atrac">
+        <di:waypoint x="700" y="150" />
+        <di:waypoint x="795" y="150" />
+        <di:waypoint x="795" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_10_Ticket" bpmnElement="SF_P3_10_Ticket">
+        <di:waypoint x="700" y="240" />
+        <di:waypoint x="735" y="240" />
+        <di:waypoint x="735" y="260" />
+        <di:waypoint x="770" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_11_Desc" bpmnElement="SF_P3_11_Desc">
+        <di:waypoint x="700" y="360" />
+        <di:waypoint x="795" y="360" />
+        <di:waypoint x="795" y="285" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_13_Stats" bpmnElement="SF_P3_13_Stats">
+        <di:waypoint x="700" y="600" />
+        <di:waypoint x="795" y="600" />
+        <di:waypoint x="795" y="285" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_14" bpmnElement="SF_P3_14">
+        <di:waypoint x="600" y="1010" />
+        <di:waypoint x="650" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_15" bpmnElement="SF_P3_15">
+        <di:waypoint x="830" y="1010" />
+        <di:waypoint x="880" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_16" bpmnElement="SF_P3_16">
+        <di:waypoint x="1060" y="1010" />
+        <di:waypoint x="1110" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_17_Si" bpmnElement="SF_P3_17_Si">
+        <di:waypoint x="1135" y="985" />
+        <di:waypoint x="1135" y="960" />
+        <di:waypoint x="1210" y="960" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1112" y="963" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_18_No" bpmnElement="SF_P3_18_No">
+        <di:waypoint x="1160" y="1010" />
+        <di:waypoint x="1420" y="1010" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1283" y="985" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_19" bpmnElement="SF_P3_19">
+        <di:waypoint x="1370" y="960" />
+        <di:waypoint x="1445" y="960" />
+        <di:waypoint x="1445" y="985" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_20" bpmnElement="SF_P3_20">
+        <di:waypoint x="1470" y="1010" />
+        <di:waypoint x="1520" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_21" bpmnElement="SF_P3_21">
+        <di:waypoint x="1700" y="1010" />
+        <di:waypoint x="1750" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_12_Empl" bpmnElement="SF_P3_12_Empl">
+        <di:waypoint x="700" y="470" />
+        <di:waypoint x="795" y="470" />
+        <di:waypoint x="795" y="285" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P3_22" bpmnElement="SF_P3_22">
+        <di:waypoint x="820" y="260" />
+        <di:waypoint x="870" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Shape_Pool_Monitor" bpmnElement="Pool_Monitor" isHorizontal="true">
+        <dc:Bounds x="160" y="1260" width="2600" height="750" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_Monitor_Admin" bpmnElement="Lane_Monitor_Admin" isHorizontal="true">
+        <dc:Bounds x="190" y="1260" width="2570" height="350" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_Monitor_Sistema" bpmnElement="Lane_Monitor_Sistema" isHorizontal="true">
+        <dc:Bounds x="190" y="1610" width="2570" height="400" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Start" bpmnElement="P4_Start">
+        <dc:Bounds x="240" y="1392" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="223" y="1431" width="71" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_IniciarSimulacion" bpmnElement="P4_IniciarSimulacion">
+        <dc:Bounds x="330" y="1390" width="180" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_GenerarEventos" bpmnElement="P4_GenerarEventos">
+        <dc:Bounds x="330" y="1690" width="200" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_RegistrarEvento" bpmnElement="P4_RegistrarEvento">
+        <dc:Bounds x="580" y="1690" width="160" height="40" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_ActualizarDashboard" bpmnElement="P4_ActualizarDashboard">
+        <dc:Bounds x="790" y="1690" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_DifundirColas" bpmnElement="P4_DifundirColas">
+        <dc:Bounds x="1000" y="1690" width="200" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_GW_Umbral" bpmnElement="P4_GW_Umbral" isMarkerVisible="true">
+        <dc:Bounds x="1250" y="1685" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1300" y="1706" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_DifundirActualizacion" bpmnElement="P4_DifundirActualizacion">
+        <dc:Bounds x="1350" y="1630" width="180" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_End_Loop" bpmnElement="P4_End_Loop">
+        <dc:Bounds x="1580" y="1632" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1568" y="1671" width="60" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_DeterminarSeveridad" bpmnElement="P4_DeterminarSeveridad">
+        <dc:Bounds x="1350" y="1770" width="220" height="40" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_GenerarAlerta" bpmnElement="P4_GenerarAlerta">
+        <dc:Bounds x="1620" y="1770" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_DifundirAlerta" bpmnElement="P4_DifundirAlerta">
+        <dc:Bounds x="1830" y="1770" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_RecibirNotificacion" bpmnElement="P4_RecibirNotificacion">
+        <dc:Bounds x="1830" y="1390" width="200" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_GW_Resolucion" bpmnElement="P4_GW_Resolucion" isMarkerVisible="true">
+        <dc:Bounds x="2080" y="1385" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2051" y="1438" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_AsignarOperativo" bpmnElement="P4_AsignarOperativo">
+        <dc:Bounds x="2180" y="1290" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_EnviarMedico" bpmnElement="P4_EnviarMedico">
+        <dc:Bounds x="2180" y="1350" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_PatrullaSeguridad" bpmnElement="P4_PatrullaSeguridad">
+        <dc:Bounds x="2180" y="1410" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_LlamarRefuerzo" bpmnElement="P4_LlamarRefuerzo">
+        <dc:Bounds x="2180" y="1470" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_GW_MergeResolucion" bpmnElement="P4_GW_MergeResolucion" isMarkerVisible="true">
+        <dc:Bounds x="2390" y="1385" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2449.5" y="1403" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_DesactivarAlerta" bpmnElement="P4_DesactivarAlerta">
+        <dc:Bounds x="2240" y="1770" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_DifundirResolucion" bpmnElement="P4_DifundirResolucion">
+        <dc:Bounds x="2240" y="1850" width="200" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_End_Resolucion" bpmnElement="P4_End_Resolucion">
+        <dc:Bounds x="2520" y="1852" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2503" y="1891" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_01" bpmnElement="SF_P4_01">
+        <di:waypoint x="276" y="1410" />
+        <di:waypoint x="330" y="1410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_02" bpmnElement="SF_P4_02">
+        <di:waypoint x="420" y="1430" />
+        <di:waypoint x="420" y="1560" />
+        <di:waypoint x="430" y="1560" />
+        <di:waypoint x="430" y="1690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_03" bpmnElement="SF_P4_03">
+        <di:waypoint x="530" y="1710" />
+        <di:waypoint x="580" y="1710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_04" bpmnElement="SF_P4_04">
+        <di:waypoint x="740" y="1710" />
+        <di:waypoint x="790" y="1710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_05" bpmnElement="SF_P4_05">
+        <di:waypoint x="950" y="1710" />
+        <di:waypoint x="1000" y="1710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_06" bpmnElement="SF_P4_06">
+        <di:waypoint x="1200" y="1710" />
+        <di:waypoint x="1250" y="1710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_07_No" bpmnElement="SF_P4_07_No">
+        <di:waypoint x="1275" y="1685" />
+        <di:waypoint x="1275" y="1650" />
+        <di:waypoint x="1350" y="1650" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1283" y="1658" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_08_Si" bpmnElement="SF_P4_08_Si">
+        <di:waypoint x="1275" y="1735" />
+        <di:waypoint x="1275" y="1790" />
+        <di:waypoint x="1350" y="1790" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1284" y="1753" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_09" bpmnElement="SF_P4_09">
+        <di:waypoint x="1530" y="1650" />
+        <di:waypoint x="1580" y="1650" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_10" bpmnElement="SF_P4_10">
+        <di:waypoint x="1570" y="1790" />
+        <di:waypoint x="1620" y="1790" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_11" bpmnElement="SF_P4_11">
+        <di:waypoint x="1780" y="1790" />
+        <di:waypoint x="1830" y="1790" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_12" bpmnElement="SF_P4_12">
+        <di:waypoint x="1910" y="1770" />
+        <di:waypoint x="1910" y="1600" />
+        <di:waypoint x="1930" y="1600" />
+        <di:waypoint x="1930" y="1430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_13" bpmnElement="SF_P4_13">
+        <di:waypoint x="2030" y="1410" />
+        <di:waypoint x="2080" y="1410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_14_Operativo" bpmnElement="SF_P4_14_Operativo">
+        <di:waypoint x="2105" y="1385" />
+        <di:waypoint x="2105" y="1310" />
+        <di:waypoint x="2180" y="1310" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2078" y="1338" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_15_Medico" bpmnElement="SF_P4_15_Medico">
+        <di:waypoint x="2130" y="1410" />
+        <di:waypoint x="2155" y="1410" />
+        <di:waypoint x="2155" y="1370" />
+        <di:waypoint x="2180" y="1370" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2165" y="1393" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_16_Seguridad" bpmnElement="SF_P4_16_Seguridad">
+        <di:waypoint x="2130" y="1410" />
+        <di:waypoint x="2155" y="1410" />
+        <di:waypoint x="2155" y="1430" />
+        <di:waypoint x="2180" y="1430" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2145" y="1453" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_17_Refuerzo" bpmnElement="SF_P4_17_Refuerzo">
+        <di:waypoint x="2105" y="1435" />
+        <di:waypoint x="2105" y="1490" />
+        <di:waypoint x="2180" y="1490" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2071" y="1473" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_18" bpmnElement="SF_P4_18">
+        <di:waypoint x="2340" y="1310" />
+        <di:waypoint x="2415" y="1310" />
+        <di:waypoint x="2415" y="1385" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_19" bpmnElement="SF_P4_19">
+        <di:waypoint x="2340" y="1370" />
+        <di:waypoint x="2415" y="1370" />
+        <di:waypoint x="2415" y="1385" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_20" bpmnElement="SF_P4_20">
+        <di:waypoint x="2340" y="1430" />
+        <di:waypoint x="2365" y="1430" />
+        <di:waypoint x="2365" y="1410" />
+        <di:waypoint x="2390" y="1410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_21" bpmnElement="SF_P4_21">
+        <di:waypoint x="2340" y="1490" />
+        <di:waypoint x="2415" y="1490" />
+        <di:waypoint x="2415" y="1435" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_22" bpmnElement="SF_P4_22">
+        <di:waypoint x="2415" y="1435" />
+        <di:waypoint x="2415" y="1790" />
+        <di:waypoint x="2400" y="1790" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_24" bpmnElement="SF_P4_24">
+        <di:waypoint x="2320" y="1810" />
+        <di:waypoint x="2320" y="1830" />
+        <di:waypoint x="2340" y="1830" />
+        <di:waypoint x="2340" y="1850" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P4_25" bpmnElement="SF_P4_25">
+        <di:waypoint x="2440" y="1870" />
+        <di:waypoint x="2520" y="1870" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF_AdminToMonitor" bpmnElement="MF_AdminToMonitor">
+        <di:waypoint x="1460" y="1210" />
+        <di:waypoint x="1460" y="1260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1433" y="1225" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SP_Atracciones" name="Gestión de Atracciones (CRUD)">
+    <bpmndi:BPMNPlane bpmnElement="P3_SP_Atracciones">
+      <bpmndi:BPMNShape id="Shape_Exp_SA_Start" bpmnElement="P3_SA_Start">
+        <dc:Bounds x="30" y="160" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="199" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SA_GW_Op" bpmnElement="P3_SA_GW_Op" isMarkerVisible="true">
+        <dc:Bounds x="110" y="153" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="85" y="206" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SA_FormCrear" bpmnElement="P3_SA_FormCrear">
+        <dc:Bounds x="210" y="55" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SA_ValidarCrear" bpmnElement="P3_SA_ValidarCrear">
+        <dc:Bounds x="370" y="55" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SA_RegistrarAtraccion" bpmnElement="P3_SA_RegistrarAtraccion">
+        <dc:Bounds x="530" y="55" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SA_SeleccionarEditar" bpmnElement="P3_SA_SeleccionarEditar">
+        <dc:Bounds x="210" y="153" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SA_ValidarEditar" bpmnElement="P3_SA_ValidarEditar">
+        <dc:Bounds x="370" y="153" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SA_SeleccionarEliminar" bpmnElement="P3_SA_SeleccionarEliminar">
+        <dc:Bounds x="210" y="253" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SA_LimpiarDependencias" bpmnElement="P3_SA_LimpiarDependencias">
+        <dc:Bounds x="370" y="253" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SA_EliminarAtraccion" bpmnElement="P3_SA_EliminarAtraccion">
+        <dc:Bounds x="530" y="253" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SA_GW_Merge" bpmnElement="P3_SA_GW_Merge" isMarkerVisible="true">
+        <dc:Bounds x="690" y="153" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="665" y="206" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SA_ActualizarDashboard" bpmnElement="P3_SA_ActualizarDashboard">
+        <dc:Bounds x="790" y="153" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SA_End" bpmnElement="P3_SA_End">
+        <dc:Bounds x="950" y="160" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="918" y="199" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_01" bpmnElement="SF_P3_SA_01">
+        <di:waypoint x="66" y="178" />
+        <di:waypoint x="110" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_02" bpmnElement="SF_P3_SA_02_Crear">
+        <di:waypoint x="135" y="153" />
+        <di:waypoint x="135" y="80" />
+        <di:waypoint x="210" y="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="140" y="110" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_03" bpmnElement="SF_P3_SA_03_Editar">
+        <di:waypoint x="160" y="178" />
+        <di:waypoint x="210" y="178" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="168" y="163" width="31" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_04" bpmnElement="SF_P3_SA_04_Eliminar">
+        <di:waypoint x="135" y="203" />
+        <di:waypoint x="135" y="278" />
+        <di:waypoint x="210" y="278" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="140" y="240" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_05" bpmnElement="SF_P3_SA_05">
+        <di:waypoint x="320" y="80" />
+        <di:waypoint x="370" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_06" bpmnElement="SF_P3_SA_06">
+        <di:waypoint x="480" y="80" />
+        <di:waypoint x="530" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_07" bpmnElement="SF_P3_SA_07">
+        <di:waypoint x="640" y="80" />
+        <di:waypoint x="715" y="80" />
+        <di:waypoint x="715" y="153" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_08" bpmnElement="SF_P3_SA_08">
+        <di:waypoint x="320" y="178" />
+        <di:waypoint x="370" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_09" bpmnElement="SF_P3_SA_09">
+        <di:waypoint x="480" y="178" />
+        <di:waypoint x="690" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_10" bpmnElement="SF_P3_SA_10">
+        <di:waypoint x="320" y="278" />
+        <di:waypoint x="370" y="278" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_11" bpmnElement="SF_P3_SA_11">
+        <di:waypoint x="480" y="278" />
+        <di:waypoint x="530" y="278" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_12" bpmnElement="SF_P3_SA_12">
+        <di:waypoint x="640" y="278" />
+        <di:waypoint x="715" y="278" />
+        <di:waypoint x="715" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_13" bpmnElement="SF_P3_SA_13">
+        <di:waypoint x="740" y="178" />
+        <di:waypoint x="790" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SA_14" bpmnElement="SF_P3_SA_14">
+        <di:waypoint x="900" y="178" />
+        <di:waypoint x="950" y="178" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SP_TiposEntrada" name="Gestión de Tipos de Entrada (CRUD)">
+    <bpmndi:BPMNPlane bpmnElement="P3_SP_TiposEntrada">
+      <bpmndi:BPMNShape id="Shape_Exp_ST_Start" bpmnElement="P3_ST_Start">
+        <dc:Bounds x="30" y="160" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="199" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_ST_GW_Op" bpmnElement="P3_ST_GW_Op" isMarkerVisible="true">
+        <dc:Bounds x="110" y="153" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="85" y="206" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_ST_FormCrear" bpmnElement="P3_ST_FormCrear">
+        <dc:Bounds x="210" y="55" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_ST_ValidarCapacidad" bpmnElement="P3_ST_ValidarCapacidad">
+        <dc:Bounds x="370" y="55" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_ST_RegistrarTipo" bpmnElement="P3_ST_RegistrarTipo">
+        <dc:Bounds x="530" y="55" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_ST_SeleccionarEditar" bpmnElement="P3_ST_SeleccionarEditar">
+        <dc:Bounds x="210" y="153" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_ST_RevalidarCapacidad" bpmnElement="P3_ST_RevalidarCapacidad">
+        <dc:Bounds x="370" y="153" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_ST_VerificarDescuentos" bpmnElement="P3_ST_VerificarDescuentos">
+        <dc:Bounds x="210" y="253" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_ST_EliminarTipo" bpmnElement="P3_ST_EliminarTipo">
+        <dc:Bounds x="370" y="253" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_ST_GW_Merge" bpmnElement="P3_ST_GW_Merge" isMarkerVisible="true">
+        <dc:Bounds x="690" y="153" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="665" y="206" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_ST_NotificarWebSocket" bpmnElement="P3_ST_NotificarWebSocket">
+        <dc:Bounds x="790" y="153" width="110" height="50" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_ST_End" bpmnElement="P3_ST_End">
+        <dc:Bounds x="950" y="160" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="918" y="199" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_01" bpmnElement="SF_P3_ST_01">
+        <di:waypoint x="66" y="178" />
+        <di:waypoint x="110" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_02" bpmnElement="SF_P3_ST_02_Crear">
+        <di:waypoint x="135" y="153" />
+        <di:waypoint x="135" y="80" />
+        <di:waypoint x="210" y="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="140" y="110" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_03" bpmnElement="SF_P3_ST_03_Editar">
+        <di:waypoint x="160" y="178" />
+        <di:waypoint x="210" y="178" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="168" y="163" width="31" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_04" bpmnElement="SF_P3_ST_04_Eliminar">
+        <di:waypoint x="135" y="203" />
+        <di:waypoint x="135" y="278" />
+        <di:waypoint x="210" y="278" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="140" y="240" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_05" bpmnElement="SF_P3_ST_05">
+        <di:waypoint x="320" y="80" />
+        <di:waypoint x="370" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_06" bpmnElement="SF_P3_ST_06">
+        <di:waypoint x="480" y="80" />
+        <di:waypoint x="530" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_07" bpmnElement="SF_P3_ST_07">
+        <di:waypoint x="640" y="80" />
+        <di:waypoint x="715" y="80" />
+        <di:waypoint x="715" y="153" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_08" bpmnElement="SF_P3_ST_08">
+        <di:waypoint x="320" y="178" />
+        <di:waypoint x="370" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_09" bpmnElement="SF_P3_ST_09">
+        <di:waypoint x="480" y="178" />
+        <di:waypoint x="690" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_10" bpmnElement="SF_P3_ST_10">
+        <di:waypoint x="320" y="278" />
+        <di:waypoint x="370" y="278" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_11" bpmnElement="SF_P3_ST_11">
+        <di:waypoint x="480" y="278" />
+        <di:waypoint x="715" y="278" />
+        <di:waypoint x="715" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_12" bpmnElement="SF_P3_ST_12">
+        <di:waypoint x="740" y="178" />
+        <di:waypoint x="790" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_ST_13" bpmnElement="SF_P3_ST_13">
+        <di:waypoint x="900" y="178" />
+        <di:waypoint x="950" y="178" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SP_Descuentos" name="Gestión de Códigos de Descuento (CRUD)">
+    <bpmndi:BPMNPlane bpmnElement="P3_SP_Descuentos">
+      <bpmndi:BPMNShape id="Shape_Exp_SD_Start" bpmnElement="P3_SD_Start">
+        <dc:Bounds x="30" y="160" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="199" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SD_GW_Op" bpmnElement="P3_SD_GW_Op" isMarkerVisible="true">
+        <dc:Bounds x="110" y="153" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="85" y="206" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SD_FormCrear" bpmnElement="P3_SD_FormCrear">
+        <dc:Bounds x="210" y="55" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SD_AsignarTipos" bpmnElement="P3_SD_AsignarTipos">
+        <dc:Bounds x="370" y="55" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SD_RegistrarDescuento" bpmnElement="P3_SD_RegistrarDescuento">
+        <dc:Bounds x="530" y="55" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SD_SeleccionarEditar" bpmnElement="P3_SD_SeleccionarEditar">
+        <dc:Bounds x="210" y="153" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SD_ReemplazarAsociaciones" bpmnElement="P3_SD_ReemplazarAsociaciones">
+        <dc:Bounds x="370" y="153" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SD_EliminarAsociaciones" bpmnElement="P3_SD_EliminarAsociaciones">
+        <dc:Bounds x="210" y="253" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SD_EliminarDescuento" bpmnElement="P3_SD_EliminarDescuento">
+        <dc:Bounds x="370" y="253" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SD_GW_Merge" bpmnElement="P3_SD_GW_Merge" isMarkerVisible="true">
+        <dc:Bounds x="690" y="153" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="665" y="206" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SD_End" bpmnElement="P3_SD_End">
+        <dc:Bounds x="790" y="160" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="758" y="199" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Exp_SD_01" bpmnElement="SF_P3_SD_01">
+        <di:waypoint x="66" y="178" />
+        <di:waypoint x="110" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SD_02" bpmnElement="SF_P3_SD_02_Crear">
+        <di:waypoint x="135" y="153" />
+        <di:waypoint x="135" y="80" />
+        <di:waypoint x="210" y="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="140" y="110" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SD_03" bpmnElement="SF_P3_SD_03_Editar">
+        <di:waypoint x="160" y="178" />
+        <di:waypoint x="210" y="178" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="168" y="163" width="31" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SD_04" bpmnElement="SF_P3_SD_04_Eliminar">
+        <di:waypoint x="135" y="203" />
+        <di:waypoint x="135" y="278" />
+        <di:waypoint x="210" y="278" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="140" y="240" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SD_05" bpmnElement="SF_P3_SD_05">
+        <di:waypoint x="320" y="80" />
+        <di:waypoint x="370" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SD_06" bpmnElement="SF_P3_SD_06">
+        <di:waypoint x="480" y="80" />
+        <di:waypoint x="530" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SD_07" bpmnElement="SF_P3_SD_07">
+        <di:waypoint x="640" y="80" />
+        <di:waypoint x="715" y="80" />
+        <di:waypoint x="715" y="153" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SD_08" bpmnElement="SF_P3_SD_08">
+        <di:waypoint x="320" y="178" />
+        <di:waypoint x="370" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SD_09" bpmnElement="SF_P3_SD_09">
+        <di:waypoint x="480" y="178" />
+        <di:waypoint x="690" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SD_10" bpmnElement="SF_P3_SD_10">
+        <di:waypoint x="320" y="278" />
+        <di:waypoint x="370" y="278" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SD_11" bpmnElement="SF_P3_SD_11">
+        <di:waypoint x="480" y="278" />
+        <di:waypoint x="715" y="278" />
+        <di:waypoint x="715" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SD_12" bpmnElement="SF_P3_SD_12">
+        <di:waypoint x="740" y="178" />
+        <di:waypoint x="790" y="178" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SP_Empleados" name="Gestión de Empleados y Cuadrante">
+    <bpmndi:BPMNPlane bpmnElement="P3_SP_Empleados">
+      <bpmndi:BPMNShape id="Shape_Exp_SE_Start" bpmnElement="P3_SE_Start">
+        <dc:Bounds x="30" y="160" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="199" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SE_GW_Op" bpmnElement="P3_SE_GW_Op" isMarkerVisible="true">
+        <dc:Bounds x="110" y="153" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="85" y="206" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SE_RegistrarEmpleado" bpmnElement="P3_SE_RegistrarEmpleado">
+        <dc:Bounds x="210" y="55" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SE_SeleccionarSemana" bpmnElement="P3_SE_SeleccionarSemana">
+        <dc:Bounds x="210" y="153" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SE_ValidarAusencias" bpmnElement="P3_SE_ValidarAusencias">
+        <dc:Bounds x="370" y="153" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SE_RegistrarHorario" bpmnElement="P3_SE_RegistrarHorario">
+        <dc:Bounds x="530" y="153" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SE_SeleccionarBaja" bpmnElement="P3_SE_SeleccionarBaja">
+        <dc:Bounds x="210" y="253" width="110" height="50" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SE_EliminarRegistros" bpmnElement="P3_SE_EliminarRegistros">
+        <dc:Bounds x="370" y="253" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SE_TerminarEmpleado" bpmnElement="P3_SE_TerminarEmpleado">
+        <dc:Bounds x="530" y="253" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SE_GW_Merge" bpmnElement="P3_SE_GW_Merge" isMarkerVisible="true">
+        <dc:Bounds x="690" y="153" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="665" y="206" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SE_End" bpmnElement="P3_SE_End">
+        <dc:Bounds x="790" y="160" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="758" y="199" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Exp_SE_01" bpmnElement="SF_P3_SE_01">
+        <di:waypoint x="66" y="178" />
+        <di:waypoint x="110" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SE_02" bpmnElement="SF_P3_SE_02_Alta">
+        <di:waypoint x="135" y="153" />
+        <di:waypoint x="135" y="80" />
+        <di:waypoint x="210" y="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="140" y="110" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SE_03" bpmnElement="SF_P3_SE_03_Horario">
+        <di:waypoint x="160" y="178" />
+        <di:waypoint x="210" y="178" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="155" y="163" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SE_04" bpmnElement="SF_P3_SE_04_Baja">
+        <di:waypoint x="135" y="203" />
+        <di:waypoint x="135" y="278" />
+        <di:waypoint x="210" y="278" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="140" y="240" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SE_05" bpmnElement="SF_P3_SE_05">
+        <di:waypoint x="320" y="80" />
+        <di:waypoint x="715" y="80" />
+        <di:waypoint x="715" y="153" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SE_07" bpmnElement="SF_P3_SE_07">
+        <di:waypoint x="320" y="178" />
+        <di:waypoint x="370" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SE_08" bpmnElement="SF_P3_SE_08">
+        <di:waypoint x="480" y="178" />
+        <di:waypoint x="530" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SE_09" bpmnElement="SF_P3_SE_09">
+        <di:waypoint x="640" y="178" />
+        <di:waypoint x="690" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SE_10" bpmnElement="SF_P3_SE_10">
+        <di:waypoint x="320" y="278" />
+        <di:waypoint x="370" y="278" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SE_11" bpmnElement="SF_P3_SE_11">
+        <di:waypoint x="480" y="278" />
+        <di:waypoint x="530" y="278" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SE_12" bpmnElement="SF_P3_SE_12">
+        <di:waypoint x="640" y="278" />
+        <di:waypoint x="715" y="278" />
+        <di:waypoint x="715" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SE_13" bpmnElement="SF_P3_SE_13">
+        <di:waypoint x="740" y="178" />
+        <di:waypoint x="790" y="178" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SP_Estadisticas" name="Estadísticas y Precios Estacionales">
+    <bpmndi:BPMNPlane bpmnElement="P3_SP_Estadisticas">
+      <bpmndi:BPMNShape id="Shape_Exp_SS_Start" bpmnElement="P3_SS_Start">
+        <dc:Bounds x="30" y="160" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="0" y="199" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SS_GW_Fork" bpmnElement="P3_SS_GW_Fork">
+        <dc:Bounds x="110" y="153" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="170" y="164" width="50" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SS_RankingHoras" bpmnElement="P3_SS_RankingHoras">
+        <dc:Bounds x="210" y="-105" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SS_RankingAusencias" bpmnElement="P3_SS_RankingAusencias">
+        <dc:Bounds x="210" y="375" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SS_PreciosEstacionales" bpmnElement="P3_SS_PreciosEstacionales">
+        <dc:Bounds x="210" y="465" width="110" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SS_GW_Join" bpmnElement="P3_SS_GW_Join">
+        <dc:Bounds x="370" y="153" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="302.5" y="164" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Exp_SS_End" bpmnElement="P3_SS_End">
+        <dc:Bounds x="470" y="160" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="438" y="199" width="100" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1v6q2z2" bpmnElement="Activity_0fj9ysw">
+        <dc:Bounds x="210" y="-15" width="110" height="50" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_19xfotr" bpmnElement="Activity_117wmxr">
+        <dc:Bounds x="210" y="75" width="110" height="50" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0853yu0" bpmnElement="Activity_00okwhw">
+        <dc:Bounds x="210" y="205" width="110" height="50" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_17dspbl" bpmnElement="Activity_10tpfvz">
+        <dc:Bounds x="210" y="295" width="110" height="50" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Exp_SS_01" bpmnElement="SF_P3_SS_01">
+        <di:waypoint x="66" y="178" />
+        <di:waypoint x="110" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SS_02" bpmnElement="SF_P3_SS_02">
+        <di:waypoint x="135" y="153" />
+        <di:waypoint x="135" y="-80" />
+        <di:waypoint x="210" y="-80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SS_03" bpmnElement="SF_P3_SS_03">
+        <di:waypoint x="135" y="203" />
+        <di:waypoint x="135" y="400" />
+        <di:waypoint x="210" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SS_04" bpmnElement="SF_P3_SS_04">
+        <di:waypoint x="135" y="203" />
+        <di:waypoint x="135" y="490" />
+        <di:waypoint x="210" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SS_05" bpmnElement="SF_P3_SS_05">
+        <di:waypoint x="320" y="-80" />
+        <di:waypoint x="395" y="-80" />
+        <di:waypoint x="395" y="153" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SS_06" bpmnElement="SF_P3_SS_06">
+        <di:waypoint x="320" y="400" />
+        <di:waypoint x="395" y="400" />
+        <di:waypoint x="395" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SS_07" bpmnElement="SF_P3_SS_07">
+        <di:waypoint x="320" y="490" />
+        <di:waypoint x="395" y="490" />
+        <di:waypoint x="395" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Exp_SS_08" bpmnElement="SF_P3_SS_08">
+        <di:waypoint x="420" y="178" />
+        <di:waypoint x="470" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kett5z_di" bpmnElement="Flow_1kett5z">
+        <di:waypoint x="135" y="153" />
+        <di:waypoint x="135" y="10" />
+        <di:waypoint x="210" y="10" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kxjhn7_di" bpmnElement="Flow_1kxjhn7">
+        <di:waypoint x="135" y="153" />
+        <di:waypoint x="135" y="100" />
+        <di:waypoint x="210" y="100" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03abgr1_di" bpmnElement="Flow_03abgr1">
+        <di:waypoint x="135" y="203" />
+        <di:waypoint x="135" y="230" />
+        <di:waypoint x="210" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02omahr_di" bpmnElement="Flow_02omahr">
+        <di:waypoint x="320" y="10" />
+        <di:waypoint x="395" y="10" />
+        <di:waypoint x="395" y="153" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14dbxkh_di" bpmnElement="Flow_14dbxkh">
+        <di:waypoint x="320" y="100" />
+        <di:waypoint x="395" y="100" />
+        <di:waypoint x="395" y="153" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_088z91x_di" bpmnElement="Flow_088z91x">
+        <di:waypoint x="320" y="230" />
+        <di:waypoint x="395" y="230" />
+        <di:waypoint x="395" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1sb7bbj_di" bpmnElement="Flow_1sb7bbj">
+        <di:waypoint x="135" y="203" />
+        <di:waypoint x="135" y="320" />
+        <di:waypoint x="210" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19wurtj_di" bpmnElement="Flow_19wurtj">
+        <di:waypoint x="320" y="320" />
+        <di:waypoint x="395" y="320" />
+        <di:waypoint x="395" y="203" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:open-bpmn="http://open-bpmn.org/XMLSchema" id="Definitions_Auth" targetNamespace="http://www.magicworld.com/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.13.2">
+  <bpmn2:collaboration id="Collaboration_Auth">
+    <bpmn2:participant id="Pool_Auth" name="Autenticación y Gestión de Cuenta" processRef="Process_Auth">
+      <bpmn2:documentation id="documentation_aJo8CQ" />
+    </bpmn2:participant>
+  </bpmn2:collaboration>
+  <bpmn2:process id="Process_Auth" name="Autenticación y Gestión de Cuenta" processType="Private" isExecutable="false">
+    <bpmn2:laneSet id="LaneSet_Auth">
+      <bpmn2:lane id="Lane_Auth_Sistema" name="Sistema">
+        <bpmn2:documentation id="documentation_zZMrwQ" />
+        <bpmn2:flowNodeRef>P1_ValidarDatos</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_CodificarPassword</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_CrearCuenta</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_GenerarJWT_Reg</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_CallbackOAuth2</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_GW_UsuarioExistente</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_GenerarJWT_OAuth</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_GenerarJWT_OAuthNew</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_RateLimit</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_ValidarCredenciales</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_GenerarJWT_Login</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_ValidarPatronPassword</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_ActualizarPassword</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_EnviarEmailReset</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_ValidarPasswordOAuth</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_CrearCuentaOAuth</bpmn2:flowNodeRef>
+      </bpmn2:lane>
+      <bpmn2:lane id="Lane_Auth_Cliente" name="Cliente">
+        <bpmn2:documentation id="documentation_M2qn0Q" />
+        <bpmn2:flowNodeRef>P1_Start</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_GW_TieneCuenta</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_GW_MetodoRegistro</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_CompletarFormulario</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_RedirectOAuth2</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_AutorizarGoogle</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_GW_RecuerdaPassword</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_IntroducirCredenciales</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_SolicitarRecuperacion</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_AccederEnlaceReset</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_EstablecerNuevaPassword</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_End_Recovery</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_EstablecerPassword</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>Activity_1ajbsfr</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>Event_05xoger</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P1_SubProcess_Perfil</bpmn2:flowNodeRef>
+      </bpmn2:lane>
+    </bpmn2:laneSet>
+    <bpmn2:startEvent id="P1_Start" name="Usuario accede al sistema">
+      <bpmn2:documentation id="documentation_hWdp3Q" />
+      <bpmn2:outgoing>SF_P1_01</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:exclusiveGateway id="P1_GW_TieneCuenta" name="¿Tiene cuenta?">
+      <bpmn2:documentation id="documentation_JG9Vsg" />
+      <bpmn2:incoming>SF_P1_01</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_02_No</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P1_03_Si</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:exclusiveGateway id="P1_GW_MetodoRegistro" name="¿Método de registro?">
+      <bpmn2:documentation id="documentation_myQdNQ" />
+      <bpmn2:incoming>SF_P1_02_No</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_04_Manual</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P1_05_OAuth</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:userTask id="P1_CompletarFormulario" name="Completar formulario de registro">
+      <bpmn2:documentation id="documentation_Na9x5Q" />
+      <bpmn2:incoming>SF_P1_04_Manual</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_06</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="P1_ValidarDatos" name="Validar datos y unicidad">
+      <bpmn2:documentation id="documentation_eSkeKg" />
+      <bpmn2:incoming>SF_P1_06</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_07</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P1_CodificarPassword" name="Codificar contraseña (BCrypt)">
+      <bpmn2:documentation id="documentation_fl1Vaw" />
+      <bpmn2:incoming>SF_P1_07</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_08</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P1_CrearCuenta" name="Crear cuenta (Role.USER)">
+      <bpmn2:documentation id="documentation_M1cg7A" />
+      <bpmn2:incoming>SF_P1_08</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_09</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P1_GenerarJWT_Reg" name="Generar token JWT">
+      <bpmn2:documentation id="documentation_sR0eog" />
+      <bpmn2:incoming>SF_P1_09</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1f44ln5</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:userTask id="P1_RedirectOAuth2" name="Redirigir a proveedor OAuth2 (Google)">
+      <bpmn2:documentation id="documentation_Jh2tEg" />
+      <bpmn2:incoming>SF_P1_05_OAuth</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_11</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="P1_AutorizarGoogle" name="Autorizar en Google">
+      <bpmn2:documentation id="documentation_Ym05QA" />
+      <bpmn2:incoming>SF_P1_11</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_12</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="P1_CallbackOAuth2" name="Procesar callback OAuth2">
+      <bpmn2:documentation id="documentation_0vbDcQ" />
+      <bpmn2:incoming>SF_P1_12</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_13</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:exclusiveGateway id="P1_GW_UsuarioExistente" name="¿Usuario existente?">
+      <bpmn2:documentation id="documentation_OZDm3A" />
+      <bpmn2:incoming>SF_P1_13</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_14_Si</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P1_15_No</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:serviceTask id="P1_GenerarJWT_OAuth" name="Generar token JWT (usuario existente)">
+      <bpmn2:documentation id="documentation_4lNUdw" />
+      <bpmn2:incoming>SF_P1_14_Si</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0lof32n</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P1_GenerarJWT_OAuthNew" name="Generar token JWT (nuevo OAuth2)">
+      <bpmn2:documentation id="documentation_s0gyEg" />
+      <bpmn2:incoming>SF_P1_19</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0rdfivh</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:exclusiveGateway id="P1_GW_RecuerdaPassword" name="¿Recuerda contraseña?">
+      <bpmn2:documentation id="documentation_178RKQ" />
+      <bpmn2:incoming>SF_P1_03_Si</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_21_Si</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P1_22_No</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:userTask id="P1_IntroducirCredenciales" name="Introducir credenciales">
+      <bpmn2:documentation id="documentation_yjATxQ" />
+      <bpmn2:incoming>SF_P1_21_Si</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_23</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="P1_RateLimit" name="Verificar límite de intentos (5/min)">
+      <bpmn2:documentation id="documentation_2c8iDg" />
+      <bpmn2:incoming>SF_P1_23</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_24</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P1_ValidarCredenciales" name="Validar credenciales (BCrypt)">
+      <bpmn2:documentation id="documentation_mCxA8w" />
+      <bpmn2:incoming>SF_P1_24</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_25</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P1_GenerarJWT_Login" name="Generar token JWT">
+      <bpmn2:documentation id="documentation_pj9CVg" />
+      <bpmn2:incoming>SF_P1_25</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0kqohyn</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:userTask id="P1_SolicitarRecuperacion" name="Solicitar recuperación de contraseña">
+      <bpmn2:documentation id="documentation_kJcBsQ" />
+      <bpmn2:incoming>SF_P1_22_No</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_27</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="P1_AccederEnlaceReset" name="Acceder enlace de restablecimiento">
+      <bpmn2:documentation id="documentation_CgIgDg" />
+      <bpmn2:incoming>SF_P1_28</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_29</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="P1_EstablecerNuevaPassword" name="Establecer nueva contraseña">
+      <bpmn2:documentation id="documentation_NeJyxg" />
+      <bpmn2:incoming>SF_P1_29</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_30</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="P1_ValidarPatronPassword" name="Validar patrón de contraseña">
+      <bpmn2:documentation id="documentation_8cP0Ig" />
+      <bpmn2:incoming>SF_P1_30</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_31</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P1_ActualizarPassword" name="Actualizar contraseña">
+      <bpmn2:documentation id="documentation_02DoYw" />
+      <bpmn2:incoming>SF_P1_31</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_32</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:endEvent id="P1_End_Recovery" name="Redirigir a inicio de sesión">
+      <bpmn2:documentation id="documentation_ij4rSA" />
+      <bpmn2:incoming>SF_P1_32</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="SF_P1_01" sourceRef="P1_Start" targetRef="P1_GW_TieneCuenta">
+      <bpmn2:documentation id="documentation_idBrLw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_02_No" name="No" sourceRef="P1_GW_TieneCuenta" targetRef="P1_GW_MetodoRegistro">
+      <bpmn2:documentation id="documentation_yDQXsw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_03_Si" name="Sí" sourceRef="P1_GW_TieneCuenta" targetRef="P1_GW_RecuerdaPassword">
+      <bpmn2:documentation id="documentation_n087tA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_04_Manual" name="Manual" sourceRef="P1_GW_MetodoRegistro" targetRef="P1_CompletarFormulario">
+      <bpmn2:documentation id="documentation_YqPFBw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_05_OAuth" name="OAuth2 Google" sourceRef="P1_GW_MetodoRegistro" targetRef="P1_RedirectOAuth2">
+      <bpmn2:documentation id="documentation_R2ki9Q" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_06" sourceRef="P1_CompletarFormulario" targetRef="P1_ValidarDatos">
+      <bpmn2:documentation id="documentation_h7JPmg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_07" sourceRef="P1_ValidarDatos" targetRef="P1_CodificarPassword">
+      <bpmn2:documentation id="documentation_nfkYNg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_08" sourceRef="P1_CodificarPassword" targetRef="P1_CrearCuenta">
+      <bpmn2:documentation id="documentation_Hhr05w" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_09" sourceRef="P1_CrearCuenta" targetRef="P1_GenerarJWT_Reg">
+      <bpmn2:documentation id="documentation_vXq2Cw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_11" sourceRef="P1_RedirectOAuth2" targetRef="P1_AutorizarGoogle">
+      <bpmn2:documentation id="documentation_2MpdaA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_12" sourceRef="P1_AutorizarGoogle" targetRef="P1_CallbackOAuth2">
+      <bpmn2:documentation id="documentation_hkZ01w" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_13" sourceRef="P1_CallbackOAuth2" targetRef="P1_GW_UsuarioExistente">
+      <bpmn2:documentation id="documentation_ZQRTAQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_14_Si" name="Sí" sourceRef="P1_GW_UsuarioExistente" targetRef="P1_GenerarJWT_OAuth">
+      <bpmn2:documentation id="documentation_80SiOw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_15_No" name="No" sourceRef="P1_GW_UsuarioExistente" targetRef="P1_EstablecerPassword">
+      <bpmn2:documentation id="documentation_IZy08w" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_17" sourceRef="P1_EstablecerPassword" targetRef="P1_ValidarPasswordOAuth">
+      <bpmn2:documentation id="documentation_QvdKOA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_18" sourceRef="P1_ValidarPasswordOAuth" targetRef="P1_CrearCuentaOAuth">
+      <bpmn2:documentation id="documentation_SecbZA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_19" sourceRef="P1_CrearCuentaOAuth" targetRef="P1_GenerarJWT_OAuthNew">
+      <bpmn2:documentation id="documentation_sQQNYQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_21_Si" name="Sí" sourceRef="P1_GW_RecuerdaPassword" targetRef="P1_IntroducirCredenciales">
+      <bpmn2:documentation id="documentation_TU6uMw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_22_No" name="No" sourceRef="P1_GW_RecuerdaPassword" targetRef="P1_SolicitarRecuperacion">
+      <bpmn2:documentation id="documentation_RnFkBg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_23" sourceRef="P1_IntroducirCredenciales" targetRef="P1_RateLimit">
+      <bpmn2:documentation id="documentation_itOi8w" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_24" sourceRef="P1_RateLimit" targetRef="P1_ValidarCredenciales">
+      <bpmn2:documentation id="documentation_4wf6oA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_25" sourceRef="P1_ValidarCredenciales" targetRef="P1_GenerarJWT_Login">
+      <bpmn2:documentation id="documentation_UX4rzg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_27" sourceRef="P1_SolicitarRecuperacion" targetRef="P1_EnviarEmailReset">
+      <bpmn2:documentation id="documentation_YtyP0A" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_28" sourceRef="P1_EnviarEmailReset" targetRef="P1_AccederEnlaceReset">
+      <bpmn2:documentation id="documentation_m3yzdg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_29" sourceRef="P1_AccederEnlaceReset" targetRef="P1_EstablecerNuevaPassword">
+      <bpmn2:documentation id="documentation_hgtXHw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_30" sourceRef="P1_EstablecerNuevaPassword" targetRef="P1_ValidarPatronPassword">
+      <bpmn2:documentation id="documentation_CcQR1Q" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_31" sourceRef="P1_ValidarPatronPassword" targetRef="P1_ActualizarPassword">
+      <bpmn2:documentation id="documentation_GzNLeQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P1_32" sourceRef="P1_ActualizarPassword" targetRef="P1_End_Recovery">
+      <bpmn2:documentation id="documentation_By3JEg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:userTask id="P1_EstablecerPassword" name="Solicitar establecimiento de contraseña">
+      <bpmn2:documentation id="documentation_Ky29fA" />
+      <bpmn2:incoming>SF_P1_15_No</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_17</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="Flow_0rdfivh" sourceRef="P1_GenerarJWT_OAuthNew" targetRef="Activity_1ajbsfr" />
+    <bpmn2:sequenceFlow id="Flow_0lof32n" sourceRef="P1_GenerarJWT_OAuth" targetRef="Activity_1ajbsfr" />
+    <bpmn2:sequenceFlow id="Flow_1f44ln5" sourceRef="P1_GenerarJWT_Reg" targetRef="Activity_1ajbsfr" />
+    <bpmn2:serviceTask id="P1_EnviarEmailReset" name="Enviar email con token de reset (15 min)">
+      <bpmn2:documentation id="documentation_F5FY6A" />
+      <bpmn2:incoming>SF_P1_27</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_28</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="Flow_0kqohyn" sourceRef="P1_GenerarJWT_Login" targetRef="Activity_1ajbsfr" />
+    <bpmn2:serviceTask id="P1_ValidarPasswordOAuth" name="Validar contraseña">
+      <bpmn2:documentation id="documentation_SIp90A" />
+      <bpmn2:incoming>SF_P1_17</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_18</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P1_CrearCuentaOAuth" name="Crear cuenta OAuth2">
+      <bpmn2:documentation id="documentation_q70aYg" />
+      <bpmn2:incoming>SF_P1_18</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P1_19</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:userTask id="Activity_1ajbsfr" name="Token establecido">
+      <bpmn2:documentation />
+      <bpmn2:incoming>Flow_0rdfivh</bpmn2:incoming>
+      <bpmn2:incoming>Flow_0lof32n</bpmn2:incoming>
+      <bpmn2:incoming>Flow_1f44ln5</bpmn2:incoming>
+      <bpmn2:incoming>Flow_0kqohyn</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1j2d9u9</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:subProcess id="P1_SubProcess_Perfil" name="Gestión de Perfil de Usuario">
+      <bpmn2:documentation id="documentation_I1BvqA" />
+      <bpmn2:incoming>Flow_1j2d9u9</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0dfg5p5</bpmn2:outgoing>
+      <bpmn2:startEvent id="P1_SP_Start" name="Acceder a gestión de perfil">
+        <bpmn2:documentation id="documentation_fJgzDw" />
+        <bpmn2:outgoing>SF_P1_SP_01</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:exclusiveGateway id="P1_SP_GW_Accion" name="¿Acción de perfil?">
+        <bpmn2:documentation id="documentation_7rh3EA" />
+        <bpmn2:incoming>SF_P1_SP_01</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P1_SP_02_Editar</bpmn2:outgoing>
+        <bpmn2:outgoing>SF_P1_SP_03_Eliminar</bpmn2:outgoing>
+      </bpmn2:exclusiveGateway>
+      <bpmn2:userTask id="P1_SP_EditarPerfil" name="Editar datos del perfil">
+        <bpmn2:documentation id="documentation_izfuBA" />
+        <bpmn2:incoming>SF_P1_SP_02_Editar</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P1_SP_04</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:serviceTask id="P1_SP_ValidarUnicidad" name="Validar unicidad de datos">
+        <bpmn2:documentation id="documentation_RjISLg" />
+        <bpmn2:incoming>SF_P1_SP_04</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P1_SP_05</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P1_SP_ActualizarDatos" name="Actualizar datos y regenerar JWT si necesario">
+        <bpmn2:documentation id="documentation_6d7qMQ" />
+        <bpmn2:incoming>SF_P1_SP_05</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P1_SP_06</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:userTask id="P1_SP_ConfirmarEliminacion" name="Confirmar eliminación de cuenta">
+        <bpmn2:documentation id="documentation_YJSkcw" />
+        <bpmn2:incoming>SF_P1_SP_03_Eliminar</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P1_SP_07</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:serviceTask id="P1_SP_EliminarValoraciones" name="Eliminar valoraciones del usuario">
+        <bpmn2:documentation id="documentation_8bucFA" />
+        <bpmn2:incoming>SF_P1_SP_07</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P1_SP_08</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P1_SP_EliminarCompras" name="Eliminar compras del usuario">
+        <bpmn2:documentation id="documentation_60lSCA" />
+        <bpmn2:incoming>SF_P1_SP_08</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P1_SP_09</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P1_SP_EliminarUsuario" name="Eliminar cuenta de usuario">
+        <bpmn2:documentation id="documentation_xVW1EQ" />
+        <bpmn2:incoming>SF_P1_SP_09</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P1_SP_10</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P1_SP_CerrarSesion" name="Cerrar sesión y limpiar cookies">
+        <bpmn2:documentation id="documentation_qGS4yw" />
+        <bpmn2:incoming>SF_P1_SP_10</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P1_SP_11</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:endEvent id="P1_SP_End_Edit" name="Perfil actualizado">
+        <bpmn2:documentation id="documentation_05fLdA" />
+        <bpmn2:incoming>SF_P1_SP_06</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:endEvent id="P1_SP_End_Delete" name="Cuenta eliminada">
+        <bpmn2:documentation id="documentation_Xa0ydQ" />
+        <bpmn2:incoming>SF_P1_SP_11</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="SF_P1_SP_01" sourceRef="P1_SP_Start" targetRef="P1_SP_GW_Accion">
+        <bpmn2:documentation id="documentation_pZS0mQ" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P1_SP_02_Editar" name="Editar" sourceRef="P1_SP_GW_Accion" targetRef="P1_SP_EditarPerfil">
+        <bpmn2:documentation id="documentation_4pMUxg" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P1_SP_03_Eliminar" name="Eliminar" sourceRef="P1_SP_GW_Accion" targetRef="P1_SP_ConfirmarEliminacion">
+        <bpmn2:documentation id="documentation_kB0BoQ" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P1_SP_04" sourceRef="P1_SP_EditarPerfil" targetRef="P1_SP_ValidarUnicidad">
+        <bpmn2:documentation id="documentation_59qrZg" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P1_SP_05" sourceRef="P1_SP_ValidarUnicidad" targetRef="P1_SP_ActualizarDatos">
+        <bpmn2:documentation id="documentation_5EtEfA" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P1_SP_06" sourceRef="P1_SP_ActualizarDatos" targetRef="P1_SP_End_Edit">
+        <bpmn2:documentation id="documentation_Gd0BMA" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P1_SP_07" sourceRef="P1_SP_ConfirmarEliminacion" targetRef="P1_SP_EliminarValoraciones">
+        <bpmn2:documentation id="documentation_S0zbqA" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P1_SP_08" sourceRef="P1_SP_EliminarValoraciones" targetRef="P1_SP_EliminarCompras">
+        <bpmn2:documentation id="documentation_PmqmwA" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P1_SP_09" sourceRef="P1_SP_EliminarCompras" targetRef="P1_SP_EliminarUsuario">
+        <bpmn2:documentation id="documentation_RKO0AA" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P1_SP_10" sourceRef="P1_SP_EliminarUsuario" targetRef="P1_SP_CerrarSesion">
+        <bpmn2:documentation id="documentation_Ilu5Rg" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P1_SP_11" sourceRef="P1_SP_CerrarSesion" targetRef="P1_SP_End_Delete">
+        <bpmn2:documentation id="documentation_a4Tljw" />
+      </bpmn2:sequenceFlow>
+    </bpmn2:subProcess>
+    <bpmn2:sequenceFlow id="Flow_1j2d9u9" sourceRef="Activity_1ajbsfr" targetRef="P1_SubProcess_Perfil" />
+    <bpmn2:endEvent id="Event_05xoger" name="Gesión finalizada">
+      <bpmn2:incoming>Flow_0dfg5p5</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="Flow_0dfg5p5" sourceRef="P1_SubProcess_Perfil" targetRef="Event_05xoger" />
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Auth" name="MagicWorld - Autenticación y Gestión de Cuenta">
+    <bpmndi:BPMNPlane id="BPMNPlane_Auth" bpmnElement="Collaboration_Auth">
+      <bpmndi:BPMNShape id="Shape_Pool_Auth" bpmnElement="Pool_Auth" isHorizontal="true">
+        <dc:Bounds x="160" y="110" width="2658" height="710" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_Auth_Cliente" bpmnElement="Lane_Auth_Cliente" isHorizontal="true">
+        <dc:Bounds x="190" y="110" width="2628" height="400" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_Auth_Sistema" bpmnElement="Lane_Auth_Sistema" isHorizontal="true">
+        <dc:Bounds x="190" y="510" width="2628" height="310" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Start" bpmnElement="P1_Start">
+        <dc:Bounds x="240" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="214" y="321" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_GW_TieneCuenta" bpmnElement="P1_GW_TieneCuenta" isMarkerVisible="true">
+        <dc:Bounds x="325" y="275" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="312" y="328" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_GW_MetodoRegistro" bpmnElement="P1_GW_MetodoRegistro" isMarkerVisible="true">
+        <dc:Bounds x="425" y="165" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="358" y="158" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_CompletarFormulario" bpmnElement="P1_CompletarFormulario">
+        <dc:Bounds x="530" y="120" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_ValidarDatos" bpmnElement="P1_ValidarDatos">
+        <dc:Bounds x="530" y="530" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_CodificarPassword" bpmnElement="P1_CodificarPassword">
+        <dc:Bounds x="730" y="530" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_CrearCuenta" bpmnElement="P1_CrearCuenta">
+        <dc:Bounds x="930" y="530" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_GenerarJWT_Reg" bpmnElement="P1_GenerarJWT_Reg">
+        <dc:Bounds x="1130" y="530" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_RedirectOAuth2" bpmnElement="P1_RedirectOAuth2">
+        <dc:Bounds x="530" y="210" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_AutorizarGoogle" bpmnElement="P1_AutorizarGoogle">
+        <dc:Bounds x="730" y="210" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_CallbackOAuth2" bpmnElement="P1_CallbackOAuth2">
+        <dc:Bounds x="930" y="620" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_GW_UsuarioExistente" bpmnElement="P1_GW_UsuarioExistente" isMarkerVisible="true">
+        <dc:Bounds x="1125" y="615" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1125" y="668" width="51" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_GenerarJWT_OAuth" bpmnElement="P1_GenerarJWT_OAuth">
+        <dc:Bounds x="1230" y="620" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_GenerarJWT_OAuthNew" bpmnElement="P1_GenerarJWT_OAuthNew">
+        <dc:Bounds x="1830" y="710" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_GW_RecuerdaPassword" bpmnElement="P1_GW_RecuerdaPassword" isMarkerVisible="true">
+        <dc:Bounds x="425" y="365" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="365" y="406" width="61" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_IntroducirCredenciales" bpmnElement="P1_IntroducirCredenciales">
+        <dc:Bounds x="530" y="320" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_RateLimit" bpmnElement="P1_RateLimit">
+        <dc:Bounds x="730" y="620" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_ValidarCredenciales" bpmnElement="P1_ValidarCredenciales">
+        <dc:Bounds x="730" y="710" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_GenerarJWT_Login" bpmnElement="P1_GenerarJWT_Login">
+        <dc:Bounds x="930" y="710" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_SolicitarRecuperacion" bpmnElement="P1_SolicitarRecuperacion">
+        <dc:Bounds x="530" y="410" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_AccederEnlaceReset" bpmnElement="P1_AccederEnlaceReset">
+        <dc:Bounds x="1830" y="410" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_EstablecerNuevaPassword" bpmnElement="P1_EstablecerNuevaPassword">
+        <dc:Bounds x="2030" y="410" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_ValidarPatronPassword" bpmnElement="P1_ValidarPatronPassword">
+        <dc:Bounds x="2030" y="620" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_ActualizarPassword" bpmnElement="P1_ActualizarPassword">
+        <dc:Bounds x="2230" y="620" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_End_Recovery" bpmnElement="P1_End_Recovery">
+        <dc:Bounds x="2540" y="412" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2519" y="451" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_EstablecerPassword" bpmnElement="P1_EstablecerPassword">
+        <dc:Bounds x="1062" y="155" width="176" height="69" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_EnviarEmailReset" bpmnElement="P1_EnviarEmailReset">
+        <dc:Bounds x="1560" y="570" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_ValidarPasswordOAuth" bpmnElement="P1_ValidarPasswordOAuth">
+        <dc:Bounds x="1430" y="750" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_CrearCuentaOAuth" bpmnElement="P1_CrearCuentaOAuth">
+        <dc:Bounds x="1630" y="750" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0x6n9gx" bpmnElement="Activity_1ajbsfr">
+        <dc:Bounds x="2230" y="260" width="160" height="40" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_05xoger_di" bpmnElement="Event_05xoger">
+        <dc:Bounds x="2682" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2658" y="305" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_SubProcess_Perfil" bpmnElement="P1_SubProcess_Perfil" isExpanded="false">
+        <dc:Bounds x="2430" y="255" width="200" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_01" bpmnElement="SF_P1_01">
+        <di:waypoint x="276" y="300" />
+        <di:waypoint x="325" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_02_No" bpmnElement="SF_P1_02_No">
+        <di:waypoint x="350" y="275" />
+        <di:waypoint x="350" y="190" />
+        <di:waypoint x="425" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="358" y="223" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_03_Si" bpmnElement="SF_P1_03_Si">
+        <di:waypoint x="350" y="325" />
+        <di:waypoint x="350" y="390" />
+        <di:waypoint x="425" y="390" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="359" y="348" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_04_Manual" bpmnElement="SF_P1_04_Manual">
+        <di:waypoint x="450" y="165" />
+        <di:waypoint x="450" y="140" />
+        <di:waypoint x="530" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="447" y="143" width="37" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_05_OAuth" bpmnElement="SF_P1_05_OAuth">
+        <di:waypoint x="450" y="215" />
+        <di:waypoint x="450" y="230" />
+        <di:waypoint x="530" y="230" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="427" y="213" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_06" bpmnElement="SF_P1_06">
+        <di:waypoint x="610" y="160" />
+        <di:waypoint x="610" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_07" bpmnElement="SF_P1_07">
+        <di:waypoint x="690" y="550" />
+        <di:waypoint x="730" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_08" bpmnElement="SF_P1_08">
+        <di:waypoint x="890" y="550" />
+        <di:waypoint x="930" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_09" bpmnElement="SF_P1_09">
+        <di:waypoint x="1090" y="550" />
+        <di:waypoint x="1130" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_11" bpmnElement="SF_P1_11">
+        <di:waypoint x="690" y="230" />
+        <di:waypoint x="730" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_12" bpmnElement="SF_P1_12">
+        <di:waypoint x="890" y="230" />
+        <di:waypoint x="910" y="230" />
+        <di:waypoint x="910" y="640" />
+        <di:waypoint x="930" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_13" bpmnElement="SF_P1_13">
+        <di:waypoint x="1090" y="640" />
+        <di:waypoint x="1125" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_14_Si" bpmnElement="SF_P1_14_Si">
+        <di:waypoint x="1175" y="640" />
+        <di:waypoint x="1230" y="640" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1197" y="615" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_15_No" bpmnElement="SF_P1_15_No">
+        <di:waypoint x="1150" y="615" />
+        <di:waypoint x="1150" y="224" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1158" y="413" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_17" bpmnElement="SF_P1_17">
+        <di:waypoint x="1238" y="175" />
+        <di:waypoint x="1410" y="175" />
+        <di:waypoint x="1410" y="770" />
+        <di:waypoint x="1430" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_18" bpmnElement="SF_P1_18">
+        <di:waypoint x="1590" y="770" />
+        <di:waypoint x="1630" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_19" bpmnElement="SF_P1_19">
+        <di:waypoint x="1790" y="770" />
+        <di:waypoint x="1810" y="770" />
+        <di:waypoint x="1810" y="730" />
+        <di:waypoint x="1830" y="730" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_21_Si" bpmnElement="SF_P1_21_Si">
+        <di:waypoint x="450" y="365" />
+        <di:waypoint x="450" y="340" />
+        <di:waypoint x="530" y="340" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="459" y="343" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_22_No" bpmnElement="SF_P1_22_No">
+        <di:waypoint x="450" y="415" />
+        <di:waypoint x="450" y="430" />
+        <di:waypoint x="530" y="430" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="458" y="413" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_23" bpmnElement="SF_P1_23">
+        <di:waypoint x="690" y="340" />
+        <di:waypoint x="710" y="340" />
+        <di:waypoint x="710" y="640" />
+        <di:waypoint x="730" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_24" bpmnElement="SF_P1_24">
+        <di:waypoint x="810" y="660" />
+        <di:waypoint x="810" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_25" bpmnElement="SF_P1_25">
+        <di:waypoint x="890" y="730" />
+        <di:waypoint x="930" y="730" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_27" bpmnElement="SF_P1_27">
+        <di:waypoint x="690" y="430" />
+        <di:waypoint x="1640" y="430" />
+        <di:waypoint x="1640" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_28" bpmnElement="SF_P1_28">
+        <di:waypoint x="1720" y="590" />
+        <di:waypoint x="1810" y="590" />
+        <di:waypoint x="1810" y="430" />
+        <di:waypoint x="1830" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_29" bpmnElement="SF_P1_29">
+        <di:waypoint x="1990" y="430" />
+        <di:waypoint x="2030" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_30" bpmnElement="SF_P1_30">
+        <di:waypoint x="2110" y="450" />
+        <di:waypoint x="2110" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_31" bpmnElement="SF_P1_31">
+        <di:waypoint x="2190" y="640" />
+        <di:waypoint x="2230" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P1_32" bpmnElement="SF_P1_32">
+        <di:waypoint x="2390" y="640" />
+        <di:waypoint x="2558" y="640" />
+        <di:waypoint x="2558" y="448" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rdfivh_di" bpmnElement="Flow_0rdfivh">
+        <di:waypoint x="1990" y="730" />
+        <di:waypoint x="2155" y="730" />
+        <di:waypoint x="2155" y="280" />
+        <di:waypoint x="2230" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0lof32n_di" bpmnElement="Flow_0lof32n">
+        <di:waypoint x="1390" y="640" />
+        <di:waypoint x="1740" y="640" />
+        <di:waypoint x="1740" y="280" />
+        <di:waypoint x="2230" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1f44ln5_di" bpmnElement="Flow_1f44ln5">
+        <di:waypoint x="1290" y="550" />
+        <di:waypoint x="1830" y="550" />
+        <di:waypoint x="1830" y="280" />
+        <di:waypoint x="2230" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kqohyn_di" bpmnElement="Flow_0kqohyn">
+        <di:waypoint x="1090" y="730" />
+        <di:waypoint x="1730" y="730" />
+        <di:waypoint x="1730" y="280" />
+        <di:waypoint x="2230" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1j2d9u9_di" bpmnElement="Flow_1j2d9u9">
+        <di:waypoint x="2390" y="280" />
+        <di:waypoint x="2430" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dfg5p5_di" bpmnElement="Flow_0dfg5p5">
+        <di:waypoint x="2630" y="280" />
+        <di:waypoint x="2682" y="280" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Perfil" name="Gestión de Perfil de Usuario">
+    <bpmndi:BPMNPlane bpmnElement="P1_SubProcess_Perfil">
+      <bpmndi:BPMNShape id="ExpShape_P1_SP_Start" bpmnElement="P1_SP_Start">
+        <dc:Bounds x="50" y="150" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="24" y="189" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P1_SP_GW_Accion" bpmnElement="P1_SP_GW_Accion" isMarkerVisible="true">
+        <dc:Bounds x="140" y="143" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="121" y="196" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P1_SP_EditarPerfil" bpmnElement="P1_SP_EditarPerfil">
+        <dc:Bounds x="250" y="50" width="160" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P1_SP_ValidarUnicidad" bpmnElement="P1_SP_ValidarUnicidad">
+        <dc:Bounds x="450" y="50" width="180" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P1_SP_ActualizarDatos" bpmnElement="P1_SP_ActualizarDatos">
+        <dc:Bounds x="670" y="50" width="200" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P1_SP_ConfirmarEliminacion" bpmnElement="P1_SP_ConfirmarEliminacion">
+        <dc:Bounds x="250" y="210" width="170" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P1_SP_EliminarValoraciones" bpmnElement="P1_SP_EliminarValoraciones">
+        <dc:Bounds x="460" y="210" width="170" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P1_SP_EliminarCompras" bpmnElement="P1_SP_EliminarCompras">
+        <dc:Bounds x="670" y="210" width="170" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P1_SP_EliminarUsuario" bpmnElement="P1_SP_EliminarUsuario">
+        <dc:Bounds x="880" y="210" width="170" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P1_SP_CerrarSesion" bpmnElement="P1_SP_CerrarSesion">
+        <dc:Bounds x="1090" y="210" width="170" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P1_SP_End_Edit" bpmnElement="P1_SP_End_Edit">
+        <dc:Bounds x="910" y="57" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="886" y="96" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P1_SP_End_Delete" bpmnElement="P1_SP_End_Delete">
+        <dc:Bounds x="1300" y="217" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1275" y="256" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P1_SP_01" bpmnElement="SF_P1_SP_01">
+        <di:waypoint x="86" y="168" />
+        <di:waypoint x="140" y="168" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P1_SP_02_Editar" bpmnElement="SF_P1_SP_02_Editar">
+        <di:waypoint x="165" y="143" />
+        <di:waypoint x="165" y="75" />
+        <di:waypoint x="250" y="75" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="175" y="103" width="31" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P1_SP_03_Eliminar" bpmnElement="SF_P1_SP_03_Eliminar">
+        <di:waypoint x="165" y="193" />
+        <di:waypoint x="165" y="235" />
+        <di:waypoint x="250" y="235" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="175" y="218" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P1_SP_04" bpmnElement="SF_P1_SP_04">
+        <di:waypoint x="410" y="75" />
+        <di:waypoint x="450" y="75" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P1_SP_05" bpmnElement="SF_P1_SP_05">
+        <di:waypoint x="630" y="75" />
+        <di:waypoint x="670" y="75" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P1_SP_06" bpmnElement="SF_P1_SP_06">
+        <di:waypoint x="870" y="75" />
+        <di:waypoint x="910" y="75" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P1_SP_07" bpmnElement="SF_P1_SP_07">
+        <di:waypoint x="420" y="235" />
+        <di:waypoint x="460" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P1_SP_08" bpmnElement="SF_P1_SP_08">
+        <di:waypoint x="630" y="235" />
+        <di:waypoint x="670" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P1_SP_09" bpmnElement="SF_P1_SP_09">
+        <di:waypoint x="840" y="235" />
+        <di:waypoint x="880" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P1_SP_10" bpmnElement="SF_P1_SP_10">
+        <di:waypoint x="1050" y="235" />
+        <di:waypoint x="1090" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P1_SP_11" bpmnElement="SF_P1_SP_11">
+        <di:waypoint x="1260" y="235" />
+        <di:waypoint x="1300" y="235" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

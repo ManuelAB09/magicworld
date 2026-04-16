@@ -3,7 +3,7 @@ import { AttractionList } from './attraction-list';
 import { AttractionApiService, Attraction } from './attraction.service';
 import { AuthService, Role } from '../auth/auth.service';
 import { ErrorService } from '../error/error-service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { provideRouter } from '@angular/router';
 import { of, throwError, Subject } from 'rxjs';
 
@@ -13,7 +13,6 @@ describe('AttractionList', () => {
   let mockApiService: jasmine.SpyObj<AttractionApiService>;
   let mockAuthService: jasmine.SpyObj<AuthService>;
   let mockErrorService: jasmine.SpyObj<ErrorService>;
-  let translateService: TranslateService;
 
   const mockAttractions: Attraction[] = [
     { id: 1, name: 'Roller Coaster', intensity: 'HIGH', category: 'ROLLER_COASTER', minimumHeight: 120, minimumAge: 10, minimumWeight: 30, description: 'Exciting ride', photoUrl: '/images/roller.jpg', isActive: true, mapPositionX: 30, mapPositionY: 40 },
@@ -44,7 +43,6 @@ describe('AttractionList', () => {
 
     fixture = TestBed.createComponent(AttractionList);
     component = fixture.componentInstance;
-    translateService = TestBed.inject(TranslateService);
   });
 
   it('should create', () => {

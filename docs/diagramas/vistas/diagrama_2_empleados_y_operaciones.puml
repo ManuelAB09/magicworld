@@ -1,0 +1,123 @@
+@startuml MagicWorld_EmpleadosYOperaciones
+
+!theme plain
+hide circle
+skinparam linetype ortho
+skinparam backgroundColor #FFFFFF
+skinparam class {
+    BackgroundColor #EBF5FB
+    BorderColor #1278DF
+    HeaderBackgroundColor #1278DF
+    HeaderFontColor White
+    FontName Arial
+    FontSize 11
+    AttributeFontSize 10
+}
+skinparam class<<externo>> {
+    BackgroundColor #F0F0F0
+    BorderColor #999999
+    HeaderBackgroundColor #999999
+    HeaderFontColor White
+}
+skinparam package {
+    BackgroundColor #FAFAFA
+    BorderColor #ADB5BD
+    FontColor #212529
+    FontStyle bold
+    FontSize 12
+}
+skinparam arrow {
+    Color #343A40
+    FontSize 9
+    FontColor #555555
+    Thickness 1.5
+}
+
+title "<b>MagicWorld — Empleados y Operaciones</b>"
+
+' ─────────────────────────────────────────
+package "Empleados" {
+    class Employee {
+        firstName : String
+        lastName  : String
+        email     : String
+        phone     : String
+        role      : EmployeeRole
+        status    : EmployeeStatus
+        hireDate  : LocalDate
+    }
+    class DailyAssignment {
+        assignmentDate : LocalDate
+        currentStatus  : DailyStatus
+        breakStartTime : LocalTime
+        breakEndTime   : LocalTime
+        breakGroup     : BreakGroup
+        isOvertime     : Boolean
+    }
+    class WeeklySchedule {
+        weekStartDate          : LocalDate
+        dayOfWeek              : DayOfWeek
+        shift                  : WorkShift
+        snapshotAttractionName : String
+        snapshotEffectiveHours : BigDecimal
+        breakGroup             : BreakGroup
+        isOvertime             : Boolean
+        isReinforcement        : Boolean
+    }
+    class WorkLog {
+        targetDate    : LocalDate
+        action        : WorkLogAction
+        hoursAffected : BigDecimal
+        isOvertime    : Boolean
+        reason        : String
+        performedBy   : String
+        createdAt     : LocalDateTime
+    }
+    class ReinforcementCall {
+        callTime     : LocalDateTime
+        status       : ReinforcementStatus
+        responseTime : LocalDateTime
+        arrivalTime  : LocalDateTime
+        isOvertime   : Boolean
+    }
+}
+
+' ─────────────────────────────────────────
+package "Ref. Parque / Monitorización" <<Frame>> {
+    class ParkZone <<externo>> {
+        zoneName : String
+    }
+    class Attraction <<externo>> {
+        name : String
+    }
+    class ParkAlert <<externo>> {
+        alertType : AlertType
+        severity  : AlertSeverity
+        isActive  : Boolean
+    }
+}
+
+' ─────────────────────────────────────────
+'  RELACIONES
+' ─────────────────────────────────────────
+Employee        "1"    *--  "0..*"  DailyAssignment   : "tiene >"
+Employee        "1"    *--  "0..*"  WeeklySchedule    : "planifica >"
+Employee        "1"    *--  "0..*"  WorkLog           : "registra >"
+Employee        "1"    -->  "0..*"  ReinforcementCall : "atiende >"
+
+DailyAssignment "0..*" --> "0..1"  ParkZone    : "trabaja en >"
+DailyAssignment "0..*" --> "0..1"  Attraction  : "opera en >"
+DailyAssignment "0..*" --> "0..1"  ParkAlert   : "responde a >"
+
+WeeklySchedule  "0..*" --> "0..1"  ParkZone    : "asignado a >"
+WeeklySchedule  "0..*" --> "0..1"  Attraction  : "asignado a >"
+
+ReinforcementCall "0..*" --> "0..1" ParkAlert  : "originada por >"
+
+note bottom of ParkZone
+  Entidades definidas en el
+  Diagrama 3 (Parque y Monitorización).
+  Se muestran aquí como referencia.
+end note
+
+@enduml

@@ -14,6 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("PMD.UnusedFormalParameter")
 public class ResolutionOptionsService {
 
     private final AttractionRepository attractionRepository;

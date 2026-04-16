@@ -3,7 +3,7 @@ import { TicketTypeList } from './ticket-type-list';
 import { TicketTypeApiService, TicketType } from './ticket-type.service';
 import { AuthService, Role } from '../auth/auth.service';
 import { ErrorService } from '../error/error-service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { provideRouter } from '@angular/router';
 import { of, throwError, Subject } from 'rxjs';
 

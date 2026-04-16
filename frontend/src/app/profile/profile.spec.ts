@@ -3,7 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { ProfileComponent } from './profile';
-import { ProfileService, PurchaseDTO, UpdateProfileRequest } from './profile.service';
+import { ProfileService, PurchaseDTO } from './profile.service';
 import { AuthService, UserProfile, Role } from '../auth/auth.service';
 import { ErrorService } from '../error/error-service';
 import { CurrencyService } from '../shared/currency.service';

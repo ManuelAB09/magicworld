@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@SuppressWarnings("PMD.UnusedFormalParameter")
 public class AlertResolutionService {
 
     private final ParkAlertRepository alertRepository;

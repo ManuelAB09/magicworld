@@ -1,0 +1,123 @@
+@startuml
+left to right direction
+
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 14
+skinparam padding 12
+skinparam roundCorner 18
+skinparam backgroundColor #FAFAFA
+
+' Parámetros de espaciado para que no se vea tan apelotonado
+skinparam nodesep 30
+skinparam ranksep 60
+
+skinparam actor {
+  BackgroundColor #FFFFFF
+  BorderColor #444444
+  FontSize 17
+  FontStyle bold
+  BorderThickness 2
+}
+
+skinparam usecase {
+  BackgroundColor #FFFFFF
+  BorderColor #888888
+  FontSize 13
+  BorderThickness 1.5
+}
+
+skinparam package {
+  FontSize 15
+  FontStyle bold
+  BorderThickness 2
+}
+
+skinparam arrow {
+  Color #555555
+  Thickness 1.5
+  FontSize 11
+}
+
+skinparam note {
+  FontSize 12
+  BackgroundColor #FFFDE7
+  BorderColor #BBAA44
+}
+
+skinparam rectangle {
+  FontSize 16
+  FontStyle bold
+  BorderThickness 2.5
+  BorderColor #333333
+}
+
+' ── Actores (fuera del límite del sistema) ───────────────────────
+actor "Visitante\n(Anónimo)" as V #1188DD
+actor "Cliente\n(Autenticado)" as C #117733
+actor "Administrador" as A #DD3333
+
+' Generalización en cadena: Visitante ← Cliente ← Administrador
+V <|-- C
+C <|-- A
+
+' ── Límite del sistema (un solo rectángulo) ──────────────────────
+rectangle "Casos de uso" {
+
+  ' -- Accesibles por el Visitante (y por herencia, por todos) --
+  usecase "RQF-001: Iniciar sesión" as UC01
+  usecase "RQF-002: Registrarse" as UC02
+  usecase "RQF-004: Comprar entradas" as UC04
+  usecase "RQF-007: Visualizar y filtrar atracciones" as UC07
+  usecase "RQF-010: Ver mapa del parque" as UC10
+  usecase "RQF-013: Cambiar idioma" as UC13
+  usecase "RQF-014: Ver reseñas del parque" as UC14
+
+  ' -- Exclusivos del Cliente (y por herencia, del Administrador) --
+  usecase "RQF-003: Recuperar contraseña" as UC03
+  usecase "RQF-005: Gestionar perfil" as UC05
+  usecase "RQF-011: Dejar reseña" as UC11
+  usecase "RQF-012: Ver resúmenes de compra" as UC12
+
+  ' -- Exclusivos del Administrador --
+  usecase "RQF-006: Gestionar tipos de entrada" as UC06
+  usecase "RQF-008: Gestionar atracciones" as UC08
+  usecase "RQF-009: Chatbot de administración" as UC09
+  usecase "RQF-015: Crear promociones" as UC15
+  usecase "RQF-016: Precios estacionales" as UC16
+  usecase "RQF-017: Días de cierre del parque" as UC17
+  usecase "RQF-018: Gestión de empleados" as UC18
+  usecase "RQF-019: Cuadrantes y control de trabajo" as UC19
+  usecase "RQF-020: Estadísticas de ventas" as UC20
+  usecase "RQF-021: Estadísticas de empleados" as UC21
+  usecase "RQF-022: Monitorización de respuestas" as UC22
+}
+
+' ── Asociaciones del Visitante (sin punta de flecha, estándar UML) ──
+V -- UC01
+V -- UC02
+V -- UC04
+V -- UC07
+V -- UC10
+V -- UC13
+V -- UC14
+
+' ── Asociaciones adicionales del Cliente ─────────────────────────
+C -- UC03
+C -- UC05
+C -- UC11
+C -- UC12
+
+' ── Asociaciones exclusivas del Administrador ────────────────────
+A -- UC06
+A -- UC08
+A -- UC09
+A -- UC15
+A -- UC16
+A -- UC17
+A -- UC18
+A -- UC19
+A -- UC20
+A -- UC21
+A -- UC22
+
+@enduml

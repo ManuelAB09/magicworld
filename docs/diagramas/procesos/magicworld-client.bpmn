@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:open-bpmn="http://open-bpmn.org/XMLSchema" id="Definitions_Client" targetNamespace="http://www.magicworld.com/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.13.2">
+  <bpmn2:collaboration id="Collaboration_Client">
+    <bpmn2:participant id="Pool_Client" name="Experiencia del Cliente — Compra y Valoración" processRef="Process_Client">
+      <bpmn2:documentation id="documentation_ocqzLw" />
+    </bpmn2:participant>
+  </bpmn2:collaboration>
+  <bpmn2:process id="Process_Client" name="Experiencia del Cliente — Compra y Valoración" processType="Private" isExecutable="false">
+    <bpmn2:laneSet id="LaneSet_Client">
+      <bpmn2:lane id="Lane_Client_Sistema" name="Sistema">
+        <bpmn2:documentation id="documentation_IpiQ5w" />
+        <bpmn2:flowNodeRef>P2_ConsultarDisponibilidad</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_ValidarCodigo</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_RegistrarCompra</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_EnviarEmailQR</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_NotificarDisponibilidad</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_CalcularPrecio</bpmn2:flowNodeRef>
+      </bpmn2:lane>
+      <bpmn2:lane id="Lane_Client_Pasarela" name="Pasarela de Pago (Stripe)">
+        <bpmn2:documentation id="documentation_XsNasQ" />
+        <bpmn2:flowNodeRef>P2_CrearPaymentIntent</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_ProcesarCobro</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_GW_PagoExitoso</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_End_Error</bpmn2:flowNodeRef>
+      </bpmn2:lane>
+      <bpmn2:lane id="Lane_Client_Cliente" name="Cliente">
+        <bpmn2:documentation id="documentation_PzLC4Q" />
+        <bpmn2:flowNodeRef>P2_Start</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_SeleccionarEntradas</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_GW_Descuento</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_IntroducirCodigo</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_GW_MergeDescuento</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_IntroducirPago</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_SeleccionarFecha</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>Activity_0yiyb2u</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_ConsultarMapa</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_MostrarConfirmacion</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_End_Compra</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>Gateway_1qyr49v</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_SubProcess_Historial</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>P2_SubProcess_Valoracion</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>Event_0ohhb5i</bpmn2:flowNodeRef>
+      </bpmn2:lane>
+    </bpmn2:laneSet>
+    <bpmn2:startEvent id="P2_Start" name="Cliente inicia proceso de compra">
+      <bpmn2:documentation id="documentation_mpwFDA" />
+      <bpmn2:outgoing>SF_P2_01</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:serviceTask id="P2_ConsultarDisponibilidad" name="Consultar disponibilidad de entradas (WebSocket)">
+      <bpmn2:documentation id="documentation_Ucu6Dg" />
+      <bpmn2:incoming>SF_P2_03</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_04</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:userTask id="P2_SeleccionarEntradas" name="Seleccionar tipos de entrada y cantidades">
+      <bpmn2:documentation id="documentation_xy7vgw" />
+      <bpmn2:incoming>SF_P2_04</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_05</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:exclusiveGateway id="P2_GW_Descuento" name="¿Aplicar código de descuento?">
+      <bpmn2:documentation id="documentation_YXNq0w" />
+      <bpmn2:incoming>SF_P2_05</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_06_Si</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P2_07_No</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:userTask id="P2_IntroducirCodigo" name="Introducir código de descuento">
+      <bpmn2:documentation id="documentation_ic3Umw" />
+      <bpmn2:incoming>SF_P2_06_Si</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_08</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="P2_ValidarCodigo" name="Validar código y vigencia del descuento">
+      <bpmn2:documentation id="documentation_TroaDg" />
+      <bpmn2:incoming>SF_P2_08</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_09</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:exclusiveGateway id="P2_GW_MergeDescuento" name="Merge descuento">
+      <bpmn2:documentation id="documentation_0jboDQ" />
+      <bpmn2:incoming>SF_P2_07_No</bpmn2:incoming>
+      <bpmn2:incoming>SF_P2_09</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_10</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:userTask id="P2_IntroducirPago" name="Introducir método de pago">
+      <bpmn2:documentation id="documentation_VAmWmg" />
+      <bpmn2:incoming>SF_P2_11</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_12</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="P2_CrearPaymentIntent" name="Crear PaymentIntent en Stripe">
+      <bpmn2:documentation id="documentation_oIsdRw" />
+      <bpmn2:incoming>SF_P2_12</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_13</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P2_ProcesarCobro" name="Procesar cobro">
+      <bpmn2:documentation id="documentation_NkH0pw" />
+      <bpmn2:incoming>SF_P2_13</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_14</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:exclusiveGateway id="P2_GW_PagoExitoso" name="¿Pago exitoso?">
+      <bpmn2:documentation id="documentation_yffy2A" />
+      <bpmn2:incoming>SF_P2_14</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_15_No</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_P2_16_Si</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:endEvent id="P2_End_Error" name="Error de pago">
+      <bpmn2:documentation id="documentation_GDcZXQ" />
+      <bpmn2:incoming>SF_P2_15_No</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:serviceTask id="P2_EnviarEmailQR" name="Enviar email de confirmación con QR">
+      <bpmn2:documentation id="documentation_D4JJOg" />
+      <bpmn2:incoming>SF_P2_17</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_19</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P2_NotificarDisponibilidad" name="Notificar actualización de disponibilidad (WebSocket)">
+      <bpmn2:documentation id="documentation_ueSR6g" />
+      <bpmn2:incoming>SF_P2_19</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_20</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="P2_CalcularPrecio" name="Calcular precio (base × cantidad × multiplicador estacional − descuento)">
+      <bpmn2:documentation id="documentation_kKvYsw" />
+      <bpmn2:incoming>SF_P2_10</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_11</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:userTask id="P2_SeleccionarFecha" name="Seleccionar fecha de visita">
+      <bpmn2:documentation id="documentation_ZvD8zw" />
+      <bpmn2:incoming>Flow_1owcchj</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_03</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="Activity_0yiyb2u" name="Consulta listado y detalle de atracciones con y sin su filtro de restricciones">
+      <bpmn2:documentation id="documentation_FLH7tQ" />
+      <bpmn2:incoming>SF_P2_02</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1owcchj</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="P2_ConsultarMapa" name="Consultar mapa interactivo 3D (colas en tiempo real si simulación activa)">
+      <bpmn2:documentation id="documentation_ZJM0iQ" />
+      <bpmn2:incoming>SF_P2_01</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_02</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SF_P2_01" sourceRef="P2_Start" targetRef="P2_ConsultarMapa">
+      <bpmn2:documentation id="documentation_a970Xw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_03" sourceRef="P2_SeleccionarFecha" targetRef="P2_ConsultarDisponibilidad">
+      <bpmn2:documentation id="documentation_VpjYSg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_04" sourceRef="P2_ConsultarDisponibilidad" targetRef="P2_SeleccionarEntradas">
+      <bpmn2:documentation id="documentation_3U2uYQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_05" sourceRef="P2_SeleccionarEntradas" targetRef="P2_GW_Descuento">
+      <bpmn2:documentation id="documentation_ZPDxMA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_06_Si" name="Sí" sourceRef="P2_GW_Descuento" targetRef="P2_IntroducirCodigo">
+      <bpmn2:documentation id="documentation_RftXxQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_07_No" name="No" sourceRef="P2_GW_Descuento" targetRef="P2_GW_MergeDescuento">
+      <bpmn2:documentation id="documentation_Xg5OWw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_08" sourceRef="P2_IntroducirCodigo" targetRef="P2_ValidarCodigo">
+      <bpmn2:documentation id="documentation_ch3IIw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_09" sourceRef="P2_ValidarCodigo" targetRef="P2_GW_MergeDescuento">
+      <bpmn2:documentation id="documentation_s8nD9A" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_10" sourceRef="P2_GW_MergeDescuento" targetRef="P2_CalcularPrecio">
+      <bpmn2:documentation id="documentation_QFqO9A" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_11" sourceRef="P2_CalcularPrecio" targetRef="P2_IntroducirPago">
+      <bpmn2:documentation id="documentation_0HiFwg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_12" sourceRef="P2_IntroducirPago" targetRef="P2_CrearPaymentIntent">
+      <bpmn2:documentation id="documentation_y0geuQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_13" sourceRef="P2_CrearPaymentIntent" targetRef="P2_ProcesarCobro">
+      <bpmn2:documentation id="documentation_5WxYDw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_14" sourceRef="P2_ProcesarCobro" targetRef="P2_GW_PagoExitoso">
+      <bpmn2:documentation id="documentation_ILWp5A" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_15_No" name="No" sourceRef="P2_GW_PagoExitoso" targetRef="P2_End_Error">
+      <bpmn2:documentation id="documentation_3qdmvw" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_16_Si" name="Sí" sourceRef="P2_GW_PagoExitoso" targetRef="P2_RegistrarCompra">
+      <bpmn2:documentation id="documentation_N8320w" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_17" sourceRef="P2_RegistrarCompra" targetRef="P2_EnviarEmailQR">
+      <bpmn2:documentation id="documentation_Tw3aTA" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_19" sourceRef="P2_EnviarEmailQR" targetRef="P2_NotificarDisponibilidad">
+      <bpmn2:documentation id="documentation_20OQ8g" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_20" sourceRef="P2_NotificarDisponibilidad" targetRef="P2_MostrarConfirmacion">
+      <bpmn2:documentation id="documentation_ATfFzg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_1owcchj" sourceRef="Activity_0yiyb2u" targetRef="P2_SeleccionarFecha">
+      <bpmn2:documentation id="documentation_6mdMqQ" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SF_P2_02" sourceRef="P2_ConsultarMapa" targetRef="Activity_0yiyb2u">
+      <bpmn2:documentation id="documentation_yP7iAg" />
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_16q3mbh" sourceRef="P2_MostrarConfirmacion" targetRef="Gateway_1qyr49v" />
+    <bpmn2:sequenceFlow id="Flow_0u4lovn" name="No" sourceRef="Gateway_1qyr49v" targetRef="P2_End_Compra" />
+    <bpmn2:userTask id="P2_MostrarConfirmacion" name="Mostrar confirmación de compra">
+      <bpmn2:documentation id="documentation_vIwWfg" />
+      <bpmn2:incoming>SF_P2_20</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_16q3mbh</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="P2_RegistrarCompra" name="Registrar compra y líneas de compra">
+      <bpmn2:documentation id="documentation_jErEmA" />
+      <bpmn2:incoming>SF_P2_16_Si</bpmn2:incoming>
+      <bpmn2:outgoing>SF_P2_17</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="Flow_0k6i4jl" sourceRef="Gateway_1qyr49v" targetRef="P2_SubProcess_Historial" />
+    <bpmn2:sequenceFlow id="Flow_14aj6n5" sourceRef="P2_SubProcess_Historial" targetRef="P2_SubProcess_Valoracion" />
+    <bpmn2:endEvent id="P2_End_Compra" name="Compra finalizada">
+      <bpmn2:documentation />
+      <bpmn2:incoming>Flow_0u4lovn</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:exclusiveGateway id="Gateway_1qyr49v" name="¿ Tiene sesión iniciada y quiere valorar el parque o ver compras?">
+      <bpmn2:incoming>Flow_16q3mbh</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0u4lovn</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_0k6i4jl</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:subProcess id="P2_SubProcess_Historial" name="Consulta de Historial de Compras">
+      <bpmn2:documentation id="documentation_M4Du7w" />
+      <bpmn2:incoming>Flow_0k6i4jl</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_14aj6n5</bpmn2:outgoing>
+      <bpmn2:startEvent id="P2_SH_Start" name="Acceder a perfil">
+        <bpmn2:documentation id="documentation_2NnAwQ" />
+        <bpmn2:outgoing>SF_P2_SH_01</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:serviceTask id="P2_SH_CargarHistorial" name="Cargar historial de compras del usuario">
+        <bpmn2:documentation id="documentation_Y6Mnmg" />
+        <bpmn2:incoming>SF_P2_SH_01</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P2_SH_02</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:userTask id="P2_SH_VisualizarResumenes" name="Visualizar resúmenes de compra">
+        <bpmn2:documentation id="documentation_c8p5tw" />
+        <bpmn2:incoming>SF_P2_SH_02</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P2_SH_03</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:endEvent id="P2_SH_End" name="Historial consultado">
+        <bpmn2:documentation id="documentation_Rj2LUw" />
+        <bpmn2:incoming>SF_P2_SH_03</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="SF_P2_SH_01" sourceRef="P2_SH_Start" targetRef="P2_SH_CargarHistorial">
+        <bpmn2:documentation id="documentation_Z4VjIg" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P2_SH_02" sourceRef="P2_SH_CargarHistorial" targetRef="P2_SH_VisualizarResumenes">
+        <bpmn2:documentation id="documentation_0a023Q" />
+      </bpmn2:sequenceFlow>
+      <bpmn2:sequenceFlow id="SF_P2_SH_03" sourceRef="P2_SH_VisualizarResumenes" targetRef="P2_SH_End">
+        <bpmn2:documentation id="documentation_q4xvpA" />
+      </bpmn2:sequenceFlow>
+    </bpmn2:subProcess>
+    <bpmn2:subProcess id="P2_SubProcess_Valoracion" name="Valoración de Visita">
+      <bpmn2:documentation id="documentation_Yrbp5w" />
+      <bpmn2:incoming>Flow_14aj6n5</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0ezk1xj</bpmn2:outgoing>
+      <bpmn2:startEvent id="P2_SV_Start" name="Acceder a valoraciones">
+        <bpmn2:outgoing>SF_P2_SV_01</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:serviceTask id="P2_SV_ListadoPaginado" name="Consultar valoraciones">
+        <bpmn2:incoming>SF_P2_SV_01</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P2_SV_02</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:exclusiveGateway id="P2_SV_GW_Crear" name="¿Crear valoración?">
+        <bpmn2:incoming>SF_P2_SV_02</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P2_SV_03_No</bpmn2:outgoing>
+        <bpmn2:outgoing>SF_P2_SV_04_Si</bpmn2:outgoing>
+      </bpmn2:exclusiveGateway>
+      <bpmn2:endEvent id="P2_SV_End_NoCrear" name="Sí">
+        <bpmn2:incoming>SF_P2_SV_03_No</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:serviceTask id="P2_SV_ComprasSinValorar" name="Consultar compras sin valorar">
+        <bpmn2:incoming>SF_P2_SV_04_Si</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P2_SV_05</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:userTask id="P2_SV_SeleccionarCompra" name="Seleccionar compra a valorar">
+        <bpmn2:incoming>SF_P2_SV_05</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P2_SV_06</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:userTask id="P2_SV_AsignarPuntuacion" name="Asigna puntuación y descripción">
+        <bpmn2:incoming>SF_P2_SV_06</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P2_SV_07</bpmn2:outgoing>
+      </bpmn2:userTask>
+      <bpmn2:serviceTask id="P2_SV_ValidarPropiedad" name="Validar propiedad de compra">
+        <bpmn2:incoming>SF_P2_SV_07</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P2_SV_08</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:serviceTask id="P2_SV_PublicarValoracion" name="Publicar valoración">
+        <bpmn2:incoming>SF_P2_SV_08</bpmn2:incoming>
+        <bpmn2:outgoing>SF_P2_SV_09</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:endEvent id="P2_SV_End_Crear" name="Valoración publicada">
+        <bpmn2:incoming>SF_P2_SV_09</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="SF_P2_SV_01" sourceRef="P2_SV_Start" targetRef="P2_SV_ListadoPaginado" />
+      <bpmn2:sequenceFlow id="SF_P2_SV_02" sourceRef="P2_SV_ListadoPaginado" targetRef="P2_SV_GW_Crear" />
+      <bpmn2:sequenceFlow id="SF_P2_SV_03_No" name="No" sourceRef="P2_SV_GW_Crear" targetRef="P2_SV_End_NoCrear" />
+      <bpmn2:sequenceFlow id="SF_P2_SV_04_Si" sourceRef="P2_SV_GW_Crear" targetRef="P2_SV_ComprasSinValorar" />
+      <bpmn2:sequenceFlow id="SF_P2_SV_05" sourceRef="P2_SV_ComprasSinValorar" targetRef="P2_SV_SeleccionarCompra" />
+      <bpmn2:sequenceFlow id="SF_P2_SV_06" sourceRef="P2_SV_SeleccionarCompra" targetRef="P2_SV_AsignarPuntuacion" />
+      <bpmn2:sequenceFlow id="SF_P2_SV_07" sourceRef="P2_SV_AsignarPuntuacion" targetRef="P2_SV_ValidarPropiedad" />
+      <bpmn2:sequenceFlow id="SF_P2_SV_08" sourceRef="P2_SV_ValidarPropiedad" targetRef="P2_SV_PublicarValoracion" />
+      <bpmn2:sequenceFlow id="SF_P2_SV_09" sourceRef="P2_SV_PublicarValoracion" targetRef="P2_SV_End_Crear" />
+    </bpmn2:subProcess>
+    <bpmn2:endEvent id="Event_0ohhb5i" name="Fin de compra y valoración">
+      <bpmn2:documentation />
+      <bpmn2:incoming>Flow_0ezk1xj</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="Flow_0ezk1xj" sourceRef="P2_SubProcess_Valoracion" targetRef="Event_0ohhb5i" />
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Client" name="MagicWorld - Experiencia del Cliente">
+    <bpmndi:BPMNPlane id="BPMNPlane_Client" bpmnElement="Collaboration_Client">
+      <bpmndi:BPMNShape id="Shape_Pool_Client" bpmnElement="Pool_Client" isHorizontal="true">
+        <dc:Bounds x="160" y="50" width="2658" height="810" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_Client_Cliente" bpmnElement="Lane_Client_Cliente" isHorizontal="true">
+        <dc:Bounds x="190" y="50" width="2628" height="328" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_Client_Pasarela" bpmnElement="Lane_Client_Pasarela" isHorizontal="true">
+        <dc:Bounds x="190" y="378" width="2628" height="182" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Lane_Client_Sistema" bpmnElement="Lane_Client_Sistema" isHorizontal="true">
+        <dc:Bounds x="190" y="560" width="2628" height="300" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_Start" bpmnElement="P2_Start">
+        <dc:Bounds x="240" y="212" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="227" y="251" width="63" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_ConsultarDisponibilidad" bpmnElement="P2_ConsultarDisponibilidad">
+        <dc:Bounds x="520" y="610" width="180" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_SeleccionarEntradas" bpmnElement="P2_SeleccionarEntradas">
+        <dc:Bounds x="740" y="210" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_GW_Descuento" bpmnElement="P2_GW_Descuento" isMarkerVisible="true">
+        <dc:Bounds x="940" y="205" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="927" y="258" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_IntroducirCodigo" bpmnElement="P2_IntroducirCodigo">
+        <dc:Bounds x="1030" y="150" width="140" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_ValidarCodigo" bpmnElement="P2_ValidarCodigo">
+        <dc:Bounds x="1030" y="610" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_GW_MergeDescuento" bpmnElement="P2_GW_MergeDescuento" isMarkerVisible="true">
+        <dc:Bounds x="1225" y="205" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1207" y="181" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_IntroducirPago" bpmnElement="P2_IntroducirPago">
+        <dc:Bounds x="1440" y="210" width="140" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_CrearPaymentIntent" bpmnElement="P2_CrearPaymentIntent">
+        <dc:Bounds x="1420" y="440" width="180" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_ProcesarCobro" bpmnElement="P2_ProcesarCobro">
+        <dc:Bounds x="1640" y="440" width="140" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_GW_PagoExitoso" bpmnElement="P2_GW_PagoExitoso" isMarkerVisible="true">
+        <dc:Bounds x="1820" y="435" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1807" y="488" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_End_Error" bpmnElement="P2_End_Error">
+        <dc:Bounds x="1920" y="402" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1904" y="441" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_RegistrarCompra" bpmnElement="P2_RegistrarCompra">
+        <dc:Bounds x="1920" y="610" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_EnviarEmailQR" bpmnElement="P2_EnviarEmailQR">
+        <dc:Bounds x="1920" y="690" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_NotificarDisponibilidad" bpmnElement="P2_NotificarDisponibilidad">
+        <dc:Bounds x="2120" y="690" width="180" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_CalcularPrecio" bpmnElement="P2_CalcularPrecio">
+        <dc:Bounds x="1220" y="610" width="200" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_SeleccionarFecha" bpmnElement="P2_SeleccionarFecha">
+        <dc:Bounds x="570" y="210" width="140" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0rtbnd6" bpmnElement="Activity_0yiyb2u">
+        <dc:Bounds x="450" y="280" width="180" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_ConsultarMapa" bpmnElement="P2_ConsultarMapa">
+        <dc:Bounds x="300" y="230" width="180" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_MostrarConfirmacion" bpmnElement="P2_MostrarConfirmacion">
+        <dc:Bounds x="2130" y="245" width="160" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1nitk4g" bpmnElement="P2_End_Compra">
+        <dc:Bounds x="2592" y="92" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2566" y="131" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1qyr49v_di" bpmnElement="Gateway_1qyr49v" isMarkerVisible="true">
+        <dc:Bounds x="2345" y="240" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2329" y="300" width="82" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1p4mbrq" bpmnElement="Event_0ohhb5i">
+        <dc:Bounds x="2712" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2691" y="321" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_SubProcess_Historial" bpmnElement="P2_SubProcess_Historial" isExpanded="false">
+        <dc:Bounds x="2460" y="170" width="200" height="50" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2_SubProcess_Valoracion" bpmnElement="P2_SubProcess_Valoracion" isExpanded="false">
+        <dc:Bounds x="2460" y="275" width="200" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_01" bpmnElement="SF_P2_01">
+        <di:waypoint x="276" y="230" />
+        <di:waypoint x="288" y="230" />
+        <di:waypoint x="288" y="250" />
+        <di:waypoint x="300" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_03" bpmnElement="SF_P2_03">
+        <di:waypoint x="640" y="250" />
+        <di:waypoint x="640" y="430" />
+        <di:waypoint x="610" y="430" />
+        <di:waypoint x="610" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_04" bpmnElement="SF_P2_04">
+        <di:waypoint x="700" y="630" />
+        <di:waypoint x="720" y="630" />
+        <di:waypoint x="720" y="230" />
+        <di:waypoint x="740" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_05" bpmnElement="SF_P2_05">
+        <di:waypoint x="900" y="230" />
+        <di:waypoint x="940" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_06_Si" bpmnElement="SF_P2_06_Si">
+        <di:waypoint x="965" y="205" />
+        <di:waypoint x="965" y="170" />
+        <di:waypoint x="1030" y="170" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="974" y="178" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_07_No" bpmnElement="SF_P2_07_No">
+        <di:waypoint x="990" y="230" />
+        <di:waypoint x="1225" y="230" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="992" y="213" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_08" bpmnElement="SF_P2_08">
+        <di:waypoint x="1100" y="190" />
+        <di:waypoint x="1100" y="400" />
+        <di:waypoint x="1110" y="400" />
+        <di:waypoint x="1110" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_09" bpmnElement="SF_P2_09">
+        <di:waypoint x="1190" y="630" />
+        <di:waypoint x="1200" y="630" />
+        <di:waypoint x="1200" y="230" />
+        <di:waypoint x="1225" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_10" bpmnElement="SF_P2_10">
+        <di:waypoint x="1250" y="255" />
+        <di:waypoint x="1250" y="433" />
+        <di:waypoint x="1320" y="433" />
+        <di:waypoint x="1320" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_11" bpmnElement="SF_P2_11">
+        <di:waypoint x="1320" y="610" />
+        <di:waypoint x="1320" y="230" />
+        <di:waypoint x="1440" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_12" bpmnElement="SF_P2_12">
+        <di:waypoint x="1510" y="250" />
+        <di:waypoint x="1510" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_13" bpmnElement="SF_P2_13">
+        <di:waypoint x="1600" y="460" />
+        <di:waypoint x="1640" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_14" bpmnElement="SF_P2_14">
+        <di:waypoint x="1780" y="460" />
+        <di:waypoint x="1820" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_15_No" bpmnElement="SF_P2_15_No">
+        <di:waypoint x="1845" y="435" />
+        <di:waypoint x="1845" y="420" />
+        <di:waypoint x="1920" y="420" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1853" y="418" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_16_Si" bpmnElement="SF_P2_16_Si">
+        <di:waypoint x="1845" y="485" />
+        <di:waypoint x="1845" y="630" />
+        <di:waypoint x="1920" y="630" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1854" y="548" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_17" bpmnElement="SF_P2_17">
+        <di:waypoint x="2080" y="630" />
+        <di:waypoint x="2190" y="630" />
+        <di:waypoint x="2190" y="670" />
+        <di:waypoint x="2000" y="670" />
+        <di:waypoint x="2000" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_19" bpmnElement="SF_P2_19">
+        <di:waypoint x="2080" y="710" />
+        <di:waypoint x="2120" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_20" bpmnElement="SF_P2_20">
+        <di:waypoint x="2210" y="690" />
+        <di:waypoint x="2210" y="285" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1owcchj_di" bpmnElement="Flow_1owcchj">
+        <di:waypoint x="540" y="280" />
+        <di:waypoint x="540" y="265" />
+        <di:waypoint x="580" y="265" />
+        <di:waypoint x="580" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SF_P2_02" bpmnElement="SF_P2_02">
+        <di:waypoint x="390" y="270" />
+        <di:waypoint x="390" y="300" />
+        <di:waypoint x="450" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16q3mbh_di" bpmnElement="Flow_16q3mbh">
+        <di:waypoint x="2290" y="265" />
+        <di:waypoint x="2345" y="265" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0u4lovn_di" bpmnElement="Flow_0u4lovn">
+        <di:waypoint x="2370" y="240" />
+        <di:waypoint x="2370" y="110" />
+        <di:waypoint x="2592" y="110" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2378" y="214" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0k6i4jl_di" bpmnElement="Flow_0k6i4jl">
+        <di:waypoint x="2395" y="265" />
+        <di:waypoint x="2428" y="265" />
+        <di:waypoint x="2428" y="195" />
+        <di:waypoint x="2460" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14aj6n5_di" bpmnElement="Flow_14aj6n5">
+        <di:waypoint x="2560" y="220" />
+        <di:waypoint x="2560" y="275" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ezk1xj_di" bpmnElement="Flow_0ezk1xj">
+        <di:waypoint x="2660" y="300" />
+        <di:waypoint x="2712" y="300" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Valoracion" name="Valoración de Visita">
+    <bpmndi:BPMNPlane bpmnElement="P2_SubProcess_Valoracion">
+      <bpmndi:BPMNShape id="ExpShape_P2_SV_Start" bpmnElement="P2_SV_Start">
+        <dc:Bounds x="170" y="150" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="157" y="189" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P2_SV_ListadoPaginado" bpmnElement="P2_SV_ListadoPaginado">
+        <dc:Bounds x="260" y="130" width="160" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P2_SV_GW_Crear" bpmnElement="P2_SV_GW_Crear" isMarkerVisible="true">
+        <dc:Bounds x="460" y="130" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="522" y="141" width="56" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P2_SV_End_NoCrear" bpmnElement="P2_SV_End_NoCrear">
+        <dc:Bounds x="560" y="57" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="504" y="173" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P2_SV_ComprasSinValorar" bpmnElement="P2_SV_ComprasSinValorar">
+        <dc:Bounds x="560" y="210" width="170" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P2_SV_SeleccionarCompra" bpmnElement="P2_SV_SeleccionarCompra">
+        <dc:Bounds x="770" y="210" width="170" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P2_SV_AsignarPuntuacion" bpmnElement="P2_SV_AsignarPuntuacion">
+        <dc:Bounds x="980" y="210" width="180" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P2_SV_ValidarPropiedad" bpmnElement="P2_SV_ValidarPropiedad">
+        <dc:Bounds x="1200" y="210" width="170" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P2_SV_PublicarValoracion" bpmnElement="P2_SV_PublicarValoracion">
+        <dc:Bounds x="1410" y="210" width="150" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P2_SV_End_Crear" bpmnElement="P2_SV_End_Crear">
+        <dc:Bounds x="1600" y="217" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1593" y="256" width="51" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P2_SV_01" bpmnElement="SF_P2_SV_01">
+        <di:waypoint x="206" y="168" />
+        <di:waypoint x="260" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P2_SV_02" bpmnElement="SF_P2_SV_02">
+        <di:waypoint x="420" y="155" />
+        <di:waypoint x="460" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P2_SV_03_No" bpmnElement="SF_P2_SV_03_No">
+        <di:waypoint x="485" y="130" />
+        <di:waypoint x="485" y="75" />
+        <di:waypoint x="560" y="75" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="495" y="97" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P2_SV_04_Si" bpmnElement="SF_P2_SV_04_Si">
+        <di:waypoint x="485" y="180" />
+        <di:waypoint x="485" y="235" />
+        <di:waypoint x="560" y="235" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="375" y="210" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P2_SV_05" bpmnElement="SF_P2_SV_05">
+        <di:waypoint x="730" y="235" />
+        <di:waypoint x="770" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P2_SV_06" bpmnElement="SF_P2_SV_06">
+        <di:waypoint x="940" y="235" />
+        <di:waypoint x="980" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P2_SV_07" bpmnElement="SF_P2_SV_07">
+        <di:waypoint x="1160" y="235" />
+        <di:waypoint x="1200" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P2_SV_08" bpmnElement="SF_P2_SV_08">
+        <di:waypoint x="1370" y="235" />
+        <di:waypoint x="1410" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P2_SV_09" bpmnElement="SF_P2_SV_09">
+        <di:waypoint x="1560" y="235" />
+        <di:waypoint x="1600" y="235" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Historial" name="Consulta de Historial de Compras">
+    <bpmndi:BPMNPlane bpmnElement="P2_SubProcess_Historial">
+      <bpmndi:BPMNShape id="ExpShape_P2_SH_Start" bpmnElement="P2_SH_Start">
+        <dc:Bounds x="50" y="82" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="30" y="121" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P2_SH_CargarHistorial" bpmnElement="P2_SH_CargarHistorial">
+        <dc:Bounds x="140" y="62" width="200" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P2_SH_VisualizarResumenes" bpmnElement="P2_SH_VisualizarResumenes">
+        <dc:Bounds x="380" y="62" width="180" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExpShape_P2_SH_End" bpmnElement="P2_SH_End">
+        <dc:Bounds x="600" y="69" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="591" y="108" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P2_SH_01" bpmnElement="SF_P2_SH_01">
+        <di:waypoint x="86" y="100" />
+        <di:waypoint x="140" y="87" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P2_SH_02" bpmnElement="SF_P2_SH_02">
+        <di:waypoint x="340" y="87" />
+        <di:waypoint x="380" y="87" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ExpEdge_SF_P2_SH_03" bpmnElement="SF_P2_SH_03">
+        <di:waypoint x="560" y="87" />
+        <di:waypoint x="600" y="87" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

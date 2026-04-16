@@ -1,0 +1,49 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+LAYOUT_LEFT_RIGHT()
+
+AddElementTag("fe",  $bgColor="#b71c1c", $fontColor="#ffffff", $borderColor="#7f0000")
+AddElementTag("be",  $bgColor="#2e7d32", $fontColor="#ffffff", $borderColor="#1b5e20")
+AddElementTag("db",  $bgColor="#0277bd", $fontColor="#ffffff", $borderColor="#01579b")
+AddElementTag("ext", $bgColor="#546e7a", $fontColor="#ffffff", $borderColor="#37474f")
+
+title Despliegue — Producción
+
+Deployment_Node(browser, "Navegador", "Chrome / Firefox · Internet") {
+    Container(spa_cliente, "Angular SPA", "Angular 20", "SPA cargada desde la CDN de Vercel.", $tags="fe")
+}
+
+Deployment_Node(produccion, "Infraestructura Cloud", "HTTPS / WSS") {
+
+    Deployment_Node(vercel_node, "Vercel", "CDN Global · vercel.com") {
+        Container(prod_spa, "Angular SPA", "Static Build", "Build estático en CDN. SPA routing via vercel.json.", $tags="fe")
+    }
+
+    Deployment_Node(render_node, "Render", "PaaS · render.com") {
+        Container(prod_spring, "Spring Boot API", "Java 21 · Spring Boot 3.5 · Docker", "REST + WebSocket.", $tags="be")
+    }
+
+    Deployment_Node(aiven_node, "Aiven", "DBaaS · aiven.io") {
+        ContainerDb(prod_mysql, "MySQL (Aiven)", "MySQL 8.x · InnoDB · TLS", "BD gestionada. Conexión TLS obligatoria.", $tags="db")
+    }
+}
+
+Deployment_Node(externos, "Servicios Externos", "Cloud · HTTPS") {
+    Container(oauth2,     "Google OAuth2",  "OAuth2 / OIDC",          "Login social con Google.",    $tags="ext")
+    Container(gemini,     "Gemini API",     "REST · gemini-2.5-flash", "LLM para el chatbot IA.",     $tags="ext")
+    Container(stripe,     "Stripe",         "REST · PaymentIntents",   "Cobros con tarjeta.",          $tags="ext")
+    Container(sendgrid,   "SendGrid",        "REST · HTTPS",            "Emails transaccionales.",      $tags="ext")
+}
+
+Rel_D(browser,      prod_spa,    "CDN Vercel",      "HTTPS")
+Rel_D(browser,      prod_spring, "API + WebSocket", "HTTPS / WSS")
+Rel_D(prod_spring,  prod_mysql,  "JDBC · TLS",      "TCP 3306")
+Rel_R(browser,      oauth2,      "Login social",    "HTTPS")
+Rel_D(prod_spring,  oauth2,      "Valida token",    "HTTPS")
+Rel_D(prod_spring,  gemini,      "Chatbot IA",      "HTTPS")
+Rel_D(prod_spring,  stripe,      "Pago",            "HTTPS")
+Rel_D(prod_spring,  sendgrid,    "Emails",          "HTTPS")
+
+SHOW_LEGEND()
+@enduml

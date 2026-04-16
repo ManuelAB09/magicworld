@@ -1,0 +1,60 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+' Paleta de colores consistente con el diagrama de contexto
+AddElementTag("frontend",  $bgColor="#b71c1c", $fontColor="#ffffff", $borderColor="#7f0000")
+AddElementTag("backend",   $bgColor="#2e7d32", $fontColor="#ffffff", $borderColor="#1b5e20")
+AddElementTag("db",        $bgColor="#0277bd", $fontColor="#ffffff", $borderColor="#01579b")
+AddElementTag("storage",   $bgColor="#6a1b9a", $fontColor="#ffffff", $borderColor="#4a148c")
+
+title Diagrama de Contenedores - MagicWorld
+
+' === ACTORES ===
+Person(cliente, "Cliente / Visitante", "Usuario final que interactúa\ncon las funcionalidades del parque.")
+Person(admin,   "Administrador",       "Personal que gestiona y monitorea\nla operación del parque.")
+
+' === SISTEMA ===
+System_Boundary(magicworld_sys, "Plataforma MagicWorld") {
+
+    Container(spa, "Frontend SPA", "Angular, TypeScript · Nginx", "Interfaz gráfica de página única para clientes\ny administradores. Consume la API REST y recibe\neventos en tiempo real vía WebSocket.", $tags="frontend")
+
+    Container(api, "API Backend", "Spring Boot 3.5 · Java 21", "Núcleo de lógica de negocio. Expone REST API\ny WebSocket (STOMP/SockJS). Gestiona seguridad\n(JWT + OAuth2), pagos, chatbot IA y monitoreo.", $tags="backend")
+
+    ContainerDb(db, "Base de Datos Relacional", "MySQL 8.0", "Almacena todas las entidades del dominio:\nusuarios, atracciones, compras, pagos y empleados.", $tags="db")
+
+    Container(file_storage, "Almacenamiento de Imágenes", "Sistema de ficheros · Docker volume", "Persiste las imágenes subidas por administradores.\nServidas por el backend vía endpoint dedicado.", $tags="storage")
+}
+
+' === SISTEMAS EXTERNOS ===
+System_Ext(stripe,       "Stripe",            "Procesamiento de pagos\nonline (PaymentIntent API)")
+System_Ext(google_oauth, "Google OAuth2",     "Proveedor de identidad\ny autenticación social")
+System_Ext(gemini,       "Google Gemini API", "Modelo LLM para el chatbot\nadministrativo inteligente")
+System_Ext(smtp,         "SMTP / SendGrid",   "Servicio de correo\nelectrónico transaccional")
+
+' === RELACIONES ===
+
+' Actores → Frontend
+Rel_D(cliente, spa, "Interactúa con las funcionalidades del parque", "HTTPS")
+Rel_D(admin,   spa, "Gestiona parque, empleados y monitoreo", "HTTPS")
+
+' Flujo OAuth2 (redirect del navegador)
+Rel_R(cliente, google_oauth, "Inicia login social\n(redirect del navegador)", "OAuth2 / HTTPS")
+
+' Frontend → Backend
+Rel_D(spa, api, "Consume los endpoints REST", "JSON / HTTPS")
+Rel_D(spa, api, "Recibe alertas y eventos de monitoreo", "WebSocket · STOMP/SockJS")
+
+' Backend → Base de Datos
+Rel_R(api, db, "Lee y escribe entidades del dominio", "JDBC / TCP")
+
+' Backend → Almacenamiento
+Rel_D(api, file_storage, "Persiste y sirve imágenes subidas", "I/O Local")
+
+' Backend → Externos
+Rel_L(api, google_oauth, "Valida tokens OAuth2 tras el callback", "HTTPS")
+Rel_D(api, stripe,       "Crea y gestiona PaymentIntents", "HTTPS · Stripe REST API")
+Rel_D(api, gemini,       "Envía prompts del chatbot administrativo", "HTTPS · Gemini REST API")
+Rel_D(api, smtp,         "Envía emails transaccionales al usuario", "SMTP / API")
+
+SHOW_LEGEND()
+@enduml

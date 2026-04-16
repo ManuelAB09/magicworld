@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MapPicker3DComponent } from './map-picker-3d';
 import { AttractionApiService } from './attraction.service';
 import { TranslateModule } from '@ngx-translate/core';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import { SimpleChange } from '@angular/core';
 
 describe('MapPicker3DComponent', () => {

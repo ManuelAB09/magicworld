@@ -296,6 +296,7 @@ public class PaymentService {
         return userRepository.save(guestUser);
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private Purchase createPurchaseFromRequest(PaymentRequest request, User buyer, PriceCalculationResponse priceCalc) {
         BigDecimal multiplier = seasonalPricingService.getMultiplier(request.getVisitDate());
         List<PurchaseLine> lines = new ArrayList<>();

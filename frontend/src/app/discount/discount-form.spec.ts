@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { DiscountForm } from './discount-form';
-import { DiscountApiService, Discount, DiscountRequest } from './discount.service';
+import { DiscountApiService, Discount } from './discount.service';
 import { TicketTypeApiService, TicketType } from '../ticket-type/ticket-type.service';
 import { ErrorService } from '../error/error-service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { provideRouter, ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { ReactiveFormsModule } from '@angular/forms';

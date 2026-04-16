@@ -32,10 +32,14 @@ public class DashboardService {
 
     @Transactional(readOnly = true)
     public DashboardSnapshot getSnapshot() {
+        LocalDate today = LocalDate.now();
+        int ticketsSoldToday = purchaseLineService.getTotalSoldForDate(today);
+        int visitorLimit = Math.max(0, Math.min(ticketsSoldToday, parkMaxCapacity));
+
         LocalDateTime todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
         long entries = eventService.countEntriesSince(todayStart);
         long exits = eventService.countExitsSince(todayStart);
-        int currentVisitors = (int) (entries - exits);
+        int currentVisitors = Math.max(0, Math.min((int) (entries - exits), visitorLimit));
 
         List<Attraction> allAttractions = attractionRepository.findAll();
         List<AttractionStatus> statuses = allAttractions.stream()
@@ -48,10 +52,8 @@ public class DashboardService {
                 .mapToInt(AttractionStatus::getEstimatedWaitMinutes)
                 .average().orElse(0);
 
-        int ticketsSoldToday = purchaseLineService.getTotalSoldForDate(LocalDate.now());
-
         return DashboardSnapshot.builder()
-                .currentVisitors(Math.max(0, currentVisitors))
+            .currentVisitors(currentVisitors)
                 .totalEntriesToday((int) entries)
                 .totalSalesToday(0)
                 .activeAttractions((int) activeCount)

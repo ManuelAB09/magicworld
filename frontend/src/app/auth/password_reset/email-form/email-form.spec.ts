@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { EmailForm } from './email-form';
 import { AuthService } from '../../auth.service';
 import { ErrorService } from '../../../error/error-service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { of, throwError, Subject } from 'rxjs';
 import { ReactiveFormsModule } from '@angular/forms';
 
@@ -11,7 +11,6 @@ describe('EmailForm', () => {
   let fixture: ComponentFixture<EmailForm>;
   let mockAuthService: jasmine.SpyObj<AuthService>;
   let mockErrorService: jasmine.SpyObj<ErrorService>;
-  let translateService: TranslateService;
 
   beforeEach(async () => {
     mockAuthService = jasmine.createSpyObj('AuthService', ['forgotPassword'], {
@@ -29,7 +28,6 @@ describe('EmailForm', () => {
 
     fixture = TestBed.createComponent(EmailForm);
     component = fixture.componentInstance;
-    translateService = TestBed.inject(TranslateService);
     fixture.detectChanges();
   });
 

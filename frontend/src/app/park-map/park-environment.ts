@@ -291,7 +291,7 @@ export class ParkEnvironment {
     return plaza;
   }
 
-  createLake(radiusX: number, radiusZ: number): THREE.Group {
+  createLake(radiusX: number, _radiusZ: number): THREE.Group {
     const group = new THREE.Group();
 
     // sandy shore

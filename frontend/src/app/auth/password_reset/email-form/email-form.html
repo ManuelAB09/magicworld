@@ -1,9 +1,9 @@
-<div class="page-background">
-  <form class="email-form" [formGroup]="emailForm" (ngSubmit)="onSubmit()">
+<div class="page-background" data-cy="forgot-password-page">
+  <form class="email-form" data-cy="forgot-password-form" [formGroup]="emailForm" (ngSubmit)="onSubmit()">
     <h2 class="form-title">{{ 'passwordReset.title' | translate }}</h2>
 
     <label class="form-label" for="email">{{ 'passwordReset.emailLabel' | translate }}</label>
-    <input class="form-input" id="email" type="email" formControlName="email" />
+    <input class="form-input" data-cy="forgot-password-email" id="email" type="email" formControlName="email" />
 
     @if (submitted && email?.invalid) {
       <div class="form-error">
@@ -16,7 +16,7 @@
       </div>
     }
 
-    <button class="form-button" type="submit">{{ 'passwordReset.sendButton' | translate }}</button>
+    <button class="form-button" data-cy="forgot-password-submit" type="submit">{{ 'passwordReset.sendButton' | translate }}</button>
 
     @if (successMessage) {
       <div class="form-success">{{ successMessage | translate }}</div>

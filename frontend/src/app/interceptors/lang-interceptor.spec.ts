@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient, HttpRequest, HttpHandler } from '@angular/common/http';
 import { LangInterceptor } from './lang-interceptor';
 import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
@@ -48,9 +48,9 @@ describe('LangInterceptor', () => {
     const noLangTranslate = jasmine.createSpyObj('TranslateService', ['getDefaultLang'], {
       currentLang: null
     });
-    noLangTranslate.getDefaultLang.and.returnValue('en');
+    noLangTranslate['getDefaultLang'].and.returnValue('en');
 
-    const newInterceptor = new LangInterceptor(noLangTranslate);
+    const newInterceptor = new LangInterceptor(noLangTranslate as unknown as TranslateService);
     const mockRequest = new HttpRequest('GET', '/api/test');
     const mockHandler: HttpHandler = {
       handle: jasmine.createSpy('handle').and.returnValue(of({}))

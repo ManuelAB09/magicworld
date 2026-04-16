@@ -1,0 +1,76 @@
+@startuml ArquitecturaGeneralMagicworld
+
+!theme plain
+hide stereotype
+top to bottom direction
+
+skinparam backgroundColor #ECECEC
+skinparam shadowing true
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam ArrowColor #111111
+skinparam ArrowThickness 2
+skinparam package {
+  BorderStyle dashed
+  RoundCorner 14
+  FontStyle bold
+  FontColor #1F1F1F
+  BackgroundColor #F5F5F5
+}
+skinparam package<<frontend>> {
+  BorderColor #D84E6A
+  BackgroundColor #F5ECEE
+}
+skinparam package<<backend>> {
+  BorderColor #6DB34F
+  BackgroundColor #E8F0E8
+}
+skinparam package<<data>> {
+  BorderColor #2E6C9B
+  BackgroundColor #E8EFF5
+}
+skinparam rectangle {
+  RoundCorner 12
+  FontStyle bold
+}
+skinparam database {
+  FontStyle bold
+  FontColor #FFFFFF
+  BackgroundColor #2F6C97
+  BorderColor #1F4D6C
+}
+
+package "1. Frontend (Capa de presentacion)" <<frontend>> {
+  rectangle "<size:18><b>Aplicacion Angular</b></size>\n<size:15><i>(Modulos, Componentes y Vistas)</i></size>" as Angular #E50046
+}
+
+package "2. Backend (Arquitectura Spring Boot)" <<backend>> {
+  rectangle "<b>Controladores REST</b>\n<i>(Capa de Presentacion / API)</i>\nej. AttractionController" as Controllers #70B844
+
+  rectangle "<b>Servicios</b>\n<i>(Logica de Negocio)</i>\nej. AttractionService" as Services #70B844
+
+  rectangle "<b>Repositorios</b>\n<i>(Acceso a Datos)</i>\nej. AttractionRepository" as Repositories #70B844
+
+  Controllers --> Services : Llama a metodos
+  Services --> Repositories : Llama a metodos
+}
+
+package "3. Persistencia de Datos" <<data>> {
+  database "Base de Datos\n<i>(Motor Relacional)</i>" as DB
+}
+
+rectangle "<b>Objetos DTO</b>\n<i>(Data Transfer Object)</i>\nViajan por la red\nej. AttractionRequest" as DTO #EFE3BA
+rectangle "<b>Modelos / Entidades</b>\n<i>(Clases de Dominio)</i>\nSe manejan dentro del Backend\nej. Attraction" as Entities #EFE3BA
+
+Angular <--> Controllers : HTTP / API REST\nWebSockets (Tiempo real)
+Repositories --> DB : JPA / Hibernate\n(Mapeo ORM y Consultas SQL)
+Services ..> Entities : Maneja y transforma
+Repositories ..> Entities : Persiste
+
+Controllers ..> DTO
+Angular ..> DTO
+
+DTO -[hidden]-> Controllers
+Entities -[hidden]-> Repositories
+
+@enduml

@@ -1,5 +1,5 @@
-<div class="login-background">
-  <form class="auth-form" (ngSubmit)="onLogin()">
+<div class="login-background" data-cy="login-page">
+  <form class="auth-form" data-cy="login-form" (ngSubmit)="onLogin()">
     @if (errorMessages.length > 0) {
     <div class="error">
       @for (msg of errorMessages; track $index) {
@@ -12,11 +12,11 @@
     }
     <h2>{{ 'LOGIN.TITLE' | translate }}</h2>
     <label for="username">{{ 'LOGIN.USERNAME' | translate }}</label>
-    <input id="username" [(ngModel)]="username" name="username" required />
+    <input id="username" data-cy="login-username" [(ngModel)]="username" name="username" required />
 
     <label for="password">{{ 'LOGIN.PASSWORD' | translate }}</label>
     <div class="password-container">
-      <input id="password" [(ngModel)]="password" name="password" [type]="showPassword ? 'text' : 'password'"
+      <input id="password" data-cy="login-password" [(ngModel)]="password" name="password" [type]="showPassword ? 'text' : 'password'"
         required />
       <button type="button" class="toggle-password" (click)="togglePasswordVisibility()" tabindex="-1"
         aria-label="Mostrar/Ocultar contraseña">
@@ -29,18 +29,18 @@
     </div>
 
     <div class="forgot-password-link">
-      <a [routerLink]="['/forgot-password']">
+      <a data-cy="forgot-password-link" [routerLink]="['/forgot-password']">
         {{ 'LOGIN.FORGOT_PASSWORD' | translate }}
       </a>
     </div>
 
-    <button type="submit" class="btn-brand">{{ 'LOGIN.BUTTON' | translate }}</button>
+    <button type="submit" class="btn-brand" data-cy="login-submit">{{ 'LOGIN.BUTTON' | translate }}</button>
 
     <div class="divider">
       <span>{{ 'LOGIN.OR' | translate }}</span>
     </div>
 
-    <button type="button" class="google-btn" (click)="loginWithGoogle()">
+    <button type="button" class="google-btn" data-cy="login-google" (click)="loginWithGoogle()">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
       {{ 'LOGIN.GOOGLE' | translate }}
     </button>

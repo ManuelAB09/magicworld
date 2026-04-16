@@ -1,21 +1,21 @@
-<div class="register-background">
-  <form class="auth-form" (ngSubmit)="onRegister()">
+<div class="register-background" data-cy="register-page">
+  <form class="auth-form" data-cy="register-form" (ngSubmit)="onRegister()">
     <h2>{{ 'REGISTER.TITLE' | translate }}</h2>
     <label for="username">{{ 'REGISTER.USERNAME' | translate }}</label>
-    <input id="username" [(ngModel)]="username" name="username" required />
+    <input id="username" data-cy="register-username" [(ngModel)]="username" name="username" required />
 
     <label for="firstname">{{ 'REGISTER.FIRSTNAME' | translate }}</label>
-    <input id="firstname" [(ngModel)]="firstname" name="firstname" required />
+    <input id="firstname" data-cy="register-firstname" [(ngModel)]="firstname" name="firstname" required />
 
     <label for="lastname">{{ 'REGISTER.LASTNAME' | translate }}</label>
-    <input id="lastname" [(ngModel)]="lastname" name="lastname" required />
+    <input id="lastname" data-cy="register-lastname" [(ngModel)]="lastname" name="lastname" required />
 
     <label for="email">{{ 'REGISTER.EMAIL' | translate }}</label>
-    <input id="email" [(ngModel)]="email" name="email" required />
+    <input id="email" data-cy="register-email" [(ngModel)]="email" name="email" required />
 
     <label for="password">{{ 'REGISTER.PASSWORD' | translate }}</label>
     <div class="password-container">
-      <input id="password" [(ngModel)]="password" name="password" [type]="showPassword ? 'text' : 'password'"
+      <input id="password" data-cy="register-password" [(ngModel)]="password" name="password" [type]="showPassword ? 'text' : 'password'"
         required />
       <button type="button" class="toggle-password" (click)="togglePasswordVisibility()" tabindex="-1"
         aria-label="Mostrar/Ocultar contraseña">
@@ -29,7 +29,7 @@
 
     <label for="confirmPassword">{{ 'REGISTER.CONFIRM' | translate }}</label>
     <div class="password-container">
-      <input id="confirmPassword" [(ngModel)]="confirmPassword" name="confirmPassword"
+      <input id="confirmPassword" data-cy="register-confirm-password" [(ngModel)]="confirmPassword" name="confirmPassword"
         [type]="showConfirmPassword ? 'text' : 'password'" required />
       <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()" tabindex="-1"
         aria-label="Mostrar/Ocultar confirmación">
@@ -50,7 +50,7 @@
     @else if (errorCode) {
     <div class="error">{{ errorCode | translate:errorArgs }}</div>
     }
-    <button type="submit" class="btn-brand">{{ 'REGISTER.BUTTON' | translate }}</button>
+    <button type="submit" class="btn-brand" data-cy="register-submit">{{ 'REGISTER.BUTTON' | translate }}</button>
   </form>
 
 </div>

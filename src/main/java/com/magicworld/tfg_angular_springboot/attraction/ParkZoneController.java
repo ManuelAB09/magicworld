@@ -39,6 +39,7 @@ public class ParkZoneController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private ParkZoneDTO toDTO(ParkZone zone) {
         List<ParkZoneDTO.ZoneAttractionInfo> attractions = attractionRepository.findByZoneId(zone.getId())
                 .stream()

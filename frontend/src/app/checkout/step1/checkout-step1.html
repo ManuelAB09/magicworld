@@ -1,4 +1,4 @@
-<div class="checkout-container">
+<div class="checkout-container" data-cy="checkout-step1-page">
   <div class="tickets-section">
     <h2>{{ 'CHECKOUT.STEP1.TICKETS_TITLE' | translate }}</h2>
 
@@ -23,7 +23,7 @@
     @if (!loading && !error) {
     <div class="tickets-grid">
       @for (ticket of tickets; track ticket.id) {
-      <div class="ticket-card">
+      <div class="ticket-card" data-cy="ticket-card">
         <div class="ticket-image">
           <img [src]="getImageUrl(ticket.photoUrl)" [alt]="ticket.typeName">
           <span class="availability-badge" [class.low]="ticket.available <= 10"
@@ -44,12 +44,12 @@
           </div>
         </div>
         <div class="quantity-controls">
-          <button class="qty-btn minus" (click)="removeFromCart(ticket)"
+          <button class="qty-btn minus" data-cy="ticket-minus" (click)="removeFromCart(ticket)"
             [disabled]="getQuantity(ticket.typeName) === 0">
             −
           </button>
           <span class="qty-value">{{ getQuantity(ticket.typeName) }}</span>
-          <button class="qty-btn plus" (click)="addToCart(ticket)"
+          <button class="qty-btn plus" data-cy="ticket-plus" (click)="addToCart(ticket)"
             [disabled]="ticket.available === 0 || getQuantity(ticket.typeName) >= ticket.available">
             +
           </button>
@@ -81,7 +81,7 @@
 
         <div class="calendar-days">
           @for (day of calendarDays; track $index) {
-          <button class="calendar-day" [class.empty]="day === null" [class.disabled]="!isDaySelectable(day)"
+          <button class="calendar-day" data-cy="calendar-day" [class.empty]="day === null" [class.disabled]="!isDaySelectable(day)"
             [class.selected]="isDaySelected(day)" [class.closed]="isClosedDay(day)"
             [class.beyond-limit]="isBeyondMaxDate(day)" [disabled]="!isDaySelectable(day)"
             [title]="isClosedDay(day) ? getClosureReason(day) : (isBeyondMaxDate(day) ? ('CHECKOUT.STEP1.MAX_DATE_REASON' | translate) : '')"
@@ -134,7 +134,7 @@
       }
     </div>
 
-    <button class="proceed-btn" [disabled]="!canProceed()" (click)="goToStep2()">
+    <button class="proceed-btn" data-cy="checkout-proceed-step2" [disabled]="!canProceed()" (click)="goToStep2()">
       {{ 'CHECKOUT.STEP1.PROCEED' | translate }}
     </button>
   </div>
