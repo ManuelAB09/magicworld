@@ -3,6 +3,7 @@ WORKDIR /build
 COPY pom.xml .
 COPY src ./src
 COPY checkstyle.xml .
+COPY pmd-ruleset.xml .
 RUN mvn -B -DskipTests clean package
 
 FROM eclipse-temurin:21-jre AS runtime
