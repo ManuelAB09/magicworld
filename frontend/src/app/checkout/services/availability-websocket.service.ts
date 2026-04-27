@@ -10,8 +10,10 @@ export class AvailabilityWebSocketService implements OnDestroy {
   private client: Client | null = null;
   private availabilitySubject = new Subject<TicketAvailability[]>();
   private ticketTypesSubject = new Subject<any[]>();
+  private discountChangesSubject = new Subject<void>();
   private currentSubscription: { unsubscribe: () => void } | null = null;
   private ticketTypesSubscription: { unsubscribe: () => void } | null = null;
+  private discountsSubscription: { unsubscribe: () => void } | null = null;
 
   connect(date: string): Observable<TicketAvailability[]> {
     this.disconnect();
@@ -41,6 +43,13 @@ export class AvailabilityWebSocketService implements OnDestroy {
           this.ticketTypesSubject.next(ticketTypes);
         }
       );
+
+      this.discountsSubscription = this.client!.subscribe(
+        '/topic/discounts',
+        () => {
+          this.discountChangesSubject.next();
+        }
+      );
     };
 
     this.client.onStompError = (frame) => {
@@ -56,6 +65,10 @@ export class AvailabilityWebSocketService implements OnDestroy {
     return this.ticketTypesSubject.asObservable();
   }
 
+  getDiscountChanges(): Observable<void> {
+    return this.discountChangesSubject.asObservable();
+  }
+
   disconnect(): void {
     if (this.currentSubscription) {
       this.currentSubscription.unsubscribe();
@@ -64,6 +77,10 @@ export class AvailabilityWebSocketService implements OnDestroy {
     if (this.ticketTypesSubscription) {
       this.ticketTypesSubscription.unsubscribe();
       this.ticketTypesSubscription = null;
+    }
+    if (this.discountsSubscription) {
+      this.discountsSubscription.unsubscribe();
+      this.discountsSubscription = null;
     }
     if (this.client) {
       this.client.deactivate();

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { CheckoutService, CartItem, PriceCalculationResponse, PaymentRequest } from '../services/checkout.service';
+import { AvailabilityWebSocketService } from '../services/availability-websocket.service';
 import { AuthService, UserProfile } from '../../auth/auth.service';
 import { ErrorService } from '../../error/error-service';
 import { CurrencyService } from '../../shared/currency.service';
@@ -39,6 +40,7 @@ export class CheckoutStep2Component implements OnInit, OnDestroy, AfterViewInit 
   discountInput = '';
   appliedCodes: string[] = [];
   validCodes: string[] = [];
+  alreadyDiscountedCodes: string[] = [];
   invalidCodes: string[] = [];
   validButNotApplicableCodes: string[] = [];
   discountPercentages: { [key: string]: number } = {};
@@ -58,6 +60,7 @@ export class CheckoutStep2Component implements OnInit, OnDestroy, AfterViewInit 
 
   constructor(
     private checkoutService: CheckoutService,
+    private availabilityWebSocketService: AvailabilityWebSocketService,
     private authService: AuthService,
     private router: Router,
     private translate: TranslateService,
@@ -67,6 +70,7 @@ export class CheckoutStep2Component implements OnInit, OnDestroy, AfterViewInit 
 
   ngOnInit(): void {
     this.loadCart();
+    this.setupDiscountUpdatesWebSocket();
     this.loadUserData();
     this.initStripe();
     this.setupDiscountDebounce();
@@ -79,6 +83,7 @@ export class CheckoutStep2Component implements OnInit, OnDestroy, AfterViewInit 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.availabilityWebSocketService.disconnect();
     if (this.cardElementInstance) {
       this.cardElementInstance.destroy();
     }
@@ -174,6 +179,56 @@ export class CheckoutStep2Component implements OnInit, OnDestroy, AfterViewInit 
       .subscribe(() => this.applyDiscountCodes());
   }
 
+  private setupDiscountUpdatesWebSocket(): void {
+    if (!this.cart?.visitDate) return;
+
+    this.availabilityWebSocketService.connect(this.cart.visitDate);
+    this.availabilityWebSocketService
+      .getDiscountChanges()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.calculatePrice());
+  }
+
+  private classifyValidDiscountCodes(validCodes: string[]): {
+    appliedCodes: string[];
+    alreadyDiscountedCodes: string[];
+  } {
+    if (!validCodes.length) {
+      return { appliedCodes: [], alreadyDiscountedCodes: [] };
+    }
+
+    const winnerByTicketType = new Map<string, { code: string; percentage: number }>();
+
+    for (const code of validCodes) {
+      const percentage = this.discountPercentages[code] ?? 0;
+      const appliesTo = this.discountAppliesTo[code] ?? [];
+
+      for (const ticketTypeName of appliesTo) {
+        const currentWinner = winnerByTicketType.get(ticketTypeName);
+        if (!currentWinner || percentage > currentWinner.percentage) {
+          winnerByTicketType.set(ticketTypeName, { code, percentage });
+        }
+      }
+    }
+
+    const appliedCodeSet = new Set<string>(
+      Array.from(winnerByTicketType.values()).map((winner) => winner.code)
+    );
+
+    const appliedCodes: string[] = [];
+    const alreadyDiscountedCodes: string[] = [];
+
+    for (const code of validCodes) {
+      if (appliedCodeSet.has(code)) {
+        appliedCodes.push(code);
+      } else {
+        alreadyDiscountedCodes.push(code);
+      }
+    }
+
+    return { appliedCodes, alreadyDiscountedCodes };
+  }
+
   onDiscountInputChange(): void {
     this.discountInput$.next(this.discountInput);
   }
@@ -205,11 +260,15 @@ export class CheckoutStep2Component implements OnInit, OnDestroy, AfterViewInit 
       .subscribe({
         next: (response) => {
           this.priceCalc = response;
-          this.validCodes = response.validDiscountCodes || [];
-          this.invalidCodes = response.invalidDiscountCodes || [];
-          this.validButNotApplicableCodes = response.validButNotApplicableCodes || [];
           this.discountPercentages = response.discountPercentages || {};
           this.discountAppliesTo = response.discountAppliesTo || {};
+          this.invalidCodes = response.invalidDiscountCodes || [];
+          this.validButNotApplicableCodes = response.validButNotApplicableCodes || [];
+
+          const classifiedCodes = this.classifyValidDiscountCodes(response.validDiscountCodes || []);
+          this.validCodes = classifiedCodes.appliedCodes;
+          this.alreadyDiscountedCodes = classifiedCodes.alreadyDiscountedCodes;
+
           this.calculatingPrice = false;
         },
         error: (err) => {

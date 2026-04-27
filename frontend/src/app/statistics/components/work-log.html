@@ -80,7 +80,7 @@
               <div class="timeline-content">
                 <div class="timeline-header">
                   <span class="action-tag">{{ getActionLabel(entry.action) }}</span>
-                  @if (entry.hoursAffected > 0) {
+                  @if (showHoursTag(entry.action) && entry.hoursAffected > 0) {
                     <span class="hours-tag">{{ entry.hoursAffected }}h</span>
                   }
                 </div>
@@ -118,10 +118,12 @@
           <label>{{ 'stats.worklog.targetDate' | translate }}</label>
           <input type="date" [(ngModel)]="formData.targetDate" [min]="todayStr" />
         </div>
-        <div class="form-group">
-          <label>{{ 'stats.worklog.hoursAffected' | translate }}</label>
-          <input type="number" [(ngModel)]="formData.hoursAffected" min="0.25" max="8" step="0.25" />
-        </div>
+        @if (showHoursInput()) {
+          <div class="form-group">
+            <label>{{ 'stats.worklog.hoursAffected' | translate }}</label>
+            <input type="number" [(ngModel)]="formData.hoursAffected" min="0.25" max="8" step="0.25" />
+          </div>
+        }
         <div class="form-group">
           <label>{{ 'stats.worklog.reason' | translate }}</label>
           <textarea [(ngModel)]="formData.reason" rows="3" [placeholder]="'stats.worklog.reasonPlaceholder' | translate"></textarea>

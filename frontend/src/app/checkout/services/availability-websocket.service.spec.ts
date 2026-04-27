@@ -35,6 +35,12 @@ describe('AvailabilityWebSocketService', () => {
     expect(result.subscribe).toBeDefined();
   });
 
+  it('should return observable from getDiscountChanges', () => {
+    const result = service.getDiscountChanges();
+    expect(result).toBeTruthy();
+    expect(result.subscribe).toBeDefined();
+  });
+
   it('should handle ngOnDestroy', () => {
     expect(() => service.ngOnDestroy()).not.toThrow();
   });
@@ -141,6 +147,31 @@ describe('AvailabilityWebSocketService', () => {
     expect((received as any)[0].typeName).toBe('VIP');
   });
 
+  it('should emit discount change when receiving on discounts topic', () => {
+    let received = 0;
+
+    service.connect('2026-01-15');
+    service.getDiscountChanges().subscribe(() => {
+      received += 1;
+    });
+
+    const client = (service as any).client;
+
+    const mockUnsubscribe = { unsubscribe: jasmine.createSpy('unsubscribe') };
+    client.subscribe = jasmine.createSpy('subscribe').and.callFake(
+      (dest: string, callback: (msg: any) => void) => {
+        if (dest === '/topic/discounts') {
+          callback({ body: 'updated' });
+        }
+        return mockUnsubscribe;
+      }
+    );
+
+    client.onConnect();
+
+    expect(received).toBe(1);
+  });
+
   it('should unsubscribe from topics on disconnect after connect', () => {
     service.connect('2026-01-15');
     const client = (service as any).client;
@@ -155,7 +186,7 @@ describe('AvailabilityWebSocketService', () => {
     spyOn(client, 'deactivate');
     service.disconnect();
 
-    expect(mockUnsubscribe.unsubscribe).toHaveBeenCalledTimes(2);
+    expect(mockUnsubscribe.unsubscribe).toHaveBeenCalledTimes(3);
   });
 
   it('should configure client with reconnectDelay', () => {

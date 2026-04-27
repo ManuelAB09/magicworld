@@ -316,6 +316,7 @@
       "DISCOUNT_APPLIED": "Discount applied successfully!",
       "DISCOUNT_INVALID": "Invalid or expired code",
       "DISCOUNT_NOT_APPLICABLE": "Valid code but not applicable to selected tickets",
+      "DISCOUNT_ALREADY_APPLIED": "A discount is already applied to this ticket type",
       "APPLIES_TO": "Applies to",
       "SUBTOTAL": "Subtotal",
       "DISCOUNT": "Discount",

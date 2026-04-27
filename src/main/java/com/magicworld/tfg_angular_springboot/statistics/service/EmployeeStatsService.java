@@ -60,10 +60,10 @@ public class EmployeeStatsService {
 
             switch (log.getAction()) {
                 case ADD_OVERTIME_HOURS -> acc.overtimeHours = acc.overtimeHours.add(log.getHoursAffected());
-                case ADD_ABSENCE -> acc.normalHours = acc.normalHours.subtract(log.getHoursAffected());
-                case REMOVE_ABSENCE -> acc.normalHours = acc.normalHours.add(log.getHoursAffected());
                 case PARTIAL_ABSENCE -> acc.normalHours = acc.normalHours.subtract(log.getHoursAffected());
-                case REMOVE_SCHEDULED_DAY -> acc.normalHours = acc.normalHours.subtract(log.getHoursAffected());
+                case ADD_ABSENCE, REMOVE_ABSENCE, REMOVE_SCHEDULED_DAY -> {
+                    // Full-day changes are synchronized against WeeklySchedule and already in baseline.
+                }
             }
         }
 

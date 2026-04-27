@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -26,6 +27,7 @@ public class DiscountController {
 
     private final DiscountService discountService;
     private final DiscountTicketTypeService discountTicketTypeService;
+    private final SimpMessagingTemplate messagingTemplate;
 
 
     @Getter
@@ -48,6 +50,7 @@ public class DiscountController {
     @PostMapping
     public ResponseEntity<Discount> create(@RequestBody @Valid DiscountRequest request) {
         Discount saved = discountService.save(request.getDiscount(), request.getApplicableTicketTypesNames());
+        notifyDiscountsChanged();
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(saved.getId())
@@ -86,6 +89,7 @@ public class DiscountController {
     @PutMapping("/{id}")
     public ResponseEntity<Discount> update(@PathVariable Long id, @RequestBody @Valid DiscountRequest request) {
         Discount updated = discountService.update(request.getDiscount(), request.getApplicableTicketTypesNames());
+        notifyDiscountsChanged();
         return ResponseEntity.ok(updated);
     }
 
@@ -98,6 +102,7 @@ public class DiscountController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         discountService.deleteById(id);
+        notifyDiscountsChanged();
         return ResponseEntity.noContent().build();
     }
 
@@ -113,5 +118,9 @@ public class DiscountController {
         discountService.findById(id);
         List<TicketType> list = discountTicketTypeService.findTicketsTypesByDiscountId(id);
         return ResponseEntity.ok(list);
+    }
+
+    private void notifyDiscountsChanged() {
+        messagingTemplate.convertAndSend("/topic/discounts", "updated");
     }
 }

@@ -220,6 +220,16 @@
   margin-bottom: 0.8rem;
 }
 
+.already-applied-codes {
+  margin-bottom: 0.8rem;
+}
+
+.discount-already-applied {
+  color: #856404;
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0 0;
+}
+
 .discount-invalid {
   color: #dc3545;
   font-size: 0.9rem;

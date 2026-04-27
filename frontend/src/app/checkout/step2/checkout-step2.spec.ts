@@ -4,10 +4,11 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { CheckoutStep2Component } from './checkout-step2';
 import { CheckoutService, PriceCalculationResponse, PaymentResponse } from '../services/checkout.service';
+import { AvailabilityWebSocketService } from '../services/availability-websocket.service';
 import { AuthService, UserProfile, Role } from '../../auth/auth.service';
 import { ErrorService } from '../../error/error-service';
 import { Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { ElementRef } from '@angular/core';
 
 describe('CheckoutStep2Component', () => {
@@ -15,8 +16,10 @@ describe('CheckoutStep2Component', () => {
   let fixture: ComponentFixture<CheckoutStep2Component>;
   let router: Router;
   let mockCheckoutService: jasmine.SpyObj<CheckoutService>;
+  let mockAvailabilityWebSocketService: jasmine.SpyObj<AvailabilityWebSocketService>;
   let mockAuthService: jasmine.SpyObj<AuthService>;
   let mockErrorService: jasmine.SpyObj<ErrorService>;
+  let discountChanges$: Subject<void>;
 
   const mockCartData = {
     items: [{ ticketTypeName: 'ADULT', quantity: 2, unitPrice: 50, totalPrice: 100, photoUrl: '/img.jpg', description: 'Adult' }],
@@ -46,12 +49,18 @@ describe('CheckoutStep2Component', () => {
     mockCheckoutService = jasmine.createSpyObj('CheckoutService', [
       'getStripePublicKey', 'calculatePrice', 'processPayment', 'getAvailability'
     ]);
+    mockAvailabilityWebSocketService = jasmine.createSpyObj('AvailabilityWebSocketService', [
+      'connect', 'getDiscountChanges', 'disconnect'
+    ]);
     mockAuthService = jasmine.createSpyObj('AuthService', ['getProfile']);
     mockErrorService = jasmine.createSpyObj('ErrorService', ['handleError', 'getValidationMessages']);
+    discountChanges$ = new Subject<void>();
 
     mockAuthService.getProfile.and.returnValue(of(mockProfile));
     mockCheckoutService.calculatePrice.and.returnValue(of(mockPriceResponse));
     mockCheckoutService.getStripePublicKey.and.returnValue(of({ publicKey: 'pk_test_123' }));
+    mockAvailabilityWebSocketService.connect.and.returnValue(of([]));
+    mockAvailabilityWebSocketService.getDiscountChanges.and.returnValue(discountChanges$.asObservable());
     mockErrorService.handleError.and.returnValue({ code: 'error.test', args: {} });
 
     await TestBed.configureTestingModule({
@@ -63,6 +72,7 @@ describe('CheckoutStep2Component', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: CheckoutService, useValue: mockCheckoutService },
+        { provide: AvailabilityWebSocketService, useValue: mockAvailabilityWebSocketService },
         { provide: AuthService, useValue: mockAuthService },
         { provide: ErrorService, useValue: mockErrorService }
       ]
@@ -81,6 +91,7 @@ describe('CheckoutStep2Component', () => {
       component.cardElementInstance = { destroy: () => {} };
     }
     component.ngOnDestroy();
+    discountChanges$.complete();
     sessionStorage.removeItem('checkout_cart');
     sessionStorage.removeItem('checkout_result');
     delete (window as any).Stripe;
@@ -103,6 +114,7 @@ describe('CheckoutStep2Component', () => {
     expect(component.cart).toBeTruthy();
     expect(component.cart!.items.length).toBe(1);
     expect(component.cart!.visitDate).toBe('2026-01-15');
+    expect(mockAvailabilityWebSocketService.connect).toHaveBeenCalledWith('2026-01-15');
   }));
 
   it('should load user data and populate form fields', fakeAsync(() => {
@@ -515,6 +527,39 @@ describe('CheckoutStep2Component', () => {
 
     expect(component.discountPercentages).toEqual({ 'SAVE10': 10 });
     expect(component.discountAppliesTo).toEqual({ 'SAVE10': ['ADULT'] });
+  }));
+
+  it('should move redundant valid codes to alreadyDiscountedCodes', fakeAsync(() => {
+    const withRedundantCode: PriceCalculationResponse = {
+      subtotal: 100,
+      discountAmount: 30,
+      total: 70,
+      validDiscountCodes: ['SAVE10', 'SAVE30'],
+      invalidDiscountCodes: [],
+      validButNotApplicableCodes: [],
+      discountPercentages: { SAVE10: 10, SAVE30: 30 },
+      discountAppliesTo: { SAVE10: ['ADULT'], SAVE30: ['ADULT'] }
+    };
+    mockCheckoutService.calculatePrice.and.returnValue(of(withRedundantCode));
+
+    sessionStorage.setItem('checkout_cart', JSON.stringify(mockCartData));
+    fixture.detectChanges();
+    tick();
+
+    expect(component.validCodes).toEqual(['SAVE30']);
+    expect(component.alreadyDiscountedCodes).toEqual(['SAVE10']);
+  }));
+
+  it('should recalculate price when discount changes arrive via websocket', fakeAsync(() => {
+    sessionStorage.setItem('checkout_cart', JSON.stringify(mockCartData));
+    fixture.detectChanges();
+    tick();
+
+    mockCheckoutService.calculatePrice.calls.reset();
+    discountChanges$.next();
+    tick();
+
+    expect(mockCheckoutService.calculatePrice).toHaveBeenCalled();
   }));
 });
 

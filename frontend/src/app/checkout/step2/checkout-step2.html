@@ -41,7 +41,7 @@
         (input)="onDiscountInputChange()"
         [placeholder]="'CHECKOUT.STEP2.DISCOUNT_PLACEHOLDER' | translate">
 
-      @if (validCodes.length > 0 || invalidCodes.length > 0 || validButNotApplicableCodes.length > 0) {
+      @if (validCodes.length > 0 || alreadyDiscountedCodes.length > 0 || invalidCodes.length > 0 || validButNotApplicableCodes.length > 0) {
         <div class="discount-feedback">
           @if (validCodes.length > 0) {
             <div class="valid-codes">
@@ -56,6 +56,21 @@
                 </div>
               }
               <p class="discount-applied">{{ 'CHECKOUT.STEP2.DISCOUNT_APPLIED' | translate }}</p>
+            </div>
+          }
+          @if (alreadyDiscountedCodes.length > 0) {
+            <div class="already-applied-codes">
+              @for (code of alreadyDiscountedCodes; track code) {
+                <div class="code-detail">
+                  <span class="code-tag not-applicable">
+                    ⚠ {{ code }}
+                  </span>
+                  <span class="applies-to">
+                    {{ 'CHECKOUT.STEP2.APPLIES_TO' | translate }}: {{ discountAppliesTo[code] ? discountAppliesTo[code].join(', ') : '' }}
+                  </span>
+                </div>
+              }
+              <p class="discount-already-applied">{{ 'CHECKOUT.STEP2.DISCOUNT_ALREADY_APPLIED' | translate }}</p>
             </div>
           }
           @if (validButNotApplicableCodes.length > 0) {

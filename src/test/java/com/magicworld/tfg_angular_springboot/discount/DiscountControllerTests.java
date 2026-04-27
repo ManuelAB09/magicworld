@@ -24,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -341,6 +342,11 @@ public class DiscountControllerTests {
         @Bean
         public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
             return Mockito.mock(OAuth2AuthenticationFailureHandler.class);
+        }
+
+        @Bean
+        public SimpMessagingTemplate simpMessagingTemplate() {
+            return Mockito.mock(SimpMessagingTemplate.class);
         }
     }
 }

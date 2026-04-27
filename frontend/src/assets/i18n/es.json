@@ -325,6 +325,7 @@
       "DISCOUNT_APPLIED": "Descuento aplicado correctamente!",
       "DISCOUNT_INVALID": "Código no válido o expirado",
       "DISCOUNT_NOT_APPLICABLE": "Código válido pero no aplicable a las entradas seleccionadas",
+      "DISCOUNT_ALREADY_APPLIED": "Ya hay un descuento aplicado para este tipo de entrada",
       "APPLIES_TO": "Aplica a",
       "SUBTOTAL": "Subtotal",
       "DISCOUNT": "Descuento",

@@ -18,6 +18,11 @@ import { EmployeeService, EmployeeDTO } from '../../admin-dashboard/employee.ser
   styleUrls: ['./work-log.css']
 })
 export class WorkLogComponent implements OnInit, OnChanges {
+  private static readonly INTERNAL_AUTO_REASONS = [
+    '__AUTO_ABSENCE_OVERTIME_DEDUCTION__',
+    '__AUTO_ABSENCE_OVERTIME_RESTORE__'
+  ];
+
   @Input() dateFrom = '';
   @Input() dateTo = '';
 
@@ -85,11 +90,16 @@ export class WorkLogComponent implements OnInit, OnChanges {
     this.statsService.getEmployeeSummary(this.selectedEmployeeId, this.dateFrom, this.dateTo).subscribe({
       next: data => {
         this.summary = data;
-        this.history = data.adjustments || [];
+        this.history = (data.adjustments || []).filter(entry => !this.isSystemGeneratedEntry(entry));
         this.loading = false;
       },
       error: () => this.loading = false
     });
+  }
+
+  private isSystemGeneratedEntry(entry: WorkLogEntryDTO): boolean {
+    return entry.action === 'ADD_OVERTIME_HOURS'
+      && WorkLogComponent.INTERNAL_AUTO_REASONS.includes(entry.reason);
   }
 
   openForm(): void {
@@ -117,21 +127,25 @@ export class WorkLogComponent implements OnInit, OnChanges {
     if (this.formData.action === 'ADD_OVERTIME_HOURS') {
       this.formData.isOvertime = true;
       this.formData.hoursAffected = 2;
-    } else if (this.formData.action === 'ADD_ABSENCE' || this.formData.action === 'REMOVE_ABSENCE') {
-      this.formData.hoursAffected = 8;
-      this.formData.isOvertime = false;
     } else if (this.formData.action === 'PARTIAL_ABSENCE') {
       this.formData.hoursAffected = 1;
       this.formData.isOvertime = false;
     } else {
-      this.formData.hoursAffected = 8;
+      this.formData.hoursAffected = 0;
       this.formData.isOvertime = false;
     }
   }
 
   submitEntry(): void {
     this.errorMessage = '';
-    this.statsService.addWorkLogEntry(this.formData).subscribe({
+    const payload: WorkLogEntryRequest = {
+      ...this.formData,
+      hoursAffected: this.isManualHoursAction(this.formData.action)
+        ? this.formData.hoursAffected
+        : 0,
+    };
+
+    this.statsService.addWorkLogEntry(payload).subscribe({
       next: () => {
         this.showForm = false;
         this.successMessage = this.translate.instant('stats.worklog.entryAdded');
@@ -145,6 +159,18 @@ export class WorkLogComponent implements OnInit, OnChanges {
         this.successMessage = '';
       }
     });
+  }
+
+  isManualHoursAction(action: string): boolean {
+    return action === 'ADD_OVERTIME_HOURS' || action === 'PARTIAL_ABSENCE';
+  }
+
+  showHoursInput(): boolean {
+    return this.isManualHoursAction(this.formData.action);
+  }
+
+  showHoursTag(action: string): boolean {
+    return this.isManualHoursAction(action);
   }
 
   getRoleLabel(role: string): string {

@@ -21,6 +21,9 @@ import java.util.List;
 public class WorkLogService {
 
     private static final BigDecimal MAX_NORMAL_WEEKLY_HOURS = new BigDecimal("40");
+    private static final BigDecimal DEFAULT_FULL_DAY_HOURS = new BigDecimal("8.00");
+    private static final String AUTO_ABSENCE_OVERTIME_DEDUCTION_REASON = "__AUTO_ABSENCE_OVERTIME_DEDUCTION__";
+    private static final String AUTO_ABSENCE_OVERTIME_RESTORE_REASON = "__AUTO_ABSENCE_OVERTIME_RESTORE__";
 
     private final WorkLogRepository workLogRepository;
     private final EmployeeRepository employeeRepository;
@@ -40,40 +43,45 @@ public class WorkLogService {
         }
 
         // For REMOVE_SCHEDULED_DAY, ADD_ABSENCE, PARTIAL_ABSENCE: employee must be scheduled that day
+        WeeklySchedule scheduleEntry = null;
         if (action == WorkLogAction.REMOVE_SCHEDULED_DAY
                 || action == WorkLogAction.ADD_ABSENCE
                 || action == WorkLogAction.PARTIAL_ABSENCE) {
-            if (!isEmployeeScheduledOnDate(employee.getId(), targetDate)) {
+            scheduleEntry = findScheduleEntry(employee.getId(), targetDate);
+            if (scheduleEntry == null) {
                 throw new IllegalArgumentException("error.worklog.not.scheduled");
             }
         }
 
         // REMOVE_ABSENCE: only if there are active absences for that employee on that date
+        WorkLog activeAbsenceLog = null;
         if (action == WorkLogAction.REMOVE_ABSENCE) {
-            if (!hasActiveAbsence(employee.getId(), targetDate)) {
+            activeAbsenceLog = findActiveAbsenceLog(employee.getId(), targetDate);
+            if (activeAbsenceLog == null) {
                 throw new IllegalArgumentException("error.worklog.no.absence");
             }
         }
+
+        BigDecimal hoursAffected = resolveHoursAffected(request, employee, action, scheduleEntry, activeAbsenceLog);
 
         // Build WorkLog
         WorkLog.WorkLogBuilder builder = WorkLog.builder()
                 .employee(employee)
                 .targetDate(targetDate)
                 .action(action)
-                .hoursAffected(request.getHoursAffected())
-                .isOvertime(Boolean.TRUE.equals(request.getIsOvertime()))
+                .hoursAffected(hoursAffected)
+                .isOvertime(action == WorkLogAction.ADD_OVERTIME_HOURS && Boolean.TRUE.equals(request.getIsOvertime()))
                 .reason(request.getReason())
                 .performedBy(adminUsername)
                 .createdAt(LocalDateTime.now());
 
         // On ADD_ABSENCE: save schedule snapshot before removing
         if (action == WorkLogAction.ADD_ABSENCE) {
-            WeeklySchedule ws = findScheduleEntry(employee.getId(), targetDate);
-            if (ws != null) {
-                builder.snapshotAttraction(ws.getAssignedAttraction())
-                       .snapshotZone(ws.getAssignedZone())
-                       .snapshotShift(ws.getShift())
-                       .snapshotBreakGroup(ws.getBreakGroup());
+            if (scheduleEntry != null) {
+                builder.snapshotAttraction(scheduleEntry.getAssignedAttraction())
+                       .snapshotZone(scheduleEntry.getAssignedZone())
+                       .snapshotShift(scheduleEntry.getShift())
+                       .snapshotBreakGroup(scheduleEntry.getBreakGroup());
             }
         }
 
@@ -81,9 +89,13 @@ public class WorkLogService {
 
         // Sync schedule
         if (action == WorkLogAction.ADD_ABSENCE || action == WorkLogAction.REMOVE_SCHEDULED_DAY) {
-            removeFromSchedule(employee.getId(), targetDate);
+            removeFromSchedule(scheduleEntry);
+            if (action == WorkLogAction.ADD_ABSENCE) {
+                applyAbsenceOvertimeCompensation(employee, targetDate, adminUsername);
+            }
         } else if (action == WorkLogAction.REMOVE_ABSENCE) {
-            restoreScheduleFromAbsence(employee.getId(), targetDate);
+            restoreScheduleFromAbsence(employee.getId(), targetDate, activeAbsenceLog);
+            restoreAbsenceOvertimeCompensation(employee, targetDate, adminUsername);
         }
 
         return toDTO(saved);
@@ -102,25 +114,25 @@ public class WorkLogService {
                 .orElse(null);
     }
 
-    private boolean isEmployeeScheduledOnDate(Long employeeId, LocalDate date) {
-        LocalDate weekStart = date.minusDays(date.getDayOfWeek().getValue() - 1);
-        java.time.DayOfWeek dow = date.getDayOfWeek();
-
-        return weeklyScheduleRepository.findByEmployeeIdAndWeekStartDateBetween(employeeId, weekStart, weekStart)
-                .stream()
-                .anyMatch(ws -> ws.getDayOfWeek() == dow);
-    }
-
-    private boolean hasActiveAbsence(Long employeeId, LocalDate date) {
+    private WorkLog findActiveAbsenceLog(Long employeeId, LocalDate date) {
         List<WorkLog> logs = workLogRepository
                 .findByEmployeeIdAndTargetDateBetweenOrderByCreatedAtDesc(employeeId, date, date);
 
-        int absenceCount = 0;
+        int pendingRemovals = 0;
         for (WorkLog log : logs) {
-            if (log.getAction() == WorkLogAction.ADD_ABSENCE) absenceCount++;
-            if (log.getAction() == WorkLogAction.REMOVE_ABSENCE) absenceCount--;
+            if (log.getAction() == WorkLogAction.REMOVE_ABSENCE) {
+                pendingRemovals++;
+                continue;
+            }
+            if (log.getAction() == WorkLogAction.ADD_ABSENCE) {
+                if (pendingRemovals > 0) {
+                    pendingRemovals--;
+                    continue;
+                }
+                return log;
+            }
         }
-        return absenceCount > 0;
+        return null;
     }
 
     // ── History ──
@@ -136,10 +148,10 @@ public class WorkLogService {
 
     // ── Employee Summary ──
     // Rules:
-    //   scheduledDays / scheduledHours → from WeeklySchedule only
+    //   scheduledDays / workedDays / scheduledHours → from WeeklySchedule
     //   absences → from WorkLog only (ADD_ABSENCE minus REMOVE_ABSENCE)
-    //   workedDays = scheduledDays - absences
-    //   normalHoursWorked = scheduledNormalHours - absenceHours - partialAbsenceHours
+    //   workedDays = scheduledDays (full-day absences remove the schedule entry)
+    //   normalHoursWorked = scheduledNormalHours - partialAbsenceHours
     //   overtimeHours = scheduledOvertimeHours + worklog ADD_OVERTIME_HOURS
     //   totalHours = normalHoursWorked + overtimeHours
 
@@ -152,10 +164,9 @@ public class WorkLogService {
         WorkLogAdjustments adj = calculateWorkLogAdjustments(employeeId, from, to);
 
         int absences = Math.max(0, adj.absences);
-        int workedDays = Math.max(0, baseline.scheduledDays - absences);
+        int workedDays = baseline.scheduledDays;
 
         BigDecimal normalHours = baseline.normalHours
-                .subtract(adj.absenceHours)
                 .subtract(adj.partialAbsenceHours)
                 .max(BigDecimal.ZERO);
 
@@ -235,36 +246,118 @@ public class WorkLogService {
                 .findByEmployeeIdAndTargetDateBetweenOrderByCreatedAtDesc(employeeId, from, to);
 
         BigDecimal overtimeHours = BigDecimal.ZERO;
-        BigDecimal absenceHours = BigDecimal.ZERO;
         BigDecimal partialAbsenceHours = BigDecimal.ZERO;
         int absences = 0;
 
         for (WorkLog log : logs) {
             switch (log.getAction()) {
                 case ADD_OVERTIME_HOURS -> overtimeHours = overtimeHours.add(log.getHoursAffected());
-                case ADD_ABSENCE -> {
-                    absences++;
-                    absenceHours = absenceHours.add(log.getHoursAffected());
-                }
-                case REMOVE_ABSENCE -> {
-                    absences--;
-                    absenceHours = absenceHours.subtract(log.getHoursAffected());
-                }
+                case ADD_ABSENCE -> absences++;
+                case REMOVE_ABSENCE -> absences--;
                 case PARTIAL_ABSENCE -> partialAbsenceHours = partialAbsenceHours.add(log.getHoursAffected());
-                case REMOVE_SCHEDULED_DAY -> absenceHours = absenceHours.add(log.getHoursAffected());
+                case REMOVE_SCHEDULED_DAY -> {
+                    // Full-day schedule removals are already reflected in WeeklySchedule baseline.
+                }
             }
         }
 
-        return new WorkLogAdjustments(overtimeHours, absenceHours.max(BigDecimal.ZERO),
-                partialAbsenceHours, Math.max(0, absences));
+        return new WorkLogAdjustments(overtimeHours, partialAbsenceHours, Math.max(0, absences));
+    }
+
+    private void applyAbsenceOvertimeCompensation(Employee employee, LocalDate targetDate, String adminUsername) {
+        BigDecimal currentOvertime = getNetOvertimeHoursForDate(employee.getId(), targetDate);
+        if (currentOvertime.compareTo(BigDecimal.ZERO) > 0) {
+            persistOvertimeAdjustment(
+                    employee,
+                    targetDate,
+                    currentOvertime.negate(),
+                    adminUsername,
+                    AUTO_ABSENCE_OVERTIME_DEDUCTION_REASON
+            );
+        }
+    }
+
+    private void restoreAbsenceOvertimeCompensation(Employee employee, LocalDate targetDate, String adminUsername) {
+        BigDecimal pendingCompensation = findPendingAbsenceOvertimeCompensation(employee.getId(), targetDate);
+        if (pendingCompensation.compareTo(BigDecimal.ZERO) > 0) {
+            persistOvertimeAdjustment(
+                    employee,
+                    targetDate,
+                    pendingCompensation,
+                    adminUsername,
+                    AUTO_ABSENCE_OVERTIME_RESTORE_REASON
+            );
+        }
+    }
+
+    private BigDecimal getNetOvertimeHoursForDate(Long employeeId, LocalDate date) {
+        List<WorkLog> logs = workLogRepository
+                .findByEmployeeIdAndTargetDateBetweenOrderByCreatedAtDesc(employeeId, date, date);
+
+        return logs.stream()
+                .filter(log -> log.getAction() == WorkLogAction.ADD_OVERTIME_HOURS)
+                .map(WorkLog::getHoursAffected)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal findPendingAbsenceOvertimeCompensation(Long employeeId, LocalDate date) {
+        List<WorkLog> logs = workLogRepository
+                .findByEmployeeIdAndTargetDateBetweenOrderByCreatedAtDesc(employeeId, date, date);
+
+        int pendingRestores = 0;
+        for (WorkLog log : logs) {
+            if (log.getAction() != WorkLogAction.ADD_OVERTIME_HOURS) {
+                continue;
+            }
+
+            if (isAutoAbsenceOvertimeRestore(log)) {
+                pendingRestores++;
+                continue;
+            }
+
+            if (isAutoAbsenceOvertimeDeduction(log)) {
+                if (pendingRestores > 0) {
+                    pendingRestores--;
+                    continue;
+                }
+                return log.getHoursAffected().abs();
+            }
+        }
+
+        return BigDecimal.ZERO;
+    }
+
+    private boolean isAutoAbsenceOvertimeDeduction(WorkLog log) {
+        return AUTO_ABSENCE_OVERTIME_DEDUCTION_REASON.equals(log.getReason());
+    }
+
+    private boolean isAutoAbsenceOvertimeRestore(WorkLog log) {
+        return AUTO_ABSENCE_OVERTIME_RESTORE_REASON.equals(log.getReason());
+    }
+
+    private void persistOvertimeAdjustment(
+            Employee employee,
+            LocalDate targetDate,
+            BigDecimal hours,
+            String adminUsername,
+            String reason) {
+        workLogRepository.save(WorkLog.builder()
+                .employee(employee)
+                .targetDate(targetDate)
+                .action(WorkLogAction.ADD_OVERTIME_HOURS)
+                .hoursAffected(hours)
+                .isOvertime(true)
+                .reason(reason)
+                .performedBy(adminUsername)
+                .createdAt(LocalDateTime.now())
+                .build());
     }
 
     // ── Utility ──
 
-    private void removeFromSchedule(Long employeeId, LocalDate date) {
-        WeeklySchedule ws = findScheduleEntry(employeeId, date);
-        if (ws != null) {
-            weeklyScheduleRepository.deleteById(ws.getId());
+    private void removeFromSchedule(WeeklySchedule scheduleEntry) {
+        if (scheduleEntry != null) {
+            weeklyScheduleRepository.deleteById(scheduleEntry.getId());
         }
     }
 
@@ -272,19 +365,11 @@ public class WorkLogService {
      * Restore the schedule entry that was removed when the absence was registered.
      * Also remove any overtime replacement that was covering this position.
      */
-    private void restoreScheduleFromAbsence(Long employeeId, LocalDate date) {
+    private void restoreScheduleFromAbsence(Long employeeId, LocalDate date, WorkLog absenceLog) {
         LocalDate weekStart = date.minusDays(date.getDayOfWeek().getValue() - 1);
         DayOfWeek dow = date.getDayOfWeek();
 
-        // Find the original ADD_ABSENCE WorkLog with the snapshot
-        WorkLog absenceLog = workLogRepository
-                .findByEmployeeIdAndTargetDateBetweenOrderByCreatedAtDesc(employeeId, date, date)
-                .stream()
-                .filter(wl -> wl.getAction() == WorkLogAction.ADD_ABSENCE && wl.getSnapshotShift() != null)
-                .findFirst()
-                .orElse(null);
-
-        if (absenceLog == null) {
+        if (absenceLog == null || absenceLog.getSnapshotShift() == null) {
             return;
         }
 
@@ -340,7 +425,7 @@ public class WorkLogService {
     /**
      * Calculate the effective working hours for a schedule entry.
      * If the employee is assigned to an attraction, use the attraction's
-     * operating hours (capped at 8h max). Otherwise use the shift hours (8h).
+     * operating hours. Otherwise use shift hours.
      */
     public static BigDecimal calculateEffectiveHours(WeeklySchedule ws) {
         if (ws.getAssignedAttraction() != null) {
@@ -349,8 +434,7 @@ public class WorkLogService {
             LocalTime close = attr.getClosingTime();
             if (open != null && close != null && close.isAfter(open)) {
                 long attractionMinutes = Duration.between(open, close).toMinutes();
-                long effectiveMinutes = Math.min(attractionMinutes, 480); // 8h max
-                return BigDecimal.valueOf(effectiveMinutes)
+                return BigDecimal.valueOf(attractionMinutes)
                         .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
             }
         }
@@ -364,6 +448,34 @@ public class WorkLogService {
     static BigDecimal calculateShiftHours(WorkShift shift) {
         long minutes = Duration.between(shift.getStartTime(), shift.getEndTime()).toMinutes();
         return BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal resolveHoursAffected(
+            WorkLogEntryRequest request,
+            Employee employee,
+            WorkLogAction action,
+            WeeklySchedule scheduleEntry,
+            WorkLog activeAbsenceLog) {
+        return switch (action) {
+            case ADD_ABSENCE, REMOVE_SCHEDULED_DAY -> calculateFullDayHours(employee, scheduleEntry);
+            case REMOVE_ABSENCE -> activeAbsenceLog.getHoursAffected();
+            case ADD_OVERTIME_HOURS, PARTIAL_ABSENCE -> request.getHoursAffected();
+        };
+    }
+
+    private BigDecimal calculateFullDayHours(Employee employee, WeeklySchedule scheduleEntry) {
+        if (employee.getRole() == EmployeeRole.OPERATOR
+                && scheduleEntry != null
+                && scheduleEntry.getAssignedAttraction() != null) {
+            Attraction attraction = scheduleEntry.getAssignedAttraction();
+            LocalTime open = attraction.getOpeningTime();
+            LocalTime close = attraction.getClosingTime();
+            if (open != null && close != null && close.isAfter(open)) {
+                long minutes = Duration.between(open, close).toMinutes();
+                return BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+            }
+        }
+        return DEFAULT_FULL_DAY_HOURS;
     }
 
     private LocalDate normalizeToMonday(LocalDate date) {
@@ -390,7 +502,7 @@ public class WorkLogService {
     private record ScheduleBaseline(BigDecimal normalHours, BigDecimal overtimeHours,
                                      BigDecimal totalScheduled, int scheduledDays, int reinforcementDays) {}
 
-    private record WorkLogAdjustments(BigDecimal overtimeHours, BigDecimal absenceHours,
-                                       BigDecimal partialAbsenceHours, int absences) {}
+    private record WorkLogAdjustments(BigDecimal overtimeHours,
+                                      BigDecimal partialAbsenceHours, int absences) {}
 }
 

@@ -77,7 +77,13 @@ const getEnvValue = (...keys: string[]): string | undefined => {
   return fromDotEnv ? dotenv.get(fromDotEnv) : undefined;
 };
 
+const cypressBackendUrl = getEnvValue('CYPRESS_BACKEND_URL', 'BACKEND_URL') ?? 'http://localhost:8080';
+
 export default defineConfig({
+  allowCypressEnv: false,
+  expose: {
+    BACKEND_URL: cypressBackendUrl,
+  },
   retries: {
     runMode: 2,
     openMode: 0,

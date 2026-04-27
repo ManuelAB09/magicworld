@@ -7,7 +7,6 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,8 +14,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springframework.mock.env.MockEnvironment;
 import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,6 +30,7 @@ public class ImageStorageServiceTests {
     private static final String IMAGE_WEBP = "image/webp";
     private static final String TEXT_PLAIN = "text/plain";
     private static final String MAX_FILE_SIZE_PROP = "spring.servlet.multipart.max-file-size";
+        private static final String UPLOAD_DIR_PROP = "app.upload.dir";
     private static final String MAX_FILE_SIZE_10MB = "10MB";
     private static final String MAX_FILE_SIZE_1B = "1B";
     private static final String INVALID_SIZE = "invalid";
@@ -46,22 +44,8 @@ public class ImageStorageServiceTests {
     void setUp() {
         MockEnvironment env = new MockEnvironment();
         env.setProperty(MAX_FILE_SIZE_PROP, MAX_FILE_SIZE_10MB);
+                env.setProperty(UPLOAD_DIR_PROP, tempDir.toString());
         imageStorageService = new ImageStorageService(env);
-    }
-
-    @AfterEach
-    void tearDown() throws IOException {
-        Path uploadsDir = Path.of("uploads").toAbsolutePath();
-        if (Files.exists(uploadsDir)) {
-            Files.walk(uploadsDir)
-                    .sorted((a, b) -> -a.compareTo(b))
-                    .forEach(p -> {
-                        try {
-                            Files.deleteIfExists(p);
-                        } catch (IOException ignored) {
-                        }
-                    });
-        }
     }
 
     @Test
@@ -190,6 +174,7 @@ public class ImageStorageServiceTests {
     void testStoreFileTooLargeThrows() {
         MockEnvironment env = new MockEnvironment();
         env.setProperty(MAX_FILE_SIZE_PROP, MAX_FILE_SIZE_1B);
+        env.setProperty(UPLOAD_DIR_PROP, tempDir.toString());
         ImageStorageService service = new ImageStorageService(env);
         byte[] content = "content larger than 1 byte".getBytes();
         MockMultipartFile file = new MockMultipartFile(
@@ -206,6 +191,7 @@ public class ImageStorageServiceTests {
     void testStoreInvalidConfiguredSizeFallsBackToDefault() {
         MockEnvironment env = new MockEnvironment();
         env.setProperty(MAX_FILE_SIZE_PROP, INVALID_SIZE);
+        env.setProperty(UPLOAD_DIR_PROP, tempDir.toString());
         ImageStorageService service = new ImageStorageService(env);
         byte[] content = "fake content".getBytes();
         MockMultipartFile file = new MockMultipartFile(

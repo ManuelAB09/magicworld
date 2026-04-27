@@ -36,7 +36,6 @@ build/
 allure-results/
 
 ### Runtime uploads (user-generated files) ###
-uploads/
 
 ### Coverage reports (generated on every test run) ###
 coverage/

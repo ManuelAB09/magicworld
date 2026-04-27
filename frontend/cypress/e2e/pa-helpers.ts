@@ -1,5 +1,5 @@
 export const backendUrl =
-  (Cypress.env('BACKEND_URL') as string) || 'http://localhost:8080';
+  (Cypress.expose('BACKEND_URL') as string) || 'http://localhost:8080';
 
 export const authRateLimitHeaders = (): Record<string, string> => ({
   'X-Forwarded-For': `10.${Cypress._.random(0, 255)}.${Cypress._.random(0, 255)}.${Cypress._.random(1, 254)}`,

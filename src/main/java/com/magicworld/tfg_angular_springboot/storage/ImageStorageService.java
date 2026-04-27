@@ -22,6 +22,7 @@ import java.util.UUID;
 @Slf4j
 public class ImageStorageService {
 
+    private static final String UPLOAD_DIR_PROP = "app.upload.dir";
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
             "jpg", "jpeg", "png", "gif", "bmp", "webp", "svg", "ico", "tiff", "tif"
     );
@@ -30,7 +31,11 @@ public class ImageStorageService {
     private final long maxBytes;
 
     public ImageStorageService(Environment env) {
-        this.baseDir = Paths.get("uploads").toAbsolutePath().normalize();
+        String configuredUploadDir = env.getProperty(UPLOAD_DIR_PROP, "uploads");
+        if (configuredUploadDir == null || configuredUploadDir.isBlank()) {
+            configuredUploadDir = "uploads";
+        }
+        this.baseDir = Paths.get(configuredUploadDir).toAbsolutePath().normalize();
         String configured = env.getProperty("spring.servlet.multipart.max-file-size", "10MB");
         long computed;
         try {

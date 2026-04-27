@@ -188,6 +188,73 @@ public class WorkLogServiceIntegrationTests {
     }
 
     @Test
+    @Story("Registrar Ausencia")
+    @Description("Verifica que ADD_ABSENCE ignora horas manuales y usa duración real de atracción para operadores")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("addAbsenceOperadorUsaDuracionAtraccion")
+    void addAbsenceOperadorUsaDuracionAtraccion() {
+        Attraction longAttraction = attractionRepository.save(Attraction.builder()
+                .name("WL Long Ride").description("Long duration").photoUrl("http://example.com/wl-long.jpg")
+                .category(AttractionCategory.ROLLER_COASTER).intensity(Intensity.HIGH)
+                .maintenanceStatus(MaintenanceStatus.OPERATIONAL)
+                .isActive(true).minimumAge(12).minimumHeight(140).minimumWeight(0)
+                .mapPositionX(2.0).mapPositionY(2.0)
+                .openingTime(LocalTime.of(9, 0)).closingTime(LocalTime.of(21, 0))
+                .build());
+
+        LocalDate tuesday = monday.plusDays(1);
+        scheduleService.createScheduleEntry(CreateScheduleRequest.builder()
+                .employeeId(employee.getId())
+                .weekStartDate(monday)
+                .dayOfWeek(DayOfWeek.TUESDAY)
+                .shift(WorkShift.FULL_DAY)
+                .assignedAttractionId(longAttraction.getId())
+                .breakGroup(BreakGroup.B)
+                .build());
+
+        WorkLogEntryDTO result = workLogService.addWorkLogEntry(WorkLogEntryRequest.builder()
+                .employeeId(employee.getId())
+                .targetDate(tuesday)
+                .action(WorkLogAction.ADD_ABSENCE)
+                .hoursAffected(new BigDecimal("1.00"))
+                .reason("Sick leave")
+                .build(), ADMIN_USERNAME);
+
+        assertEquals(0, new BigDecimal("12.00").compareTo(result.getHoursAffected()));
+    }
+
+    @Test
+    @Story("Registrar Ausencia")
+    @Description("Verifica que ADD_ABSENCE para roles no operador usa 8h por defecto")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("addAbsenceNoOperadorUsaOchoHoras")
+    void addAbsenceNoOperadorUsaOchoHoras() {
+        if (zone == null) {
+            return;
+        }
+
+        LocalDate tuesday = monday.plusDays(1);
+        scheduleService.createScheduleEntry(CreateScheduleRequest.builder()
+                .employeeId(securityEmp.getId())
+                .weekStartDate(monday)
+                .dayOfWeek(DayOfWeek.TUESDAY)
+                .shift(WorkShift.FULL_DAY)
+                .assignedZoneId(zone.getId())
+                .breakGroup(BreakGroup.A)
+                .build());
+
+        WorkLogEntryDTO result = workLogService.addWorkLogEntry(WorkLogEntryRequest.builder()
+                .employeeId(securityEmp.getId())
+                .targetDate(tuesday)
+                .action(WorkLogAction.ADD_ABSENCE)
+                .hoursAffected(new BigDecimal("2.00"))
+                .reason("Medical leave")
+                .build(), ADMIN_USERNAME);
+
+        assertEquals(0, FULL_DAY_HOURS.compareTo(result.getHoursAffected()));
+    }
+
+    @Test
     @Story("Resumen de Empleado")
     @Description("Verifica que getEmployeeSummary con ausencia reduce días trabajados")
     @Severity(SeverityLevel.CRITICAL)
@@ -213,6 +280,64 @@ public class WorkLogServiceIntegrationTests {
 
     @Test
     @Story("Resumen de Empleado")
+    @Description("Verifica que, tras una falta total, los días trabajados quedan alineados con los programados restantes")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("getEmployeeSummaryConFaltaTotalMantieneDiasAlineados")
+    void getEmployeeSummaryConFaltaTotalMantieneDiasAlineados() {
+        scheduleService.createScheduleEntry(CreateScheduleRequest.builder()
+                .employeeId(employee.getId())
+                .weekStartDate(monday)
+                .dayOfWeek(DayOfWeek.TUESDAY)
+                .shift(WorkShift.FULL_DAY)
+                .assignedAttractionId(attraction.getId())
+                .breakGroup(BreakGroup.B)
+                .build());
+
+        scheduleService.createScheduleEntry(CreateScheduleRequest.builder()
+                .employeeId(employee.getId())
+                .weekStartDate(monday)
+                .dayOfWeek(DayOfWeek.WEDNESDAY)
+                .shift(WorkShift.FULL_DAY)
+                .assignedAttractionId(attraction.getId())
+                .breakGroup(BreakGroup.C)
+                .build());
+
+        scheduleService.createScheduleEntry(CreateScheduleRequest.builder()
+                .employeeId(employee.getId())
+                .weekStartDate(monday)
+                .dayOfWeek(DayOfWeek.THURSDAY)
+                .shift(WorkShift.FULL_DAY)
+                .assignedAttractionId(attraction.getId())
+                .breakGroup(BreakGroup.D)
+                .build());
+
+        scheduleService.createScheduleEntry(CreateScheduleRequest.builder()
+                .employeeId(employee.getId())
+                .weekStartDate(monday)
+                .dayOfWeek(DayOfWeek.FRIDAY)
+                .shift(WorkShift.FULL_DAY)
+                .assignedAttractionId(attraction.getId())
+                .breakGroup(BreakGroup.A)
+                .build());
+
+        workLogService.addWorkLogEntry(WorkLogEntryRequest.builder()
+                .employeeId(employee.getId())
+                .targetDate(monday)
+                .action(WorkLogAction.ADD_ABSENCE)
+                .hoursAffected(FULL_DAY_HOURS)
+                .reason("Sick")
+                .build(), ADMIN_USERNAME);
+
+        EmployeeHoursSummaryDTO summary = workLogService.getEmployeeSummary(
+                employee.getId(), monday, monday.plusDays(4));
+
+        assertEquals(1, summary.getAbsences());
+        assertEquals(4, summary.getScheduledDays());
+        assertEquals(4, summary.getWorkedDays());
+    }
+
+    @Test
+    @Story("Resumen de Empleado")
     @Description("Verifica que getEmployeeSummary con horas extra suma correctamente")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("getEmployeeSummaryConHorasExtraSumaCorrectamente")
@@ -230,6 +355,52 @@ public class WorkLogServiceIntegrationTests {
                 employee.getId(), futureDate, futureDate);
 
         assertTrue(summary.getTotalHoursWorked().compareTo(BigDecimal.ZERO) > 0);
+    }
+
+    @Test
+    @Story("Resumen de Empleado")
+    @Description("Verifica que una falta total elimina las horas extra del día y que REMOVE_ABSENCE las restaura")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("addAbsenceCompensaHorasExtraYRemoveAbsenceLasRestaura")
+    void addAbsenceCompensaHorasExtraYRemoveAbsenceLasRestaura() {
+        workLogService.addWorkLogEntry(WorkLogEntryRequest.builder()
+                .employeeId(employee.getId())
+                .targetDate(futureDate)
+                .action(WorkLogAction.ADD_OVERTIME_HOURS)
+                .hoursAffected(OVERTIME_HOURS)
+                .isOvertime(true)
+                .reason("Extra coverage")
+                .build(), ADMIN_USERNAME);
+
+        EmployeeHoursSummaryDTO beforeAbsence = workLogService.getEmployeeSummary(
+                employee.getId(), futureDate, futureDate);
+        assertEquals(0, new BigDecimal("12.00").compareTo(beforeAbsence.getTotalHoursWorked()));
+
+        workLogService.addWorkLogEntry(WorkLogEntryRequest.builder()
+                .employeeId(employee.getId())
+                .targetDate(futureDate)
+                .action(WorkLogAction.ADD_ABSENCE)
+                .hoursAffected(FULL_DAY_HOURS)
+                .reason("Sick")
+                .build(), ADMIN_USERNAME);
+
+        EmployeeHoursSummaryDTO duringAbsence = workLogService.getEmployeeSummary(
+                employee.getId(), futureDate, futureDate);
+        assertEquals(0, BigDecimal.ZERO.compareTo(duringAbsence.getTotalHoursWorked()));
+        assertEquals(1, duringAbsence.getAbsences());
+
+        workLogService.addWorkLogEntry(WorkLogEntryRequest.builder()
+                .employeeId(employee.getId())
+                .targetDate(futureDate)
+                .action(WorkLogAction.REMOVE_ABSENCE)
+                .hoursAffected(FULL_DAY_HOURS)
+                .reason("Recovered")
+                .build(), ADMIN_USERNAME);
+
+        EmployeeHoursSummaryDTO afterRemovingAbsence = workLogService.getEmployeeSummary(
+                employee.getId(), futureDate, futureDate);
+        assertEquals(0, new BigDecimal("12.00").compareTo(afterRemovingAbsence.getTotalHoursWorked()));
+        assertEquals(0, afterRemovingAbsence.getAbsences());
     }
 
     @Test
@@ -300,6 +471,34 @@ public class WorkLogServiceIntegrationTests {
         BigDecimal hours = WorkLogService.calculateEffectiveHours(ws);
         assertTrue(hours.compareTo(BigDecimal.ZERO) > 0);
         assertTrue(hours.compareTo(new BigDecimal("8.00")) <= 0);
+    }
+
+    @Test
+    @Story("Horas Efectivas")
+    @Description("Verifica que calculateEffectiveHours no limita a 8h cuando la atracción dura más")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("calculateEffectiveHoursSinCapParaAtraccionesLargas")
+    void calculateEffectiveHoursSinCapParaAtraccionesLargas() {
+        Attraction longAttraction = attractionRepository.save(Attraction.builder()
+                .name("WL Very Long Ride").description("Long duration").photoUrl("http://example.com/wl-very-long.jpg")
+                .category(AttractionCategory.ROLLER_COASTER).intensity(Intensity.HIGH)
+                .maintenanceStatus(MaintenanceStatus.OPERATIONAL)
+                .isActive(true).minimumAge(12).minimumHeight(140).minimumWeight(0)
+                .mapPositionX(5.0).mapPositionY(5.0)
+                .openingTime(LocalTime.of(9, 0)).closingTime(LocalTime.of(21, 0))
+                .build());
+
+        WeeklySchedule ws = WeeklySchedule.builder()
+                .employee(employee)
+                .weekStartDate(monday)
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .shift(WorkShift.FULL_DAY)
+                .assignedAttraction(longAttraction)
+                .breakGroup(BreakGroup.A)
+                .build();
+
+        BigDecimal hours = WorkLogService.calculateEffectiveHours(ws);
+        assertEquals(0, new BigDecimal("12.00").compareTo(hours));
     }
 
     @Test

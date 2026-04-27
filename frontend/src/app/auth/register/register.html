@@ -1,45 +1,60 @@
 <div class="register-background" data-cy="register-page">
   <form class="auth-form" data-cy="register-form" (ngSubmit)="onRegister()">
     <h2>{{ 'REGISTER.TITLE' | translate }}</h2>
-    <label for="username">{{ 'REGISTER.USERNAME' | translate }}</label>
-    <input id="username" data-cy="register-username" [(ngModel)]="username" name="username" required />
+    <div class="form-grid">
+      <div class="field-group">
+        <label for="username">{{ 'REGISTER.USERNAME' | translate }}</label>
+        <input id="username" data-cy="register-username" [(ngModel)]="username" name="username" required />
+      </div>
 
-    <label for="firstname">{{ 'REGISTER.FIRSTNAME' | translate }}</label>
-    <input id="firstname" data-cy="register-firstname" [(ngModel)]="firstname" name="firstname" required />
+      <div class="field-group">
+        <label for="firstname">{{ 'REGISTER.FIRSTNAME' | translate }}</label>
+        <input id="firstname" data-cy="register-firstname" [(ngModel)]="firstname" name="firstname" required />
+      </div>
 
-    <label for="lastname">{{ 'REGISTER.LASTNAME' | translate }}</label>
-    <input id="lastname" data-cy="register-lastname" [(ngModel)]="lastname" name="lastname" required />
+      <div class="field-group">
+        <label for="lastname">{{ 'REGISTER.LASTNAME' | translate }}</label>
+        <input id="lastname" data-cy="register-lastname" [(ngModel)]="lastname" name="lastname" required />
+      </div>
 
-    <label for="email">{{ 'REGISTER.EMAIL' | translate }}</label>
-    <input id="email" data-cy="register-email" [(ngModel)]="email" name="email" required />
+      <div class="field-group">
+        <label for="email">{{ 'REGISTER.EMAIL' | translate }}</label>
+        <input id="email" data-cy="register-email" [(ngModel)]="email" name="email" required />
+      </div>
 
-    <label for="password">{{ 'REGISTER.PASSWORD' | translate }}</label>
-    <div class="password-container">
-      <input id="password" data-cy="register-password" [(ngModel)]="password" name="password" [type]="showPassword ? 'text' : 'password'"
-        required />
-      <button type="button" class="toggle-password" (click)="togglePasswordVisibility()" tabindex="-1"
-        aria-label="Mostrar/Ocultar contraseña">
-        @if (showPassword) {
-        <i class="fa-solid fa-eye"></i>
-        } @else {
-        <i class="fa-solid fa-eye-slash"></i>
-        }
-      </button>
+      <div class="field-group">
+        <label for="password">{{ 'REGISTER.PASSWORD' | translate }}</label>
+        <div class="password-container">
+          <input id="password" data-cy="register-password" [(ngModel)]="password" name="password"
+            [type]="showPassword ? 'text' : 'password'" required />
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility()" tabindex="-1"
+            aria-label="Mostrar/Ocultar contraseña">
+            @if (showPassword) {
+            <i class="fa-solid fa-eye"></i>
+            } @else {
+            <i class="fa-solid fa-eye-slash"></i>
+            }
+          </button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="confirmPassword">{{ 'REGISTER.CONFIRM' | translate }}</label>
+        <div class="password-container">
+          <input id="confirmPassword" data-cy="register-confirm-password" [(ngModel)]="confirmPassword" name="confirmPassword"
+            [type]="showConfirmPassword ? 'text' : 'password'" required />
+          <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()" tabindex="-1"
+            aria-label="Mostrar/Ocultar confirmación">
+            @if (showConfirmPassword) {
+            <i class="fa-solid fa-eye"></i>
+            } @else {
+            <i class="fa-solid fa-eye-slash"></i>
+            }
+          </button>
+        </div>
+      </div>
     </div>
 
-    <label for="confirmPassword">{{ 'REGISTER.CONFIRM' | translate }}</label>
-    <div class="password-container">
-      <input id="confirmPassword" data-cy="register-confirm-password" [(ngModel)]="confirmPassword" name="confirmPassword"
-        [type]="showConfirmPassword ? 'text' : 'password'" required />
-      <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()" tabindex="-1"
-        aria-label="Mostrar/Ocultar confirmación">
-        @if (showConfirmPassword) {
-        <i class="fa-solid fa-eye"></i>
-        } @else {
-        <i class="fa-solid fa-eye-slash"></i>
-        }
-      </button>
-    </div>
     @if (errorMessages.length > 0) {
     <div class="error">
       @for (msg of errorMessages; track $index) {

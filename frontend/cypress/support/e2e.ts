@@ -1,10 +1,4 @@
-// ***********************************************************
-// Archivo de soporte para Cypress E2E
-// Se ejecuta antes de cada archivo de spec
-// https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests#Support-file
-// ***********************************************************
-
-const backendUrl = (Cypress.env('BACKEND_URL') as string) || 'http://localhost:8080';
+const backendUrl = (Cypress.expose('BACKEND_URL') as string) || 'http://localhost:8080';
 
 const apiUrl = (path: string): string => `${backendUrl}${path}`;
 const randomForwardedFor = (): string =>
