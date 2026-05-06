@@ -4,33 +4,48 @@
 hide circle
 skinparam linetype ortho
 skinparam backgroundColor #FFFFFF
+
+' Ajustamos la separación para el formato vertical
+skinparam nodesep 90
+skinparam ranksep 130
+
+' Tamaños masivos para LaTeX
+skinparam titleFontSize 50
+
 skinparam class {
     BackgroundColor #EBF5FB
     BorderColor #1278DF
     HeaderBackgroundColor #1278DF
     HeaderFontColor White
     FontName Arial
-    FontSize 11
-    AttributeFontSize 10
+    FontSize 35
+    AttributeFontSize 35
 }
+
 skinparam class<<externo>> {
     BackgroundColor #F0F0F0
     BorderColor #999999
     HeaderBackgroundColor #999999
     HeaderFontColor White
 }
+
 skinparam package {
     BackgroundColor #FAFAFA
     BorderColor #ADB5BD
     FontColor #212529
     FontStyle bold
-    FontSize 12
+    FontSize 35
 }
+
 skinparam arrow {
     Color #343A40
-    FontSize 9
+    FontSize 30
     FontColor #555555
-    Thickness 1.5
+    Thickness 3.0
+}
+
+skinparam note {
+    FontSize 30
 }
 
 title "<b>MagicWorld — Parque y Monitorización</b>"
@@ -62,6 +77,15 @@ package "Parque" {
 
 ' ─────────────────────────────────────────
 package "Monitorización" {
+    class ParkEvent {
+        eventType    : ParkEventType
+        timestamp    : LocalDateTime
+        attractionId : Long
+        userId       : Long
+        visitorCount : Integer
+        queueSize    : Integer
+        metadata     : String
+    }
     class ParkAlert {
         alertType    : AlertType
         severity     : AlertSeverity
@@ -71,15 +95,6 @@ package "Monitorización" {
         isActive     : Boolean
         timestamp    : LocalDateTime
         resolvedAt   : LocalDateTime
-    }
-    class ParkEvent {
-        eventType    : ParkEventType
-        timestamp    : LocalDateTime
-        attractionId : Long
-        userId       : Long
-        visitorCount : Integer
-        queueSize    : Integer
-        metadata     : String
     }
 }
 
@@ -98,12 +113,28 @@ package "Ref. Compras" <<Frame>> {
 }
 
 ' ─────────────────────────────────────────
-'  RELACIONES
+' ENLACES OCULTOS PARA FORZAR APILAMIENTO VERTICAL
 ' ─────────────────────────────────────────
-ParkZone  "1"    *--  "0..*"  Attraction  : "alberga >"
-ParkAlert "0..*" ..>  "0..1"  Attraction  : "relacionada con >"
-ParkClosureDay "0..*" ..> PurchaseLine : "bloquea validDate de >"
+' Estos enlaces invisibles obligan al motor a dibujar 
+' las clases de abajo literalmente debajo de las de arriba
+Attraction -[hidden]down-> ParkAlert
+ParkZone -[hidden]down-> ParkEvent
+ParkEvent -[hidden]down-> ParkClosureDay
+ParkAlert -[hidden]down-> PurchaseLine
 
+' ─────────────────────────────────────────
+'  RELACIONES (con dirección forzada)
+' ─────────────────────────────────────────
+' Forzamos que la flecha apunte hacia abajo o hacia arriba para evitar ensanchar
+ParkZone  "1" -down-* "0..*" Attraction  : "alberga >"
+ParkAlert "0..*" -up-.> "0..1" Attraction  : "relacionada con >"
+
+' Estas dos clases más pequeñas las ponemos de lado abajo del todo
+ParkClosureDay "0..*" -right-.> PurchaseLine : "bloquea validDate de >"
+
+' ─────────────────────────────────────────
+' NOTAS (Todas reubicadas al fondo para no ganar anchura)
+' ─────────────────────────────────────────
 note bottom of ParkEvent
   Registro histórico de eventos del parque.
   attractionId y userId son referencias
@@ -111,24 +142,22 @@ note bottom of ParkEvent
   eficiencia analítica y de rendimiento.
 end note
 
-note right of ParkAlert
+note bottom of ParkAlert
   Alertas operacionales en tiempo real.
-    Incluyen sugerencia y attractionId.
+  Incluyen sugerencia y attractionId.
   Son consultadas por DailyAssignment
-  y ReinforcementCall
-  (ver Diagrama 2 — Empleados).
+  y ReinforcementCall.
 end note
 
-note right of ParkClosureDay
-    Registro de días de cierre del parque.
-    Se usa en checkout para impedir
-    compras en fechas no operativas.
+note bottom of ParkClosureDay
+  Registro de días de cierre del parque.
+  Se usa en checkout para impedir
+  compras en fechas no operativas.
 end note
 
 note bottom of PurchaseLine
-    Entidad definida en el
-    Diagrama 1 (Usuarios, Compras y Tickets).
-    Se muestra aquí como referencia.
+  Entidad del Diagrama 1.
+  Se muestra aquí como referencia.
 end note
 
 @enduml

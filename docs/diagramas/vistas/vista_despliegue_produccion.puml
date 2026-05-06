@@ -7,7 +7,7 @@ AddElementTag("fe",  $bgColor="#b71c1c", $fontColor="#ffffff", $borderColor="#7f
 AddElementTag("be",  $bgColor="#2e7d32", $fontColor="#ffffff", $borderColor="#1b5e20")
 AddElementTag("db",  $bgColor="#0277bd", $fontColor="#ffffff", $borderColor="#01579b")
 AddElementTag("ext", $bgColor="#546e7a", $fontColor="#ffffff", $borderColor="#37474f")
-
+skinparam defaultFontSize 20
 title Despliegue — Producción
 
 Deployment_Node(browser, "Navegador", "Chrome / Firefox · Internet") {

@@ -7,7 +7,7 @@ AddElementTag("db",   $bgColor="#0277bd", $fontColor="#ffffff", $borderColor="#0
 AddElementTag("seed", $bgColor="#4527a0", $fontColor="#ffffff", $borderColor="#311b92")
 AddElementTag("vol",  $bgColor="#37474f", $fontColor="#ffffff", $borderColor="#263238")
 AddElementTag("ext",  $bgColor="#546e7a", $fontColor="#ffffff", $borderColor="#37474f")
-
+skinparam defaultFontSize 30
 title Despliegue — Local con Docker Compose
 
 Deployment_Node(browser, "Navegador", "Chrome / Firefox") {

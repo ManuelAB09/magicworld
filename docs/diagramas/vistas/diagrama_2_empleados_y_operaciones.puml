@@ -4,14 +4,22 @@
 hide circle
 skinparam linetype ortho
 skinparam backgroundColor #FFFFFF
+
+' Separación ajustada para el formato vertical XXL
+skinparam nodesep 90
+skinparam ranksep 130
+
+' Tamaños masivos para que se lea en LaTeX
+skinparam titleFontSize 50
+
 skinparam class {
     BackgroundColor #EBF5FB
     BorderColor #1278DF
     HeaderBackgroundColor #1278DF
     HeaderFontColor White
     FontName Arial
-    FontSize 11
-    AttributeFontSize 10
+    FontSize 35
+    AttributeFontSize 35
 }
 skinparam class<<externo>> {
     BackgroundColor #F0F0F0
@@ -24,13 +32,16 @@ skinparam package {
     BorderColor #ADB5BD
     FontColor #212529
     FontStyle bold
-    FontSize 12
+    FontSize 35
 }
 skinparam arrow {
     Color #343A40
-    FontSize 9
+    FontSize 30
     FontColor #555555
-    Thickness 1.5
+    Thickness 3.0
+}
+skinparam note {
+    FontSize 30
 }
 
 title "<b>MagicWorld — Empleados y Operaciones</b>"
@@ -98,22 +109,31 @@ package "Ref. Parque / Monitorización" <<Frame>> {
 }
 
 ' ─────────────────────────────────────────
-'  RELACIONES
+' ENLACES OCULTOS PARA APILAMIENTO VERTICAL
 ' ─────────────────────────────────────────
-Employee        "1"    *--  "0..*"  DailyAssignment   : "tiene >"
-Employee        "1"    *--  "0..*"  WeeklySchedule    : "planifica >"
-Employee        "1"    *--  "0..*"  WorkLog           : "registra >"
-Employee        "1"    -->  "0..*"  ReinforcementCall : "atiende >"
+Employee -[hidden]down-> DailyAssignment
+DailyAssignment -[hidden]down-> ParkZone
 
-DailyAssignment "0..*" --> "0..1"  ParkZone    : "trabaja en >"
-DailyAssignment "0..*" --> "0..1"  Attraction  : "opera en >"
-DailyAssignment "0..*" --> "0..1"  ParkAlert   : "responde a >"
+' ─────────────────────────────────────────
+'  RELACIONES FORZADAS HACIA ABAJO
+' ─────────────────────────────────────────
+Employee        "1" *-down- "0..*" DailyAssignment   : "tiene >"
+Employee        "1" *-down- "0..*" WeeklySchedule    : "planifica >"
+Employee        "1" *-down- "0..*" WorkLog           : "registra >"
+Employee        "1" -down-> "0..*" ReinforcementCall : "atiende >"
 
-WeeklySchedule  "0..*" --> "0..1"  ParkZone    : "asignado a >"
-WeeklySchedule  "0..*" --> "0..1"  Attraction  : "asignado a >"
+DailyAssignment "0..*" -down-> "0..1" ParkZone   : "trabaja en >"
+DailyAssignment "0..*" -down-> "0..1" Attraction : "opera en >"
+DailyAssignment "0..*" -down-> "0..1" ParkAlert  : "responde a >"
 
-ReinforcementCall "0..*" --> "0..1" ParkAlert  : "originada por >"
+WeeklySchedule  "0..*" -down-> "0..1" ParkZone   : "asignado a >"
+WeeklySchedule  "0..*" -down-> "0..1" Attraction : "asignado a >"
 
+ReinforcementCall "0..*" -down-> "0..1" ParkAlert : "originada por >"
+
+' ─────────────────────────────────────────
+'  NOTAS (en la parte inferior para no ensanchar)
+' ─────────────────────────────────────────
 note bottom of ParkZone
   Entidades definidas en el
   Diagrama 3 (Parque y Monitorización).

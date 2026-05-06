@@ -2,29 +2,37 @@
 
 !theme plain
 hide circle
-skinparam linetype ortho
 skinparam backgroundColor #FFFFFF
+
+' Separación amplia para compensar los textos gigantes
+skinparam linetype ortho
+skinparam nodesep 140
+skinparam ranksep 180
+
+' Título gigante
+skinparam titleFontSize 50
+
 skinparam class {
     BackgroundColor #EBF5FB
     BorderColor #1278DF
     HeaderBackgroundColor #1278DF
     HeaderFontColor White
     FontName Arial
-    FontSize 11
-    AttributeFontSize 10
+    FontSize 35
+    AttributeFontSize 35
 }
 skinparam package {
     BackgroundColor #FAFAFA
     BorderColor #ADB5BD
     FontColor #212529
     FontStyle bold
-    FontSize 12
+    FontSize 35
 }
 skinparam arrow {
     Color #343A40
-    FontSize 9
+    FontSize 30
     FontColor #555555
-    Thickness 1.5
+    Thickness 3.0
 }
 
 title "<b>MagicWorld — Usuarios, Compras, Tickets y Cierres</b>"

@@ -6,7 +6,7 @@ AddElementTag("frontend",  $bgColor="#b71c1c", $fontColor="#ffffff", $borderColo
 AddElementTag("backend",   $bgColor="#2e7d32", $fontColor="#ffffff", $borderColor="#1b5e20")
 AddElementTag("db",        $bgColor="#0277bd", $fontColor="#ffffff", $borderColor="#01579b")
 AddElementTag("storage",   $bgColor="#6a1b9a", $fontColor="#ffffff", $borderColor="#4a148c")
-
+skinparam defaultFontSize 36
 title Diagrama de Contenedores - MagicWorld
 
 ' === ACTORES ===
@@ -16,11 +16,11 @@ Person(admin,   "Administrador",       "Personal que gestiona y monitorea\nla op
 ' === SISTEMA ===
 System_Boundary(magicworld_sys, "Plataforma MagicWorld") {
 
-    Container(spa, "Frontend SPA", "Angular, TypeScript · Nginx", "Interfaz gráfica de página única para clientes\ny administradores. Consume la API REST y recibe\neventos en tiempo real vía WebSocket.", $tags="frontend")
+    Container(spa, "Frontend SPA", "Angular, TypeScript", "Interfaz gráfica de página única para clientes\ny administradores. Consume la API REST y recibe\neventos en tiempo real vía WebSocket.", $tags="frontend")
 
     Container(api, "API Backend", "Spring Boot 3.5 · Java 21", "Núcleo de lógica de negocio. Expone REST API\ny WebSocket (STOMP/SockJS). Gestiona seguridad\n(JWT + OAuth2), pagos, chatbot IA y monitoreo.", $tags="backend")
 
-    ContainerDb(db, "Base de Datos Relacional", "MySQL 8.0", "Almacena todas las entidades del dominio:\nusuarios, atracciones, compras, pagos y empleados.", $tags="db")
+    ContainerDb(db, "Base de Datos Relacional", "MySQL 8.0", "Almacena todas las entidades del dominio", $tags="db")
 
     Container(file_storage, "Almacenamiento de Imágenes", "Sistema de ficheros · Docker volume", "Persiste las imágenes subidas por administradores.\nServidas por el backend vía endpoint dedicado.", $tags="storage")
 }

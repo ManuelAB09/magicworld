@@ -5,7 +5,7 @@
 AddElementTag("central", $bgColor="#005b9f", $fontColor="#ffffff")
 AddElementTag("external", $bgColor="#707b7c", $fontColor="#ffffff")
 AddElementTag("actor", $bgColor="#1e8449", $fontColor="#ffffff")
-
+skinparam defaultFontSize 20
 title Diagrama de Contexto de Sistema - MagicWorld
 
 Person(cliente, "Cliente / Visitante", "Interactúa con el sistema para buscar atracciones, comprar entradas y gestionar su cuenta.", $tags="actor")

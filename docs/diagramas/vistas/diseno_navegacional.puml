@@ -1,0 +1,133 @@
+@startuml
+left to right direction
+
+' Ajustes para evitar cortes en la exportación PNG
+scale max 4000 width
+skinparam margin 20
+
+skinparam defaultFontSize 75
+skinparam defaultFontName Arial
+skinparam PackageFontSize 40
+skinparam PackageFontStyle bold
+skinparam RectangleFontSize 65
+skinparam ArrowFontSize 65
+skinparam TitleFontSize 70
+skinparam LegendFontSize 50
+
+skinparam rectangle {
+  RoundCorner 15
+}
+
+title Diseño Navegacional - MagicWorld
+
+' == Colores por zona ==
+skinparam rectangle<<public>> {
+  BackgroundColor #E8F5E9
+  BorderColor #388E3C
+}
+skinparam rectangle<<auth>> {
+  BackgroundColor #FFF3E0
+  BorderColor #E65100
+}
+skinparam rectangle<<client>> {
+  BackgroundColor #E3F2FD
+  BorderColor #1565C0
+}
+skinparam rectangle<<admin>> {
+  BackgroundColor #F3E5F5
+  BorderColor #7B1FA2
+}
+skinparam rectangle<<checkout>> {
+  BackgroundColor #E0F7FA
+  BorderColor #00838F
+}
+
+legend top left
+  |= Color |= Zona |
+  | <#E8F5E9> | Acceso público (sin autenticación) |
+  | <#FFF3E0> | Autenticación |
+  | <#E3F2FD> | Área de cliente (requiere sesión) |
+  | <#E0F7FA> | Flujo de compra |
+  | <#F3E5F5> | Administración (rol ADMIN) |
+endlegend
+
+' ========== GLOBAL ==========
+rectangle "**Selector de Idioma**\n(Cualquier vista)" as language <<public>>
+
+' ========== ZONA PÚBLICA ==========
+rectangle "**Página de Inicio**\n(Landing Page)" as home <<public>>
+rectangle "**Valoraciones**\n/reviews" as reviews <<public>>
+rectangle "**Atracciones**\n/attractions" as attractions <<public>>
+rectangle "**Detalle Atracción**\n/attraction/:id" as attractionDetail <<public>>
+rectangle "**Mapa del Parque**\n/park-map" as parkMap <<public>>
+
+' ========== ZONA AUTH ==========
+rectangle "**Inicio de Sesión**\n/login" as login <<auth>>
+rectangle "**Registro**\n/register" as register <<auth>>
+rectangle "**Recuperar Contraseña**\n/forgot-password" as forgotPw <<auth>>
+rectangle "**Restablecer Contraseña**\n/reset-password" as resetPw <<auth>>
+rectangle "**Contraseña OAuth2**\n/oauth2-set-password" as oauth2Pw <<auth>>
+
+' ========== ZONA CLIENTE ==========
+rectangle "**Mi Perfil**\n/profile" as profile <<client>>
+rectangle "**Escribir Valoración**\n(Modal)" as writeReview <<client>>
+
+' ========== ZONA CHECKOUT ==========
+rectangle "**Paso 1: Selección**\n/checkout" as checkout1 <<checkout>>
+rectangle "**Paso 2: Pago**\n/checkout/step2" as checkout2 <<checkout>>
+rectangle "**Confirmación**\n/checkout/confirmation" as checkoutOk <<checkout>>
+
+' ========== ZONA ADMIN (Acceso Directo Nav) ==========
+rectangle "**Descuentos (Admin)**\n/discounts" as discounts <<admin>>
+rectangle "**CRUD Descuentos**\n/discounts/new o :id" as discountForm <<admin>>
+rectangle "**CRUD Atracciones**\n/attractions/new o :id" as attractionForm <<admin>>
+
+' ========== ZONA ADMIN (Selector "Panel Admin") ==========
+package "Panel de Administración (Selector Nav)" <<admin>> {
+  rectangle "**Monitorización**\n/admin/dashboard" as dashboard <<admin>>
+  rectangle "**Empleados**\n/admin/employees" as employees <<admin>>
+  rectangle "**Cuadrantes**\n/admin/schedule" as schedule <<admin>>
+  rectangle "**Chatbot IA**\n/chatbot" as chatbot <<admin>>
+  rectangle "**Tipos de Entrada**\n/ticket-types" as ticketTypes <<admin>>
+  rectangle "**Config. Parque**\n/admin/park-config" as parkConfig <<admin>>
+  rectangle "**Estadísticas**\n/admin/statistics" as statistics <<admin>>
+  rectangle "**CRUD Entradas**\n/ticket-types/new o :id" as ticketForm <<admin>>
+}
+
+' ========== RELACIONES PÚBLICAS ==========
+home --> language : Cambiar ES/EN
+home --> attractions : Explorar
+home --> checkout1 : Comprar entradas
+home --> login : Iniciar sesión
+home --> register : Registrarse
+home --> reviews : Ver valoraciones
+home --> parkMap : Ver mapa
+
+parkMap --> attractionDetail : Ver detalle desde el mapa
+
+' ========== RELACIONES AUTH ==========
+login --> forgotPw : ¿Olvidó contraseña?
+forgotPw --> resetPw : Correo enviado
+login --> home : Login exitoso
+register --> home : Registro exitoso
+login --> oauth2Pw : Google OAuth2
+
+' ========== RELACIONES CLIENTE ==========
+login ..> profile : Sesión activa
+reviews --> writeReview : Si está autenticado\ny tiene compras
+
+' ========== RELACIONES CHECKOUT ==========
+checkout1 --> checkout2 : Continuar
+checkout2 --> checkoutOk : Pago exitoso
+
+' ========== RELACIONES ADMIN ==========
+login ..> discounts : Sesión activa (Admin)
+login ..> dashboard : Sesión activa (Admin)
+
+dashboard --> employees : Gestionar
+dashboard --> schedule : Cuadrantes
+attractions --> attractionForm : Crear / Editar
+discounts --> discountForm : Crear / Editar
+ticketTypes --> ticketForm : Crear / Editar
+
+@enduml
