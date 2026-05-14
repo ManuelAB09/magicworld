@@ -1,4 +1,4 @@
-#MagicWorld
+# MagicWorld
 
 Repositorio del proyecto TFG para la gestión de un parque de atracciones ficticio.  
 Tecnologías principales: **Angular** (frontend) y **Spring Boot** (backend, Java), con base de datos **MySQL**.
