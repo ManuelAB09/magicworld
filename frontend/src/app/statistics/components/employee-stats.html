@@ -140,7 +140,7 @@
               <tr>
                 <td class="name-cell">{{ emp.fullName }}</td>
                 <td><span class="role-tag">{{ getRoleLabel(emp.role) }}</span></td>
-                <td>{{ emp.hourlyRate | number:'1.2-2' }} {{ getCurrencySymbol() }}</td>
+                <td>{{ getConvertedSalary(emp.hourlyRate, emp) | number:'1.2-2' }} {{ getCurrencySymbol() }}</td>
                 <td>{{ emp.normalHours | number:'1.1-1' }}h</td>
                 <td>
                   @if (emp.overtimeHours > 0) {
@@ -149,9 +149,9 @@
                     <span class="text-muted">0h</span>
                   }
                 </td>
-                <td>{{ emp.normalPay | number:'1.2-2' }} {{ getCurrencySymbol() }}</td>
-                <td>{{ emp.overtimePay | number:'1.2-2' }} {{ getCurrencySymbol() }}</td>
-                <td class="total-cell"><strong>{{ emp.totalSalary | number:'1.2-2' }} {{ getCurrencySymbol() }}</strong></td>
+                <td>{{ getConvertedSalary(emp.normalPay, emp) | number:'1.2-2' }} {{ getCurrencySymbol() }}</td>
+                <td>{{ getConvertedSalary(emp.overtimePay, emp) | number:'1.2-2' }} {{ getCurrencySymbol() }}</td>
+                <td class="total-cell"><strong>{{ getConvertedSalary(emp.totalSalary, emp) | number:'1.2-2' }} {{ getCurrencySymbol() }}</strong></td>
               </tr>
             }
           </tbody>

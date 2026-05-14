@@ -2,10 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { CheckoutService, TicketAvailability, PriceCalculationResponse, PaymentResponse } from './checkout.service';
+import { TranslateService } from '@ngx-translate/core';
 
 describe('CheckoutService', () => {
   let service: CheckoutService;
   let httpMock: HttpTestingController;
+  let mockTranslate: jasmine.SpyObj<TranslateService>;
 
   const mockAvailability: TicketAvailability[] = [
     { id: 1, typeName: 'ADULT', description: 'Adult ticket', cost: 50, adjustedCost: 50, seasonalMultiplier: 1, photoUrl: '/img.jpg', maxPerDay: 100, available: 80 }
@@ -23,11 +25,17 @@ describe('CheckoutService', () => {
   };
 
   beforeEach(() => {
+    mockTranslate = jasmine.createSpyObj('TranslateService', ['getDefaultLang'], {
+      currentLang: 'es'
+    });
+    mockTranslate.getDefaultLang.and.returnValue('es');
+
     TestBed.configureTestingModule({
       providers: [
         CheckoutService,
         provideHttpClient(),
-        provideHttpClientTesting()
+        provideHttpClientTesting(),
+        { provide: TranslateService, useValue: mockTranslate }
       ]
     });
     service = TestBed.inject(CheckoutService);

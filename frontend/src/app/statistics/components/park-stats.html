@@ -32,7 +32,7 @@
         <div class="metric-card revenue">
           <div class="metric-icon"><i class="fa-solid fa-coins"></i></div>
           <div class="metric-info">
-            <span class="metric-value">{{ ticketSales.totalRevenue | number:'1.2-2' }} {{ getCurrencySymbol() }}</span>
+            <span class="metric-value">{{ getConvertedTicketRevenue() | number:'1.2-2' }} {{ getCurrencySymbol() }}</span>
             <span class="metric-label">{{ 'stats.park.totalRevenue' | translate }}</span>
           </div>
         </div>
@@ -41,7 +41,7 @@
           <div class="metric-info">
             @if (ticketSales.totalTicketsSold > 0) {
               <span class="metric-value">
-                {{ (ticketSales.totalRevenue / ticketSales.totalTicketsSold) | number:'1.2-2' }} {{ getCurrencySymbol() }}
+                {{ getAverageTicketPrice() | number:'1.2-2' }} {{ getCurrencySymbol() }}
               </span>
             } @else {
               <span class="metric-value">0.00 {{ getCurrencySymbol() }}</span>

@@ -323,7 +323,8 @@ public class PaymentService {
         String qrContent = "MAGICWORLD-TICKET-" + purchase.getId() + "-" + request.getVisitDate();
         byte[] qrCode = qrCodeService.generateQrCodeBytes(qrContent);
 
-        boolean isSpanish = "es".equalsIgnoreCase(lang);
+        String normalizedLang = normalizeLang(lang);
+        boolean isSpanish = normalizedLang.startsWith("es");
         String currencySymbol = isSpanish ? "€" : "$";
         BigDecimal exchangeRate = isSpanish ? BigDecimal.ONE : new BigDecimal("1.08");
 
@@ -371,6 +372,17 @@ public class PaymentService {
 
         String subject = isSpanish ? "Confirmación de compra - MagicWorld" : "Purchase Confirmation - MagicWorld";
         emailService.sendHtmlEmailWithQr(request.getEmail(), subject, "purchase-confirmation", vars, qrCode);
+    }
+
+    private String normalizeLang(String lang) {
+        if (lang == null || lang.isBlank()) {
+            return "en";
+        }
+        String primary = lang.split(",")[0].trim();
+        if (primary.isEmpty()) {
+            return "en";
+        }
+        return primary.toLowerCase();
     }
 
     @Transactional

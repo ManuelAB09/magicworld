@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {catchError, map, Observable, of, Subject, switchMap} from 'rxjs';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { getBackendBaseUrl } from '../config/backend';
 
 export enum Role {
@@ -28,7 +29,11 @@ export interface UserProfile {
 export class AuthService {
   private apiUrl = `${getBackendBaseUrl()}/api/v1/auth`;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private translate: TranslateService
+  ) {}
 
   authChanged = new Subject<boolean>();
 
@@ -138,9 +143,10 @@ export class AuthService {
   }
 
   forgotPassword(email: string): Observable<any> {
+    const lang = this.translate.currentLang || this.translate.getDefaultLang() || 'es';
     return this.http.post(`${this.apiUrl}/forgot-password`, email, {
       withCredentials: true,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: { 'Content-Type': 'text/plain', 'Accept-Language': lang }
     });
   }
 

@@ -119,8 +119,10 @@ public class AuthController {
 
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody String email) {
-        passwordResetService.createPasswordResetToken(email);
+    public ResponseEntity<?> forgotPassword(
+            @RequestBody String email,
+            @RequestHeader(value = "Accept-Language", defaultValue = "es") String lang) {
+        passwordResetService.createPasswordResetToken(email, lang);
         return ResponseEntity.ok().build();
     }
 

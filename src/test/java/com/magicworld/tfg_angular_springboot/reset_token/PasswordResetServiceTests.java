@@ -27,8 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -82,7 +84,8 @@ public class PasswordResetServiceTests {
                 .password(passwordEncoder.encode(OLD_PASSWORD))
                 .userRole(Role.USER)
                 .build());
-        doNothing().when(emailService).sendSimpleMessage(anyString(), anyString(), anyString());
+        doNothing().when(emailService).sendHtmlEmailWithQr(
+            anyString(), anyString(), anyString(), anyMap(), isNull());
     }
 
     @AfterEach
@@ -108,7 +111,7 @@ public class PasswordResetServiceTests {
     @DisplayName("Crear token envía email")
     void testCreatePasswordResetTokenSendsEmail() {
         passwordResetService.createPasswordResetToken(TEST_EMAIL);
-        verify(emailService).sendSimpleMessage(eq(TEST_EMAIL), anyString(), anyString());
+        verify(emailService).sendHtmlEmailWithQr(eq(TEST_EMAIL), anyString(), eq("password-reset"), anyMap(), isNull());
     }
 
     @Test

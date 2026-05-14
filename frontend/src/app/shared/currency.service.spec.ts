@@ -79,6 +79,32 @@ describe('CurrencyService', () => {
     });
   });
 
+  describe('convertBetweenCurrencies', () => {
+    it('should return same amount when currencies match', () => {
+      expect(service.convertBetweenCurrencies(99.5, 'EUR', 'EUR')).toBe(99.5);
+    });
+
+    it('should convert EUR to USD', () => {
+      expect(service.convertBetweenCurrencies(100, 'EUR', 'USD')).toBe(108);
+    });
+
+    it('should convert USD to EUR', () => {
+      expect(service.convertBetweenCurrencies(108, 'USD', 'EUR')).toBe(100);
+    });
+  });
+
+  describe('convertFromCurrency', () => {
+    it('should convert from EUR to current USD', () => {
+      Object.defineProperty(mockTranslate, 'currentLang', { value: 'en' });
+      expect(service.convertFromCurrency(100, 'EUR')).toBe(108);
+    });
+
+    it('should keep USD when current currency is USD', () => {
+      Object.defineProperty(mockTranslate, 'currentLang', { value: 'en' });
+      expect(service.convertFromCurrency(100, 'USD')).toBe(100);
+    });
+  });
+
   describe('formatPrice', () => {
     it('should format price with EUR symbol for Spanish', () => {
       Object.defineProperty(mockTranslate, 'currentLang', { value: 'es' });

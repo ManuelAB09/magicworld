@@ -4,21 +4,28 @@ import { provideHttpClient } from '@angular/common/http';
 import { AuthService, Role, UserDTO } from './auth.service';
 import { Router } from '@angular/router';
 import { HttpHeaders } from '@angular/common/http';
+import { TranslateService } from '@ngx-translate/core';
 
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
   let mockRouter: jasmine.SpyObj<Router>;
+  let mockTranslate: jasmine.SpyObj<TranslateService>;
 
   beforeEach(() => {
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockTranslate = jasmine.createSpyObj('TranslateService', ['getDefaultLang'], {
+      currentLang: 'es'
+    });
+    mockTranslate.getDefaultLang.and.returnValue('es');
 
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         AuthService,
-        { provide: Router, useValue: mockRouter }
+        { provide: Router, useValue: mockRouter },
+        { provide: TranslateService, useValue: mockTranslate }
       ]
     });
 

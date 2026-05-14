@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { getBackendBaseUrl } from '../../config/backend';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface TicketAvailability {
   id: number;
@@ -83,7 +84,7 @@ export class CheckoutService {
   private closuresUrl = `${getBackendBaseUrl()}/api/v1/park-closures`;
   private pricingUrl = `${getBackendBaseUrl()}/api/v1/seasonal-pricing`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private translate: TranslateService) {}
 
   getStripePublicKey(): Observable<{ publicKey: string }> {
     return this.http.get<{ publicKey: string }>(`${this.baseUrl}/stripe-key`, {
@@ -105,8 +106,10 @@ export class CheckoutService {
   }
 
   processPayment(request: PaymentRequest): Observable<PaymentResponse> {
+    const lang = this.translate.currentLang || this.translate.getDefaultLang() || 'es';
     return this.http.post<PaymentResponse>(`${this.baseUrl}/process`, request, {
-      withCredentials: true
+      withCredentials: true,
+      headers: { 'Accept-Language': lang }
     });
   }
 

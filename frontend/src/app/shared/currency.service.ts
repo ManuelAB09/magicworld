@@ -18,6 +18,14 @@ export class CurrencyService {
     return this.getCurrentLang() === 'en';
   }
 
+  private normalizeCurrencyCode(code: string | null | undefined): string {
+    return (code || 'EUR').toUpperCase();
+  }
+
+  private roundToCents(value: number): number {
+    return Math.round(value * 100) / 100;
+  }
+
   getCurrencySymbol(): string {
     return this.isEnglish() ? '$' : '€';
   }
@@ -26,18 +34,35 @@ export class CurrencyService {
     return this.isEnglish() ? 'USD' : 'EUR';
   }
 
-  convertFromEur(priceInEur: number): number {
-    if (this.isEnglish()) {
-      return Math.round(priceInEur * this.EUR_TO_USD_RATE * 100) / 100;
+  convertBetweenCurrencies(amount: number, fromCurrency: string, toCurrency: string): number {
+    const from = this.normalizeCurrencyCode(fromCurrency);
+    const to = this.normalizeCurrencyCode(toCurrency);
+
+    if (from === to) {
+      return amount;
     }
-    return priceInEur;
+
+    if (from === 'EUR' && to === 'USD') {
+      return this.roundToCents(amount * this.EUR_TO_USD_RATE);
+    }
+
+    if (from === 'USD' && to === 'EUR') {
+      return this.roundToCents(amount / this.EUR_TO_USD_RATE);
+    }
+
+    return amount;
+  }
+
+  convertFromCurrency(amount: number, fromCurrency: string): number {
+    return this.convertBetweenCurrencies(amount, fromCurrency, this.getCurrencyCode());
+  }
+
+  convertFromEur(priceInEur: number): number {
+    return this.convertBetweenCurrencies(priceInEur, 'EUR', this.getCurrencyCode());
   }
 
   convertToEur(price: number): number {
-    if (this.isEnglish()) {
-      return Math.round((price / this.EUR_TO_USD_RATE) * 100) / 100;
-    }
-    return price;
+    return this.convertBetweenCurrencies(price, this.getCurrencyCode(), 'EUR');
   }
 
   formatPrice(priceInEur: number): string {

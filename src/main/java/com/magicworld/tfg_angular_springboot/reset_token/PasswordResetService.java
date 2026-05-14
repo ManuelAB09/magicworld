@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -29,6 +31,11 @@ public class PasswordResetService {
 
     @Transactional
     public void createPasswordResetToken(String email) {
+        createPasswordResetToken(email, "es");
+        }
+
+        @Transactional
+        public void createPasswordResetToken(String email, String locale) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException(email));
         tokenRepository.deleteAllByUser(user);
@@ -41,8 +48,45 @@ public class PasswordResetService {
         tokenRepository.save(resetToken);
 
         String resetUrl = frontendUrl + "/reset-password?token=" + token;
-        emailService.sendSimpleMessage(user.getEmail(), "Recuperación de contraseña",
-                "Haz clic en el siguiente enlace para restablecer tu contraseña: " + resetUrl);
+        String normalizedLang = normalizeLang(locale);
+        boolean isSpanish = normalizedLang.startsWith("es");
+
+        String displayName = user.getFirstname();
+        if (displayName == null || displayName.isBlank()) {
+            displayName = user.getUsername();
+        }
+
+        String subject = isSpanish
+            ? "Recuperación de contraseña - MagicWorld"
+            : "Password Recovery - MagicWorld";
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("subject", subject);
+        vars.put("headerText", isSpanish ? "Recuperación de contraseña" : "Password Recovery");
+        vars.put("greeting", isSpanish ? "¡Hola " + displayName + "!" : "Hello " + displayName + "!");
+        vars.put("introText", isSpanish
+            ? "Hemos recibido una solicitud para restablecer tu contraseña."
+            : "We received a request to reset your password.");
+        vars.put("actionText", isSpanish
+            ? "Haz clic en el botón de abajo para continuar."
+            : "Click the button below to continue.");
+        vars.put("buttonLabel", isSpanish ? "Restablecer contraseña" : "Reset Password");
+        vars.put("resetLink", resetUrl);
+        vars.put("expiryText", isSpanish
+            ? "Este enlace expira en 15 minutos."
+            : "This link expires in 15 minutes.");
+        vars.put("linkFallback", isSpanish
+            ? "Si el botón no funciona, copia y pega este enlace en tu navegador:"
+            : "If the button doesn't work, copy and paste this link into your browser:");
+        vars.put("footerMessage", isSpanish
+            ? "Si no solicitaste este cambio, puedes ignorar este correo."
+            : "If you did not request this change, you can ignore this email.");
+        vars.put("footerRights", isSpanish ? "Todos los derechos reservados" : "All rights reserved");
+        vars.put("contactInfo", isSpanish
+            ? "Contáctanos en info@magicworld.com"
+            : "Contact us at info@magicworld.com");
+
+        emailService.sendHtmlEmailWithQr(user.getEmail(), subject, "password-reset", vars, null);
     }
 
     @Transactional
@@ -61,6 +105,17 @@ public class PasswordResetService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         tokenRepository.delete(resetToken);
+    }
+
+    private String normalizeLang(String locale) {
+        if (locale == null || locale.isBlank()) {
+            return "es";
+        }
+        String primary = locale.split(",")[0].trim();
+        if (primary.isEmpty()) {
+            return "es";
+        }
+        return primary.toLowerCase();
     }
 
 }

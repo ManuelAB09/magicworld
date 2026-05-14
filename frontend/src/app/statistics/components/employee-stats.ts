@@ -32,6 +32,7 @@ export class EmployeeStatsComponent implements OnInit, OnChanges {
   absenceRanking: EmployeeAbsenceRankingDTO[] = [];
   salaryReport: SalaryReportDTO[] = [];
   positionFrequency: PositionFrequencyDTO[] = [];
+  salaryReportCurrency: string | null = null;
 
   employees: EmployeeDTO[] = [];
   selectedEmployeeId: number | null = null;
@@ -78,7 +79,11 @@ export class EmployeeStatsComponent implements OnInit, OnChanges {
         break;
       case 'salary':
         this.statsService.getSalaryReport(this.dateFrom, this.dateTo).subscribe({
-          next: data => { this.salaryReport = data; this.loading = false; },
+          next: data => {
+            this.salaryReport = data;
+            this.salaryReportCurrency = data.length ? data[0].currency : null;
+            this.loading = false;
+          },
           error: () => this.loading = false
         });
         break;
@@ -119,8 +124,13 @@ export class EmployeeStatsComponent implements OnInit, OnChanges {
     return type === 'ATTRACTION' ? '🎢' : type === 'ZONE' ? '📍' : '🏢';
   }
 
+  getConvertedSalary(amount: number, row?: SalaryReportDTO): number {
+    const sourceCurrency = row?.currency || this.salaryReportCurrency || this.currency.getCurrencyCode();
+    return this.currency.convertFromCurrency(amount, sourceCurrency);
+  }
+
   getTotalSalary(): number {
-    return this.salaryReport.reduce((sum, r) => sum + r.totalSalary, 0);
+    return this.salaryReport.reduce((sum, r) => sum + this.getConvertedSalary(r.totalSalary, r), 0);
   }
 }
 
